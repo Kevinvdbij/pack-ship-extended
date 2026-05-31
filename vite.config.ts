@@ -12,6 +12,7 @@ export default defineConfig({
         icon: 'https://vitejs.dev/logo.svg',
         namespace: 'npm/vite-plugin-monkey',
         match: ['https://retailvista.net/bztrs/packingportal*'],
+		"run-at": "document-start",
       },
       build: {
         externalGlobals: {

@@ -242,7 +242,7 @@ const waitForKeyElements: WaitForKeyElements = function(
 };
 
 
-/* globals jQuery, $ */
+/* globals, $ */
 
 (function() {
 	"use strict";
@@ -1121,8 +1121,8 @@ const waitForKeyElements: WaitForKeyElements = function(
 			lastOpenButton.innerText = "Laatst geopende reservering";
 
 			// Insert the button after the reservation search button
-			const afterAddParcelsBtnOpen = document.querySelector("#frmAddParcels > div.form-group.pt-3 > button")!.nextSibling;
-			document.querySelector("#frmReservations > div.form-group.pt-3")!.insertBefore(lastOpenButton, afterAddParcelsBtnOpen);
+			//const afterAddParcelsBtnOpen = document.querySelector("#frmAddParcels > div.form-group.pt-3 > button")!.nextSibling;
+			//document.querySelector("#frmReservations > div.form-group.pt-3")?.insertBefore(lastOpenButton, afterAddParcelsBtnOpen);
 		}
 	}
 

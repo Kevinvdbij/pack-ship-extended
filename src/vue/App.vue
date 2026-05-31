@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue';
+import HelloWorld from '../vue/components/HelloWorld.vue';
 import viteLogoUrl from './assets/vite.svg';
 import vueLogoUrl from './assets/vue.svg';
 </script>

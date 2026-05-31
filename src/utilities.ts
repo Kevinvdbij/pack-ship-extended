@@ -1,0 +1,185 @@
+import { GM_getValue, GM_setValue } from "$";
+import { ProductDetails, ReservationDetails, ReservationSearchResponseType, SearchResponseState } from "./interfaces";
+
+export function GetContainer():Element | null {
+	return document.querySelector(".container");
+}
+
+export function GetFooterLeft():Element | null {
+	return document.querySelector("footer > div > div > div.col-auto.mr-auto.text-left");
+}
+
+export function GetParcelContainerParent():Element | null {
+	return document.querySelector("#ReservationOverview > div:nth-child(2) > div.col-9")
+}
+
+export function GetReservationDetailsFromOverview(ReservationOverview?:HTMLFormElement):ReservationDetails| null {
+	const target = ReservationOverview ? ReservationOverview : document;
+	let reservationId = (target.querySelector("input[name='Reservation.ReservationNumber']") as HTMLInputElement).value;
+	
+	let products:Array<ProductDetails> = [];
+
+	for(let i = 0; i < 200; i++){
+		if (target.querySelector(`input[name^='ReservationRowsNotInCarriers[${i}]']`)) {
+			products.push({
+				itemId: (target.querySelector(`input[name^='ReservationRowsNotInCarriers[${i}].ItemId']`) as HTMLInputElement).value,
+				number: (target.querySelector(`input[name^='ReservationRowsNotInCarriers[${i}].ProductNumber']`) as HTMLInputElement).value,
+				description: (target.querySelector(`input[name^='ReservationRowsNotInCarriers[${i}].ProductDescription']`) as HTMLInputElement).value,
+				mainBarcode: (target.querySelector(`input[name^='ReservationRowsNotInCarriers[${i}].ProductMainBarcode']`) as HTMLInputElement).value,
+				requiredQuantity: Number(((target.querySelector(`input[name^='ReservationRowsNotInCarriers[${i}].ProductQuantity']`) as HTMLInputElement).value).split(",").shift()),
+				verifiedQuantity: 0
+			});
+		} 
+		else {
+			break;
+		}
+	}
+	return {
+		id: reservationId,
+		products: products
+	};
+}
+
+export function cacheReservationDetails(reservationDetails:ReservationDetails) {
+	let cacheData = (GM_getValue("PSE_Reservation_Cache", []) as Array<ReservationDetails>);
+
+	let existingIndex = cacheData.findIndex((reservation) => reservation.id == reservationDetails.id)
+
+	// if there is not currently a reservation matching the given reservation, cache the new reservation and remove the oldest.
+	if (existingIndex == -1) {
+		if (cacheData.push(reservationDetails) > 50) {
+			cacheData.shift();
+		}
+		console.log("1")
+	} else {
+		// overwrite if there is
+		cacheData[existingIndex] = reservationDetails;
+		console.log("2")
+	}
+	
+	GM_setValue("PSE_Reservation_Cache", cacheData);
+	console.log("Cached reservation product details:");
+	console.log(cacheData)
+}
+
+export function retrieveCachedReservationDetails():Array<ReservationDetails> {
+	try {
+		let cacheData = GM_getValue("PSE_Reservation_Cache", []) as Array<ReservationDetails>;
+	
+		console.log("Retrieved cached reservation details:");
+		console.log(cacheData)
+
+		return cacheData;
+	} 
+	catch(error) {
+		console.log(`Failed to retrieve cached reservation details: ${error}`)
+		
+		return [];
+	}
+}
+
+export function getCurrentReservationNumber() {
+	return (document.querySelector("input[name='Reservation.ReservationNumber']") as HTMLInputElement).value;
+}
+
+export function getCurrentReservationId() {
+	return (document.querySelector("#ReservationId") as HTMLInputElement).value;
+}
+
+export async function fetchReservationDetails(reservationId: string):Promise<ReservationDetails | null> {
+	try {
+		const response = await fetch(`https://retailvista.net/bztrs/packingportal/Reservations/Index/${reservationId}`);
+		const result = await response.text();
+
+		let resultElement = document.createElement("div");
+		resultElement.innerHTML = result;
+
+		let overview = GetReservationDetailsFromOverview(resultElement.querySelector("#ReservationOverview") as HTMLFormElement);
+
+		return overview;
+		
+	} catch(error){
+		console.log(error);
+
+		return null;
+	}
+}
+
+export function getReservationRowIndexFromItemId(itemId: string) {
+	const itemIdInput = Array.from(document.querySelectorAll<HTMLInputElement>(
+		"input[name^='VerificationReservationRows['][name$='].ItemId']")).find((x) => x.value == itemId);
+
+	return itemIdInput?.getAttribute("name")?.split("VerificationReservationRows[").pop()?.split("].ItemId").shift()
+}
+
+// Request that retrieves reservations from submitted data
+export async function reservationSearchRequest(formData: string): Promise<string> {
+	return new Promise((resolve) => {
+		$.ajax({
+			url: "/bztrs/packingportal/Reservations/Search",
+			type: "GET",
+			data: formData,
+			success: function(data: string) {
+				resolve(data);
+			},
+		});
+	});
+}
+
+// Evaluate the state of the given response
+export function evaluateSearchResponse(element: HTMLElement): ReservationSearchResponseType {
+/* 	const isUnfinished = element.querySelector("[id=unfinishedOrderPickingRunsModal]") !== null;
+	const isAlert = element.querySelector("#alert") !== null && !isUnfinished;
+	const isProductSelection = element.querySelector("#productReservationsModal");
+
+	return { isAlert, isUnfinished, isProductSelection }; */
+	const reservationOverview = element.querySelector("#ReservationOverview");
+	const selectionModal = element.querySelector("#productReservationsModal")
+
+	console.log(element);
+	console.log(element.querySelector("body"));
+	console.log(selectionModal);
+
+	
+
+	switch(true) {
+		case reservationOverview != undefined:
+			return ReservationSearchResponseType.ContinueVerification;
+
+		case selectionModal != undefined:
+			return ReservationSearchResponseType.SelectionModal;
+
+		default:
+			return ReservationSearchResponseType.RefreshMain;
+	}
+}
+
+export function skipVerification(target:HTMLElement) {
+	for (let i = 0; i < 200; i++) {
+		const collected = target.querySelector<HTMLInputElement>("#ReservationRowsNotInCarriers_" + i + "__Collected");
+
+		if (collected) {
+			collected.value = "true";
+		}
+		else {
+			break;
+		}
+	}
+
+	const form = target.querySelector("#ReservationOverview") as HTMLFormElement;
+	form.action = "/bztrs/packingportal/Reservations/Update";
+	form.submit();
+
+	console.log(GetReservationDetailsFromOverview(form));
+}
+
+export function focusBarcodeInput() {
+	document.querySelector<HTMLInputElement>("#Productbarcode")!.focus();
+	document.querySelector<HTMLInputElement>("#Productbarcode")!.value = "";
+}
+
+export function removeBusy() {
+	let bodyClass = document.body.getAttribute("class")?.replace("busy", "");
+
+	document.body.setAttribute("class", bodyClass!)
+}
