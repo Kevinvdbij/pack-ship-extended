@@ -27,15 +27,27 @@ export enum ReservationSearchResponseType {
 export interface ReservationSelectionModalData {
 	searchProductName: string,
 	searchProductBarcode: string,
-	searchProductResults: number,
+	searchProductAmount: number,
 	searchProductImageUrl: string,
 
-	singleLineReservations: ReservationDetails,
-	singleLineReservationAmount: number
+	singleLineReservations: ModalReservationDetails[],
+	multiLineReservations: ModalReservationDetails[],
+	invalidReservations: ModalReservationDetails[],
+}
 
-	multiLineReservations: ReservationDetails,
-	multiLineReservationAmount: number
+export interface ModalReservationDetails {
+	reservationNumber: number,
+	saleOrderReference: string,
+	status: string,
+	deliveryStatus: string,
+	customer: string,
+	products: ModalProductDetails[],
+	url: string
+}
 
-	invalidReservations: ReservationDetails,
-	invalidReservationAmount:number
+export interface ModalProductDetails {
+	number: number,
+	description: string,
+	barcode: string,
+	amount: string
 }

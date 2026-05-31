@@ -1,11 +1,12 @@
 <script setup lang="ts">
 import { onMounted, ref, Transition } from "vue";
-import { evaluateSearchResponse, removeBusy, reservationSearchRequest, skipVerification } from "../utilities";
-import { ReservationSearchResponseType } from "../interfaces";
+import { evaluateSearchResponse, removeBusy, reservationSearchRequest, RetrieveModalData, skipVerification } from "../utilities";
+import { ReservationSearchResponseType, ReservationSelectionModalData } from "../interfaces";
 import Modal from "./components/ReservationSelectionModal.vue";
 
 const show = ref(false);
 const showModal = ref(false);
+const modalData= ref<ReservationSelectionModalData>();
 
 onMounted(() => {
 	show.value = true;
@@ -32,6 +33,7 @@ async function onSearchReservation() {
 			break;
 
 		case ReservationSearchResponseType.SelectionModal:
+			modalData.value = RetrieveModalData(responseElement);
 			showModal.value = true;
 			removeBusy();
 			break;
@@ -49,7 +51,7 @@ async function onSearchReservation() {
 <template>
 	<Teleport to="body">
 		<Transition name="modal">
-			<Modal v-if="showModal" @close="showModal = false"/>
+			<Modal :modal-data="modalData!" v-if="showModal" @close="showModal = false"/>
 		</Transition>
 	</Teleport>
 	<Transition>

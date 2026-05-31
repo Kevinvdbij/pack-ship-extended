@@ -1,5 +1,5 @@
 import { GM_getValue, GM_setValue } from "$";
-import { ProductDetails, ReservationDetails, ReservationSearchResponseType, SearchResponseState } from "./interfaces";
+import { ModalProductDetails, ModalReservationDetails, ProductDetails, ReservationDetails, ReservationSearchResponseType, ReservationSelectionModalData, SearchResponseState } from "./interfaces";
 
 export function GetContainer():Element | null {
 	return document.querySelector(".container");
@@ -182,4 +182,89 @@ export function removeBusy() {
 	let bodyClass = document.body.getAttribute("class")?.replace("busy", "");
 
 	document.body.setAttribute("class", bodyClass!)
+}
+
+export function RetrieveModalData(modalElement:HTMLElement):ReservationSelectionModalData {
+	const amount = (<HTMLElement>modalElement.querySelector("#productReservationsModal > div > div > div.modal-header > h5")).innerText.trimStart()[0];
+	const barcode = (<HTMLElement>modalElement.querySelector("#productReservationsModal > div > div > div.modal-header > h5")).innerText.split("'")[1];
+	const name = (<HTMLElement>modalElement.querySelector("#productReservationsModal > div > div > div.modal-body > div > div > div.row.text-success > div:nth-child(1) > h3")).innerText.split("'")[1];
+	const imgUrl = (<HTMLImageElement>modalElement.querySelector("#productReservationsModal > div > div > div.modal-body > div > div > div.row.text-success > div:nth-child(2) > div > div.col-3.product-image > div > img")).src;
+
+	const singleLineElement = <HTMLElement>modalElement.querySelector(
+		"#productReservationsModal > div > div > div.modal-body > div > div > div.singleline-reservations");
+
+	const invalidElement = <HTMLElement>modalElement.querySelector(
+		"#productReservationsModal > div > div > div.modal-body > div > div > div.invalid-reservations");
+	
+	const singleReservations:ModalReservationDetails[] = iterateModalContainer(singleLineElement);
+	const invalidReservations:ModalReservationDetails[] = iterateModalContainer(invalidElement);
+
+	console.log(singleReservations);
+
+	return {
+		searchProductName: name,
+		searchProductBarcode: barcode,
+		searchProductAmount: parseInt(amount!),
+		searchProductImageUrl: imgUrl,
+
+		singleLineReservations: singleReservations,
+
+		multiLineReservations: undefined!,
+
+		invalidReservations: invalidReservations
+	}
+}
+
+function iterateModalContainer(container:HTMLElement):ModalReservationDetails[] {
+	const reservations:ModalReservationDetails[] = [];
+	const reservationElement = container;
+
+	if (reservationElement && reservationElement.children.length > 0) {
+		Array.from(reservationElement.children).forEach((reservation) => {
+			const reservationNumber = (<HTMLElement>reservation.querySelector("div.card-header > div > div.col-10 > div > div:nth-child(1) > div:nth-child(1) > b")).innerText;
+			const saleOrderRef = (<HTMLElement>reservation.querySelector("div.card-header > div > div.col-10 > div > div:nth-child(1) > div:nth-child(2) > b")).innerText;
+			const status = (<HTMLElement>reservation.querySelector("div.card-header > div > div.col-10 > div > div:nth-child(2) > div:nth-child(1) > b")).innerText;
+			const deliveryStatus = (<HTMLElement>reservation.querySelector("div.card-header > div > div.col-10 > div > div:nth-child(2) > div:nth-child(2) > b")).innerText;
+			const customer = (<HTMLElement>reservation.querySelector("div.card-header > div > div.col-10 > div > div:nth-child(3) > div > b")).innerText;
+			const url = (<HTMLLinkElement>reservation.querySelector("div > div.col-2 > div > a"))?.href;
+
+			const products:ModalProductDetails[] = [];
+			const productListElement = (<HTMLElement>reservation.querySelector("div.card-body > div > div.reservation-rows"));
+			Array.from(productListElement.children).forEach((product) =>{
+				const number = (<HTMLElement>product.querySelector("div > div:nth-child(1)")).innerText;
+				const description = (<HTMLElement>product.querySelector("div > div:nth-child(2)")).innerText;
+				const barcode = (<HTMLElement>product.querySelector("div > div:nth-child(3)")).innerText;
+				const amount = (<HTMLElement>product.querySelector("div > div:nth-child(4)")).innerText;
+
+				products.push({
+					number: parseInt(number),
+					description: description,
+					barcode: barcode,
+					amount: amount
+				});
+			})
+
+			reservations.push({
+				reservationNumber: parseInt(reservationNumber),
+				saleOrderReference: saleOrderRef,
+				status: status,
+				deliveryStatus: deliveryStatus,
+				customer: customer,
+				url: url,
+				products: products
+			});
+		});
+	}
+
+	return reservations;
+}
+
+export function parseAmountString(amount:string):number[] {
+	return amount.split(" van ").map((x) => parseInt(x))
+}
+
+export function isAmountStringComplete(amount:string) {
+	const amounts:number[] = parseAmountString(amount);
+
+	return amounts[0] >= amounts[1];
 }
