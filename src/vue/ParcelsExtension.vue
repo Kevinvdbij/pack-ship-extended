@@ -1,8 +1,9 @@
 <script setup lang="ts">
-import { onMounted, ref, Transition } from 'vue';
-import { fetchReservationDetails, getCurrentReservationId, getCurrentReservationNumber, getReservationId, getReservationRowIndexFromItemId, retrieveCachedReservationDetails, setLastOpenReservation } from '../utilities';
+import { createApp, onMounted, ref, Transition } from 'vue';
+import { fetchReservationDetails, getCurrentReservationId, getCurrentReservationNumber, getReservationRowIndexFromItemId, retrieveCachedReservationDetails, setLastOpenReservation } from '../utilities';
 import addIconUrl from "../assets/add.svg";
 import { ReservationDetails } from '../interfaces';
+import ReservationSummary from './components/ReservationSummary.vue';
 
 const show = ref(false);
 
@@ -24,6 +25,7 @@ onMounted(() => {
 	show.value = true;
 	updateVerifiedQuantities();
 	observeParcelContainer();
+	setupSummary();
 	
 	setLastOpenReservation(getCurrentReservationId());
 });
@@ -53,6 +55,22 @@ function observeParcelContainer() {
 		const observer = new MutationObserver(updateVerifiedQuantities);
 		observer.observe(parcelContainerElement, config);
 	}
+}
+
+function setupSummary() {
+	const overviewElement = <HTMLElement>document.querySelector("#ReservationOverview");
+	const backButton = <HTMLLinkElement>overviewElement.querySelector("div:nth-child(1) > div > a")
+	
+	backButton.href = "https://retailvista.net/bztrs/packingportal";
+	backButton.innerHTML = "<span class='material-icons'>chevron_left</span>Nieuwe zoekopdracht";
+	
+	createApp(ReservationSummary).mount(
+			(() => {
+				const app = document.createElement('div');
+				document.querySelector("#ReservationSummary\\ mb-2")!.insertAdjacentElement("beforeend", app);
+				return app;
+			})(),
+		);
 }
 
 </script>

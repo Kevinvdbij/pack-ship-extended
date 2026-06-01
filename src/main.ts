@@ -4,12 +4,20 @@ import PortalExtension from './vue/PortalExtension.vue';
 import FooterExtension from './vue/FooterExtension.vue';
 import ParcelsExtension from './vue/ParcelsExtension.vue';
 import ReservationExtension from './vue/ReservationExtension.vue';
+import CompletedExtension from './vue/CompletedExtension.vue';
 
 
 const path = window.location.pathname;
 
 switch(true) {
 	case /bztrs\/packingportal\/CompleteReservations.*/.test(path):
+		createApp(CompletedExtension).mount(
+			(() => {
+				const app = document.createElement('div');
+				document.body.append(app);
+				return app;
+			})(),
+		);
 	break;
 
 	case /bztrs\/packingportal\/Parcels.*/.test(path):

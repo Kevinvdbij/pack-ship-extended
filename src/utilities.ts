@@ -79,11 +79,21 @@ export function retrieveCachedReservationDetails():Array<ReservationDetails> {
 }
 
 export function setLastOpenReservation(reservationId: string) {
-	return GM_setValue("PSE_LastOpenReservationId", "");
+	console.log(reservationId);
+
+	return GM_setValue("PSE_LastOpenReservationId", reservationId);
 }
 
 export function getLastOpenReservation() {
 	return GM_getValue("PSE_LastOpenReservationId");
+}
+
+export function setLastCompletedReservation(reservationId: string) {
+	return GM_setValue("PSE_LastCompletedReservationNumber", reservationId);
+}
+
+export function getLastCompletedReservation() {
+	return GM_getValue("PSE_LastCompletedReservationNumber");
 }
 
 export function getCurrentReservationNumber() {

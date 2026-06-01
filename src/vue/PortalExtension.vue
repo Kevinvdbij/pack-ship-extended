@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, Transition } from "vue";
-import { cacheReservationDetails, evaluateSearchResponse, getLastOpenReservation, GetReservationDetailsFromOverview, removeBusy, reservationSearchRequest, RetrieveModalData, skipVerification } from "../utilities";
+import { cacheReservationDetails, evaluateSearchResponse, getLastCompletedReservation, getLastOpenReservation, GetReservationDetailsFromOverview, removeBusy, reservationSearchRequest, RetrieveModalData, skipVerification } from "../utilities";
 import { ReservationSearchResponseType, ReservationSelectionModalData } from "../interfaces";
 import Modal from "./components/ReservationSelectionModal.vue";
 
@@ -9,6 +9,7 @@ const showModal = ref(false);
 
 const modalData= ref<ReservationSelectionModalData>();
 const lastOpenReservation = ref(getLastOpenReservation());
+const lastCompletedReservation = ref(getLastCompletedReservation());
 
 onMounted(() => {
 	show.value = true;
@@ -54,9 +55,12 @@ async function onSearchReservation() {
 	}
 }
 
-function openReservation(url: string) {
-	//window.location.href = url;
-	console.log(url);
+function openReservation(reservationId: string) {
+	window.location.href = `https://retailvista.net/bztrs/packingportal/Parcels?reservationId=${reservationId}&allowCashOnDelivery=False`;
+}
+
+function openAddParcels(reservationNumber: string) {
+	window.location.href = `https://retailvista.net/bztrs/packingportal/AddParcels/Search?ReservationNumber=${reservationNumber}`;
 }
 </script>
 
@@ -81,7 +85,7 @@ function openReservation(url: string) {
                         </div>
                         <div class="col-md-5">
 							<div class="form-group pt-3">
-								<button type="submit" class="btn btn-primary btn-block">Laatst voltooide reservering</button>
+								<button type="submit" class="btn btn-primary btn-block" :disabled="!lastCompletedReservation || lastCompletedReservation == ''" @click="openAddParcels(lastCompletedReservation )">Laatst voltooide reservering</button>
 							</div>
                         </div>
                     </div>
