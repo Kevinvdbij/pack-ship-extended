@@ -1,35 +1,65 @@
 <script setup lang="ts">
+import { onMounted, ref } from 'vue';
 
+const show = ref(false);
+
+onMounted(() => {
+    show.value = true;
+})
 </script>
 
 <template>
-    <div class="card">
-        <div class="card-body">
-            <textarea class="text-box">
+    <Transition>
+        <div class="card card-comment" v-show="show">
+            <div class="card-header">
+                <h4 class="card-title">Shopware Comment</h4>
+            </div>
+            <div class="card-body">
+                <textarea class="text-box"></textarea>
                 
-            </textarea>
-
-            <div class="button-footer">
-                <button class="btn btn-primary">Save</button>
-                <button class="btn btn-primary btn-right" style="right: 0px;">Open</button>
+                <div class="button-footer">
+                    <button class="btn btn-primary button">Open</button>
+                    <button class="btn btn-primary btn-right button">Opslaan</button>
+                </div>
             </div>
         </div>
-    </div>
+    </Transition>
 </template>
 
 <style>
+.v-enter-active,
+.v-leave-active {
+  transition: opacity 0.25s ease, transform 0.1s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+  opacity: 0;
+  transform: scaleY(0);
+}
+
 .card-body {
-    padding: 0px;
+    padding: 10px;
 }
 .text-box {
     width: 100%;
+    height: 150px;
+    font-size: 24px;
+    border-color: rgb(206, 206, 206);
+    border-radius: 3px;
 }
 .button-footer {
-    padding: 5px;
-    padding-top: 0px;
+    padding-top: 5px;
 }
 .btn-right {
-    align-items: end;
-    right: 15px;
+    float: right;
+}
+.button {
+    width: 100px;
+}
+
+.card-comment{
+    margin-top: 25px;
+    right: 20px;
 }
 </style>
