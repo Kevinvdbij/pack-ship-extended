@@ -52,75 +52,143 @@ const props = defineProps({
 									</div>
 								</div>
 
-								<div class="row">
-									<div class="col">
-										<h4>{{ modalData.singleLineReservations.length }} singleline reserveringen</h4>
-										<p>Deze reserveringen bevatten 1 stuk van het product.</p>
+								<div v-show="modalData.singleLineReservations.length > 0">
+									<div class="row">
+										<div class="col">
+											<h4>{{ modalData.singleLineReservations.length }} singleline reserveringen</h4>
+											<p>Deze reserveringen bevatten 1 stuk van het product.</p>
+										</div>
 									</div>
-								</div>
 
 
-								<div class="singleline-reservations">
+									<div class="singleline-reservations">
+										<template v-for="reservation in modalData.singleLineReservations">
+											<div class="card mb-2">
+												<div class="card-header">
+													<div class="row">
+														<div class="col-10">
+															<div class="row">
+																<div class="col-4">
+																	<div>Reservering: <b>{{ reservation.reservationNumber }}</b></div>
+																	<div>Verkooporder referentiecode: <b>{{ reservation.saleOrderReference }}</b></div>
 
-									<template v-for="reservation in modalData.singleLineReservations">
-										<div class="card mb-2">
-											<div class="card-header">
-												<div class="row">
-													<div class="col-10">
-														<div class="row">
-															<div class="col-4">
-																<div>Reservering: <b>{{ reservation.reservationNumber }}</b></div>
-																<div>Verkooporder referentiecode: <b>{{ reservation.saleOrderReference }}</b></div>
-
-															</div>
-															<div class="col-4">
-																<div>Status: <b>{{ reservation.status }}</b></div>
-																<div>Logistieke status: <b>{{ reservation.deliveryStatus }}</b></div>
-															</div>
-															<div class="col-4">
-																<div> Klant: <b>{{ reservation.customer }}</b></div>
+																</div>
+																<div class="col-4">
+																	<div>Status: <b>{{ reservation.status }}</b></div>
+																	<div>Logistieke status: <b>{{ reservation.deliveryStatus }}</b></div>
+																</div>
+																<div class="col-4">
+																	<div> Klant: <b>{{ reservation.customer }}</b></div>
+																</div>
 															</div>
 														</div>
+														<div class="col-2">
+															<div class="float-right">
+																<a :href="reservation.url"
+																	class="btn btn-primary">Open&nbsp;<span
+																		class="material-icons">chevron_right</span></a>
+															</div>
+														</div>
+
 													</div>
-													<div class="col-2">
-														<div class="float-right">
-															<a :href="reservation.url"
-																class="btn btn-primary">Open&nbsp;<span
-																	class="material-icons">chevron_right</span></a>
+												</div>
+												<div class="card-body" v-bind:hidden="true">
+													<div class="reservation-rows reservation-rows">
+														<div class="row nfTableHeader">
+															<div class="col-3 ">Artikel nr</div>
+															<div class="col-3">Omschrijving</div>
+															<div class="col-3">Hoofd barcode</div>
+															<div class="col-3">Geraapt aantal</div>
 														</div>
+														<template v-for="product in reservation.products">
+															<div class="reservation-rows ">
+																<div class="row nfTableRow ">
+																	<div class="col-3">{{ product.number }}</div>
+																	<div class="col-3">{{ product.description }}
+																	</div>
+																	<div class="col-3">{{ product.barcode }}</div>
+																	<div class="col-3 ">{{ product.amount }}</div>
+																</div>
+															</div>
+														</template>
 													</div>
 
 												</div>
 											</div>
-											<div class="card-body">
-												<div class="reservation-rows reservation-rows">
-													<div class="row nfTableHeader">
-														<div class="col-3 ">Artikel nr</div>
-														<div class="col-3">Omschrijving</div>
-														<div class="col-3">Hoofd barcode</div>
-														<div class="col-3">Geraapt aantal</div>
-													</div>
-													<template v-for="product in reservation.products">
-														<div class="reservation-rows ">
-															<div class="row nfTableRow ">
-																<div class="col-3">{{ product.number }}</div>
-																<div class="col-3">{{ product.description }}
+										</template>
+									</div>
+								</div>
+								
+								<hr v-show="modalData.singleLineReservations.length > 0 && modalData.validReservations.length > 0">
+								
+								<div v-show="modalData.validReservations.length > 0">
+									<div class="row">
+										<div class="col">
+											<h4>{{ modalData.validReservations.length }} Reserveringen</h4>
+										</div>
+									</div>
+
+									<div class="valid-reservations">
+										<template v-for="reservation in modalData.validReservations">
+											<div class="card mb-2">
+												<div class="card-header">
+													<div class="row">
+														<div class="col-10">
+															<div class="row">
+																<div class="col-4">
+																	<div>Reservering: <b>{{ reservation.reservationNumber }}</b></div>
+																	<div>Verkooporder referentiecode: <b>{{ reservation.saleOrderReference }}</b></div>
+																	
 																</div>
-																<div class="col-3">{{ product.barcode }}</div>
-																<div class="col-3 ">{{ product.amount }}</div>
+																<div class="col-4">
+																	<div>Status: <b>{{ reservation.status }}</b></div>
+																	<div>Logistieke status: <b>{{ reservation.deliveryStatus }}</b></div>
+																</div>
+																<div class="col-4">
+																	<div> Klant: <b>{{ reservation.customer }}</b></div>
+																</div>
 															</div>
 														</div>
-													</template>
+														<div class="col-2">
+															<div class="float-right">
+																<a :href="reservation.url"
+																class="btn btn-primary">Open&nbsp;<span
+																class="material-icons">chevron_right</span></a>
+															</div>
+														</div>
+														
+													</div>
 												</div>
+												<div class="card-body">
+													<div class="reservation-rows reservation-rows">
+														<div class="row nfTableHeader">
+															<div class="col-3 ">Artikel nr</div>
+															<div class="col-3">Omschrijving</div>
+															<div class="col-3">Hoofd barcode</div>
+															<div class="col-3">Geraapt aantal</div>
+														</div>
 
+														<div class="reservation-rows ">
+															<template v-for="product in reservation.products">
+																<div class="row nfTableRow ">
+																	<div class="col-3">{{ product.number }}</div>
+																	<div class="col-3">{{ product.description }}</div>
+																	<div class="col-3">{{ product.barcode }}</div>
+																	<div class="col-3 ">{{ product.amount }}</div>
+																</div>
+															</template>
+													</div>
+												</div>
+												
 											</div>
 										</div>
 									</template>
+									</div>
 								</div>
+								
+								<hr v-show="modalData.validReservations.length > 0 && modalData.invalidReservations.length > 0">
 
-
-								<hr>
-								<div class="row">
+								<div class="row" v-show="modalData.invalidReservations.length > 0">
 									<div class="col">
 										<h4>{{ modalData.invalidReservations.length }} reserveringen zijn nog niet volledig geraapt.</h4>
 										<div class="alert alert-danger">Onderstaande reserveringen bevatten het product,
@@ -209,7 +277,7 @@ const props = defineProps({
 }
 
 .settings-modal-content {
-	position: relative;
+	position: absolute;
 	background-color: rgb(255, 255, 255);
 	min-width: 550px;
 	min-height: 300px;
@@ -224,6 +292,10 @@ const props = defineProps({
 	padding: 25px;
 	font-size: 16px;
 	border-radius: 15px;
+}
+
+.modal {
+	overflow-y: auto;
 }
 
 .settings-modal-content-options {

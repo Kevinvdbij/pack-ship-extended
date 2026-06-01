@@ -31,7 +31,7 @@ export interface ReservationSelectionModalData {
 	searchProductImageUrl: string,
 
 	singleLineReservations: ModalReservationDetails[],
-	multiLineReservations: ModalReservationDetails[],
+	validReservations: ModalReservationDetails[],
 	invalidReservations: ModalReservationDetails[],
 }
 

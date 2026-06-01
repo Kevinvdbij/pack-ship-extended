@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, Transition } from 'vue';
-import { fetchReservationDetails, getCurrentReservationId, getCurrentReservationNumber, getReservationRowIndexFromItemId, retrieveCachedReservationDetails } from '../utilities';
+import { fetchReservationDetails, getCurrentReservationId, getCurrentReservationNumber, getReservationId, getReservationRowIndexFromItemId, retrieveCachedReservationDetails, setLastOpenReservation } from '../utilities';
 import addIconUrl from "../assets/add.svg";
 import { ReservationDetails } from '../interfaces';
 
@@ -24,6 +24,8 @@ onMounted(() => {
 	show.value = true;
 	updateVerifiedQuantities();
 	observeParcelContainer();
+	
+	setLastOpenReservation(getCurrentReservationId());
 });
 
 function onClickAddProduct(barcode: string) {

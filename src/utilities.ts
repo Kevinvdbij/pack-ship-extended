@@ -78,12 +78,24 @@ export function retrieveCachedReservationDetails():Array<ReservationDetails> {
 	}
 }
 
+export function setLastOpenReservation(reservationId: string) {
+	return GM_setValue("PSE_LastOpenReservationId", "");
+}
+
+export function getLastOpenReservation() {
+	return GM_getValue("PSE_LastOpenReservationId");
+}
+
 export function getCurrentReservationNumber() {
 	return (document.querySelector("input[name='Reservation.ReservationNumber']") as HTMLInputElement).value;
 }
 
 export function getCurrentReservationId() {
-	return (document.querySelector("#ReservationId") as HTMLInputElement).value;
+	return getReservationId(document.body);
+}
+
+export function getReservationId(target: HTMLElement) {
+	return (target.querySelector("#ReservationId") as HTMLInputElement).value;
 }
 
 export async function fetchReservationDetails(reservationId: string):Promise<ReservationDetails | null> {
@@ -169,8 +181,6 @@ export function skipVerification(target:HTMLElement) {
 	const form = target.querySelector("#ReservationOverview") as HTMLFormElement;
 	form.action = "/bztrs/packingportal/Reservations/Update";
 	form.submit();
-
-	console.log(GetReservationDetailsFromOverview(form));
 }
 
 export function focusBarcodeInput() {
@@ -193,11 +203,15 @@ export function RetrieveModalData(modalElement:HTMLElement):ReservationSelection
 	const singleLineElement = <HTMLElement>modalElement.querySelector(
 		"#productReservationsModal > div > div > div.modal-body > div > div > div.singleline-reservations");
 
-	const invalidElement = <HTMLElement>modalElement.querySelector(
+	const validReservationElement = <HTMLElement>modalElement.querySelector(
+	"#productReservationsModal > div > div > div.modal-body > div > div > div.valid-reservations");
+
+	const invalidReservationElement = <HTMLElement>modalElement.querySelector(
 		"#productReservationsModal > div > div > div.modal-body > div > div > div.invalid-reservations");
 	
 	const singleReservations:ModalReservationDetails[] = iterateModalContainer(singleLineElement);
-	const invalidReservations:ModalReservationDetails[] = iterateModalContainer(invalidElement);
+	const validReservations:ModalReservationDetails[] = iterateModalContainer(validReservationElement);
+	const invalidReservations:ModalReservationDetails[] = iterateModalContainer(invalidReservationElement);
 
 	console.log(singleReservations);
 
@@ -208,9 +222,7 @@ export function RetrieveModalData(modalElement:HTMLElement):ReservationSelection
 		searchProductImageUrl: imgUrl,
 
 		singleLineReservations: singleReservations,
-
-		multiLineReservations: undefined!,
-
+		validReservations: validReservations,
 		invalidReservations: invalidReservations
 	}
 }

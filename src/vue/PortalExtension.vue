@@ -1,12 +1,14 @@
 <script setup lang="ts">
 import { onMounted, ref, Transition } from "vue";
-import { evaluateSearchResponse, removeBusy, reservationSearchRequest, RetrieveModalData, skipVerification } from "../utilities";
+import { cacheReservationDetails, evaluateSearchResponse, getLastOpenReservation, GetReservationDetailsFromOverview, removeBusy, reservationSearchRequest, RetrieveModalData, skipVerification } from "../utilities";
 import { ReservationSearchResponseType, ReservationSelectionModalData } from "../interfaces";
 import Modal from "./components/ReservationSelectionModal.vue";
 
 const show = ref(false);
 const showModal = ref(false);
+
 const modalData= ref<ReservationSelectionModalData>();
+const lastOpenReservation = ref(getLastOpenReservation());
 
 onMounted(() => {
 	show.value = true;
@@ -29,6 +31,11 @@ async function onSearchReservation() {
 		case ReservationSearchResponseType.ContinueVerification:
 			responseElement.setAttribute("hidden", "")
 			document.body.append(responseElement);
+
+			let responseOverview = <HTMLFormElement>responseElement.querySelector("#ReservationOverview");
+			if (responseOverview) {
+				cacheReservationDetails(GetReservationDetailsFromOverview(responseOverview)!);
+			}
 			skipVerification(responseElement);
 			break;
 
@@ -46,6 +53,11 @@ async function onSearchReservation() {
 			break;
 	}
 }
+
+function openReservation(url: string) {
+	//window.location.href = url;
+	console.log(url);
+}
 </script>
 
 <template>
@@ -61,7 +73,7 @@ async function onSearchReservation() {
                     <div class="row justify-content-md-center extension-content">
                         <div class="col-md-5">
 							<div class="form-group pt-3">
-								<button type="submit" class="btn btn-primary btn-block">Laatst geopende reservering</button>
+								<button type="submit" class="btn btn-primary btn-block" :disabled="!lastOpenReservation || lastOpenReservation == ''" @click="openReservation(lastOpenReservation)">Laatst geopende reservering</button>
 							</div>
                         </div>
                         <div class="col-md-1 p-2">
