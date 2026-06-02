@@ -2,6 +2,7 @@
 import { ref } from "vue";
 import { ReservationSelectionModalData } from "../../interfaces";
 import { isAmountStringComplete } from "../../utilities";
+import ShopwareLogoIconUrl from "../../assets/shopware.svg"
 
 const props = defineProps({
 	modalData: { type: Object, required: true }
@@ -112,7 +113,6 @@ const props = defineProps({
 															</div>
 														</template>
 													</div>
-
 												</div>
 											</div>
 										</template>
@@ -244,7 +244,23 @@ const props = defineProps({
 															</template>
 													</div>
 												</div>
-
+											</div>
+																						<div class="card-body" >
+												<div class="reservation-rows reservation-rows">
+													<div class="row nfTableHeader sw-header">
+														<img :src="ShopwareLogoIconUrl" style="float: left; width: 25px; height: 25px; margin-right: 8px;" /><h4 style="line-height: 22px;">Shopware Notitie</h4>
+													</div>
+														<div class="reservation-rows ">
+																<div class="row nfTableRow sw-body">
+																	<div class="col">
+																		<textarea class="sw-textarea">VAK A2</textarea>
+																	</div>
+																	<div class="col-1.5">
+																		<button class="sw-btn">Opslaan</button>
+																	</div>
+																</div>
+													</div>
+												</div>
 											</div>
 										</div>
 									</template>
@@ -345,5 +361,61 @@ const props = defineProps({
 
 input {
 	vertical-align: -4px;
+}
+
+.sw-btn {
+	float: right;
+	width: 100%;
+	height: 35px;
+	background-color: #189eff;
+
+    transition: all .15s ease-out;
+    display: inline-block;
+    border-radius: 4px;
+    padding: 2px 24px;
+    font-size: 14px;
+    outline: none;
+    font-weight: 600;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    vertical-align: middle;
+    text-decoration: none;
+    cursor: pointer;
+    user-select: none;
+    margin: 0;
+    position: relative;
+
+	background: #189eff;
+    color: #fff;
+    line-height: 32px;
+    border: 0;
+	margin: 3px;
+}
+
+.sw-btn:hover {
+    background: #118cff;
+}
+
+.sw-btn:active {
+	background: #0e82ff;
+}
+
+.sw-header {
+	background-color: #243758;
+	color: #fff;
+}
+
+.sw-body {
+	background-color: #f9fafb;
+}
+
+.sw-textarea {
+	field-sizing: content;
+	min-height: 34px;
+	width: 100%;
+	margin-top: 4px;
+	padding-left: 5px;
+	border-radius: 4px;
+	font-size: 18px;
 }
 </style>
