@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { ReservationSelectionModalData } from "../../interfaces";
 import { getCurrentOrderNumber, isAmountStringComplete } from "../../utilities";
 import ShopwareLogoIconUrl from "../../assets/shopware.svg"
 import * as Shopware from "../../shopware";

@@ -22,7 +22,7 @@ onMounted(() => {
 			</button>
 		</Transition>
 		<Transition>
-			<div v-if="show" class="col ml-2">Pack&Ship Extended Version {{ pkg.version }}</div>
+			<div v-if="show" class="col ml-2">Pack&Ship Extended Versie {{ pkg.version }}</div>
 		</Transition>
 
 		<Transition>

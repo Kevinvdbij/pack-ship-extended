@@ -1,5 +1,5 @@
 import { GM_getValue, GM_setValue } from "$";
-import { ModalProductDetails, ModalReservationDetails, ProductDetails, ReservationDetails, ReservationSearchResponseType, ReservationSelectionModalData, SearchResponseState } from "./interfaces";
+import { ModalProductDetails, ModalReservationDetails, ProductDetails, ReservationDefinition, ReservationDetails, ReservationSearchResponseType, ReservationSelectionModalData, SearchResponseState } from "./interfaces";
 
 export function GetContainer():Element | null {
 	return document.querySelector(".container");
@@ -78,22 +78,20 @@ export function retrieveCachedReservationDetails():Array<ReservationDetails> {
 	}
 }
 
-export function setLastOpenReservation(reservationId: string) {
-	console.log(reservationId);
-
-	return GM_setValue("PSE_LastOpenReservationId", reservationId);
+export function setLastOpenReservation(reservationDefinition: ReservationDefinition) {
+	return GM_setValue("PSE_LastOpenReservation", reservationDefinition);
 }
 
-export function getLastOpenReservation() {
-	return GM_getValue("PSE_LastOpenReservationId");
+export function getLastOpenReservation():ReservationDefinition {
+	return GM_getValue("PSE_LastOpenReservation");
 }
 
-export function setLastCompletedReservation(reservationId: string) {
-	return GM_setValue("PSE_LastCompletedReservationNumber", reservationId);
+export function setLastCompletedReservation(reservationDefinition: ReservationDefinition) {
+	return GM_setValue("PSE_LastCompletedReservation", reservationDefinition);
 }
 
-export function getLastCompletedReservation() {
-	return GM_getValue("PSE_LastCompletedReservationNumber");
+export function getLastCompletedReservation():ReservationDefinition {
+	return GM_getValue("PSE_LastCompletedReservation");
 }
 
 export function getCurrentReservationNumber() {
@@ -312,4 +310,8 @@ export async function handleUnfinishedRun(target:HTMLElement): Promise<string> {
 			},
 		});
 	});
+}
+
+export function matchShopwareOrderNumber(value: string):boolean {
+	return /^[0-9]{6,6}$/.test(value);
 }

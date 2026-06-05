@@ -3,7 +3,7 @@ import { onMounted, ref } from 'vue';
 import ShopwareLogoIconUrl from "../../assets/shopware.svg";
 
 import * as Shopware from "../../shopware.ts";
-import { getCurrentOrderNumber } from '../../utilities.ts';
+import { getCurrentOrderNumber, matchShopwareOrderNumber } from '../../utilities.ts';
 
 const show = ref(false);
 const swCommentData = ref<string>();
@@ -16,9 +16,18 @@ const swToken = ref();
 
 onMounted(() => {
     show.value = true;
+
+    if (renderComment()) {
+        retrieveCommentData();
+    }
 })
 
-Shopware.shopwareInitialize().then(async (token) => {
+function renderComment():boolean {
+    return matchShopwareOrderNumber(getCurrentOrderNumber());
+}
+
+function retrieveCommentData() {
+    Shopware.shopwareInitialize().then(async (token) => {
     swToken.value = token;
     
     swOrderData.value = await Shopware.shopwareGetOrderData(token, getCurrentOrderNumber());
@@ -26,6 +35,7 @@ Shopware.shopwareInitialize().then(async (token) => {
 
     swCommentBoxEnabled.value = true;
 });
+}
 
 function onSaveButtonClick() {
     swOrderData.value.data[0].customerComment = swCommentData.value;
@@ -53,26 +63,28 @@ function hasComment() {
 </script>
 
 <template>
-    <Transition>
-        <div style="position: relative; right: 30px; margin-top: 32px;">
-            <Transition>
-                <div class="mt-2 alert alert-info comment-alert" style="text-align: center; font-size: 24px; max-width:100%;color: #7f5353;background-color: #f6efef;border-color: #7f5353;" v-show="hasComment()" ><b>Let op!</b> Er is een shopware notitie.</div>
-            </Transition>
-            <div class="card sw-card" v-show="show">
-                <div class="card-header sw-header">
-                    <img :src="ShopwareLogoIconUrl" style="float: left; width: 25px; height: 25px; margin-right: 8px;" /><h4 style="line-height: 22px;">Shopware Notitie</h4>
-                </div>
-                <div class="sw-body">
-                    <div class="card-body sw-body sw-content">
-                        <div class="loader" style="position: relative; margin-top: -30px; top: 45px; line-height: 20px; justify-self: center;" v-show="!swCommentBoxEnabled" ></div>
-                        <textarea class="text-box sw-textarea":disabled="!swCommentBoxEnabled" v-model="swCommentData" ></textarea>
-                        <button class="sw-btn" type="button" @click="onOpenButtonClick()" :disabled="!swCommentBoxEnabled">Open</button>
-                        <button class="sw-btn btn-right" type="button" @click="onSaveButtonClick()" :disabled="!swCommentBoxEnabled">Opslaan</button>
+    <div v-if="renderComment()">
+        <Transition>
+            <div style="position: relative; right: 30px; margin-top: 32px;">
+                <Transition>
+                    <div class="mt-2 alert alert-info comment-alert" style="text-align: center; font-size: 24px; max-width:100%;color: #7f5353;background-color: #f6efef;border-color: #7f5353;" v-show="hasComment()" ><b>Let op!</b> Er is een shopware notitie.</div>
+                </Transition>
+                <div class="card sw-card" v-show="show">
+                    <div class="card-header sw-header">
+                        <img :src="ShopwareLogoIconUrl" style="float: left; width: 25px; height: 25px; margin-right: 8px;" /><h4 style="line-height: 22px;">Shopware Notitie</h4>
+                    </div>
+                    <div class="sw-body">
+                        <div class="card-body sw-body sw-content">
+                            <div class="loader" style="position: relative; margin-top: -30px; top: 45px; line-height: 20px; justify-self: center;" v-show="!swCommentBoxEnabled" ></div>
+                            <textarea class="text-box sw-textarea":disabled="!swCommentBoxEnabled" v-model="swCommentData" ></textarea>
+                            <button class="sw-btn" type="button" @click="onOpenButtonClick()" :disabled="!swCommentBoxEnabled">Open</button>
+                            <button class="sw-btn btn-right" type="button" @click="onSaveButtonClick()" :disabled="!swCommentBoxEnabled">Opslaan</button>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
-    </Transition>
+        </Transition>
+    </div>
 </template>
 
 <style>

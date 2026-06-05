@@ -52,3 +52,8 @@ export interface ModalProductDetails {
 	barcode: string,
 	amount: string
 }
+
+export interface ReservationDefinition {
+	id: string,
+	number: string
+}

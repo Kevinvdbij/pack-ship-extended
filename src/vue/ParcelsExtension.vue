@@ -27,7 +27,10 @@ onMounted(() => {
 	observeParcelContainer();
 	setupSummary();
 	
-	setLastOpenReservation(getCurrentReservationId());
+	setLastOpenReservation({
+		id: getCurrentReservationId(),
+		number: getCurrentReservationNumber()
+	});
 });
 
 function onClickAddProduct(barcode: string) {
@@ -52,7 +55,10 @@ function observeParcelContainer() {
 	
 	if (parcelContainerElement) {
 		const config = { attributes: true, childList: true, subtree: true };
-		const observer = new MutationObserver(updateVerifiedQuantities);
+		const observer = new MutationObserver(() => {
+			updateVerifiedQuantities();
+			announceParcels(parcelContainerElement);
+		});
 		observer.observe(parcelContainerElement, config);
 	}
 }
@@ -73,6 +79,12 @@ function setupSummary() {
 	);
 }
 
+function announceParcels(parcelContainerElement: Element) {
+	const announceButton = parcelContainerElement?.querySelector("div > div:nth-child(4) > div > button") as HTMLButtonElement;
+	if (!announceButton?.hasAttribute("disabled")) {
+		announceButton?.click();
+	}
+}
 </script>
 
 <template>

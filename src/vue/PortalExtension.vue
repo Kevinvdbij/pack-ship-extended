@@ -13,12 +13,16 @@ const lastCompletedReservation = ref(getLastCompletedReservation());
 
 onMounted(() => {
 	show.value = true;
+	focusBarcodeInput();
+
+	console.log(getLastCompletedReservation());
 });
 
 (<HTMLFormElement>document.querySelector("#frmReservations"))
 	.addEventListener("submit", ((e) => {
 		e.preventDefault();
 		onSearchReservation();
+		focusBarcodeInput();
 	}))
 
 async function onSearchReservation() {
@@ -69,6 +73,12 @@ function openReservation(reservationId: string) {
 function openAddParcels(reservationNumber: string) {
 	window.location.href = `https://retailvista.net/bztrs/packingportal/AddParcels/Search?ReservationNumber=${reservationNumber}`;
 }
+
+function focusBarcodeInput() {
+	const barcodeInput = document.querySelector("#Productbarcode") as HTMLInputElement;
+	barcodeInput.focus();
+	barcodeInput.value = "";
+}
 </script>
 
 <template>
@@ -84,7 +94,7 @@ function openAddParcels(reservationNumber: string) {
                     <div class="row justify-content-md-center extension-content">
                         <div class="col-md-5">
 							<div class="form-group pt-3">
-								<button type="submit" class="btn btn-primary btn-block" :disabled="!lastOpenReservation || lastOpenReservation == ''" @click="openReservation(lastOpenReservation)">Laatst geopende reservering</button>
+								<button type="submit" class="btn btn-primary btn-block" :disabled="!lastOpenReservation || lastOpenReservation.id == '' || lastOpenReservation.id == lastCompletedReservation.id" @click="openReservation(lastOpenReservation.id)">Laatst geopende reservering</button>
 							</div>
                         </div>
                         <div class="col-md-1 p-2">
@@ -92,7 +102,7 @@ function openAddParcels(reservationNumber: string) {
                         </div>
                         <div class="col-md-5">
 							<div class="form-group pt-3">
-								<button type="submit" class="btn btn-primary btn-block" :disabled="!lastCompletedReservation || lastCompletedReservation == ''" @click="openAddParcels(lastCompletedReservation )">Laatst voltooide reservering</button>
+								<button type="submit" class="btn btn-primary btn-block" :disabled="!lastCompletedReservation || lastCompletedReservation.id == ''" @click="openAddParcels(lastCompletedReservation.number)">Laatst voltooide reservering</button>
 							</div>
                         </div>
                     </div>
