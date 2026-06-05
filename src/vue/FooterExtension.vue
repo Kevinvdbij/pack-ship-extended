@@ -2,9 +2,12 @@
 import { onMounted, ref, Teleport } from 'vue';
 import Modal from "./components/SettingsModal.vue";
 import pkg from "../../package.json";
+import powerIconUrl from "../assets/power.svg";
 
 const show = ref(false);
 const showModal = ref(false);
+
+const masterSwitch = ref(true);
 
 onMounted(() => {
 	show.value = true;
@@ -13,6 +16,11 @@ onMounted(() => {
 
 <template>
 	<Teleport to="footer > div > div > div.col-auto.mr-auto.text-left > div">
+		<Transition>
+			<button v-if="show" type="button" class="toggle-button" @click="masterSwitch = !masterSwitch">
+				<img :src="powerIconUrl" :class="masterSwitch ? 'power-button-icon-on' : 'power-button-icon-off'"/>
+			</button>
+		</Transition>
 		<Transition>
 			<div v-if="show" class="col ml-2">Pack&Ship Extended Version {{ pkg.version }}</div>
 		</Transition>
@@ -38,5 +46,27 @@ onMounted(() => {
 .v-enter-from,
 .v-leave-to {
   opacity: 0;
+}
+
+.toggle-button {
+	background-color: transparent;
+	border: none;
+	margin: 0px;
+	padding: 0px;
+}
+
+.toggle-button:hover,
+.toggle-button:active,
+.toggle-button:focus {
+	outline: none;
+	box-shadow: none;
+}
+
+.power-button-icon-on {
+	filter: invert(79%) sepia(44%) saturate(550%) hue-rotate(67deg) brightness(92%) contrast(99%);
+}
+
+.power-button-icon-off {
+	filter: invert(67%) sepia(17%) saturate(6115%) hue-rotate(316deg) brightness(91%) contrast(99%);
 }
 </style>

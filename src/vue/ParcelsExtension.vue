@@ -65,12 +65,12 @@ function setupSummary() {
 	backButton.innerHTML = "<span class='material-icons'>chevron_left</span>Nieuwe zoekopdracht";
 	
 	createApp(ReservationSummary).mount(
-			(() => {
-				const app = document.createElement('div');
-				document.querySelector("#ReservationSummary\\ mb-2")!.insertAdjacentElement("beforeend", app);
-				return app;
-			})(),
-		);
+		(() => {
+			const app = document.createElement('div');
+			document.querySelector("#ReservationSummary\\ mb-2")!.insertAdjacentElement("beforeend", app);
+			return app;
+		})(),
+	);
 }
 
 </script>

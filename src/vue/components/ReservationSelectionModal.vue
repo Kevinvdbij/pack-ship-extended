@@ -1,12 +1,44 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { ReservationSelectionModalData } from "../../interfaces";
-import { isAmountStringComplete } from "../../utilities";
+import { getCurrentOrderNumber, isAmountStringComplete } from "../../utilities";
 import ShopwareLogoIconUrl from "../../assets/shopware.svg"
+import * as Shopware from "../../shopware";
 
 const props = defineProps({
 	modalData: { type: Object, required: true }
 });
+
+const swCommentData = ref<string>();
+const swOrderData = ref();
+const swToken = ref();
+
+let saveTimeoutId:number;
+const swCommentBoxEnabled = ref(false);
+
+Shopware.shopwareInitialize().then(async (token) => {
+    swToken.value = token;
+    
+    swOrderData.value = await Shopware.shopwareGetOrderData(token, getCurrentOrderNumber());
+
+    swCommentData.value = swOrderData.value.data[0].customerComment ?? "";
+
+	swCommentBoxEnabled.value = true;
+});
+
+function onSaveButtonClick() {
+    swOrderData.value.data[0].customerComment = swCommentData.value;
+    
+    if (swToken) {
+        Shopware.shopwareUpdateOrderComment(swToken.value, swOrderData.value.data[0]);
+    }
+
+    swCommentBoxEnabled.value = false;
+    if (saveTimeoutId) { clearTimeout(saveTimeoutId) }
+    saveTimeoutId = setTimeout(() => {
+        swCommentBoxEnabled.value = true;
+    }, 250);
+}
 </script>
 
 <template>
@@ -247,16 +279,16 @@ const props = defineProps({
 											</div>
 																						<div class="card-body" >
 												<div class="reservation-rows reservation-rows">
-													<div class="row nfTableHeader sw-header">
+													<div class="row nfTableHeader sw-modal-header">
 														<img :src="ShopwareLogoIconUrl" style="float: left; width: 25px; height: 25px; margin-right: 8px;" /><h4 style="line-height: 22px;">Shopware Notitie</h4>
 													</div>
 														<div class="reservation-rows ">
-																<div class="row nfTableRow sw-body">
+																<div class="row nfTableRow sw-modal-body">
 																	<div class="col">
-																		<textarea class="sw-textarea">VAK A2</textarea>
+																		<textarea class="sw-modal-textarea" v-model="swCommentData" :disabled="!swCommentBoxEnabled" ></textarea>
 																	</div>
 																	<div class="col-1.5">
-																		<button class="sw-btn">Opslaan</button>
+																		<button class="sw-btn" @click="onSaveButtonClick()" :disabled="!swCommentBoxEnabled">Opslaan</button>
 																	</div>
 																</div>
 													</div>
@@ -363,8 +395,11 @@ input {
 	vertical-align: -4px;
 }
 
+.sw-modal-button {
+
+}
+
 .sw-btn {
-	float: right;
 	width: 100%;
 	height: 35px;
 	background-color: #189eff;
@@ -400,16 +435,22 @@ input {
 	background: #0e82ff;
 }
 
-.sw-header {
+.sw-btn:disabled:hover,
+.sw-btn:disabled {
+	background: #727272;
+}
+
+.sw-modal-header {
 	background-color: #243758;
 	color: #fff;
 }
 
-.sw-body {
+.sw-modal-body {
 	background-color: #f9fafb;
+	padding-right: 20px;
 }
 
-.sw-textarea {
+.sw-modal-textarea {
 	field-sizing: content;
 	min-height: 34px;
 	width: 100%;
@@ -418,4 +459,5 @@ input {
 	border-radius: 4px;
 	font-size: 18px;
 }
+
 </style>

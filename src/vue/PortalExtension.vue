@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted, ref, Transition } from "vue";
-import { cacheReservationDetails, evaluateSearchResponse, getLastCompletedReservation, getLastOpenReservation, GetReservationDetailsFromOverview, removeBusy, reservationSearchRequest, RetrieveModalData, skipVerification } from "../utilities";
+import { cacheReservationDetails, evaluateSearchResponse, getLastCompletedReservation, getLastOpenReservation, GetReservationDetailsFromOverview, handleUnfinishedRun, removeBusy, reservationSearchRequest, RetrieveModalData, skipVerification } from "../utilities";
 import { ReservationSearchResponseType, ReservationSelectionModalData } from "../interfaces";
 import Modal from "./components/ReservationSelectionModal.vue";
 
@@ -51,6 +51,13 @@ async function onSearchReservation() {
 			responseElement.querySelector("#alert")!.parentElement!.parentElement!.innerHTML;
 
 			removeBusy();
+			break;
+
+		case ReservationSearchResponseType.UnfinishedRun:
+			handleUnfinishedRun(responseElement).then(() => {
+				// Run function again to re-evaluate
+				onSearchReservation();
+			});
 			break;
 	}
 }

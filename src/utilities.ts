@@ -104,6 +104,10 @@ export function getCurrentReservationId() {
 	return getReservationId(document.body);
 }
 
+export function getCurrentOrderNumber() {
+	return document.querySelector<HTMLElement>("#ReservationSummary\\ mb-2 > div:nth-child(3)")!.innerHTML.split(" ")[2];
+}
+
 export function getReservationId(target: HTMLElement) {
 	return (target.querySelector("#ReservationId") as HTMLInputElement).value;
 }
@@ -156,7 +160,8 @@ export function evaluateSearchResponse(element: HTMLElement): ReservationSearchR
 
 	return { isAlert, isUnfinished, isProductSelection }; */
 	const reservationOverview = element.querySelector("#ReservationOverview");
-	const selectionModal = element.querySelector("#productReservationsModal")
+	const selectionModal = element.querySelector("#productReservationsModal");
+	const unfinishedRunButton = element.querySelector("button[data-target='#unfinishedOrderPickingRunsModal']");
 
 	console.log(element);
 	console.log(element.querySelector("body"));
@@ -167,6 +172,9 @@ export function evaluateSearchResponse(element: HTMLElement): ReservationSearchR
 	switch(true) {
 		case reservationOverview != undefined:
 			return ReservationSearchResponseType.ContinueVerification;
+
+		case unfinishedRunButton != undefined:
+			return ReservationSearchResponseType.UnfinishedRun;
 
 		case selectionModal != undefined:
 			return ReservationSearchResponseType.SelectionModal;
@@ -289,4 +297,19 @@ export function isAmountStringComplete(amount:string) {
 	const amounts:number[] = parseAmountString(amount);
 
 	return amounts[0] >= amounts[1];
+}
+
+// Send http request that sets the orderpickingrun state to finished
+export async function handleUnfinishedRun(target:HTMLElement): Promise<string> {
+	return new Promise((resolve) => {
+		const finishRunUrl = (target.querySelector("[id=unfinishedOrderPickingRunsModal]")!.querySelector(".btn") as HTMLAnchorElement).href;
+
+		$.ajax({
+			url: finishRunUrl,
+			type: "GET",
+			success: function(data: string) {
+				resolve(data);
+			},
+		});
+	});
 }

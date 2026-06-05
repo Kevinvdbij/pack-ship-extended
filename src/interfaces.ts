@@ -21,7 +21,8 @@ export interface SearchResponseState {
 export enum ReservationSearchResponseType {
 	ContinueVerification = 1,
 	RefreshMain,
-	SelectionModal
+	SelectionModal,
+	UnfinishedRun
 }
 
 export interface ReservationSelectionModalData {
