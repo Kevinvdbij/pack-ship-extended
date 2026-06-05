@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { onMounted, ref, Transition } from "vue";
 import { getCurrentOrderNumber, isAmountStringComplete } from "../../retailVistaUtils.ts";
 import ShopwareLogoIconUrl from "../../assets/shopware.svg"
 import * as Shopware from "../../shopware";
@@ -289,7 +289,9 @@ function retrieveCommentData() {
 																<div class="row nfTableRow sw-modal-body">
 																	<div class="col">
 																		<div v-show="!swCommentBoxesEnabled || !reservation.swOrderData" class="loader" style="height: 20px; margin-top: -20px; top: 30px; justify-self: center; position: relative;"></div>
-																		<textarea class="sw-modal-textarea" v-if="reservation.swOrderData" v-model.lazy="reservation.swOrderData.customerComment" :disabled="!swCommentBoxesEnabled"></textarea>
+																		<Transition>
+																			<textarea class="sw-modal-textarea" v-if="reservation.swOrderData" v-model="reservation.swOrderData.customerComment" :disabled="!swCommentBoxesEnabled"></textarea>
+																		</Transition>
 																		<textarea class="sw-modal-textarea" v-if="!reservation.swOrderData" disabled></textarea>
 																	</div>
 																	<div class="col-1.5">
@@ -318,6 +320,17 @@ function retrieveCommentData() {
 </template>
 
 <style scoped>
+.text-area-grow-enter-active,
+.text-area-grow-leave-active {
+  transition: opacity 0.25s ease, transform 0.1s ease;
+}
+
+.text-area-grow-enter-from,
+.text-area-grow-leave-to {
+  opacity: 0;
+  transform: scaleY(0);
+}
+
 .settings-modal {
 	position: absolute;
 	width: 100% !important;
