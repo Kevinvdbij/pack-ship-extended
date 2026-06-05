@@ -1,11 +1,11 @@
 import { createApp } from 'vue';
-import * as helperUtils from "./utilities.ts";
+import * as RVUtils from "./retailVistaUtils";
 import PortalExtension from './vue/PortalExtension.vue';
 import FooterExtension from './vue/FooterExtension.vue';
 import ParcelsExtension from './vue/ParcelsExtension.vue';
 import ReservationExtension from './vue/ReservationExtension.vue';
 import CompletedExtension from './vue/CompletedExtension.vue';
-
+import "./style.css";
 
 const path = window.location.pathname;
 
@@ -24,7 +24,7 @@ switch(true) {
 		createApp(ParcelsExtension).mount(
 			(() => {
 				const app = document.createElement('div');
-				helperUtils.GetParcelContainerParent()?.insertAdjacentElement("afterbegin", app);
+				RVUtils.GetParcelContainerParent()?.insertAdjacentElement("afterbegin", app);
 				return app;
 			})(),
 		);
@@ -50,7 +50,7 @@ switch(true) {
 		createApp(PortalExtension).mount(
 			(() => {
 				const app = document.createElement('div');
-				helperUtils.GetContainer()?.append(app);
+				RVUtils.GetContainer()?.append(app);
 				return app;
 			})(),
 		);

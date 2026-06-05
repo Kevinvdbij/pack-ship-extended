@@ -1,42 +1,46 @@
 <script setup lang="ts">
-import { ref } from "vue";
-import { getCurrentOrderNumber, isAmountStringComplete } from "../../utilities";
+import { onMounted, ref } from "vue";
+import { getCurrentOrderNumber, isAmountStringComplete } from "../../retailVistaUtils.ts";
 import ShopwareLogoIconUrl from "../../assets/shopware.svg"
 import * as Shopware from "../../shopware";
+import { ReservationSelectionModalData } from "../../interfaces.ts";
 
 const props = defineProps({
 	modalData: { type: Object, required: true }
 });
 
-const swCommentData = ref<string>();
-const swOrderData = ref();
 const swToken = ref();
 
 let saveTimeoutId:number;
-const swCommentBoxEnabled = ref(false);
+const swCommentBoxesEnabled = ref(false);
 
-Shopware.shopwareInitialize().then(async (token) => {
-    swToken.value = token;
-    
-    swOrderData.value = await Shopware.shopwareGetOrderData(token, getCurrentOrderNumber());
-
-    swCommentData.value = swOrderData.value.data[0].customerComment ?? "";
-
-	swCommentBoxEnabled.value = true;
+onMounted(() => {
+	Shopware.shopwareInitialize().then((token) => {
+		swToken.value = token;
+		retrieveCommentData();
+	});
 });
 
-function onSaveButtonClick() {
-    swOrderData.value.data[0].customerComment = swCommentData.value;
-    
+function onSaveButtonClick(orderData:Shopware.ShopwareOrderEntry) {
     if (swToken) {
-        Shopware.shopwareUpdateOrderComment(swToken.value, swOrderData.value.data[0]);
+        Shopware.shopwareUpdateOrderComment(swToken.value, orderData);
     }
 
-    swCommentBoxEnabled.value = false;
+    swCommentBoxesEnabled.value = false;
     if (saveTimeoutId) { clearTimeout(saveTimeoutId) }
     saveTimeoutId = setTimeout(() => {
-        swCommentBoxEnabled.value = true;
+        swCommentBoxesEnabled.value = true;
     }, 250);
+}
+
+function retrieveCommentData() {
+	(<ReservationSelectionModalData>props.modalData).invalidReservations.forEach((reservation) => {
+		Shopware.shopwareGetOrderData(swToken.value, reservation.saleOrderReference).then((response) => {
+			reservation.swOrderData = response.data[0]
+		});
+
+		swCommentBoxesEnabled.value = true;
+	});
 }
 </script>
 
@@ -284,10 +288,12 @@ function onSaveButtonClick() {
 														<div class="reservation-rows ">
 																<div class="row nfTableRow sw-modal-body">
 																	<div class="col">
-																		<textarea class="sw-modal-textarea" v-model="swCommentData" :disabled="!swCommentBoxEnabled" ></textarea>
+																		<div v-show="!swCommentBoxesEnabled || !reservation.swOrderData" class="loader" style="height: 20px; margin-top: -20px; top: 30px; justify-self: center; position: relative;"></div>
+																		<textarea class="sw-modal-textarea" v-if="reservation.swOrderData" v-model.lazy="reservation.swOrderData.customerComment" :disabled="!swCommentBoxesEnabled"></textarea>
+																		<textarea class="sw-modal-textarea" v-if="!reservation.swOrderData" disabled></textarea>
 																	</div>
 																	<div class="col-1.5">
-																		<button class="sw-btn" @click="onSaveButtonClick()" :disabled="!swCommentBoxEnabled">Opslaan</button>
+																		<button class="sw-btn" @click="onSaveButtonClick(reservation.swOrderData)" :disabled="!swCommentBoxesEnabled">Opslaan</button>
 																	</div>
 																</div>
 													</div>

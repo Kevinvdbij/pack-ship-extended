@@ -1,3 +1,5 @@
+import { ShopwareOrderEntry } from "./shopware";
+
 export interface ReservationDetails {
 	id: string,
 	products: Array<ProductDetails>
@@ -43,7 +45,8 @@ export interface ModalReservationDetails {
 	deliveryStatus: string,
 	customer: string,
 	products: ModalProductDetails[],
-	url: string
+	url: string,
+	swOrderData: ShopwareOrderEntry
 }
 
 export interface ModalProductDetails {

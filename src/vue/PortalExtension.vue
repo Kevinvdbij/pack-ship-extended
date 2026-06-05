@@ -1,21 +1,19 @@
 <script setup lang="ts">
 import { onMounted, ref, Transition } from "vue";
-import { cacheReservationDetails, evaluateSearchResponse, getLastCompletedReservation, getLastOpenReservation, GetReservationDetailsFromOverview, handleUnfinishedRun, removeBusy, reservationSearchRequest, RetrieveModalData, skipVerification } from "../utilities";
-import { ReservationSearchResponseType, ReservationSelectionModalData } from "../interfaces";
+import { ReservationSearchResponseType, ReservationSelectionModalData } from "../interfaces.ts";
 import Modal from "./components/ReservationSelectionModal.vue";
+import * as PSUtils from "../retailVistaUtils.ts";
 
 const show = ref(false);
 const showModal = ref(false);
 
 const modalData= ref<ReservationSelectionModalData>();
-const lastOpenReservation = ref(getLastOpenReservation());
-const lastCompletedReservation = ref(getLastCompletedReservation());
+const lastOpenReservation = ref(PSUtils.getLastOpenReservation());
+const lastCompletedReservation = ref(PSUtils.getLastCompletedReservation());
 
 onMounted(() => {
 	show.value = true;
 	focusBarcodeInput();
-
-	console.log(getLastCompletedReservation());
 });
 
 (<HTMLFormElement>document.querySelector("#frmReservations"))
@@ -27,38 +25,38 @@ onMounted(() => {
 
 async function onSearchReservation() {
 	const formData = $("#frmReservations").serialize();
-	const response = await reservationSearchRequest(formData);
+	const response = await PSUtils.reservationSearchRequest(formData);
 
 	const responseElement = document.createElement("div");
 	responseElement.innerHTML = response;
 
-	switch(evaluateSearchResponse(responseElement)) {
+	switch(PSUtils.evaluateSearchResponse(responseElement)) {
 		case ReservationSearchResponseType.ContinueVerification:
 			responseElement.setAttribute("hidden", "")
 			document.body.append(responseElement);
 
 			let responseOverview = <HTMLFormElement>responseElement.querySelector("#ReservationOverview");
 			if (responseOverview) {
-				cacheReservationDetails(GetReservationDetailsFromOverview(responseOverview)!);
+				PSUtils.cacheReservationDetails(PSUtils.GetReservationDetailsFromOverview(responseOverview)!);
 			}
-			skipVerification(responseElement);
+			PSUtils.skipVerification(responseElement);
 			break;
 
 		case ReservationSearchResponseType.SelectionModal:
-			modalData.value = RetrieveModalData(responseElement);
+			modalData.value = await PSUtils.RetrieveModalData(responseElement);
 			showModal.value = true;
-			removeBusy();
+			PSUtils.removeBusy();
 			break;
 
 		case ReservationSearchResponseType.RefreshMain:
 			document.querySelector("#messages")!.parentElement!.innerHTML = 
 			responseElement.querySelector("#alert")!.parentElement!.parentElement!.innerHTML;
 
-			removeBusy();
+			PSUtils.removeBusy();
 			break;
 
 		case ReservationSearchResponseType.UnfinishedRun:
-			handleUnfinishedRun(responseElement).then(() => {
+			PSUtils.handleUnfinishedRun(responseElement).then(() => {
 				// Run function again to re-evaluate
 				onSearchReservation();
 			});

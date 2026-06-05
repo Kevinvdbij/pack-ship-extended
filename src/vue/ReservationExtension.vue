@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { cacheReservationDetails, GetReservationDetailsFromOverview, skipVerification } from '../utilities';
+import { cacheReservationDetails, GetReservationDetailsFromOverview, skipVerification } from '../retailVistaUtils.ts';
 
 try {
 	skipVerification(document.body);

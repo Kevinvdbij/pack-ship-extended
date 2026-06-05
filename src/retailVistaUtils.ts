@@ -50,11 +50,9 @@ export function cacheReservationDetails(reservationDetails:ReservationDetails) {
 		if (cacheData.push(reservationDetails) > 50) {
 			cacheData.shift();
 		}
-		console.log("1")
 	} else {
 		// overwrite if there is
 		cacheData[existingIndex] = reservationDetails;
-		console.log("2")
 	}
 	
 	GM_setValue("PSE_Reservation_Cache", cacheData);
@@ -152,20 +150,9 @@ export async function reservationSearchRequest(formData: string): Promise<string
 
 // Evaluate the state of the given response
 export function evaluateSearchResponse(element: HTMLElement): ReservationSearchResponseType {
-/* 	const isUnfinished = element.querySelector("[id=unfinishedOrderPickingRunsModal]") !== null;
-	const isAlert = element.querySelector("#alert") !== null && !isUnfinished;
-	const isProductSelection = element.querySelector("#productReservationsModal");
-
-	return { isAlert, isUnfinished, isProductSelection }; */
 	const reservationOverview = element.querySelector("#ReservationOverview");
 	const selectionModal = element.querySelector("#productReservationsModal");
 	const unfinishedRunButton = element.querySelector("button[data-target='#unfinishedOrderPickingRunsModal']");
-
-	console.log(element);
-	console.log(element.querySelector("body"));
-	console.log(selectionModal);
-
-	
 
 	switch(true) {
 		case reservationOverview != undefined:
@@ -229,8 +216,6 @@ export function RetrieveModalData(modalElement:HTMLElement):ReservationSelection
 	const validReservations:ModalReservationDetails[] = iterateModalContainer(validReservationElement);
 	const invalidReservations:ModalReservationDetails[] = iterateModalContainer(invalidReservationElement);
 
-	console.log(singleReservations);
-
 	return {
 		searchProductName: name,
 		searchProductBarcode: barcode,
@@ -279,7 +264,8 @@ function iterateModalContainer(container:HTMLElement):ModalReservationDetails[] 
 				deliveryStatus: deliveryStatus,
 				customer: customer,
 				url: url,
-				products: products
+				products: products,
+				swOrderData: undefined!
 			});
 		});
 	}

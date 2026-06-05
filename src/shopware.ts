@@ -20,9 +20,9 @@ interface ShopwareErrorBody {
 	errors: ShopwareApiError[];
 }
 
-interface ShopwareOrderEntry {
+export interface ShopwareOrderEntry {
 	id: string;
-	customerComment: string | null;
+	customerComment: string;
 }
 
 interface ShopwareSearchResponse {

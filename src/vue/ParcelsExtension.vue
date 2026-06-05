@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { createApp, onMounted, ref, Transition } from 'vue';
-import { fetchReservationDetails, getCurrentReservationId, getCurrentReservationNumber, getReservationRowIndexFromItemId, retrieveCachedReservationDetails, setLastOpenReservation } from '../utilities';
+import { fetchReservationDetails, getCurrentReservationId, getCurrentReservationNumber, getReservationRowIndexFromItemId, retrieveCachedReservationDetails, setLastOpenReservation } from '../retailVistaUtils.ts';
 import addIconUrl from "../assets/add.svg";
-import { ReservationDetails } from '../interfaces';
+import { ReservationDetails } from '../interfaces.ts';
 import ReservationSummary from './components/ReservationSummary.vue';
 
 const show = ref(false);

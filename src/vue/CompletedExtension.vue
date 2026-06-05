@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { onMounted } from 'vue';
-import { getCurrentReservationId, getCurrentReservationNumber, setLastCompletedReservation } from '../utilities';
+import { getCurrentReservationId, getCurrentReservationNumber, setLastCompletedReservation } from '../retailVistaUtils.ts';
 
 onMounted(() => {
 	setLastCompletedReservation({
