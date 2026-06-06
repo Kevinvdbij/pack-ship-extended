@@ -9,6 +9,8 @@ const props = defineProps({
 	modalData: { type: Object, required: true }
 });
 
+const emit = defineEmits(["open", "close"]);
+
 const swToken = ref();
 
 let saveTimeoutId:number;
@@ -59,13 +61,13 @@ function autoSelectReservationCountdown() {
 }
 
 function autoSelectReservation() {
-	if (props.modalData.singleLineReservations.length >= 0) {
-		window.location.href = props.modalData.singleLineReservations[0].url;
+	if (props.modalData.singleLineReservations.length > 0) {
+		emit("open", props.modalData.singleLineReservations[0].url)
 		return;
 	}
 
-	if (props.modalData.validReservations.length >= 0) {
-		window.location.href = props.modalData.validReservations[0].url;
+	if (props.modalData.validReservations.length > 0) {
+		emit("open", props.modalData.validReservations[0].url);
 		return;
 	}
 }

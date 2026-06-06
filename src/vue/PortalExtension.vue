@@ -27,6 +27,10 @@ async function onSearchReservation() {
 	const formData = $("#frmReservations").serialize();
 	const response = await PSUtils.reservationSearchRequest(formData);
 
+	handleResponse(response)
+}
+
+async function handleResponse(response: string) {
 	const responseElement = document.createElement("div");
 	responseElement.innerHTML = response;
 
@@ -64,12 +68,18 @@ async function onSearchReservation() {
 	}
 }
 
-function openReservation(reservationId: string) {
+function reopenReservation(reservationId: string) {
 	window.location.href = `https://retailvista.net/bztrs/packingportal/Parcels?reservationId=${reservationId}&allowCashOnDelivery=False`;
 }
 
 function openAddParcels(reservationNumber: string) {
 	window.location.href = `https://retailvista.net/bztrs/packingportal/AddParcels/Search?ReservationNumber=${reservationNumber}`;
+}
+
+function openReservation(url: string) {
+	PSUtils.fetchReservation(url).then((response) => {
+		handleResponse(response);
+	});
 }
 
 function focusBarcodeInput() {
@@ -82,7 +92,7 @@ function focusBarcodeInput() {
 <template>
 	<Teleport to="body">
 		<Transition name="modal">
-			<Modal :modal-data="modalData!" v-if="showModal" @close="showModal = false"/>
+			<Modal :modal-data="modalData!" v-if="showModal" @close="showModal = false" @open="(reservationId: string) => openReservation(reservationId)"/>
 		</Transition>
 	</Teleport>
 	<Transition>
@@ -92,7 +102,7 @@ function focusBarcodeInput() {
                     <div class="row justify-content-md-center extension-content">
                         <div class="col-md-5">
 							<div class="form-group pt-3">
-								<button type="submit" class="btn btn-primary btn-block" :disabled="!lastOpenReservation || lastOpenReservation.id == '' || lastOpenReservation.id == lastCompletedReservation.id" @click="openReservation(lastOpenReservation.id)">Laatst geopende reservering</button>
+								<button type="submit" class="btn btn-primary btn-block" :disabled="!lastOpenReservation || lastOpenReservation.id == '' || lastOpenReservation.id == lastCompletedReservation.id" @click="reopenReservation(lastOpenReservation.id)">Laatst geopende reservering</button>
 							</div>
                         </div>
                         <div class="col-md-1 p-2">

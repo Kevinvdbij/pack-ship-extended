@@ -134,6 +134,18 @@ export function getReservationRowIndexFromItemId(itemId: string) {
 	return itemIdInput?.getAttribute("name")?.split("VerificationReservationRows[").pop()?.split("].ItemId").shift()
 }
 
+export async function fetchReservation(url:string): Promise<string> {
+		return new Promise((resolve) => {
+		$.ajax({
+			url: url,
+			type: "GET",
+			success: function(data: string) {
+				resolve(data);
+			},
+		});
+	});
+}
+
 // Request that retrieves reservations from submitted data
 export async function reservationSearchRequest(formData: string): Promise<string> {
 	return new Promise((resolve) => {
