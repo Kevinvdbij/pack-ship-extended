@@ -76,7 +76,7 @@ function hasComment() {
                     <div class="sw-body">
                         <div class="card-body sw-body sw-content">
                             <div class="loader" style="position: relative; margin-top: -30px; top: 45px; line-height: 20px; justify-self: center;" v-show="!swCommentBoxEnabled" ></div>
-                            <textarea class="text-box sw-textarea":disabled="!swCommentBoxEnabled" v-model="swCommentData" placeholder="Nog geen notitie..." ></textarea>
+                            <textarea class="text-box sw-textarea":disabled="!swCommentBoxEnabled" v-model="swCommentData" :placeholder="swCommentBoxEnabled ?'Nog geen notitie...' : ''" ></textarea>
                             <button class="sw-btn" type="button" @click="onOpenButtonClick()" :disabled="!swCommentBoxEnabled">Open</button>
                             <button class="sw-btn btn-right" type="button" @click="onSaveButtonClick()" :disabled="!swCommentBoxEnabled">Opslaan</button>
                         </div>

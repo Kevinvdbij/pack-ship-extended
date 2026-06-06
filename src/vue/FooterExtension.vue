@@ -51,8 +51,8 @@ onMounted(() => {
 .toggle-button {
 	background-color: transparent;
 	border: none;
-	margin: 0px;
-	padding: 0px;
+	margin-top: -5px;
+	padding-left: 10px;
 }
 
 .toggle-button:hover,

@@ -5,6 +5,7 @@ import FooterExtension from './vue/FooterExtension.vue';
 import ParcelsExtension from './vue/ParcelsExtension.vue';
 import ReservationExtension from './vue/ReservationExtension.vue';
 import CompletedExtension from './vue/CompletedExtension.vue';
+import AddParcelsExtension from './vue/AddParcelsExtension.vue';
 import "./style.css";
 
 const path = window.location.pathname;
@@ -41,6 +42,13 @@ switch(true) {
 		break;
 
 	case /bztrs\/packingportal\/AddParcels\/Search\?ReservationNumber=/.test(window.location.pathname + window.location.search):
+		createApp(AddParcelsExtension).mount(
+			(() => {
+				const app = document.createElement('div');
+				document.body.append(app);
+				return app;
+			})(),
+		);
 		break;
 
 	case /bztrs\/packingportal\/AnnounceParcels.*/.test(path):
