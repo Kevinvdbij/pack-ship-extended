@@ -216,6 +216,23 @@ export function RetrieveModalData(modalElement:HTMLElement):ReservationSelection
 	const validReservations:ModalReservationDetails[] = iterateModalContainer(validReservationElement);
 	const invalidReservations:ModalReservationDetails[] = iterateModalContainer(invalidReservationElement);
 
+	// Move items with only shipping costs as a 2nd item to single line reservations
+	validReservations.forEach((reservation) => {
+		if (reservation.products.length) {
+			let shippingCostsProduct = reservation.products.find((x) => x.description == "verzendkosten");
+
+			if (shippingCostsProduct) {
+				let index = reservation.products.indexOf(shippingCostsProduct)
+				reservation.products.splice(index, 1);
+
+				singleReservations.push(reservation);
+
+				let reservationIndex = validReservations.indexOf(reservation);
+				validReservations.splice(reservationIndex, 1)
+			}
+		}
+	})
+
 	return {
 		searchProductName: name,
 		searchProductBarcode: barcode,

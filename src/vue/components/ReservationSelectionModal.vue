@@ -3,7 +3,7 @@ import { onMounted, ref, Transition } from "vue";
 import { getCurrentOrderNumber, isAmountStringComplete } from "../../retailVistaUtils.ts";
 import ShopwareLogoIconUrl from "../../assets/shopware.svg"
 import * as Shopware from "../../shopware";
-import { ReservationSelectionModalData } from "../../interfaces.ts";
+import { ReservationDefinition, ReservationSelectionModalData } from "../../interfaces.ts";
 
 const props = defineProps({
 	modalData: { type: Object, required: true }
@@ -14,10 +14,13 @@ const swToken = ref();
 let saveTimeoutId:number;
 const swCommentBoxesEnabled = ref(false);
 
+const countdown = ref(4);
+
 onMounted(() => {
 	Shopware.shopwareInitialize().then((token) => {
 		swToken.value = token;
 		retrieveCommentData();
+		autoSelectReservationCountdown();
 	});
 });
 
@@ -41,6 +44,28 @@ function retrieveCommentData() {
 
 		swCommentBoxesEnabled.value = true;
 	});
+}
+
+function autoSelectReservationCountdown() {
+	let countdownInterval = setInterval(() => {
+		countdown.value--;
+
+		if (countdown.value <= 0) {
+			clearInterval(countdownInterval);
+
+			autoSelectReservation();
+		}
+	}, 1000)
+}
+
+function autoSelectReservation() {
+	if (props.modalData.singleLineReservations.length >= 0) {
+		window.location.href = props.modalData.singleLineReservations[0].url;
+	}
+
+	if (props.modalData.validReservations.length >= 0) {
+		window.location.href = props.modalData.validReservations[0].url;
+	}
 }
 </script>
 
@@ -86,6 +111,12 @@ function retrieveCommentData() {
 											</div>
 										</div>
 									</div>
+								</div>
+
+								<div class="auto-select-countdown-container">
+									<hr>
+										<h4>Selecting order in {{ countdown }}</h4>
+									<hr>
 								</div>
 
 								<div v-show="modalData.singleLineReservations.length > 0">
