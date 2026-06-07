@@ -237,22 +237,27 @@ export function RetrieveModalData(modalElement:HTMLElement):ReservationSelection
 	const validReservations:ModalReservationDetails[] = iterateModalContainer(validReservationElement);
 	const invalidReservations:ModalReservationDetails[] = iterateModalContainer(invalidReservationElement);
 
-	// Move items with only shipping costs as a 2nd item to single line reservations
+	const movedReservations:ModalReservationDetails[] = [];
+	// Add items with only shipping costs as a 2nd item to single line reservations
 	validReservations.forEach((reservation) => {
-		if (reservation.products.length) {
-			let shippingCostsProduct = reservation.products.find((x) => x.description == "verzendkosten");
+		if (reservation.products.length > 1) {
+			let shippingCostsProduct = reservation.products.find((x) => x.description == "verzendkosten" || x.barcode == "9900000013776");
 
 			if (shippingCostsProduct) {
 				let index = reservation.products.indexOf(shippingCostsProduct)
 				reservation.products.splice(index, 1);
 
 				singleReservations.push(reservation);
-
-				let reservationIndex = validReservations.indexOf(reservation);
-				validReservations.splice(reservationIndex, 1)
+				movedReservations.push(reservation);
 			}
 		}
 	})
+
+	// remove the reservations added to single line from valid reservations afterwards
+	movedReservations.forEach((reservation) => {
+		let reservationIndex = validReservations.indexOf(reservation);
+		validReservations.splice(reservationIndex, 1)
+	});
 
 	return {
 		searchProductName: name,

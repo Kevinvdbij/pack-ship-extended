@@ -6,18 +6,18 @@ import * as Shopware from "../../shopware";
 import { ReservationDefinition, ReservationSelectionModalData } from "../../interfaces.ts";
 import Settings from "../../settings.ts";
 
+const emit = defineEmits(["open", "close"]);
 const props = defineProps({
 	modalData: { type: Object, required: true }
 });
 
-const emit = defineEmits(["open", "close"]);
-
 const swToken = ref();
-
-let saveTimeoutId: number;
 const swCommentBoxesEnabled = ref(false);
 
 const countdown = ref(2);
+let saveTimeoutId: number;
+
+const showMassComplete = ref(false);
 
 onMounted(() => {
 	Shopware.shopwareInitialize().then((token) => {
@@ -50,7 +50,7 @@ function retrieveCommentData() {
 }
 
 function autoSelectReservationCountdown() {
-	if (!canAutoProceed){
+	if (!canAutoProceed()){
 		return;
 	}
 
@@ -146,8 +146,8 @@ function canAutoProceed():boolean {
 								<div v-show="modalData.singleLineReservations.length > 0">
 									<div class="row">
 										<div class="col">
-											<h4>{{ modalData.singleLineReservations.length }} singleline reserveringen
-											</h4>
+											<h4>{{ modalData.singleLineReservations.length }} singleline reserveringen</h4>
+											<button class="btn btn-primary btn-right" style="margin-top: -20px;" @click="showMassComplete = !showMassComplete">Massa Voltooien</button>
 											<p>Deze reserveringen bevatten 1 stuk van het product.</p>
 										</div>
 									</div>
@@ -187,7 +187,8 @@ function canAutoProceed():boolean {
 
 													</div>
 												</div>
-												<div class="card-body" v-bind:hidden="true">
+												<Transition>
+												<div class="card-body" v-show="showMassComplete">
 													<div class="reservation-rows reservation-rows">
 														<div class="row nfTableHeader">
 															<div class="col-3 ">Artikel nr</div>
@@ -208,6 +209,7 @@ function canAutoProceed():boolean {
 														</template>
 													</div>
 												</div>
+												</Transition>
 											</div>
 										</template>
 									</div>
