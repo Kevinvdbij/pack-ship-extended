@@ -1,9 +1,9 @@
 <script setup lang="ts">
 import { onMounted, ref, Transition } from "vue";
-import { getCurrentOrderNumber, isAmountStringComplete } from "../../retailVistaUtils.ts";
+import { isAmountStringComplete } from "../../retailVistaUtils.ts";
 import ShopwareLogoIconUrl from "../../assets/shopware.svg"
 import * as Shopware from "../../shopware";
-import { ReservationDefinition, ReservationSelectionModalData } from "../../interfaces.ts";
+import { ReservationSelectionModalData } from "../../interfaces.ts";
 import Settings from "../../settings.ts";
 
 const emit = defineEmits(["open", "close"]);

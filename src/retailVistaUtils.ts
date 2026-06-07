@@ -1,5 +1,5 @@
 import { GM_getValue, GM_setValue } from "$";
-import { ModalProductDetails, ModalReservationDetails, ProductDetails, ReservationDefinition, ReservationDetails, ReservationSearchResponseType, ReservationSelectionModalData, SearchResponseState } from "./interfaces";
+import { ModalProductDetails, ModalReservationDetails, ProductDetails, ReservationDefinition, ReservationDetails, ReservationSearchResponseType, ReservationSelectionModalData } from "./interfaces";
 
 export function GetContainer():Element | null {
 	return document.querySelector(".container");

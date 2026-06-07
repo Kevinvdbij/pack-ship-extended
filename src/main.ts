@@ -1,21 +1,20 @@
-import { createApp } from 'vue';
+import * as Vue from 'vue';
 import * as RVUtils from "./retailVistaUtils";
-import PortalExtension from './vue/PortalExtension.vue';
+import SearchReservationsPage from './vue/pages/SearchReservationsPage.vue';
+import VerifyProductsPage from './vue/pages/VerifyProductsPage.vue';
+import CreateParcelsPage from './vue/pages/CreateParcelsPage.vue';
+import CompletedPage from './vue/pages/CompletedPage.vue';
+import AddParcelsPage from './vue/pages/AddParcelsPage.vue';
 import FooterExtension from './vue/components/Footer.vue';
-import ParcelsExtension from './vue/ParcelsExtension.vue';
-import ReservationExtension from './vue/ReservationExtension.vue';
-import CompletedExtension from './vue/CompletedExtension.vue';
-import AddParcelsExtension from './vue/AddParcelsExtension.vue';
 import Settings from "./settings.ts"
 import "./style.css";
 
-const path = window.location.pathname;
 Settings.load();
-Settings.save();
+const path = window.location.pathname;
 
 switch(true) {
 	case /bztrs\/packingportal\/CompleteReservations.*/.test(path):
-		createApp(CompletedExtension).mount(
+		Vue.createApp(CompletedPage).mount(
 			(() => {
 				const app = document.createElement('div');
 				document.body.append(app);
@@ -25,7 +24,7 @@ switch(true) {
 	break;
 
 	case /bztrs\/packingportal\/Parcels.*/.test(path):
-		createApp(ParcelsExtension).mount(
+		Vue.createApp(CreateParcelsPage).mount(
 			(() => {
 				const app = document.createElement('div');
 				RVUtils.GetParcelContainerParent()?.insertAdjacentElement("afterbegin", app);
@@ -35,7 +34,7 @@ switch(true) {
 		break;
 
 	case /bztrs\/packingportal\/Reservations\/Index\/.*/.test(path):
-		createApp(ReservationExtension).mount(
+		Vue.createApp(VerifyProductsPage).mount(
 			(() => {
 				const app = document.createElement('div');
 				document.body.append(app);
@@ -45,7 +44,7 @@ switch(true) {
 		break;
 
 	case /bztrs\/packingportal\/AddParcels\/Search\?ReservationNumber=/.test(window.location.pathname + window.location.search):
-		createApp(AddParcelsExtension).mount(
+		Vue.createApp(AddParcelsPage).mount(
 			(() => {
 				const app = document.createElement('div');
 				document.body.append(app);
@@ -58,7 +57,7 @@ switch(true) {
 		break;
 
 	case /bztrs\/packingportal.*/.test(path):
-		createApp(PortalExtension).mount(
+		Vue.createApp(SearchReservationsPage).mount(
 			(() => {
 				const app = document.createElement('div');
 				RVUtils.GetContainer()?.append(app);
@@ -68,12 +67,10 @@ switch(true) {
 		break;
 }
 
-createApp(FooterExtension).mount(
+Vue.createApp(FooterExtension).mount(
   (() => {
     const app = document.createElement('div');
     document.body.append(app);
     return app;
   })(),
 );
-
-//import "./script.ts";

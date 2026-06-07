@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { createApp, onMounted } from 'vue';
-import ReservationSummary from './components/ReservationSummary.vue';
+import ReservationSummary from '../components/ReservationSummary.vue';
 
 onMounted(() => {
 });

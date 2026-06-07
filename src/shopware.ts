@@ -29,17 +29,6 @@ interface ShopwareSearchResponse {
 	data: ShopwareOrderEntry[];
 }
 
-interface SearchResponseState {
-	isAlert: boolean;
-	isUnfinished: boolean;
-	isProductSelection: Element | null;
-}
-
-interface ReservationDetails {
-	id: string;
-	number: string;
-}
-
 interface LoginCredentials {
 	username: string;
 	password: string;
