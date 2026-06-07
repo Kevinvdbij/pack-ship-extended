@@ -1,14 +1,17 @@
 import { createApp } from 'vue';
 import * as RVUtils from "./retailVistaUtils";
 import PortalExtension from './vue/PortalExtension.vue';
-import FooterExtension from './vue/FooterExtension.vue';
+import FooterExtension from './vue/components/Footer.vue';
 import ParcelsExtension from './vue/ParcelsExtension.vue';
 import ReservationExtension from './vue/ReservationExtension.vue';
 import CompletedExtension from './vue/CompletedExtension.vue';
 import AddParcelsExtension from './vue/AddParcelsExtension.vue';
+import Settings from "./settings.ts"
 import "./style.css";
 
 const path = window.location.pathname;
+Settings.load();
+Settings.save();
 
 switch(true) {
 	case /bztrs\/packingportal\/CompleteReservations.*/.test(path):

@@ -1,24 +1,33 @@
 <script setup lang="ts">
 import { onMounted, ref, Teleport } from 'vue';
-import Modal from "./components/SettingsModal.vue";
-import pkg from "../../package.json";
-import powerIconUrl from "../assets/power.svg";
+import Modal from "../components/SettingsModal.vue";
+import pkg from "../../../package.json";
+import powerIconUrl from "../../assets/power.svg";
+import Settings from '../../settings.ts';
 
 const show = ref(false);
 const showModal = ref(false);
 
-const masterSwitch = ref(true);
+const masterSwitch = ref(Settings.autoMasterSwitch);
 
 onMounted(() => {
 	show.value = true;
 });
+
+// Not entirely happy with this but works. 
+function masterSwitchToggle() {
+	Settings.autoMasterSwitch = !Settings.autoMasterSwitch;
+	Settings.save();
+
+	masterSwitch.value = Settings.autoMasterSwitch;
+}
 </script>
 
 <template>
 	<Teleport to="footer > div > div > div.col-auto.mr-auto.text-left > div">
 		<Transition>
-			<button v-if="show" type="button" class="toggle-button" @click="masterSwitch = !masterSwitch">
-				<img :src="powerIconUrl" :class="masterSwitch ? 'power-button-icon-on' : 'power-button-icon-off'"/>
+			<button v-if="show" type="button" class="toggle-button" @click="masterSwitchToggle()">
+				<img :src="powerIconUrl" :class="masterSwitch ? 'power-button-icon-on' : 'power-button-icon-off'" />
 			</button>
 		</Transition>
 		<Transition>
@@ -26,13 +35,15 @@ onMounted(() => {
 		</Transition>
 
 		<Transition>
-			<button v-if="show" type="submit" class="nav-link btn btn-link remove-padding col ml-3" @click="showModal = true;">Instellingen</button>
+			<!-- disabled for now -->
+			<button v-if="show" type="submit" class="nav-link btn btn-link remove-padding col ml-3"
+				@click="showModal = true;" disabled>Instellingen</button>
 		</Transition>
 	</Teleport>
 
 	<Teleport to="body">
 		<Transition>
-			<Modal v-if="showModal" @close="showModal = false"/>
+			<Modal v-if="showModal" @close="showModal = false" />
 		</Transition>
 	</Teleport>
 </template>
@@ -40,12 +51,12 @@ onMounted(() => {
 <style scoped>
 .v-enter-active,
 .v-leave-active {
-  transition: opacity 0.25s ease;
+	transition: opacity 0.25s ease;
 }
 
 .v-enter-from,
 .v-leave-to {
-  opacity: 0;
+	opacity: 0;
 }
 
 .toggle-button {

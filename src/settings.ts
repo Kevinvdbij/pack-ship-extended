@@ -1,92 +1,61 @@
 import { GM_getValue, GM_setValue } from "$";
 
-export interface SettingsData {
-	enabled: boolean;
-	proceed: boolean;
-	addButtons: boolean;
+export default class Settings {
+	private static _data: SettingsData = Settings.defaults();
+	
+	static defaults(): SettingsData {
+		return {
+			enabled: true,
+			autoMasterSwitch: true,
+			autoProceed: true,
+			autoSelect: true
+		}
+	}
+
+	static load() {
+		Object.assign(this._data, GM_getValue("PSE_Settings"));
+	}
+
+	static save() {
+		GM_setValue("PSE_Settings", (Settings._data));
+	}
+
+	static get enabled() {
+		return Settings._data.enabled;
+	}
+	
+	static set enabled(value) {
+		Settings._data.enabled = value;
+	}
+
+	static get autoMasterSwitch() {
+		return Settings._data.autoMasterSwitch;
+	}
+	
+	static set autoMasterSwitch(value) {
+		Settings._data.autoMasterSwitch = value;
+	}
+
+	static get autoProceed() {
+		return Settings._data.autoProceed;
+	}
+	
+	static set autoProceed(value) {
+		Settings._data.autoProceed = value;
+	}
+
+	static get autoSelect() {
+		return Settings._data.autoSelect;
+	}
+	
+	static set autoSelect(value) {
+		Settings._data.autoSelect = value;
+	}
 }
 
-export class Settings {
-	#isEnabled: boolean = false;
-	#isProceeding: boolean = false;
-	#enableAddButtons: boolean = false;
-
-	constructor() {
-		this.load();
-	}
-
-	get enabled(): boolean {
-		return this.#isEnabled;
-	}
-
-	set enabled(val: boolean) {
-		this.#isEnabled = val;
-		this.save();
-		location.reload();
-	}
-
-	get proceed(): boolean {
-		return this.#isProceeding;
-	}
-
-	set proceed(val: boolean) {
-		this.#isProceeding = val;
-		this.save();
-	}
-
-	get enableAddButtons(): boolean {
-		return this.#enableAddButtons;
-	}
-
-	set enableAddButtons(val: boolean) {
-		this.#enableAddButtons = val;
-		this.save();
-	}
-
-	save(): void {
-		const saveData: SettingsData = {
-			enabled: this.#isEnabled,
-			proceed: this.#isProceeding,
-			addButtons: this.#enableAddButtons,
-		};
-
-		GM_setValue("NKHR_Settings", JSON.stringify(saveData));
-
-		console.log(saveData);
-	}
-
-	load(): void {
-		const defaultSettings: SettingsData = {
-			enabled: true,
-			proceed: true,
-			addButtons: false,
-		};
-
-		const loadData: SettingsData = JSON.parse(
-			GM_getValue("NKHR_Settings", JSON.stringify(defaultSettings)),
-		);
-
-		this.#isEnabled = loadData.enabled ?? defaultSettings.enabled;
-		this.#isProceeding = loadData.proceed ?? defaultSettings.proceed;
-		this.#enableAddButtons = loadData.addButtons ?? defaultSettings.addButtons;
-
-		console.log(loadData);
-	}
-
-	public static saveData(data: SettingsData): void {
-		GM_setValue("NKHR_Settings", JSON.stringify(data));
-	}
-
-	public static loadData(): SettingsData {
-		const defaultSettings: SettingsData = {
-			enabled: true,
-			proceed: true,
-			addButtons: false,
-		};
-
-		const loadData = JSON.parse(
-			GM_getValue("NKHR_Settings", JSON.stringify(defaultSettings))) as SettingsData;
-
-		return loadData;
-	}
+type SettingsData = {
+	enabled: boolean,
+	autoMasterSwitch: boolean,
+	autoProceed: boolean,
+	autoSelect: boolean
 }

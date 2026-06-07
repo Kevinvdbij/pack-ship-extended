@@ -4,6 +4,7 @@ import { getCurrentOrderNumber, isAmountStringComplete } from "../../retailVista
 import ShopwareLogoIconUrl from "../../assets/shopware.svg"
 import * as Shopware from "../../shopware";
 import { ReservationDefinition, ReservationSelectionModalData } from "../../interfaces.ts";
+import Settings from "../../settings.ts";
 
 const props = defineProps({
 	modalData: { type: Object, required: true }
@@ -13,10 +14,10 @@ const emit = defineEmits(["open", "close"]);
 
 const swToken = ref();
 
-let saveTimeoutId:number;
+let saveTimeoutId: number;
 const swCommentBoxesEnabled = ref(false);
 
-const countdown = ref(4);
+const countdown = ref(2);
 
 onMounted(() => {
 	Shopware.shopwareInitialize().then((token) => {
@@ -26,16 +27,16 @@ onMounted(() => {
 	});
 });
 
-function onSaveButtonClick(orderData:Shopware.ShopwareOrderEntry) {
-    if (swToken) {
-        Shopware.shopwareUpdateOrderComment(swToken.value, orderData);
-    }
+function onSaveButtonClick(orderData: Shopware.ShopwareOrderEntry) {
+	if (swToken) {
+		Shopware.shopwareUpdateOrderComment(swToken.value, orderData);
+	}
 
-    swCommentBoxesEnabled.value = false;
-    if (saveTimeoutId) { clearTimeout(saveTimeoutId) }
-    saveTimeoutId = setTimeout(() => {
-        swCommentBoxesEnabled.value = true;
-    }, 250);
+	swCommentBoxesEnabled.value = false;
+	if (saveTimeoutId) { clearTimeout(saveTimeoutId) }
+	saveTimeoutId = setTimeout(() => {
+		swCommentBoxesEnabled.value = true;
+	}, 250);
 }
 
 function retrieveCommentData() {
@@ -49,6 +50,10 @@ function retrieveCommentData() {
 }
 
 function autoSelectReservationCountdown() {
+	if (!canAutoProceed){
+		return;
+	}
+
 	let countdownInterval = setInterval(() => {
 		countdown.value--;
 
@@ -71,11 +76,24 @@ function autoSelectReservation() {
 		return;
 	}
 }
+
+function canAutoProceed():boolean {
+	if (!Settings.autoMasterSwitch){
+		return false;
+	}
+
+	if (props.modalData.singleLineReservations.length <= 0 && props.modalData.validReservations <= 0) {
+		return false;
+	}
+
+	return true;
+}
 </script>
 
 <template>
 	<div class="settings-modal">
-		<div class="modal show" id="productReservationsModal" tabindex="-1" role="dialog" data-backdrop="static" aria-modal="true" style="display: block;">
+		<div class="modal show" id="productReservationsModal" tabindex="-1" role="dialog" data-backdrop="static"
+			aria-modal="true" style="display: block;">
 			<div class="modal-dialog modal-xl" role="document">
 				<div class="modal-content">
 					<div class="modal-header">
@@ -117,16 +135,19 @@ function autoSelectReservation() {
 									</div>
 								</div>
 
-								<div class="auto-select-countdown-container">
-									<hr>
-										<h4>Selecting order in {{ countdown }}</h4>
-									<hr>
+								<div v-if="canAutoProceed()">
+									<div class="auto-select-countdown-container">
+										<hr>
+										<h4>Gaat automatisch verder over {{ countdown }} seconden...</h4>
+										<hr>
+									</div>
 								</div>
 
 								<div v-show="modalData.singleLineReservations.length > 0">
 									<div class="row">
 										<div class="col">
-											<h4>{{ modalData.singleLineReservations.length }} singleline reserveringen</h4>
+											<h4>{{ modalData.singleLineReservations.length }} singleline reserveringen
+											</h4>
 											<p>Deze reserveringen bevatten 1 stuk van het product.</p>
 										</div>
 									</div>
@@ -140,13 +161,16 @@ function autoSelectReservation() {
 														<div class="col-10">
 															<div class="row">
 																<div class="col-4">
-																	<div>Reservering: <b>{{ reservation.reservationNumber }}</b></div>
-																	<div>Verkooporder referentiecode: <b>{{ reservation.saleOrderReference }}</b></div>
+																	<div>Reservering: <b>{{
+																		reservation.reservationNumber }}</b></div>
+																	<div>Verkooporder referentiecode: <b>{{
+																		reservation.saleOrderReference }}</b></div>
 
 																</div>
 																<div class="col-4">
 																	<div>Status: <b>{{ reservation.status }}</b></div>
-																	<div>Logistieke status: <b>{{ reservation.deliveryStatus }}</b></div>
+																	<div>Logistieke status: <b>{{
+																		reservation.deliveryStatus }}</b></div>
 																</div>
 																<div class="col-4">
 																	<div> Klant: <b>{{ reservation.customer }}</b></div>
@@ -188,9 +212,10 @@ function autoSelectReservation() {
 										</template>
 									</div>
 								</div>
-								
-								<hr v-show="modalData.singleLineReservations.length > 0 && modalData.validReservations.length > 0">
-								
+
+								<hr
+									v-show="modalData.singleLineReservations.length > 0 && modalData.validReservations.length > 0">
+
 								<div v-show="modalData.validReservations.length > 0">
 									<div class="row">
 										<div class="col">
@@ -206,13 +231,16 @@ function autoSelectReservation() {
 														<div class="col-10">
 															<div class="row">
 																<div class="col-4">
-																	<div>Reservering: <b>{{ reservation.reservationNumber }}</b></div>
-																	<div>Verkooporder referentiecode: <b>{{ reservation.saleOrderReference }}</b></div>
-																	
+																	<div>Reservering: <b>{{
+																		reservation.reservationNumber }}</b></div>
+																	<div>Verkooporder referentiecode: <b>{{
+																		reservation.saleOrderReference }}</b></div>
+
 																</div>
 																<div class="col-4">
 																	<div>Status: <b>{{ reservation.status }}</b></div>
-																	<div>Logistieke status: <b>{{ reservation.deliveryStatus }}</b></div>
+																	<div>Logistieke status: <b>{{
+																		reservation.deliveryStatus }}</b></div>
 																</div>
 																<div class="col-4">
 																	<div> Klant: <b>{{ reservation.customer }}</b></div>
@@ -222,11 +250,11 @@ function autoSelectReservation() {
 														<div class="col-2">
 															<div class="float-right">
 																<a :href="reservation.url"
-																class="btn btn-primary">Open&nbsp;<span
-																class="material-icons">chevron_right</span></a>
+																	class="btn btn-primary">Open&nbsp;<span
+																		class="material-icons">chevron_right</span></a>
 															</div>
 														</div>
-														
+
 													</div>
 												</div>
 												<div class="card-body">
@@ -247,20 +275,22 @@ function autoSelectReservation() {
 																	<div class="col-3 ">{{ product.amount }}</div>
 																</div>
 															</template>
+														</div>
 													</div>
+
 												</div>
-												
 											</div>
-										</div>
-									</template>
+										</template>
 									</div>
 								</div>
-								
-								<hr v-show="modalData.validReservations.length > 0 && modalData.invalidReservations.length > 0">
+
+								<hr
+									v-show="modalData.validReservations.length > 0 && modalData.invalidReservations.length > 0">
 
 								<div class="row" v-show="modalData.invalidReservations.length > 0">
 									<div class="col">
-										<h4>{{ modalData.invalidReservations.length }} reserveringen zijn nog niet volledig geraapt.</h4>
+										<h4>{{ modalData.invalidReservations.length }} reserveringen zijn nog niet
+											volledig geraapt.</h4>
 										<div class="alert alert-danger">Onderstaande reserveringen bevatten het product,
 											maar hebben niet de juiste logistieke status, of zijn nog niet volledig
 											geraapt.</div>
@@ -276,13 +306,16 @@ function autoSelectReservation() {
 													<div class="col-10">
 														<div class="row">
 															<div class="col-4">
-																<div>Reservering: <b>{{ reservation.reservationNumber }}</b></div>
-																<div>Verkooporder referentiecode: <b>{{ reservation.saleOrderReference }}</b></div>
+																<div>Reservering: <b>{{ reservation.reservationNumber
+																}}</b></div>
+																<div>Verkooporder referentiecode: <b>{{
+																	reservation.saleOrderReference }}</b></div>
 
 															</div>
 															<div class="col-4">
 																<div>Status: <b>{{ reservation.status }}</b></div>
-																<div>Logistieke status: <b>{{ reservation.deliveryStatus }}</b></div>
+																<div>Logistieke status: <b>{{ reservation.deliveryStatus
+																}}</b></div>
 															</div>
 															<div class="col-4">
 																<div> Klant: <b>{{ reservation.customer }}</b></div>
@@ -302,37 +335,50 @@ function autoSelectReservation() {
 														<div class="col-3">Hoofd barcode</div>
 														<div class="col-3">Geraapt aantal</div>
 													</div>
-														<div class="reservation-rows ">
-															<template v-for="product in reservation.products">
-																<div :class="isAmountStringComplete(product.amount) ? 'row nfTableRow' : 'row nfTableRow bg-warning text-dark'">
-																	<div class="col-3">{{ product.number }}</div>
-																	<div class="col-3">{{ product.description }}
-																	</div>
-																	<div class="col-3">{{ product.barcode }}</div>
-																	<div class="col-3 font-weight-bold">{{ product.amount }}</div>
+													<div class="reservation-rows ">
+														<template v-for="product in reservation.products">
+															<div
+																:class="isAmountStringComplete(product.amount) ? 'row nfTableRow' : 'row nfTableRow bg-warning text-dark'">
+																<div class="col-3">{{ product.number }}</div>
+																<div class="col-3">{{ product.description }}
 																</div>
-															</template>
+																<div class="col-3">{{ product.barcode }}</div>
+																<div class="col-3 font-weight-bold">{{ product.amount }}
+																</div>
+															</div>
+														</template>
 													</div>
 												</div>
 											</div>
-																						<div class="card-body" >
+											<div class="card-body">
 												<div class="reservation-rows reservation-rows">
 													<div class="row nfTableHeader sw-modal-header">
-														<img :src="ShopwareLogoIconUrl" style="float: left; width: 25px; height: 25px; margin-right: 8px;" /><h4 style="line-height: 22px;">Shopware Notitie</h4>
+														<img :src="ShopwareLogoIconUrl"
+															style="float: left; width: 25px; height: 25px; margin-right: 8px;" />
+														<h4 style="line-height: 22px;">Shopware Notitie</h4>
 													</div>
-														<div class="reservation-rows ">
-																<div class="row nfTableRow sw-modal-body">
-																	<div class="col">
-																		<div v-show="!swCommentBoxesEnabled || !reservation.swOrderData" class="loader" style="height: 20px; margin-top: -20px; top: 30px; justify-self: center; position: relative;"></div>
-																		<Transition>
-																			<textarea class="sw-modal-textarea" v-if="reservation.swOrderData" v-model="reservation.swOrderData.customerComment" :disabled="!swCommentBoxesEnabled"></textarea>
-																		</Transition>
-																		<textarea class="sw-modal-textarea" v-if="!reservation.swOrderData" disabled></textarea>
-																	</div>
-																	<div class="col-1.5">
-																		<button class="sw-btn" @click="onSaveButtonClick(reservation.swOrderData)" :disabled="!swCommentBoxesEnabled">Opslaan</button>
-																	</div>
+													<div class="reservation-rows ">
+														<div class="row nfTableRow sw-modal-body">
+															<div class="col">
+																<div v-show="!swCommentBoxesEnabled || !reservation.swOrderData"
+																	class="loader"
+																	style="height: 20px; margin-top: -20px; top: 30px; justify-self: center; position: relative;">
 																</div>
+																<Transition>
+																	<textarea class="sw-modal-textarea"
+																		v-if="reservation.swOrderData"
+																		v-model="reservation.swOrderData.customerComment"
+																		:disabled="!swCommentBoxesEnabled"></textarea>
+																</Transition>
+																<textarea class="sw-modal-textarea"
+																	v-if="!reservation.swOrderData" disabled></textarea>
+															</div>
+															<div class="col-1.5">
+																<button class="sw-btn"
+																	@click="onSaveButtonClick(reservation.swOrderData)"
+																	:disabled="!swCommentBoxesEnabled">Opslaan</button>
+															</div>
+														</div>
 													</div>
 												</div>
 											</div>
@@ -357,13 +403,13 @@ function autoSelectReservation() {
 <style scoped>
 .text-area-grow-enter-active,
 .text-area-grow-leave-active {
-  transition: opacity 0.25s ease, transform 0.1s ease;
+	transition: opacity 0.25s ease, transform 0.1s ease;
 }
 
 .text-area-grow-enter-from,
 .text-area-grow-leave-to {
-  opacity: 0;
-  transform: scaleY(0);
+	opacity: 0;
+	transform: scaleY(0);
 }
 
 .settings-modal {
@@ -448,40 +494,38 @@ input {
 	vertical-align: -4px;
 }
 
-.sw-modal-button {
-
-}
+.sw-modal-button {}
 
 .sw-btn {
 	width: 100%;
 	height: 35px;
 	background-color: #189eff;
 
-    transition: all .15s ease-out;
-    display: inline-block;
-    border-radius: 4px;
-    padding: 2px 24px;
-    font-size: 14px;
-    outline: none;
-    font-weight: 600;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-    vertical-align: middle;
-    text-decoration: none;
-    cursor: pointer;
-    user-select: none;
-    margin: 0;
-    position: relative;
+	transition: all .15s ease-out;
+	display: inline-block;
+	border-radius: 4px;
+	padding: 2px 24px;
+	font-size: 14px;
+	outline: none;
+	font-weight: 600;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	vertical-align: middle;
+	text-decoration: none;
+	cursor: pointer;
+	user-select: none;
+	margin: 0;
+	position: relative;
 
 	background: #189eff;
-    color: #fff;
-    line-height: 32px;
-    border: 0;
+	color: #fff;
+	line-height: 32px;
+	border: 0;
 	margin: 3px;
 }
 
 .sw-btn:hover {
-    background: #118cff;
+	background: #118cff;
 }
 
 .sw-btn:active {
@@ -512,5 +556,4 @@ input {
 	border-radius: 4px;
 	font-size: 18px;
 }
-
 </style>

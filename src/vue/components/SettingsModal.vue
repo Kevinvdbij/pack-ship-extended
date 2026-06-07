@@ -2,24 +2,11 @@
 import { ref } from "vue";
 import closeIconUrl from "../../assets/close.svg";
 import saveIconUrl from "../../assets/save.svg";
-import { Settings } from "../../settings";
 
-const savedData = Settings.loadData();
-
-console.log(savedData);
-
-const isEnabled = ref(savedData.enabled);
-const useAutoComplete = ref(savedData.proceed);
-const useAutoSelect = ref(savedData.proceed);
-const useAddButtons = ref(savedData.addButtons);
-
-function onSave() {
-	Settings.saveData({
-		enabled: isEnabled.value, 
-		proceed: useAutoComplete.value, 
-		addButtons: useAddButtons.value
-	});
-}
+const isEnabled = ref(false);
+const useAutoComplete = ref(false);
+const useAutoSelect = ref(false);
+const useAddButtons = ref(false);
 </script>
 
 <template>
@@ -29,23 +16,23 @@ function onSave() {
 				<img :src="closeIconUrl" width="50" height="50" />
 			</button>
 			<h3>Pack&Ship Extended Instellingen</h3>
-			
+
 			<div class="settings-modal-content-options">
 				<input type="checkbox" id="isEnabled" v-model="isEnabled">
 				<label class="setting-label" for="isEnabled">Script ingeschakeld</label><br>
-				
+
 				<input type="checkbox" id="useAutoComplete" v-model="useAutoComplete">
 				<label class="setting-label" for="useAutoComplete">Automatisch voltooien</label><br>
-				
+
 				<input type="checkbox" id="useAutoSelect" v-model="useAutoSelect">
 				<label class="setting-label" for="useAutoSelect">Automatisch reservering selecteren</label><br>
-				
+
 				<input type="checkbox" id="useAddButtons" v-model="useAddButtons">
 				<label class="setting-label" for="useAddButtons">Toevoeg knoppen</label><br>
-				
-				<button class="save-button" @click="onSave(); $emit('save'); $emit('close')">
+
+				<button class="save-button" @click="$emit('save'); $emit('close')">
 					Opslaan
-					<img :src="saveIconUrl" width="35" height="35" class="save-icon"/>
+					<img :src="saveIconUrl" width="35" height="35" class="save-icon" />
 				</button>
 			</div>
 		</div>
@@ -55,12 +42,12 @@ function onSave() {
 <style scoped>
 .settings-modal {
 	position: absolute;
-    width: 100% !important;
-    height: 100% !important;
-    left: 0;
-    top: 0;
-    background: rgba(51,51,51,0.7);
-    z-index: 100;
+	width: 100% !important;
+	height: 100% !important;
+	left: 0;
+	top: 0;
+	background: rgba(51, 51, 51, 0.7);
+	z-index: 100;
 	background-color: rgba(0, 0, 0, 0.5);
 }
 
@@ -116,7 +103,7 @@ function onSave() {
 
 .save-button:hover,
 .save-button:focus {
-  background-color: #537f5f;
+	background-color: #537f5f;
 }
 
 .save-icon {
@@ -129,6 +116,6 @@ function onSave() {
 }
 
 input {
-    vertical-align: -4px;
+	vertical-align: -4px;
 }
 </style>

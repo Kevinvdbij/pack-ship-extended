@@ -209,6 +209,15 @@ export function removeBusy() {
 	document.body.setAttribute("class", bodyClass!)
 }
 
+export function setBusy(state: boolean) {
+	if (state == true) {
+		$("body").addClass("busy");
+	}
+	else {
+		$("body").removeClass("busy");
+	}
+}
+
 export function RetrieveModalData(modalElement:HTMLElement):ReservationSelectionModalData {
 	const amount = (<HTMLElement>modalElement.querySelector("#productReservationsModal > div > div > div.modal-header > h5")).innerText.trimStart()[0];
 	const barcode = (<HTMLElement>modalElement.querySelector("#productReservationsModal > div > div > div.modal-header > h5")).innerText.split("'")[1];

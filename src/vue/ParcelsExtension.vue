@@ -1,36 +1,40 @@
 <script setup lang="ts">
 import { createApp, onMounted, ref, Transition } from 'vue';
-import { fetchReservationDetails, getCurrentReservationId, getCurrentReservationNumber, getReservationRowIndexFromItemId, retrieveCachedReservationDetails, setLastOpenReservation } from '../retailVistaUtils.ts';
+import * as RVUtils from '../retailVistaUtils.ts';
 import addIconUrl from "../assets/add.svg";
+import imageIconUrl from "../assets/image.svg";
 import { ReservationDetails } from '../interfaces.ts';
 import ReservationSummary from './components/ReservationSummary.vue';
+import Settings from '../settings.ts';
 
 const show = ref(false);
 
-const cachedReservations = retrieveCachedReservationDetails();
+const cachedReservations = RVUtils.retrieveCachedReservationDetails();
 let reservationDetails = ref<ReservationDetails>();
 
-const cacheHit = cachedReservations.find((reservation) => reservation.id == getCurrentReservationNumber());
+const cacheHit = cachedReservations.find((reservation) => reservation.id == RVUtils.getCurrentReservationNumber());
 if (cacheHit) {
 	reservationDetails.value = cacheHit;
 	console.log("cache hit!")
-} else{
-	fetchReservationDetails(getCurrentReservationId()).then((details) => {
+} else {
+	RVUtils.fetchReservationDetails(RVUtils.getCurrentReservationId()).then((details) => {
 		reservationDetails.value = details!;
 		console.log("cache miss!")
 	});
 }
 
 onMounted(() => {
-	show.value = true;
+	removeParcelItems();
 	updateVerifiedQuantities();
 	observeParcelContainer();
 	setupSummary();
-	
-	setLastOpenReservation({
-		id: getCurrentReservationId(),
-		number: getCurrentReservationNumber()
+
+	RVUtils.setLastOpenReservation({
+		id: RVUtils.getCurrentReservationId(),
+		number: RVUtils.getCurrentReservationNumber()
 	});
+
+	show.value = true;
 });
 
 function onClickAddProduct(barcode: string) {
@@ -43,21 +47,21 @@ function onClickAddProduct(barcode: string) {
 
 function updateVerifiedQuantities() {
 	reservationDetails.value?.products.forEach((product) => {
-		const itemId = getReservationRowIndexFromItemId(product.itemId);
+		const itemId = RVUtils.getReservationRowIndexFromItemId(product.itemId);
 		const quantity = <HTMLInputElement>document.querySelector(`input[name='VerificationReservationRows[${itemId}].VerifiedQuantity']`);
-			
+
 		product.verifiedQuantity = parseInt(quantity.value)
 	})
 }
 
 function observeParcelContainer() {
 	const parcelContainerElement = document.querySelector("#ParcelsContainer");
-	
+
 	if (parcelContainerElement) {
 		const config = { attributes: true, childList: true, subtree: true };
 		const observer = new MutationObserver(() => {
 			updateVerifiedQuantities();
-			announceParcels(parcelContainerElement);
+			autoAnnounceParcels(parcelContainerElement);
 		});
 		observer.observe(parcelContainerElement, config);
 	}
@@ -66,10 +70,10 @@ function observeParcelContainer() {
 function setupSummary() {
 	const overviewElement = <HTMLElement>document.querySelector("#ReservationOverview");
 	const backButton = <HTMLLinkElement>overviewElement.querySelector("div:nth-child(1) > div > a")
-	
+
 	backButton.href = "https://retailvista.net/bztrs/packingportal";
 	backButton.innerHTML = "<span class='material-icons'>chevron_left</span>Nieuwe zoekopdracht";
-	
+
 	createApp(ReservationSummary).mount(
 		(() => {
 			const app = document.createElement('div');
@@ -79,10 +83,64 @@ function setupSummary() {
 	);
 }
 
-function announceParcels(parcelContainerElement: Element) {
+function autoAnnounceParcels(parcelContainerElement: Element) {
+	if (!Settings.autoMasterSwitch) {
+		return;
+	}
+
 	const announceButton = parcelContainerElement?.querySelector("div > div:nth-child(4) > div > button") as HTMLButtonElement;
 	if (!announceButton?.hasAttribute("disabled")) {
 		announceButton?.click();
+	}
+}
+
+function verifiedClass(required: number, collected: number): string {
+	const normal = "collected-text";
+	const warn = "collected-text collected-text-warn blinking"
+	const alert = "collected-text collected-text-alert blinking";
+	const resolved = "collected-text collected-text-resolved"
+
+	if (required > 1 && required == collected) {
+		return resolved;
+	}
+	else if (required > 1 && collected == 0) {
+		return alert;
+	}
+	else if (required > 1 && collected > 0) {
+		return warn;
+	}
+	else {
+		return normal;
+	}
+}
+
+function removeParcelItems(): void {
+	// Get all delete buttons for parcel items and start iterating through them
+	const removeButtons = Array.from(document.querySelectorAll<HTMLElement>("#button-addon2"));
+
+	// Iterate through found remove buttons from the last with a delay, without this delay the removal fails
+	if (removeButtons.length > 0) {
+		// Set the class to busy so the user knows actions are happening
+		RVUtils.setBusy(true);
+		for (let i = 0; i < removeButtons.length; i++) {
+			setTimeout(() => {
+				RVUtils.setBusy(true);
+				// format the onclick event to usable data
+				const parcelInfo = removeButtons.pop()!.onclick!.toString().split("(").pop()!.split(")").shift()!.split(",");
+
+				// Get the amount and active controls for the parcel item
+				const amountControl = document.querySelector<HTMLInputElement>("#Items_" + parcelInfo[1] + "__Items_" + parcelInfo[2] + "__Amount")!;
+				const activeControl = document.querySelector<HTMLInputElement>("#Items_" + parcelInfo[1] + "__Items_" + parcelInfo[2] + "__Active")!;
+
+				// Set the controls to 0 and active, this makes the update remove the parcel items
+				amountControl.value = "0";
+				activeControl.value = "True";
+
+				// Call the page native function to update the parcel item
+				location.href = "javascript:void(update());";
+			}, i * 250);
+		}
+		RVUtils.setBusy(false);
 	}
 }
 </script>
@@ -113,22 +171,39 @@ function announceParcels(parcelContainerElement: Element) {
 												<span>{{ product.mainBarcode }}</span>
 											</td>
 											<td>
-												<span>{{ product.verifiedQuantity }} van {{ product.requiredQuantity }}</span>
+												<span
+													:class="verifiedClass(product.requiredQuantity, product.verifiedQuantity)">{{
+														product.verifiedQuantity }} van {{ product.requiredQuantity
+													}}</span>
 											</td>
 											<td>
-												<span v-if="product.verifiedQuantity < product.requiredQuantity" class="text-warning"><span class="material-icons">close</span></span>
-												<span v-if="product.verifiedQuantity >= product.requiredQuantity" class="text-success"><span class="material-icons">done</span></span>
+												<span v-if="product.verifiedQuantity < product.requiredQuantity"
+													class="text-warning"><span
+														class="material-icons">close</span></span>
+												<span v-if="product.verifiedQuantity >= product.requiredQuantity"
+													class="text-success"><span class="material-icons">done</span></span>
 											</td>
 											<td>
-												<button @click="onClickAddProduct(product.mainBarcode)" type="button" class="btn btn-primary add-button" v-bind:disabled="product.verifiedQuantity >= product.requiredQuantity">
-													<img class="add-icon" :src="addIconUrl" width="26" height="26" />
-												</button>
+												<div style="display: inline-flex; gap: 5px;">
+													<button @click="onClickAddProduct(product.mainBarcode)"
+														type="button" class="btn btn-primary action-icon"
+														v-bind:disabled="product.verifiedQuantity >= product.requiredQuantity">
+														<img class="action-icon-image" :src="addIconUrl" width="26"
+															height="26" />
+													</button>
+													<button
+														type="button" class="btn btn-primary action-icon" disabled>
+														<img class="action-icon-image" :src="imageIconUrl" width="26"
+															height="26" />
+													</button>
+												</div>
 											</td>
 										</tr>
 									</template>
 								</tbody>
 							</table>
-							<div class="mt-2 alert alert-info">Om producten te verzamelen, scan of voer de barcode in</div>
+							<div class="mt-2 alert alert-info">Om producten te verzamelen, scan of voer de barcode in
+							</div>
 						</div>
 					</div>
 				</div>
@@ -140,13 +215,13 @@ function announceParcels(parcelContainerElement: Element) {
 <style scoped>
 .v-enter-active,
 .v-leave-active {
-  transition: opacity 0.25s ease, transform 0.1s ease;
+	transition: opacity 0.25s ease, transform 0.1s ease;
 }
 
 .v-enter-from,
 .v-leave-to {
-  opacity: 0;
-  transform: scaleY(0);
+	opacity: 0;
+	transform: scaleY(0);
 }
 
 .container {
@@ -154,15 +229,48 @@ function announceParcels(parcelContainerElement: Element) {
 	margin-left: 0px;
 }
 
-.add-button {
-	width:26px;
-	height:26px;
+.action-icon {
+	width: 26px;
+	height: 26px;
 	display: flex;
 	justify-content: center;
 	align-items: center;
 }
 
-.add-icon {
+.action-icon-image {
 	filter: invert(1);
+}
+
+.collected-text {
+	background-color: transparent;
+	color: black;
+	padding: 5px;
+	padding-inline: 8px;
+	font-size: small;
+	font-weight: normal;
+	border-radius: 6px;
+}
+
+.collected-text-warn {
+	background-color: #ff8800;
+	color: white;
+	font-size: medium;
+	font-weight: bold;
+}
+
+.collected-text-alert {
+	background-color: red;
+	color: white;
+	font-size: medium;
+	font-weight: bold;
+}
+
+.collected-text-resolved {
+	background-color: #0fe02b;
+	color: rgb(255, 255, 255);
+	padding: 5px;
+	padding-inline: 8px;
+	font-size: medium;
+	font-weight: bold;
 }
 </style>

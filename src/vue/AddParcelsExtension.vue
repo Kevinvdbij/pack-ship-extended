@@ -4,26 +4,26 @@ import ReservationSummary from './components/ReservationSummary.vue';
 
 onMounted(() => {
 });
-	createApp(ReservationSummary).mount(
-		(() => {
-			const app = document.createElement('div');
-			document.querySelector("#ReservationSummary\\ mb-2")!.insertAdjacentElement("beforeend", app);
-			return app;
-		})(),
-	);
+createApp(ReservationSummary).mount(
+	(() => {
+		const app = document.createElement('div');
+		document.querySelector("#ReservationSummary\\ mb-2")!.insertAdjacentElement("beforeend", app);
+		return app;
+	})(),
+);
 </script>
 
-<template/>
+<template />
 
 <style scoped>
 .text-area-grow-enter-active,
 .text-area-grow-leave-active {
-  transition: opacity 0.25s ease, transform 0.1s ease;
+	transition: opacity 0.25s ease, transform 0.1s ease;
 }
 
 .text-area-grow-enter-from,
 .text-area-grow-leave-to {
-  opacity: 0;
-  transform: scaleY(0);
+	opacity: 0;
+	transform: scaleY(0);
 }
 </style>
