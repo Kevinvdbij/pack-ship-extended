@@ -1,11 +1,11 @@
 <script setup lang="ts">
 import { createApp, onMounted, ref, Transition } from 'vue';
-import * as RVUtils from '../retailVistaUtils.ts';
-import addIconUrl from "../assets/add.svg";
-import imageIconUrl from "../assets/image.svg";
-import { ReservationDetails } from '../interfaces.ts';
-import ReservationSummary from './components/ReservationSummary.vue';
-import Settings from '../settings.ts';
+import * as RVUtils from '../../retailVistaUtils.ts';
+import addIconUrl from "../../assets/add.svg";
+import imageIconUrl from "../../assets/image.svg";
+import { ReservationDetails } from '../../interfaces.ts';
+import ReservationSummary from '../components/ReservationSummary.vue';
+import Settings from '../../settings.ts';
 
 const show = ref(false);
 

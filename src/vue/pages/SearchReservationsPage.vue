@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import { onMounted, ref, Transition } from "vue";
-import { ReservationSearchResponseType, ReservationSelectionModalData } from "../interfaces.ts";
-import Modal from "./components/ReservationSelectionModal.vue";
-import * as PSUtils from "../retailVistaUtils.ts";
+import { ReservationSearchResponseType, ReservationSelectionModalData } from "../../interfaces.ts";
+import Modal from "../components/ReservationSelectionModal.vue";
+import * as PSUtils from "../../retailVistaUtils.ts";
 
 const show = ref(false);
 const showModal = ref(false);
