@@ -60,3 +60,15 @@ export interface ReservationDefinition {
 	id: string,
 	number: string
 }
+
+export interface MassCompleteEntry {
+	reservationNumber: string,
+	status: MassCompleteStatus
+}
+
+export enum MassCompleteStatus {
+	idle = 0,
+	started = 1,
+	finished = 2,
+	failed = 3
+}

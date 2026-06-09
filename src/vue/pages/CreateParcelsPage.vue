@@ -3,7 +3,7 @@ import { createApp, onMounted, ref, Transition } from 'vue';
 import * as RVUtils from '../../retailVistaUtils.ts';
 import addIconUrl from "../../assets/add.svg";
 import imageIconUrl from "../../assets/image.svg";
-import { ReservationDetails } from '../../interfaces.ts';
+import { MassCompleteStatus, ReservationDetails } from '../../interfaces.ts';
 import ReservationSummary from '../components/ReservationSummary.vue';
 import Settings from '../../settings.ts';
 
@@ -25,10 +25,12 @@ if (cacheHit) {
 
 onMounted(() => {
 	removeParcelItems();
+	
 	updateVerifiedQuantities();
 	observeParcelContainer();
 	setupSummary();
-
+	processAutoComplete();
+	
 	RVUtils.setLastOpenReservation({
 		id: RVUtils.getCurrentReservationId(),
 		number: RVUtils.getCurrentReservationNumber()
@@ -84,13 +86,29 @@ function setupSummary() {
 }
 
 function autoAnnounceParcels(parcelContainerElement: Element) {
-	if (!Settings.autoMasterSwitch) {
+	if (!Settings.autoMasterSwitch && !RVUtils.isMassCompleteReservation(RVUtils.getCurrentReservationNumber())) {
 		return;
 	}
 
 	const announceButton = parcelContainerElement?.querySelector("div > div:nth-child(4) > div > button") as HTMLButtonElement;
 	if (!announceButton?.hasAttribute("disabled")) {
-		announceButton?.click();
+		//announceButton?.click();
+	}
+}
+
+function processAutoComplete() {
+	const orderNumber = RVUtils.getCurrentReservationNumber();
+
+	if (RVUtils.isMassCompleteReservation(orderNumber)) {
+		RVUtils.updateMassCompleteStatus( { reservationNumber: orderNumber, status: MassCompleteStatus.started });
+		console.log({ reservationNumber: orderNumber, status: MassCompleteStatus.started });
+
+		reservationDetails.value?.products.forEach((product) => {
+			for(let i = 0; i < product.requiredQuantity; i++) {
+				document.querySelector<HTMLInputElement>("#productBarcode")!.value = product.mainBarcode;
+				document.querySelector<HTMLButtonElement>("#verifyProduct")!.click();
+			}
+		});
 	}
 }
 

@@ -1,5 +1,5 @@
-import { GM_getValue, GM_setValue } from "$";
-import { ModalProductDetails, ModalReservationDetails, ProductDetails, ReservationDefinition, ReservationDetails, ReservationSearchResponseType, ReservationSelectionModalData } from "./interfaces";
+import { GM_addValueChangeListener, GM_getValue, GM_setValue } from "$";
+import { MassCompleteEntry, ModalProductDetails, ModalReservationDetails, ProductDetails, ReservationDefinition, ReservationDetails, ReservationSearchResponseType, ReservationSelectionModalData } from "./interfaces";
 
 export function GetContainer():Element | null {
 	return document.querySelector(".container");
@@ -238,13 +238,13 @@ export function RetrieveModalData(modalElement:HTMLElement):ReservationSelection
 	const invalidReservations:ModalReservationDetails[] = iterateModalContainer(invalidReservationElement);
 
 	const movedReservations:ModalReservationDetails[] = [];
-	// Add items with only shipping costs as a 2nd item to single line reservations
+	// Add reservations with only shipping costs as a 2nd item to single line reservations
 	validReservations.forEach((reservation) => {
-		if (reservation.products.length > 1) {
+		if (reservation.products.length == 2) {
 			let shippingCostsProduct = reservation.products.find((x) => x.description == "verzendkosten");
-			let otherProduct = reservation.products.find((x) => x.description != "verzendkosten");
+			let searchProduct = reservation.products.find((x) => x.barcode == barcode);
 
-			if (shippingCostsProduct && otherProduct && parseInt(otherProduct.amount) == 1) {
+			if (shippingCostsProduct && searchProduct && parseInt(searchProduct.amount) == 1) {
 				let index = reservation.products.indexOf(shippingCostsProduct)
 				reservation.products.splice(index, 1);
 
@@ -344,4 +344,32 @@ export async function handleUnfinishedRun(target:HTMLElement): Promise<string> {
 
 export function matchShopwareOrderNumber(value: string):boolean {
 	return /^[0-9]{6,6}$/.test(value);
+}
+
+export function initMassCompleteStatus(entries: MassCompleteEntry[]) {
+	GM_setValue("PSE_MassCompleteStatus", entries)
+}
+
+export function updateMassCompleteStatus(entry: MassCompleteEntry) {
+	let massCompleteStatus = <MassCompleteEntry[]>GM_getValue("PSE_MassCompleteStatus", []);
+	GM_addValueChangeListener("PSE_MassCompleteStatus", (key, oldValue, newValue, remote) => {
+		massCompleteStatus = newValue;
+	});
+
+	let entryIndex = massCompleteStatus.findIndex((x) => x.reservationNumber == entry.reservationNumber);
+
+	if (entryIndex != -1) {
+		
+		massCompleteStatus = <MassCompleteEntry[]>GM_getValue("PSE_MassCompleteStatus", []);
+		massCompleteStatus[entryIndex] = entry;
+		GM_setValue("PSE_MassCompleteStatus", massCompleteStatus)
+	}
+}
+
+export function isMassCompleteReservation(reservationNumber: string) {
+	const massCompleteStatus = <MassCompleteEntry[]>GM_getValue("PSE_MassCompleteStatus", []);
+
+	const entry = massCompleteStatus.find((x) => x.reservationNumber == reservationNumber);
+	
+	return entry != undefined;
 }

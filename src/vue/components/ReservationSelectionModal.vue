@@ -3,8 +3,9 @@ import { onMounted, ref, Transition } from "vue";
 import * as RVUtils from "../../retailVistaUtils.ts";
 import ShopwareLogoIconUrl from "../../assets/shopware.svg"
 import * as Shopware from "../../shopware";
-import { ReservationSelectionModalData } from "../../interfaces.ts";
+import { MassCompleteEntry, MassCompleteStatus, ReservationSelectionModalData } from "../../interfaces.ts";
 import Settings from "../../settings.ts";
+import { GM, GM_addValueChangeListener, GM_getValue } from "$";
 
 const emit = defineEmits(["open", "close"]);
 const props = defineProps({
@@ -17,7 +18,12 @@ const swCommentBoxesEnabled = ref(false);
 const countdown = ref(2);
 let saveTimeoutId: number;
 
-const showMassComplete = ref(false);
+const massCompleteShowDialog = ref(false);
+const massCompleteStarted = ref(false);
+const massCompleteAmount = ref(100);
+const massCompleteMax = 50;
+const massCompleteThreshold = 1;
+const massCompleteStatus = ref<MassCompleteEntry[]>();
 
 onMounted(() => {
 	Shopware.shopwareInitialize().then((token) => {
@@ -25,6 +31,8 @@ onMounted(() => {
 		retrieveCommentData();
 		autoSelectReservationCountdown();
 	});
+
+	initMassComplete();
 });
 
 function onSaveButtonClick(orderData: Shopware.ShopwareOrderEntry) {
@@ -88,6 +96,74 @@ function canAutoProceed():boolean {
 
 	return true;
 }
+
+function initMassComplete() {
+	if (props.modalData.singleLineReservations && props.modalData.singleLineReservations.length >= massCompleteThreshold) {
+		setMassCompleteAmount(props.modalData.singleLineReservations.length);
+		massCompleteShowDialog.value = true;
+	}
+}
+
+function setMassCompleteAmount(value: number) {
+	const totalReservations = props.modalData.singleLineReservations.length;
+	const clampedVal = Math.min(Math.min(Math.max(2, value), massCompleteMax), totalReservations);
+	
+	massCompleteAmount.value = clampedVal;
+}
+
+function startMassComplete() {
+	setMassCompleteAmount(massCompleteAmount.value);
+	massCompleteStarted.value = true;
+
+	let startedReservations = [];
+
+	for(let i = 0; i < massCompleteAmount.value; i++) {
+		const reservation = props.modalData.singleLineReservations[i];
+
+		GM.openInTab(reservation.url, { active: false });
+
+		startedReservations.push(<MassCompleteEntry> { reservationNumber: reservation.reservationNumber, status: MassCompleteStatus.idle });
+	}
+
+	RVUtils.initMassCompleteStatus(startedReservations);
+	massCompleteStatus.value = startedReservations;
+	monitorMassComplete();
+}
+
+function monitorMassComplete() {
+	GM_addValueChangeListener("PSE_MassCompleteStatus", (key, oldValue, newValue, remote) => {
+		massCompleteStatus.value = newValue;
+	});
+}
+
+function getMassCompleteClass(reservationNumber: string) {
+	if (massCompleteStatus.value) {
+		const mcEntry = massCompleteStatus.value.find((x) => x.reservationNumber == reservationNumber)
+		console.log(massCompleteStatus.value);
+
+		if (mcEntry) {
+			switch(mcEntry.status) {
+				case MassCompleteStatus.idle:
+					return "mc-progress-idle";
+
+				case MassCompleteStatus.started:
+					return "mc-progress-started";
+
+				case MassCompleteStatus.finished:
+					return "mc-progress-finished";
+
+				case MassCompleteStatus.failed:
+					return "mc-progress-failed";
+
+				default:
+					return "mc-progress-failed";
+			}
+		} 
+		else {
+			return "mc-progress-failed";
+		}
+	}
+}
 </script>
 
 <template>
@@ -146,9 +222,30 @@ function canAutoProceed():boolean {
 								<div v-show="modalData.singleLineReservations.length > 0">
 									<div class="row">
 										<div class="col">
-											<h4>{{ modalData.singleLineReservations.length }} singleline reserveringen</h4>
-											<button class="btn btn-primary btn-right" style="margin-top: -20px;" @click="showMassComplete = !showMassComplete">Massa Voltooien</button>
-											<p>Deze reserveringen bevatten 1 stuk van het product.</p>
+											<h4>{{ modalData.singleLineReservations.length }} singleline reserveringen</h4>											<p>Deze reserveringen bevatten 1 stuk van het product.</p>
+										</div>
+									</div>
+
+
+									<div class="card mb-2" v-if="massCompleteShowDialog">
+										<div class="card-header">
+											<div class="row">
+												<div class="col-6">
+													<h4>Massa voltooien</h4>
+												</div>
+												<div class="col-2 pr-0">
+													<input type="number" class="form-control pr-0 combiInputButtonLeft" v-model.number="massCompleteAmount" :disabled="massCompleteStarted" @focusout="setMassCompleteAmount(massCompleteAmount)" >
+												</div>
+												<div class="col-1 pl-0 pr-0 mc-amount-btn">
+													<button class="btn btn-primary btn-block px-0 combiInputButtonRight combiInputButtonLeft" @click="setMassCompleteAmount(massCompleteAmount - 1)" :disabled="massCompleteStarted">-</button>
+												</div>
+												<div class="col-1 pl-0 pr-0 mc-amount-btn">
+													<button class="btn btn-primary btn-block px-0 combiInputButtonRight" @click="setMassCompleteAmount(massCompleteAmount + 1)" :disabled="massCompleteStarted">+</button>
+												</div>
+												<div class="col-3">
+													<button type="button" class="btn btn-primary btn-right btn-block" @click="startMassComplete()" :disabled="massCompleteStarted">Start voltooien</button>
+												</div>
+											</div>
 										</div>
 									</div>
 
@@ -179,35 +276,21 @@ function canAutoProceed():boolean {
 														</div>
 														<div class="col-2">
 															<div class="float-right">
-																<a :href="reservation.url"
-																	class="btn btn-primary">Open&nbsp;<span
-																		class="material-icons">chevron_right</span></a>
+																<Transition>
+																	<a :href="reservation.url"
+																		class="btn btn-primary"
+																		v-show="!massCompleteStarted"
+																		>Open&nbsp;<span
+																			class="material-icons">chevron_right</span></a>
+																</Transition>
 															</div>
 														</div>
 
 													</div>
 												</div>
 												<Transition>
-												<div class="card-body" v-show="showMassComplete">
-													<div class="reservation-rows reservation-rows">
-														<div class="row nfTableHeader">
-															<div class="col-3 ">Artikel nr</div>
-															<div class="col-3">Omschrijving</div>
-															<div class="col-3">Hoofd barcode</div>
-															<div class="col-3">Geraapt aantal</div>
-														</div>
-														<template v-for="product in reservation.products">
-															<div class="reservation-rows ">
-																<div class="row nfTableRow ">
-																	<div class="col-3">{{ product.number }}</div>
-																	<div class="col-3">{{ product.description }}
-																	</div>
-																	<div class="col-3">{{ product.barcode }}</div>
-																	<div class="col-3 ">{{ product.amount }}</div>
-																</div>
-															</div>
-														</template>
-													</div>
+												<div class="mc-progress-bar" v-show="massCompleteStarted">
+													<div :class="getMassCompleteClass(reservation.reservationNumber)"></div>
 												</div>
 												</Transition>
 											</div>
@@ -559,5 +642,61 @@ input {
 	padding-left: 5px;
 	border-radius: 4px;
 	font-size: 18px;
+}
+
+.mc-amount-btn {
+	-ms-flex: 0 0 4%;
+	flex: 0 0 4%;
+	max-width: 4%;
+}
+
+.mc-progress-bar {
+	background-color: rgb(211, 211, 211);
+	width: 100%;
+	height: 15px;
+	size: 5px;
+}
+
+.mc-progress-idle {
+	background-color: #c2b755;
+	width: 33.333%;
+	height: 100%;
+}
+
+.mc-progress-started {
+	background-color: #0e82ff;
+	width: 66%;
+	height: 100%;
+}
+
+.mc-progress-finished {
+	background-color: #00ff00;
+	width: 100%;
+	height: 100%;
+}
+
+.mc-progress-failed {
+	background-color: #ff0000;
+	width: 100%;
+	height: 100%;
+}
+
+.btn-primary:disabled {
+    color: #fff;
+    background-color: #ccc;
+    border-color: #bbb;
+}
+
+.form-control:disabled {
+    background-color: #eff6f3;
+	border: 1px solid #ced4da;
+}
+
+input[type=number]::-webkit-inner-spin-button, 
+input[type=number]::-webkit-outer-spin-button { 
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    margin: 0; 
 }
 </style>
