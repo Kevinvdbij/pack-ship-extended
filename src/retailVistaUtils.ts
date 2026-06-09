@@ -241,9 +241,10 @@ export function RetrieveModalData(modalElement:HTMLElement):ReservationSelection
 	// Add items with only shipping costs as a 2nd item to single line reservations
 	validReservations.forEach((reservation) => {
 		if (reservation.products.length > 1) {
-			let shippingCostsProduct = reservation.products.find((x) => x.description == "verzendkosten" || x.barcode == "9900000013776");
+			let shippingCostsProduct = reservation.products.find((x) => x.description == "verzendkosten");
+			let otherProduct = reservation.products.find((x) => x.description != "verzendkosten");
 
-			if (shippingCostsProduct) {
+			if (shippingCostsProduct && otherProduct && parseInt(otherProduct.amount) == 1) {
 				let index = reservation.products.indexOf(shippingCostsProduct)
 				reservation.products.splice(index, 1);
 
