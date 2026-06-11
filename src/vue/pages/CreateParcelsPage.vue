@@ -266,7 +266,7 @@ function removeParcelItems(): void {
 }
 
 .collected-text-resolved {
-	background-color: #0fe02b;
+	background-color: #ccc;
 	color: rgb(255, 255, 255);
 	padding: 5px;
 	padding-inline: 8px;
