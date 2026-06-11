@@ -122,24 +122,31 @@ function startMassComplete() {
 
 		GM.openInTab(reservation.url, { active: false });
 
-		startedReservations.push(<MassCompleteEntry> { reservationNumber: reservation.reservationNumber, status: MassCompleteStatus.idle });
+		const entry = <MassCompleteEntry> { reservationNumber: reservation.reservationNumber, status: MassCompleteStatus.idle }
+
+		startedReservations.push(entry);
+		monitorMassCompleteEntry(entry);
 	}
 
 	RVUtils.initMassCompleteStatus(startedReservations);
 	massCompleteStatus.value = startedReservations;
-	monitorMassComplete();
 }
 
-function monitorMassComplete() {
-	GM_addValueChangeListener("PSE_MassCompleteStatus", (key, oldValue, newValue, remote) => {
-		massCompleteStatus.value = newValue;
+function monitorMassCompleteEntry(entry: MassCompleteEntry) {
+	GM_addValueChangeListener(`PSE_MCEntry_${entry.reservationNumber}`, (key, oldValue, newValue, remote) => {
+		if (massCompleteStatus.value) {
+			const entryIndex = massCompleteStatus.value.findIndex((statusEnt) => statusEnt.reservationNumber == entry.reservationNumber);
+
+			if (entryIndex != -1) {
+				massCompleteStatus.value[entryIndex].status = newValue;
+			}
+		}
 	});
 }
 
 function getMassCompleteClass(reservationNumber: string) {
 	if (massCompleteStatus.value) {
 		const mcEntry = massCompleteStatus.value.find((x) => x.reservationNumber == reservationNumber)
-		console.log(massCompleteStatus.value);
 
 		if (mcEntry) {
 			switch(mcEntry.status) {
