@@ -1,4 +1,4 @@
-import { GM_addValueChangeListener, GM_deleteValue, GM_deleteValues, GM_getValue, GM_listValues, GM_setValue } from "$";
+import { GM_deleteValues, GM_getValue, GM_listValues, GM_setValue } from "$";
 import { MassCompleteEntry, ModalProductDetails, ModalReservationDetails, ProductDetails, ReservationDefinition, ReservationDetails, ReservationSearchResponseType, ReservationSelectionModalData } from "./interfaces";
 
 export function GetContainer():Element | null {

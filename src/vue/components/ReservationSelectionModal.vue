@@ -5,7 +5,7 @@ import ShopwareLogoIconUrl from "../../assets/shopware.svg"
 import * as Shopware from "../../shopware";
 import { MassCompleteEntry, MassCompleteStatus, ReservationSelectionModalData } from "../../interfaces.ts";
 import Settings from "../../settings.ts";
-import { GM, GM_addValueChangeListener, GM_getValue } from "$";
+import { GM, GM_addValueChangeListener } from "$";
 
 const emit = defineEmits(["open", "close"]);
 const props = defineProps({
@@ -22,7 +22,7 @@ const massCompleteShowDialog = ref(false);
 const massCompleteStarted = ref(false);
 const massCompleteAmount = ref(100);
 const massCompleteMax = 50;
-const massCompleteThreshold = 1;
+const massCompleteThreshold = 3;
 const massCompleteStatus = ref<MassCompleteEntry[]>();
 
 onMounted(() => {
@@ -133,7 +133,7 @@ function startMassComplete() {
 }
 
 function monitorMassCompleteEntry(entry: MassCompleteEntry) {
-	GM_addValueChangeListener(`PSE_MCEntry_${entry.reservationNumber}`, (key, oldValue, newValue, remote) => {
+	GM_addValueChangeListener(`PSE_MCEntry_${entry.reservationNumber}`, (_key, _oldValue, newValue, _remote) => {
 		if (massCompleteStatus.value) {
 			const entryIndex = massCompleteStatus.value.findIndex((statusEnt) => statusEnt.reservationNumber == entry.reservationNumber);
 
@@ -587,8 +587,6 @@ function getMassCompleteClass(reservationNumber: string) {
 input {
 	vertical-align: -4px;
 }
-
-.sw-modal-button {}
 
 .sw-btn {
 	width: 100%;

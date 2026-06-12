@@ -9,10 +9,12 @@ export default defineConfig({
     monkey({
       entry: 'src/main.ts',
       userscript: {
-        icon: 'https://vitejs.dev/logo.svg',
+        description: "Extension for the RetailVista Pack&Ship application with plenty of QOL improvements.",
+        icon: 'https://www.kampeerhalroden.nl/media/e9/9d/08/1703346720/favicon.ico',
         namespace: 'npm/vite-plugin-monkey',
         match: ['https://retailvista.net/bztrs/packingportal*'],
-		"run-at": "document-start",
+		    "run-at": "document-start",
+        license: "MIT",
       },
       build: {
         externalGlobals: {
