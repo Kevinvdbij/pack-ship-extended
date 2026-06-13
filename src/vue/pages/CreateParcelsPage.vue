@@ -13,14 +13,14 @@ let reservationDetails = ref<ReservationDetails>();
 
 onMounted(() => {
 	getReservationDetails().then(() => {
-		processAutoComplete();
 		updateVerifiedQuantities();
-		observeParcelContainer();
+		
+		removeParcelItems().then(() => {
+			processAutoComplete();
+			observeParcelContainer();
+		});
 	});
 
-	if (!RVUtils.isMassCompleteReservation(RVUtils.getCurrentReservationNumber())) {
-		removeParcelItems();
-	}
 	setupSummary();
 	
 	RVUtils.setLastOpenReservation({
@@ -104,7 +104,7 @@ function autoAnnounceParcels(parcelContainerElement: Element) {
 
 	const announceButton = parcelContainerElement?.querySelector("div > div:nth-child(4) > div > button") as HTMLButtonElement;
 	if (!announceButton?.hasAttribute("disabled")) {
-		announceButton?.click();
+		//announceButton?.click();
 		console.log("ANNOUNCE LABELS");
 	}
 }
@@ -122,6 +122,8 @@ function processAutoComplete() {
 			for(let i = 0; i < product.requiredQuantity; i++) {
 				document.querySelector<HTMLInputElement>("#productBarcode")!.value = product.mainBarcode;
 				document.querySelector<HTMLButtonElement>("#verifyProduct")!.click();
+
+				console.log(product.verifiedQuantity)
 			}
 		});
 	}
@@ -147,7 +149,7 @@ function verifiedClass(required: number, collected: number): string {
 	}
 }
 
-function removeParcelItems(): void {
+async function removeParcelItems(): Promise<void> {
 	// Get all delete buttons for parcel items and start iterating through them
 	const removeButtons = Array.from(document.querySelectorAll<HTMLElement>("#button-addon2"));
 
@@ -173,7 +175,8 @@ function removeParcelItems(): void {
 				location.href = "javascript:void(update());";
 			}, i * 250);
 		}
-		RVUtils.setBusy(false);
+		
+		return new Promise(resolve => setTimeout(resolve, 250 + (removeButtons.length * 250)));
 	}
 }
 </script>
