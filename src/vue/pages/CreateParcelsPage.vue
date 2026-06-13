@@ -18,8 +18,9 @@ onMounted(() => {
 		observeParcelContainer();
 	});
 
-	removeParcelItems();
-
+	if (!RVUtils.isMassCompleteReservation(RVUtils.getCurrentReservationNumber())) {
+		removeParcelItems();
+	}
 	setupSummary();
 	
 	RVUtils.setLastOpenReservation({
@@ -36,12 +37,16 @@ async function getReservationDetails() {
 	const cacheHit = cachedReservations.find((reservation) => reservation.id == RVUtils.getCurrentReservationNumber());
 	if (cacheHit) {
 		reservationDetails.value = cacheHit;
-		console.log("cache hit!");
+		console.log("Cache hit!");
+
+		return reservationDetails.value;
 	}
 	else {
-		return RVUtils.fetchReservationDetails(RVUtils.getCurrentReservationId()).then((details) => {
+		console.log("Cache miss!");
+		await RVUtils.fetchReservationDetails(RVUtils.getCurrentReservationId()).then((details) => {
 			reservationDetails.value = details!;
-			console.log("cache miss!");
+
+			return reservationDetails.value;
 		});
 	}
 }
@@ -99,12 +104,15 @@ function autoAnnounceParcels(parcelContainerElement: Element) {
 
 	const announceButton = parcelContainerElement?.querySelector("div > div:nth-child(4) > div > button") as HTMLButtonElement;
 	if (!announceButton?.hasAttribute("disabled")) {
-		announceButton?.click();
+		//announceButton?.click();
+		console.log("ANNOUNCE LABELS");
 	}
 }
 
 function processAutoComplete() {
 	const orderNumber = RVUtils.getCurrentReservationNumber();
+
+	console.log(`isMassCompleteReservation: ${RVUtils.isMassCompleteReservation(orderNumber)}`)
 
 	if (RVUtils.isMassCompleteReservation(orderNumber)) {
 		RVUtils.updateMassCompleteStatus( { reservationNumber: orderNumber, status: MassCompleteStatus.started });
