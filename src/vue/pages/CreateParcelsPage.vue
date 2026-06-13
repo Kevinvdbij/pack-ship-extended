@@ -104,7 +104,7 @@ function autoAnnounceParcels(parcelContainerElement: Element) {
 
 	const announceButton = parcelContainerElement?.querySelector("div > div:nth-child(4) > div > button") as HTMLButtonElement;
 	if (!announceButton?.hasAttribute("disabled")) {
-		//announceButton?.click();
+		announceButton?.click();
 		console.log("ANNOUNCE LABELS");
 	}
 }
