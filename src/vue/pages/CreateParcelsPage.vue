@@ -9,27 +9,18 @@ import Settings from '../../settings.ts';
 
 const show = ref(false);
 
-const cachedReservations = RVUtils.retrieveCachedReservationDetails();
 let reservationDetails = ref<ReservationDetails>();
 
-const cacheHit = cachedReservations.find((reservation) => reservation.id == RVUtils.getCurrentReservationNumber());
-if (cacheHit) {
-	reservationDetails.value = cacheHit;
-	console.log("cache hit!")
-} else {
-	RVUtils.fetchReservationDetails(RVUtils.getCurrentReservationId()).then((details) => {
-		reservationDetails.value = details!;
-		console.log("cache miss!")
-	});
-}
-
 onMounted(() => {
+	getReservationDetails().then(() => {
+		processAutoComplete();
+		updateVerifiedQuantities();
+		observeParcelContainer();
+	});
+
 	removeParcelItems();
-	
-	updateVerifiedQuantities();
-	observeParcelContainer();
+
 	setupSummary();
-	processAutoComplete();
 	
 	RVUtils.setLastOpenReservation({
 		id: RVUtils.getCurrentReservationId(),
@@ -38,6 +29,22 @@ onMounted(() => {
 
 	show.value = true;
 });
+
+async function getReservationDetails() {
+	const cachedReservations = RVUtils.retrieveCachedReservationDetails();
+
+	const cacheHit = cachedReservations.find((reservation) => reservation.id == RVUtils.getCurrentReservationNumber());
+	if (cacheHit) {
+		reservationDetails.value = cacheHit;
+		console.log("cache hit!");
+	}
+	else {
+		return RVUtils.fetchReservationDetails(RVUtils.getCurrentReservationId()).then((details) => {
+			reservationDetails.value = details!;
+			console.log("cache miss!");
+		});
+	}
+}
 
 function onClickAddProduct(barcode: string) {
 	let barcodeInput = document.querySelector("#productBarcode") as HTMLInputElement;

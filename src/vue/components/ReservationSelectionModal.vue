@@ -22,7 +22,7 @@ const massCompleteShowDialog = ref(false);
 const massCompleteStarted = ref(false);
 const massCompleteAmount = ref(100);
 const massCompleteMax = 50;
-const massCompleteThreshold = 3;
+const massCompleteThreshold = 2;
 const massCompleteStatus = ref<MassCompleteEntry[]>();
 
 onMounted(() => {
@@ -86,11 +86,18 @@ function autoSelectReservation() {
 }
 
 function canAutoProceed():boolean {
+	// Stop auto proceeding if the auto master switch is disabled.
 	if (!Settings.autoMasterSwitch){
 		return false;
 	}
 
+	// Stop auto proceeding if there is no valid reservations
 	if (props.modalData.singleLineReservations.length <= 0 && props.modalData.validReservations <= 0) {
+		return false;
+	}
+
+	// Stop auto proceeding if there is a mass complete dialog
+	if (massCompleteShowDialog.value == true) {
 		return false;
 	}
 
@@ -669,13 +676,13 @@ input {
 }
 
 .mc-progress-started {
-	background-color: #0e82ff;
+	background-color: #4ea0f7;
 	width: 66%;
 	height: 100%;
 }
 
 .mc-progress-finished {
-	background-color: #00ff00;
+	background-color: #56e656;
 	width: 100%;
 	height: 100%;
 }
