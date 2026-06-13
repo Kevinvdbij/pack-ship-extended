@@ -16,7 +16,6 @@ export default defineConfig({
         namespace: 'npm/vite-plugin-monkey',
         match: ['https://retailvista.net/bztrs/packingportal*'],
         license: "MIT",
-		    "run-at": "document-start",
       },
       build: {
         externalGlobals: {
