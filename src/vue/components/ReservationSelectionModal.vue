@@ -3,7 +3,7 @@ import { onMounted, ref, Transition } from "vue";
 import * as RVUtils from "../../retailVistaUtils.ts";
 import ShopwareLogoIconUrl from "../../assets/shopware.svg"
 import * as Shopware from "../../shopware";
-import { MassCompleteEntry, MassCompleteStatus, ReservationSelectionModalData } from "../../interfaces.ts";
+import { MassCompleteEntry, MassCompleteStatus, ModalReservationDetails, ReservationSelectionModalData } from "../../interfaces.ts";
 import Settings from "../../settings.ts";
 import { GM, GM_addValueChangeListener, GM_getValue } from "$";
 
@@ -48,7 +48,9 @@ function onSaveButtonClick(orderData: Shopware.ShopwareOrderEntry) {
 }
 
 function retrieveCommentData() {
-	(<ReservationSelectionModalData>props.modalData).invalidReservations.forEach((reservation) => {
+	const reservationsToFetch:ModalReservationDetails[] = props.modalData.invalidReservations.concat((props.modalData).validReservations);
+
+	reservationsToFetch.forEach((reservation) => {
 		Shopware.shopwareGetOrderData(swToken.value, reservation.saleOrderReference).then((response) => {
 			reservation.swOrderData = response.data[0]
 		});
@@ -362,8 +364,41 @@ function getMassCompleteClass(reservationNumber: string) {
 															</template>
 														</div>
 													</div>
-
 												</div>
+												<div v-if="RVUtils.matchShopwareOrderNumber(reservation.saleOrderReference)">
+												<div class="card-body">
+													<div class="reservation-rows reservation-rows">
+														<div class="row nfTableHeader sw-modal-header">
+															<img :src="ShopwareLogoIconUrl"
+																style="float: left; width: 25px; height: 25px; margin-right: 8px;" />
+															<h4 style="line-height: 22px;">Shopware Notitie</h4>
+														</div>
+														<div class="reservation-rows ">
+															<div class="row nfTableRow sw-modal-body">
+																<div class="col">
+																	<div v-show="!swCommentBoxesEnabled || !reservation.swOrderData"
+																		class="loader"
+																		style="height: 20px; margin-top: -20px; top: 30px; justify-self: center; position: relative;">
+																	</div>
+																	<Transition>
+																		<textarea class="sw-modal-textarea"
+																			v-if="reservation.swOrderData"
+																			v-model="reservation.swOrderData.customerComment"
+																			:disabled="!swCommentBoxesEnabled" :placeholder="swCommentBoxesEnabled ? 'Nog geen notitie...' : ''"></textarea>
+																	</Transition>
+																	<textarea class="sw-modal-textarea"
+																		v-if="!reservation.swOrderData" disabled></textarea>
+																</div>
+																<div class="col-1.5">
+																	<button class="sw-btn"
+																		@click="onSaveButtonClick(reservation.swOrderData)"
+																		:disabled="!swCommentBoxesEnabled">Opslaan</button>
+																</div>
+															</div>
+														</div>
+													</div>
+												</div>
+											</div>
 											</div>
 										</template>
 									</div>
