@@ -1,4 +1,4 @@
-import { GM_addValueChangeListener, GM_getValue, GM_setValue } from "$";
+import { GM_deleteValues, GM_getValue, GM_listValues, GM_setValue } from "$";
 import { MassCompleteEntry, ModalProductDetails, ModalReservationDetails, ProductDetails, ReservationDefinition, ReservationDetails, ReservationSearchResponseType, ReservationSelectionModalData } from "./interfaces";
 
 export function GetContainer():Element | null {
@@ -347,29 +347,22 @@ export function matchShopwareOrderNumber(value: string):boolean {
 }
 
 export function initMassCompleteStatus(entries: MassCompleteEntry[]) {
-	GM_setValue("PSE_MassCompleteStatus", entries)
+	const mcEntries = GM_listValues().filter((x) => x.startsWith("PSE_MCEntry_"));
+	if (mcEntries) {
+		GM_deleteValues(mcEntries);
+	}
+
+	entries.forEach((entry) => {
+		GM_setValue(`PSE_MCEntry_${entry.reservationNumber}`, entry.status);
+	})
 }
 
 export function updateMassCompleteStatus(entry: MassCompleteEntry) {
-	let massCompleteStatus = <MassCompleteEntry[]>GM_getValue("PSE_MassCompleteStatus", []);
-	GM_addValueChangeListener("PSE_MassCompleteStatus", (key, oldValue, newValue, remote) => {
-		massCompleteStatus = newValue;
-	});
-
-	let entryIndex = massCompleteStatus.findIndex((x) => x.reservationNumber == entry.reservationNumber);
-
-	if (entryIndex != -1) {
-		
-		massCompleteStatus = <MassCompleteEntry[]>GM_getValue("PSE_MassCompleteStatus", []);
-		massCompleteStatus[entryIndex] = entry;
-		GM_setValue("PSE_MassCompleteStatus", massCompleteStatus)
-	}
+	GM_setValue(`PSE_MCEntry_${entry.reservationNumber}`, entry.status);
 }
 
 export function isMassCompleteReservation(reservationNumber: string) {
-	const massCompleteStatus = <MassCompleteEntry[]>GM_getValue("PSE_MassCompleteStatus", []);
+	const entry = GM_getValue(`PSE_MCEntry_${reservationNumber}`, undefined);
 
-	const entry = massCompleteStatus.find((x) => x.reservationNumber == reservationNumber);
-	
 	return entry != undefined;
 }

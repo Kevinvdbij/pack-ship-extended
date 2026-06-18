@@ -5,7 +5,7 @@ import ShopwareLogoIconUrl from "../../assets/shopware.svg"
 import * as Shopware from "../../shopware";
 import { MassCompleteEntry, MassCompleteStatus, ModalReservationDetails, ReservationSelectionModalData } from "../../interfaces.ts";
 import Settings from "../../settings.ts";
-import { GM, GM_addValueChangeListener, GM_getValue } from "$";
+import { GM, GM_addValueChangeListener } from "$";
 
 const emit = defineEmits(["open", "close"]);
 const props = defineProps({
@@ -22,7 +22,7 @@ const massCompleteShowDialog = ref(false);
 const massCompleteStarted = ref(false);
 const massCompleteAmount = ref(100);
 const massCompleteMax = 50;
-const massCompleteThreshold = 1;
+const massCompleteThreshold = 2;
 const massCompleteStatus = ref<MassCompleteEntry[]>();
 
 onMounted(() => {
@@ -88,11 +88,18 @@ function autoSelectReservation() {
 }
 
 function canAutoProceed():boolean {
+	// Stop auto proceeding if the auto master switch is disabled.
 	if (!Settings.autoMasterSwitch){
 		return false;
 	}
 
+	// Stop auto proceeding if there is no valid reservations
 	if (props.modalData.singleLineReservations.length <= 0 && props.modalData.validReservations <= 0) {
+		return false;
+	}
+
+	// Stop auto proceeding if there is a mass complete dialog
+	if (massCompleteShowDialog.value == true) {
 		return false;
 	}
 
@@ -124,24 +131,31 @@ function startMassComplete() {
 
 		GM.openInTab(reservation.url, { active: false });
 
-		startedReservations.push(<MassCompleteEntry> { reservationNumber: reservation.reservationNumber, status: MassCompleteStatus.idle });
+		const entry = <MassCompleteEntry> { reservationNumber: reservation.reservationNumber, status: MassCompleteStatus.idle }
+
+		startedReservations.push(entry);
+		monitorMassCompleteEntry(entry);
 	}
 
 	RVUtils.initMassCompleteStatus(startedReservations);
 	massCompleteStatus.value = startedReservations;
-	monitorMassComplete();
 }
 
-function monitorMassComplete() {
-	GM_addValueChangeListener("PSE_MassCompleteStatus", (key, oldValue, newValue, remote) => {
-		massCompleteStatus.value = newValue;
+function monitorMassCompleteEntry(entry: MassCompleteEntry) {
+	GM_addValueChangeListener(`PSE_MCEntry_${entry.reservationNumber}`, (_key, _oldValue, newValue, _remote) => {
+		if (massCompleteStatus.value) {
+			const entryIndex = massCompleteStatus.value.findIndex((statusEnt) => statusEnt.reservationNumber == entry.reservationNumber);
+
+			if (entryIndex != -1) {
+				massCompleteStatus.value[entryIndex].status = newValue;
+			}
+		}
 	});
 }
 
 function getMassCompleteClass(reservationNumber: string) {
 	if (massCompleteStatus.value) {
 		const mcEntry = massCompleteStatus.value.find((x) => x.reservationNumber == reservationNumber)
-		console.log(massCompleteStatus.value);
 
 		if (mcEntry) {
 			switch(mcEntry.status) {
@@ -616,8 +630,6 @@ input {
 	vertical-align: -4px;
 }
 
-.sw-modal-button {}
-
 .sw-btn {
 	width: 100%;
 	height: 35px;
@@ -699,13 +711,13 @@ input {
 }
 
 .mc-progress-started {
-	background-color: #0e82ff;
+	background-color: #4ea0f7;
 	width: 66%;
 	height: 100%;
 }
 
 .mc-progress-finished {
-	background-color: #00ff00;
+	background-color: #56e656;
 	width: 100%;
 	height: 100%;
 }

@@ -9,27 +9,19 @@ import Settings from '../../settings.ts';
 
 const show = ref(false);
 
-const cachedReservations = RVUtils.retrieveCachedReservationDetails();
 let reservationDetails = ref<ReservationDetails>();
 
-const cacheHit = cachedReservations.find((reservation) => reservation.id == RVUtils.getCurrentReservationNumber());
-if (cacheHit) {
-	reservationDetails.value = cacheHit;
-	console.log("cache hit!")
-} else {
-	RVUtils.fetchReservationDetails(RVUtils.getCurrentReservationId()).then((details) => {
-		reservationDetails.value = details!;
-		console.log("cache miss!")
-	});
-}
-
 onMounted(() => {
-	removeParcelItems();
-	
-	updateVerifiedQuantities();
-	observeParcelContainer();
+	getReservationDetails().then(() => {
+		updateVerifiedQuantities();
+		
+		removeParcelItems().then(() => {
+			processAutoComplete();
+			observeParcelContainer();
+		});
+	});
+
 	setupSummary();
-	processAutoComplete();
 	
 	RVUtils.setLastOpenReservation({
 		id: RVUtils.getCurrentReservationId(),
@@ -38,6 +30,26 @@ onMounted(() => {
 
 	show.value = true;
 });
+
+async function getReservationDetails() {
+	const cachedReservations = RVUtils.retrieveCachedReservationDetails();
+
+	const cacheHit = cachedReservations.find((reservation) => reservation.id == RVUtils.getCurrentReservationNumber());
+	if (cacheHit) {
+		reservationDetails.value = cacheHit;
+		console.log("Cache hit!");
+
+		return reservationDetails.value;
+	}
+	else {
+		console.log("Cache miss!");
+		await RVUtils.fetchReservationDetails(RVUtils.getCurrentReservationId()).then((details) => {
+			reservationDetails.value = details!;
+
+			return reservationDetails.value;
+		});
+	}
+}
 
 function onClickAddProduct(barcode: string) {
 	let barcodeInput = document.querySelector("#productBarcode") as HTMLInputElement;
@@ -92,12 +104,15 @@ function autoAnnounceParcels(parcelContainerElement: Element) {
 
 	const announceButton = parcelContainerElement?.querySelector("div > div:nth-child(4) > div > button") as HTMLButtonElement;
 	if (!announceButton?.hasAttribute("disabled")) {
-		//announceButton?.click();
+		announceButton?.click();
+		console.log("ANNOUNCE LABELS");
 	}
 }
 
 function processAutoComplete() {
 	const orderNumber = RVUtils.getCurrentReservationNumber();
+
+	console.log(`isMassCompleteReservation: ${RVUtils.isMassCompleteReservation(orderNumber)}`)
 
 	if (RVUtils.isMassCompleteReservation(orderNumber)) {
 		RVUtils.updateMassCompleteStatus( { reservationNumber: orderNumber, status: MassCompleteStatus.started });
@@ -107,6 +122,8 @@ function processAutoComplete() {
 			for(let i = 0; i < product.requiredQuantity; i++) {
 				document.querySelector<HTMLInputElement>("#productBarcode")!.value = product.mainBarcode;
 				document.querySelector<HTMLButtonElement>("#verifyProduct")!.click();
+
+				console.log(product.verifiedQuantity)
 			}
 		});
 	}
@@ -132,7 +149,7 @@ function verifiedClass(required: number, collected: number): string {
 	}
 }
 
-function removeParcelItems(): void {
+async function removeParcelItems(): Promise<void> {
 	// Get all delete buttons for parcel items and start iterating through them
 	const removeButtons = Array.from(document.querySelectorAll<HTMLElement>("#button-addon2"));
 
@@ -158,7 +175,8 @@ function removeParcelItems(): void {
 				location.href = "javascript:void(update());";
 			}, i * 250);
 		}
-		RVUtils.setBusy(false);
+		
+		return new Promise(resolve => setTimeout(resolve, 250 + (removeButtons.length * 250)));
 	}
 }
 </script>
@@ -284,7 +302,7 @@ function removeParcelItems(): void {
 }
 
 .collected-text-resolved {
-	background-color: #0fe02b;
+	background-color: #ccc;
 	color: rgb(255, 255, 255);
 	padding: 5px;
 	padding-inline: 8px;
