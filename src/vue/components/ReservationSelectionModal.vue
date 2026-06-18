@@ -3,7 +3,7 @@ import { onMounted, ref, Transition } from "vue";
 import * as RVUtils from "../../retailVistaUtils.ts";
 import ShopwareLogoIconUrl from "../../assets/shopware.svg"
 import * as Shopware from "../../shopware";
-import { MassCompleteEntry, MassCompleteStatus, ModalReservationDetails, ReservationSelectionModalData } from "../../interfaces.ts";
+import { MassCompleteEntry, MassCompleteStatus, ModalReservationDetails } from "../../interfaces.ts";
 import Settings from "../../settings.ts";
 import { GM, GM_addValueChangeListener } from "$";
 
