@@ -223,6 +223,47 @@ const shopwareApiUrl = "https://www.kampeerhalroden.nl";
 		return $.ajax(ajaxSettings);
 	}
 
+	export async function getImageUri(productEAN: string) {
+		console.log(`SWIntegration: getting image URI (${productEAN}).`);
+
+		const url = shopwareApiUrl + "/store-api/product";
+		const options = {
+			method: 'POST',
+			headers: {
+				'Content-Type': 'application/json',
+				Accept: 'application/json',
+				'sw-access-key': 'SWSCNGG4CDNHVVL4MJZ2YKDCMA',
+				"sw-include-seo-urls":"true"
+			},
+			body: JSON.stringify({
+				filter: [
+					{
+						type: "contains",
+						field: "ean",
+						value: productEAN
+					}
+				]
+			})
+		};
+
+		try {
+			const response = await fetch(url, options);
+			const data = await response.json();
+			
+			if (data?.elements?.length > 0) {
+            	const product = data.elements[0];
+
+				return "https://www.kampeerhalroden.nl/" + product.cover.media.path;
+			}
+			else throw new Error("Product not found.");
+		} 
+		catch(error) {
+			console.warn(error);
+
+			return "";
+		}
+	}
+
 	// Create a login dialog to retrieve shopware login credentials
 	async function shopwareLoginDialog(): Promise<LoginCredentials> {
 		// --- Use jQuery to add the form in a "popup" dialog.

@@ -5,17 +5,23 @@ import addIconUrl from "../../assets/add.svg";
 import imageIconUrl from "../../assets/image.svg";
 import { MassCompleteStatus, ReservationDetails } from '../../interfaces.ts';
 import ReservationSummary from '../components/ReservationSummary.vue';
+import ImageModal from '../components/ImageModal.vue';
 import Settings from '../../settings.ts';
+import * as Shopware from "../../shopware.ts";
 
-const show = ref(false);
+const showReservationDetails = ref(false);
 
 let reservationDetails = ref<ReservationDetails>();
+const showImageModal = ref(false);
+const imageModalUrl = ref("");
 
 onMounted(() => {
 	getReservationDetails().then(() => {
-		updateVerifiedQuantities();
-		
+
 		removeParcelItems().then(() => {
+			updateVerifiedQuantities();
+			showReservationDetails.value = true;
+
 			processAutoComplete();
 			observeParcelContainer();
 		});
@@ -27,8 +33,6 @@ onMounted(() => {
 		id: RVUtils.getCurrentReservationId(),
 		number: RVUtils.getCurrentReservationNumber()
 	});
-
-	show.value = true;
 });
 
 async function getReservationDetails() {
@@ -57,6 +61,13 @@ function onClickAddProduct(barcode: string) {
 
 	barcodeInput.value = barcode;
 	scanButton.click();
+}
+
+async function onClickShowImage(productEAN: string) {
+	const productURL = await Shopware.getImageUri(productEAN);
+
+	imageModalUrl.value = productURL;
+	showImageModal.value = true;
 }
 
 function updateVerifiedQuantities() {
@@ -182,8 +193,16 @@ async function removeParcelItems(): Promise<void> {
 </script>
 
 <template>
+	<Teleport to="body">
+		<Transition name="modal">
+			<!-- <Modal :modal-data="modalData!" v-if="showModal" @close="showModal = false"
+				@open="(reservationId: string) => openReservation(reservationId)" /> -->
+			<ImageModal v-if="showImageModal && imageModalUrl" :image-url="imageModalUrl"
+				@close="showImageModal = false;" />
+		</Transition>
+	</Teleport>
 	<Transition>
-		<div v-if="show && reservationDetails" id="ReservationContainer">
+		<div v-if="showReservationDetails && reservationDetails" id="ReservationContainer">
 			<div class="reservation">
 				<h4>Producten</h4>
 				<div class="container my-2">
@@ -227,8 +246,8 @@ async function removeParcelItems(): Promise<void> {
 														<img class="action-icon-image" :src="addIconUrl" width="26"
 															height="26" />
 													</button>
-													<button
-														type="button" class="btn btn-primary action-icon" disabled>
+													<button @click="onClickShowImage(product.mainBarcode)"
+														type="button" class="btn btn-primary action-icon">
 														<img class="action-icon-image" :src="imageIconUrl" width="26"
 															height="26" />
 													</button>
@@ -258,6 +277,16 @@ async function removeParcelItems(): Promise<void> {
 .v-leave-to {
 	opacity: 0;
 	transform: scaleY(0);
+}
+
+.modal-enter-active,
+.modal-leave-active {
+	transition: opacity 0.25s ease, transform 0.1s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+	opacity: 0;
 }
 
 .container {
