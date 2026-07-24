@@ -293,9 +293,10 @@ function getMassCompleteClass(reservationNumber: string) {
 														<div class="col-2">
 															<div class="float-right">
 																<Transition>
-																	<a :href="reservation.url"
+																	<a href="javascript: void(0)"
 																		class="btn btn-primary"
 																		v-show="!massCompleteStarted"
+																		v-on:click="emit('open', reservation.url)"
 																		>Open&nbsp;<span
 																			class="material-icons">chevron_right</span></a>
 																</Transition>

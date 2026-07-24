@@ -195,8 +195,6 @@ async function removeParcelItems(): Promise<void> {
 <template>
 	<Teleport to="body">
 		<Transition name="modal">
-			<!-- <Modal :modal-data="modalData!" v-if="showModal" @close="showModal = false"
-				@open="(reservationId: string) => openReservation(reservationId)" /> -->
 			<ImageModal v-if="showImageModal && imageModalUrl" :image-url="imageModalUrl"
 				@close="showImageModal = false;" />
 		</Transition>
