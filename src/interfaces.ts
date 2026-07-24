@@ -63,7 +63,8 @@ export interface ReservationDefinition {
 
 export interface MassCompleteEntry {
 	reservationNumber: string,
-	status: MassCompleteStatus
+	status: MassCompleteStatus,
+	close: () => void
 }
 
 export enum MassCompleteStatus {

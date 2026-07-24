@@ -120,7 +120,7 @@ function setMassCompleteAmount(value: number) {
 	massCompleteAmount.value = clampedVal;
 }
 
-function startMassComplete() {
+async function startMassComplete() {
 	setMassCompleteAmount(massCompleteAmount.value);
 	massCompleteStarted.value = true;
 
@@ -129,9 +129,11 @@ function startMassComplete() {
 	for(let i = 0; i < massCompleteAmount.value; i++) {
 		const reservation = props.modalData.singleLineReservations[i];
 
-		GM.openInTab(reservation.url, { active: false });
+		let tab = await GM.openInTab(reservation.url, { active: false });
 
-		const entry = <MassCompleteEntry> { reservationNumber: reservation.reservationNumber, status: MassCompleteStatus.idle }
+		tab.close
+
+		const entry = <MassCompleteEntry> { reservationNumber: reservation.reservationNumber, status: MassCompleteStatus.idle, close: tab.close }
 
 		startedReservations.push(entry);
 		monitorMassCompleteEntry(entry);
@@ -148,6 +150,10 @@ function monitorMassCompleteEntry(entry: MassCompleteEntry) {
 
 			if (entryIndex != -1) {
 				massCompleteStatus.value[entryIndex].status = newValue;
+			}
+
+			if (newValue == MassCompleteStatus.finished) {
+				entry.close();
 			}
 		}
 	});
