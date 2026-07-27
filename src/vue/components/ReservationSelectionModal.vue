@@ -357,9 +357,14 @@ function getMassCompleteClass(reservationNumber: string) {
 														</div>
 														<div class="col-2">
 															<div class="float-right">
-																<a :href="reservation.url"
-																	class="btn btn-primary">Open&nbsp;<span
-																		class="material-icons">chevron_right</span></a>
+																<Transition>
+																	<a href="javascript: void(0)"
+																		class="btn btn-primary"
+																		v-show="!massCompleteStarted"
+																		v-on:click="emit('open', reservation.url)"
+																		>Open&nbsp;<span
+																			class="material-icons">chevron_right</span></a>
+																</Transition>
 															</div>
 														</div>
 
@@ -387,39 +392,39 @@ function getMassCompleteClass(reservationNumber: string) {
 													</div>
 												</div>
 												<div v-if="RVUtils.matchShopwareOrderNumber(reservation.saleOrderReference)">
-												<div class="card-body">
-													<div class="reservation-rows reservation-rows">
-														<div class="row nfTableHeader sw-modal-header">
-															<img :src="ShopwareLogoIconUrl"
-																style="float: left; width: 25px; height: 25px; margin-right: 8px;" />
-															<h4 style="line-height: 22px;">Shopware Notitie</h4>
-														</div>
-														<div class="reservation-rows ">
-															<div class="row nfTableRow sw-modal-body">
-																<div class="col">
-																	<div v-show="!swCommentBoxesEnabled || !reservation.swOrderData"
-																		class="loader"
-																		style="height: 20px; margin-top: -20px; top: 30px; justify-self: center; position: relative;">
-																	</div>
-																	<Transition>
+													<div class="card-body">
+														<div class="reservation-rows reservation-rows">
+															<div class="row nfTableHeader sw-modal-header">
+																<img :src="ShopwareLogoIconUrl"
+																	style="float: left; width: 25px; height: 25px; margin-right: 8px;" />
+																<h4 style="line-height: 22px;">Shopware Notitie</h4>
+															</div>
+															<div class="reservation-rows ">
+																<div class="row nfTableRow sw-modal-body">
+																	<div class="col">
+																		<div v-show="!swCommentBoxesEnabled || !reservation.swOrderData"
+																			class="loader"
+																			style="height: 20px; margin-top: -20px; top: 30px; justify-self: center; position: relative;">
+																		</div>
+																		<Transition>
+																			<textarea class="sw-modal-textarea"
+																				v-if="reservation.swOrderData"
+																				v-model="reservation.swOrderData.customerComment"
+																				:disabled="!swCommentBoxesEnabled" :placeholder="swCommentBoxesEnabled ? 'Nog geen notitie...' : ''"></textarea>
+																		</Transition>
 																		<textarea class="sw-modal-textarea"
-																			v-if="reservation.swOrderData"
-																			v-model="reservation.swOrderData.customerComment"
-																			:disabled="!swCommentBoxesEnabled" :placeholder="swCommentBoxesEnabled ? 'Nog geen notitie...' : ''"></textarea>
-																	</Transition>
-																	<textarea class="sw-modal-textarea"
-																		v-if="!reservation.swOrderData" disabled></textarea>
-																</div>
-																<div class="col-1.5">
-																	<button class="sw-btn"
-																		@click="onSaveButtonClick(reservation.swOrderData)"
-																		:disabled="!swCommentBoxesEnabled">Opslaan</button>
+																			v-if="!reservation.swOrderData" disabled></textarea>
+																	</div>
+																	<div class="col-1.5">
+																		<button class="sw-btn"
+																			@click="onSaveButtonClick(reservation.swOrderData)"
+																			:disabled="!swCommentBoxesEnabled">Opslaan</button>
+																	</div>
 																</div>
 															</div>
 														</div>
 													</div>
 												</div>
-											</div>
 											</div>
 										</template>
 									</div>
