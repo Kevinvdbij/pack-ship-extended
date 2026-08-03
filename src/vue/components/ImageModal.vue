@@ -1,10 +1,6 @@
 <script setup lang="ts">
-
-const emit = defineEmits(["open", "close"]);
-const props = defineProps({
-	imageUrl: { type: String, required: false }
-});
-
+defineEmits(["close"]);
+defineProps<{ imageUrl?: string }>();
 </script>
 
 <template>

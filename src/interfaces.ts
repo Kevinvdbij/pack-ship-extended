@@ -14,12 +14,6 @@ export interface ProductDetails {
 	verifiedQuantity: number,
 }
 
-export interface SearchResponseState {
-	isAlert: boolean;
-	isUnfinished: boolean;
-	isProductSelection: Element | null;
-}
-
 export enum ReservationSearchResponseType {
 	ContinueVerification = 1,
 	RefreshMain,
@@ -64,7 +58,8 @@ export interface ReservationDefinition {
 export interface MassCompleteEntry {
 	reservationNumber: string,
 	status: MassCompleteStatus,
-	close: () => void
+	// Only set for entries owned by the tab that started the mass complete run.
+	close?: () => void
 }
 
 export enum MassCompleteStatus {

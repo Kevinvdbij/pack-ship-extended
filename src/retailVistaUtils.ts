@@ -1,47 +1,52 @@
 import { GM_deleteValues, GM_getValue, GM_listValues, GM_setValue } from "$";
 import { MassCompleteEntry, ModalProductDetails, ModalReservationDetails, ProductDetails, ReservationDefinition, ReservationDetails, ReservationSearchResponseType, ReservationSelectionModalData } from "./interfaces";
+import { massCompleteEntryKey, PACKING_PORTAL_URL, RESERVATION_SUMMARY_SELECTOR, STORAGE_KEYS } from "./constants.ts";
+import { debug } from "./logger.ts";
 
-export function GetContainer():Element | null {
+export function getContainer():Element | null {
 	return document.querySelector(".container");
 }
 
-export function GetFooterLeft():Element | null {
-	return document.querySelector("footer > div > div > div.col-auto.mr-auto.text-left");
-}
-
-export function GetParcelContainerParent():Element | null {
+export function getParcelContainerParent():Element | null {
 	return document.querySelector("#ReservationOverview > div:nth-child(2) > div.col-9")
 }
 
-export function GetReservationDetailsFromOverview(ReservationOverview?:HTMLFormElement):ReservationDetails| null {
+export function getReservationDetailsFromOverview(ReservationOverview?:HTMLFormElement):ReservationDetails| null {
 	const target = ReservationOverview ? ReservationOverview : document;
 	let reservationId = (target.querySelector("input[name='Reservation.ReservationNumber']") as HTMLInputElement).value;
 	
-	let products:Array<ProductDetails> = [];
+	// One hidden input group per row, indexed from 0. Read the ItemId inputs to
+	// learn which indices exist rather than probing until one is missing.
+	const products:Array<ProductDetails> = Array
+		.from(target.querySelectorAll<HTMLInputElement>("input[name^='ReservationRowsNotInCarriers['][name$='].ItemId']"))
+		.map((itemIdInput) => {
+			const index = rowIndexFromName(itemIdInput.name);
+			const field = (name: string) =>
+				(target.querySelector(`input[name^='ReservationRowsNotInCarriers[${index}].${name}']`) as HTMLInputElement).value;
 
-	for(let i = 0; i < 200; i++){
-		if (target.querySelector(`input[name^='ReservationRowsNotInCarriers[${i}]']`)) {
-			products.push({
-				itemId: (target.querySelector(`input[name^='ReservationRowsNotInCarriers[${i}].ItemId']`) as HTMLInputElement).value,
-				number: (target.querySelector(`input[name^='ReservationRowsNotInCarriers[${i}].ProductNumber']`) as HTMLInputElement).value,
-				description: (target.querySelector(`input[name^='ReservationRowsNotInCarriers[${i}].ProductDescription']`) as HTMLInputElement).value,
-				mainBarcode: (target.querySelector(`input[name^='ReservationRowsNotInCarriers[${i}].ProductMainBarcode']`) as HTMLInputElement).value,
-				requiredQuantity: Number(((target.querySelector(`input[name^='ReservationRowsNotInCarriers[${i}].ProductQuantity']`) as HTMLInputElement).value).split(",").shift()),
+			return {
+				itemId: itemIdInput.value,
+				number: field("ProductNumber"),
+				description: field("ProductDescription"),
+				mainBarcode: field("ProductMainBarcode"),
+				requiredQuantity: Number(field("ProductQuantity").split(",").shift()),
 				verifiedQuantity: 0
-			});
-		} 
-		else {
-			break;
-		}
-	}
+			};
+		});
+
 	return {
 		id: reservationId,
 		products: products
 	};
 }
 
+// Pulls the numeric index out of a name like "ReservationRowsNotInCarriers[3].ItemId".
+function rowIndexFromName(name: string) {
+	return name.split("[").pop()!.split("]").shift()!;
+}
+
 export function cacheReservationDetails(reservationDetails:ReservationDetails) {
-	let cacheData = (GM_getValue("PSE_Reservation_Cache", []) as Array<ReservationDetails>);
+	let cacheData = (GM_getValue(STORAGE_KEYS.reservationCache, []) as Array<ReservationDetails>);
 
 	let existingIndex = cacheData.findIndex((reservation) => reservation.id == reservationDetails.id)
 
@@ -55,41 +60,39 @@ export function cacheReservationDetails(reservationDetails:ReservationDetails) {
 		cacheData[existingIndex] = reservationDetails;
 	}
 	
-	GM_setValue("PSE_Reservation_Cache", cacheData);
-	console.log("Cached reservation product details:");
-	console.log(cacheData)
+	GM_setValue(STORAGE_KEYS.reservationCache, cacheData);
+	debug("Cached reservation product details:", cacheData);
 }
 
 export function retrieveCachedReservationDetails():Array<ReservationDetails> {
 	try {
-		let cacheData = GM_getValue("PSE_Reservation_Cache", []) as Array<ReservationDetails>;
+		let cacheData = GM_getValue(STORAGE_KEYS.reservationCache, []) as Array<ReservationDetails>;
 	
-		console.log("Retrieved cached reservation details:");
-		console.log(cacheData)
+		debug("Retrieved cached reservation details:", cacheData);
 
 		return cacheData;
 	} 
 	catch(error) {
-		console.log(`Failed to retrieve cached reservation details: ${error}`)
+		console.error(`Failed to retrieve cached reservation details: ${error}`)
 		
 		return [];
 	}
 }
 
 export function setLastOpenReservation(reservationDefinition: ReservationDefinition) {
-	return GM_setValue("PSE_LastOpenReservation", reservationDefinition);
+	return GM_setValue(STORAGE_KEYS.lastOpenReservation, reservationDefinition);
 }
 
 export function getLastOpenReservation():ReservationDefinition {
-	return GM_getValue("PSE_LastOpenReservation");
+	return GM_getValue(STORAGE_KEYS.lastOpenReservation);
 }
 
 export function setLastCompletedReservation(reservationDefinition: ReservationDefinition) {
-	return GM_setValue("PSE_LastCompletedReservation", reservationDefinition);
+	return GM_setValue(STORAGE_KEYS.lastCompletedReservation, reservationDefinition);
 }
 
 export function getLastCompletedReservation():ReservationDefinition {
-	return GM_getValue("PSE_LastCompletedReservation");
+	return GM_getValue(STORAGE_KEYS.lastCompletedReservation);
 }
 
 export function getCurrentReservationNumber() {
@@ -101,7 +104,7 @@ export function getCurrentReservationId() {
 }
 
 export function getCurrentOrderNumber() {
-	return document.querySelector<HTMLElement>("#ReservationSummary\\ mb-2 > div:nth-child(3)")!.innerHTML.split(" ")[2];
+	return document.querySelector<HTMLElement>(`${RESERVATION_SUMMARY_SELECTOR} > div:nth-child(3)`)!.innerHTML.split(" ")[2];
 }
 
 export function getReservationId(target: HTMLElement) {
@@ -110,18 +113,18 @@ export function getReservationId(target: HTMLElement) {
 
 export async function fetchReservationDetails(reservationId: string):Promise<ReservationDetails | null> {
 	try {
-		const response = await fetch(`https://retailvista.net/bztrs/packingportal/Reservations/Index/${reservationId}`);
+		const response = await fetch(`${PACKING_PORTAL_URL}/Reservations/Index/${reservationId}`);
 		const result = await response.text();
 
 		let resultElement = document.createElement("div");
 		resultElement.innerHTML = result;
 
-		let overview = GetReservationDetailsFromOverview(resultElement.querySelector("#ReservationOverview") as HTMLFormElement);
+		let overview = getReservationDetailsFromOverview(resultElement.querySelector("#ReservationOverview") as HTMLFormElement);
 
 		return overview;
 		
 	} catch(error){
-		console.log(error);
+		console.error(error);
 
 		return null;
 	}
@@ -182,16 +185,8 @@ export function evaluateSearchResponse(element: HTMLElement): ReservationSearchR
 }
 
 export function skipVerification(target:HTMLElement) {
-	for (let i = 0; i < 200; i++) {
-		const collected = target.querySelector<HTMLInputElement>("#ReservationRowsNotInCarriers_" + i + "__Collected");
-
-		if (collected) {
-			collected.value = "true";
-		}
-		else {
-			break;
-		}
-	}
+	target.querySelectorAll<HTMLInputElement>("input[id^='ReservationRowsNotInCarriers_'][id$='__Collected']")
+		.forEach((collected) => collected.value = "true");
 
 	const form = target.querySelector("#ReservationOverview") as HTMLFormElement;
 	form.action = "/bztrs/packingportal/Reservations/Update";
@@ -199,14 +194,10 @@ export function skipVerification(target:HTMLElement) {
 }
 
 export function focusBarcodeInput() {
-	document.querySelector<HTMLInputElement>("#Productbarcode")!.focus();
-	document.querySelector<HTMLInputElement>("#Productbarcode")!.value = "";
-}
+	const barcodeInput = document.querySelector<HTMLInputElement>("#Productbarcode")!;
 
-export function removeBusy() {
-	let bodyClass = document.body.getAttribute("class")?.replace("busy", "");
-
-	document.body.setAttribute("class", bodyClass!)
+	barcodeInput.focus();
+	barcodeInput.value = "";
 }
 
 export function setBusy(state: boolean) {
@@ -218,7 +209,7 @@ export function setBusy(state: boolean) {
 	}
 }
 
-export function RetrieveModalData(modalElement:HTMLElement):ReservationSelectionModalData {
+export function retrieveModalData(modalElement:HTMLElement):ReservationSelectionModalData {
 	const amount = (<HTMLElement>modalElement.querySelector("#productReservationsModal > div > div > div.modal-header > h5")).innerText.trimStart()[0];
 	const barcode = (<HTMLElement>modalElement.querySelector("#productReservationsModal > div > div > div.modal-header > h5")).innerText.split("'")[1];
 	const name = (<HTMLElement>modalElement.querySelector("#productReservationsModal > div > div > div.modal-body > div > div > div.row.text-success > div:nth-child(1) > h3")).innerText.split("'")[1];
@@ -347,22 +338,22 @@ export function matchShopwareOrderNumber(value: string):boolean {
 }
 
 export function initMassCompleteStatus(entries: MassCompleteEntry[]) {
-	const mcEntries = GM_listValues().filter((x) => x.startsWith("PSE_MCEntry_"));
+	const mcEntries = GM_listValues().filter((x) => x.startsWith(STORAGE_KEYS.massCompleteEntryPrefix));
 	if (mcEntries) {
 		GM_deleteValues(mcEntries);
 	}
 
 	entries.forEach((entry) => {
-		GM_setValue(`PSE_MCEntry_${entry.reservationNumber}`, entry.status);
+		GM_setValue(massCompleteEntryKey(entry.reservationNumber), entry.status);
 	})
 }
 
 export function updateMassCompleteStatus(entry: MassCompleteEntry) {
-	GM_setValue(`PSE_MCEntry_${entry.reservationNumber}`, entry.status);
+	GM_setValue(massCompleteEntryKey(entry.reservationNumber), entry.status);
 }
 
 export function isMassCompleteReservation(reservationNumber: string) {
-	const entry = GM_getValue(`PSE_MCEntry_${reservationNumber}`, undefined);
+	const entry = GM_getValue(massCompleteEntryKey(reservationNumber), undefined);
 
 	return entry != undefined;
 }

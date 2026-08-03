@@ -27,7 +27,7 @@ function updateAutoComplete() {
 	const orderNumber = RVUtils.getCurrentReservationNumber();
 
 	if (RVUtils.isMassCompleteReservation(orderNumber)) {
-		RVUtils.updateMassCompleteStatus( { reservationNumber: orderNumber, status: MassCompleteStatus.finished, close });
+		RVUtils.updateMassCompleteStatus( { reservationNumber: orderNumber, status: MassCompleteStatus.finished });
 	}
 }
 </script>

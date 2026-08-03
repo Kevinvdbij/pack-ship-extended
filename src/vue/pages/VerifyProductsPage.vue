@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { cacheReservationDetails, GetReservationDetailsFromOverview, skipVerification } from '../../retailVistaUtils.ts';
+import { cacheReservationDetails, getReservationDetailsFromOverview, skipVerification } from '../../retailVistaUtils.ts';
 
 try {
 	skipVerification(document.body);
@@ -8,7 +8,7 @@ try {
 }
 
 try {
-	const reservationDetails = GetReservationDetailsFromOverview();
+	const reservationDetails = getReservationDetailsFromOverview();
 
 	if (reservationDetails) {
 		cacheReservationDetails(reservationDetails)
