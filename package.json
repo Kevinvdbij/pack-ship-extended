@@ -14,11 +14,8 @@
     "vue3-toastify": "^0.2.9"
   },
   "devDependencies": {
-    "@eslint/js": "^10.0.1",
     "@vitejs/plugin-vue": "^6.0.6",
-    "eslint": "^10.4.1",
     "typescript": "^6.0.3",
-    "typescript-eslint": "^8.60.0",
     "vite": "^8.0.11",
     "vite-plugin-monkey": "^8.0.0",
     "vue-tsc": "^3.2.8"

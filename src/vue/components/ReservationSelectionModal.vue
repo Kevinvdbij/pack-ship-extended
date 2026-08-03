@@ -556,17 +556,6 @@ function getMassCompleteClass(reservationNumber: string) {
 </template>
 
 <style scoped>
-.text-area-grow-enter-active,
-.text-area-grow-leave-active {
-	transition: opacity 0.25s ease, transform 0.1s ease;
-}
-
-.text-area-grow-enter-from,
-.text-area-grow-leave-to {
-	opacity: 0;
-	transform: scaleY(0);
-}
-
 .settings-modal {
 	position: absolute;
 	width: 100% !important;
@@ -578,75 +567,8 @@ function getMassCompleteClass(reservationNumber: string) {
 	background-color: rgba(0, 0, 0, 0.5);
 }
 
-.settings-modal-content {
-	position: absolute;
-	background-color: rgb(255, 255, 255);
-	min-width: 550px;
-	min-height: 300px;
-	width: 550px;
-	height: 400px;
-	max-width: 95%;
-	top: 50%;
-	justify-self: center;
-	-webkit-transform: translateY(-50%);
-	-ms-transform: translateY(-50%);
-	transform: translateY(-50%);
-	padding: 25px;
-	font-size: 16px;
-	border-radius: 15px;
-}
-
 .modal {
 	overflow-y: auto;
-}
-
-.settings-modal-content-options {
-	margin-top: 20px;
-	margin-left: 20px;
-}
-
-.close-button {
-	position: absolute;
-	top: 20px;
-	right: 15px;
-	border: 0;
-	width: 50;
-	height: 50;
-	background-color: transparent;
-}
-
-.save-button {
-	position: absolute;
-	right: 25px;
-	bottom: 25px;
-	width: 125px;
-	height: 45px;
-	background-color: #689f69;
-	border-radius: 8px;
-	border-style: none;
-	box-sizing: border-box;
-	color: #FFFFFF;
-	transition: color 100ms;
-	font-weight: 700;
-	font-size: 16px;
-}
-
-.save-button:hover,
-.save-button:focus {
-	background-color: #537f5f;
-}
-
-.save-icon {
-	filter: invert(1);
-}
-
-.setting-label {
-	padding-left: 10px;
-	justify-content: center;
-}
-
-input {
-	vertical-align: -4px;
 }
 
 .sw-btn {

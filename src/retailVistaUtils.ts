@@ -5,10 +5,6 @@ export function GetContainer():Element | null {
 	return document.querySelector(".container");
 }
 
-export function GetFooterLeft():Element | null {
-	return document.querySelector("footer > div > div > div.col-auto.mr-auto.text-left");
-}
-
 export function GetParcelContainerParent():Element | null {
 	return document.querySelector("#ReservationOverview > div:nth-child(2) > div.col-9")
 }

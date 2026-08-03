@@ -1,9 +1,7 @@
 <script setup lang="ts">
-import { createApp, onMounted } from 'vue';
+import { createApp } from 'vue';
 import ReservationSummary from '../components/ReservationSummary.vue';
 
-onMounted(() => {
-});
 createApp(ReservationSummary).mount(
 	(() => {
 		const app = document.createElement('div');
@@ -14,16 +12,3 @@ createApp(ReservationSummary).mount(
 </script>
 
 <template />
-
-<style scoped>
-.text-area-grow-enter-active,
-.text-area-grow-leave-active {
-	transition: opacity 0.25s ease, transform 0.1s ease;
-}
-
-.text-area-grow-enter-from,
-.text-area-grow-leave-to {
-	opacity: 0;
-	transform: scaleY(0);
-}
-</style>

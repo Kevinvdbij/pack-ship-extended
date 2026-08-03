@@ -14,12 +14,6 @@ export interface ProductDetails {
 	verifiedQuantity: number,
 }
 
-export interface SearchResponseState {
-	isAlert: boolean;
-	isUnfinished: boolean;
-	isProductSelection: Element | null;
-}
-
 export enum ReservationSearchResponseType {
 	ContinueVerification = 1,
 	RefreshMain,
