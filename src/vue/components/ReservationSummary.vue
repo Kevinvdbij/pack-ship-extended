@@ -4,6 +4,7 @@ import ShopwareLogoIconUrl from "../../assets/shopware.svg";
 
 import * as Shopware from "../../shopware.ts";
 import { saveOrderComment } from '../../shopwareComments.ts';
+import { SHOPWARE_URL } from '../../constants.ts';
 import { getCurrentOrderNumber, matchShopwareOrderNumber } from '../../retailVistaUtils.ts';
 
 const show = ref(false);
@@ -54,7 +55,7 @@ function onSaveButtonClick() {
 }
 
 function onOpenButtonClick() {
-	window.open("https://www.kampeerhalroden.nl/admin#/sw/order/detail/" + swOrderData.value.data[0].id + "/general", "_blank")!.focus();
+	window.open(`${SHOPWARE_URL}/admin#/sw/order/detail/${swOrderData.value.data[0].id}/general`, "_blank")!.focus();
 }
 
 function hasComment() {

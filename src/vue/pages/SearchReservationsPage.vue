@@ -2,30 +2,31 @@
 import { onMounted, ref, Transition } from "vue";
 import { ReservationSearchResponseType, ReservationSelectionModalData } from "../../interfaces.ts";
 import Modal from "../components/ReservationSelectionModal.vue";
-import * as PSUtils from "../../retailVistaUtils.ts";
+import * as RVUtils from "../../retailVistaUtils.ts";
+import { PACKING_PORTAL_URL } from "../../constants.ts";
 
 const show = ref(false);
 const showModal = ref(false);
 
 const modalData = ref<ReservationSelectionModalData>();
-const lastOpenReservation = ref(PSUtils.getLastOpenReservation());
-const lastCompletedReservation = ref(PSUtils.getLastCompletedReservation());
+const lastOpenReservation = ref(RVUtils.getLastOpenReservation());
+const lastCompletedReservation = ref(RVUtils.getLastCompletedReservation());
 
 onMounted(() => {
 	show.value = true;
-	focusBarcodeInput();
+	RVUtils.focusBarcodeInput();
 });
 
 (<HTMLFormElement>document.querySelector("#frmReservations"))
 	.addEventListener("submit", ((e) => {
 		e.preventDefault();
 		onSearchReservation();
-		focusBarcodeInput();
+		RVUtils.focusBarcodeInput();
 	}))
 
 async function onSearchReservation() {
 	const formData = $("#frmReservations").serialize();
-	const response = await PSUtils.reservationSearchRequest(formData);
+	const response = await RVUtils.reservationSearchRequest(formData);
 
 	handleResponse(response)
 }
@@ -34,33 +35,33 @@ async function handleResponse(response: string) {
 	const responseElement = document.createElement("div");
 	responseElement.innerHTML = response;
 
-	switch (PSUtils.evaluateSearchResponse(responseElement)) {
+	switch (RVUtils.evaluateSearchResponse(responseElement)) {
 		case ReservationSearchResponseType.ContinueVerification:
 			responseElement.setAttribute("hidden", "")
 			document.body.append(responseElement);
 
 			let responseOverview = <HTMLFormElement>responseElement.querySelector("#ReservationOverview");
 			if (responseOverview) {
-				PSUtils.cacheReservationDetails(PSUtils.getReservationDetailsFromOverview(responseOverview)!);
+				RVUtils.cacheReservationDetails(RVUtils.getReservationDetailsFromOverview(responseOverview)!);
 			}
-			PSUtils.skipVerification(responseElement);
+			RVUtils.skipVerification(responseElement);
 			break;
 
 		case ReservationSearchResponseType.SelectionModal:
-			modalData.value = await PSUtils.retrieveModalData(responseElement);
+			modalData.value = RVUtils.retrieveModalData(responseElement);
 			showModal.value = true;
-			PSUtils.removeBusy();
+			RVUtils.setBusy(false);
 			break;
 
 		case ReservationSearchResponseType.RefreshMain:
 			document.querySelector("#messages")!.parentElement!.innerHTML =
 				responseElement.querySelector("#alert")!.parentElement!.parentElement!.innerHTML;
 
-			PSUtils.removeBusy();
+			RVUtils.setBusy(false);
 			break;
 
 		case ReservationSearchResponseType.UnfinishedRun:
-			PSUtils.handleUnfinishedRun(responseElement).then(() => {
+			RVUtils.handleUnfinishedRun(responseElement).then(() => {
 				// Run function again to re-evaluate
 				onSearchReservation();
 			});
@@ -69,23 +70,17 @@ async function handleResponse(response: string) {
 }
 
 function reopenReservation(reservationId: string) {
-	window.location.href = `https://retailvista.net/bztrs/packingportal/Parcels?reservationId=${reservationId}&allowCashOnDelivery=False`;
+	window.location.href = `${PACKING_PORTAL_URL}/Parcels?reservationId=${reservationId}&allowCashOnDelivery=False`;
 }
 
 function openAddParcels(reservationNumber: string) {
-	window.location.href = `https://retailvista.net/bztrs/packingportal/AddParcels/Search?ReservationNumber=${reservationNumber}`;
+	window.location.href = `${PACKING_PORTAL_URL}/AddParcels/Search?ReservationNumber=${reservationNumber}`;
 }
 
 function openReservation(url: string) {
-	PSUtils.fetchReservation(url).then((response) => {
+	RVUtils.fetchReservation(url).then((response) => {
 		handleResponse(response);
 	});
-}
-
-function focusBarcodeInput() {
-	const barcodeInput = document.querySelector("#Productbarcode") as HTMLInputElement;
-	barcodeInput.focus();
-	barcodeInput.value = "";
 }
 </script>
 

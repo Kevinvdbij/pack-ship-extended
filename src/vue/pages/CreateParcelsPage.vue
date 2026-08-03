@@ -2,6 +2,8 @@
 import { onMounted, ref, Transition } from 'vue';
 import * as RVUtils from '../../retailVistaUtils.ts';
 import { mountApp } from '../mount.ts';
+import { PACKING_PORTAL_URL, RESERVATION_SUMMARY_SELECTOR } from '../../constants.ts';
+import { debug } from '../../logger.ts';
 import addIconUrl from "../../assets/add.svg";
 import imageIconUrl from "../../assets/image.svg";
 import { MassCompleteStatus, ReservationDetails } from '../../interfaces.ts';
@@ -42,12 +44,12 @@ async function getReservationDetails() {
 	const cacheHit = cachedReservations.find((reservation) => reservation.id == RVUtils.getCurrentReservationNumber());
 	if (cacheHit) {
 		reservationDetails.value = cacheHit;
-		console.log("Cache hit!");
+		debug("Reservation cache hit");
 
 		return reservationDetails.value;
 	}
 	else {
-		console.log("Cache miss!");
+		debug("Reservation cache miss");
 		await RVUtils.fetchReservationDetails(RVUtils.getCurrentReservationId()).then((details) => {
 			reservationDetails.value = details!;
 
@@ -97,11 +99,11 @@ function setupSummary() {
 	const overviewElement = <HTMLElement>document.querySelector("#ReservationOverview");
 	const backButton = <HTMLLinkElement>overviewElement.querySelector("div:nth-child(1) > div > a")
 
-	backButton.href = "https://retailvista.net/bztrs/packingportal";
+	backButton.href = PACKING_PORTAL_URL;
 	backButton.innerHTML = "<span class='material-icons'>chevron_left</span>Nieuwe zoekopdracht";
 
 	mountApp(ReservationSummary, (host) => {
-		document.querySelector("#ReservationSummary\\ mb-2")!.insertAdjacentElement("beforeend", host);
+		document.querySelector(RESERVATION_SUMMARY_SELECTOR)!.insertAdjacentElement("beforeend", host);
 	});
 }
 
@@ -113,25 +115,21 @@ function autoAnnounceParcels(parcelContainerElement: Element) {
 	const announceButton = parcelContainerElement?.querySelector("div > div:nth-child(4) > div > button") as HTMLButtonElement;
 	if (!announceButton?.hasAttribute("disabled")) {
 		announceButton?.click();
-		console.log("ANNOUNCE LABELS");
+		debug("Announcing labels");
 	}
 }
 
 function processAutoComplete() {
 	const orderNumber = RVUtils.getCurrentReservationNumber();
 
-	console.log(`isMassCompleteReservation: ${RVUtils.isMassCompleteReservation(orderNumber)}`)
-
 	if (RVUtils.isMassCompleteReservation(orderNumber)) {
 		RVUtils.updateMassCompleteStatus( { reservationNumber: orderNumber, status: MassCompleteStatus.started });
-		console.log({ reservationNumber: orderNumber, status: MassCompleteStatus.started });
+		debug("Mass complete started for reservation", orderNumber);
 
 		reservationDetails.value?.products.forEach((product) => {
 			for(let i = 0; i < product.requiredQuantity; i++) {
 				document.querySelector<HTMLInputElement>("#productBarcode")!.value = product.mainBarcode;
 				document.querySelector<HTMLButtonElement>("#verifyProduct")!.click();
-
-				console.log(product.verifiedQuantity)
 			}
 		});
 	}
