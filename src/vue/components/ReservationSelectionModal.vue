@@ -101,7 +101,7 @@ function canAutoProceed():boolean {
 	}
 
 	// Stop auto proceeding if there is no valid reservations
-	if (props.modalData.singleLineReservations.length <= 0 && props.modalData.validReservations <= 0) {
+	if (props.modalData.singleLineReservations.length <= 0 && props.modalData.validReservations.length <= 0) {
 		return false;
 	}
 
@@ -131,14 +131,12 @@ async function startMassComplete() {
 	setMassCompleteAmount(massCompleteAmount.value);
 	massCompleteStarted.value = true;
 
-	let startedReservations = [];
+	let startedReservations: MassCompleteEntry[] = [];
 
 	for(let i = 0; i < massCompleteAmount.value; i++) {
 		const reservation = props.modalData.singleLineReservations[i];
 
 		let tab = await GM.openInTab(reservation.url, { active: false });
-
-		tab.close
 
 		const entry = <MassCompleteEntry> { reservationNumber: reservation.reservationNumber, status: MassCompleteStatus.idle, close: tab.close }
 
@@ -160,7 +158,7 @@ function monitorMassCompleteEntry(entry: MassCompleteEntry) {
 			}
 
 			if (newValue == MassCompleteStatus.finished) {
-				entry.close();
+				entry.close?.();
 			}
 		}
 	});

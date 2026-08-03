@@ -282,10 +282,6 @@ const shopwareApiUrl = "https://www.kampeerhalroden.nl";
             </div>
         `);
 
-		$("#shopwareLoginButton").click(function() {
-			$("#gmPopupContainer").hide();
-		});
-
 		GM_addStyle(`
             #shopwarePopupContainer {
                 position:               fixed;

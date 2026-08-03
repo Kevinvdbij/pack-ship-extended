@@ -126,7 +126,7 @@ function processAutoComplete() {
 	console.log(`isMassCompleteReservation: ${RVUtils.isMassCompleteReservation(orderNumber)}`)
 
 	if (RVUtils.isMassCompleteReservation(orderNumber)) {
-		RVUtils.updateMassCompleteStatus( { reservationNumber: orderNumber, status: MassCompleteStatus.started, close });
+		RVUtils.updateMassCompleteStatus( { reservationNumber: orderNumber, status: MassCompleteStatus.started });
 		console.log({ reservationNumber: orderNumber, status: MassCompleteStatus.started });
 
 		reservationDetails.value?.products.forEach((product) => {
