@@ -41,13 +41,13 @@ async function handleResponse(response: string) {
 
 			let responseOverview = <HTMLFormElement>responseElement.querySelector("#ReservationOverview");
 			if (responseOverview) {
-				PSUtils.cacheReservationDetails(PSUtils.GetReservationDetailsFromOverview(responseOverview)!);
+				PSUtils.cacheReservationDetails(PSUtils.getReservationDetailsFromOverview(responseOverview)!);
 			}
 			PSUtils.skipVerification(responseElement);
 			break;
 
 		case ReservationSearchResponseType.SelectionModal:
-			modalData.value = await PSUtils.RetrieveModalData(responseElement);
+			modalData.value = await PSUtils.retrieveModalData(responseElement);
 			showModal.value = true;
 			PSUtils.removeBusy();
 			break;
@@ -129,27 +129,6 @@ function focusBarcodeInput() {
 </template>
 
 <style scoped>
-.v-enter-active,
-.v-leave-active {
-	transition: opacity 0.25s ease, transform 0.1s ease;
-}
-
-.v-enter-from,
-.v-leave-to {
-	opacity: 0;
-	transform: scaleY(0);
-}
-
-.modal-enter-active,
-.modal-leave-active {
-	transition: opacity 0.25s ease, transform 0.1s ease;
-}
-
-.modal-enter-from,
-.modal-leave-to {
-	opacity: 0;
-}
-
 .extension-container {
 	margin-top: 15px;
 }

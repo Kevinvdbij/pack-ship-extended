@@ -1,5 +1,6 @@
-import * as Vue from 'vue';
+import { Component } from 'vue';
 import * as RVUtils from "./retailVistaUtils";
+import { mountApp } from './vue/mount.ts';
 import SearchReservationsPage from './vue/pages/SearchReservationsPage.vue';
 import VerifyProductsPage from './vue/pages/VerifyProductsPage.vue';
 import CreateParcelsPage from './vue/pages/CreateParcelsPage.vue';
@@ -10,68 +11,60 @@ import Settings from "./settings.ts"
 import "./style.css";
 import "vue3-toastify/dist/index.css";
 
-Settings.load();
-const path = window.location.pathname;
-
-switch(true) {
-	case /bztrs\/packingportal\/CompleteReservations.*/.test(path):
-		Vue.createApp(CompletedPage).mount(
-			(() => {
-				const app = document.createElement('div');
-				document.body.append(app);
-				return app;
-			})(),
-		);
-	break;
-
-	case /bztrs\/packingportal\/Parcels.*/.test(path):
-		Vue.createApp(CreateParcelsPage).mount(
-			(() => {
-				const app = document.createElement('div');
-				RVUtils.GetParcelContainerParent()?.insertAdjacentElement("afterbegin", app);
-				return app;
-			})(),
-		);
-		break;
-
-	case /bztrs\/packingportal\/Reservations\/Index\/.*/.test(path):
-		Vue.createApp(VerifyProductsPage).mount(
-			(() => {
-				const app = document.createElement('div');
-				document.body.append(app);
-				return app;
-			})(),
-		);
-		break;
-
-	case /bztrs\/packingportal\/AddParcels\/Search\?ReservationNumber=/.test(window.location.pathname + window.location.search):
-		Vue.createApp(AddParcelsPage).mount(
-			(() => {
-				const app = document.createElement('div');
-				document.body.append(app);
-				return app;
-			})(),
-		);
-		break;
-
-	case /bztrs\/packingportal\/AnnounceParcels.*/.test(path):
-		break;
-
-	case /bztrs\/packingportal.*/.test(path):
-		Vue.createApp(SearchReservationsPage).mount(
-			(() => {
-				const app = document.createElement('div');
-				RVUtils.GetContainer()?.append(app);
-				return app;
-			})(),
-		);
-		break;
+interface Route {
+	pattern: RegExp;
+	// Matched against the pathname, or against pathname + query string when the
+	// route is only recognisable by its parameters.
+	matchQuery?: boolean;
+	// A route with no component is one the portal handles by itself.
+	component?: Component;
+	attach?: (host: HTMLDivElement) => void;
 }
 
-Vue.createApp(FooterExtension).mount(
-  (() => {
-    const app = document.createElement('div');
-    document.body.append(app);
-    return app;
-  })(),
-);
+const appendToBody = (host: HTMLDivElement) => document.body.append(host);
+
+// First match wins, so the catch-all search page has to come last.
+const routes: Route[] = [
+	{
+		pattern: /bztrs\/packingportal\/CompleteReservations/,
+		component: CompletedPage,
+		attach: appendToBody,
+	},
+	{
+		pattern: /bztrs\/packingportal\/Parcels/,
+		component: CreateParcelsPage,
+		attach: (host) => RVUtils.getParcelContainerParent()?.insertAdjacentElement("afterbegin", host),
+	},
+	{
+		pattern: /bztrs\/packingportal\/Reservations\/Index\//,
+		component: VerifyProductsPage,
+		attach: appendToBody,
+	},
+	{
+		pattern: /bztrs\/packingportal\/AddParcels\/Search\?ReservationNumber=/,
+		matchQuery: true,
+		component: AddParcelsPage,
+		attach: appendToBody,
+	},
+	{
+		pattern: /bztrs\/packingportal\/AnnounceParcels/,
+	},
+	{
+		pattern: /bztrs\/packingportal/,
+		component: SearchReservationsPage,
+		attach: (host) => RVUtils.getContainer()?.append(host),
+	},
+];
+
+Settings.load();
+
+const path = window.location.pathname;
+const pathWithQuery = path + window.location.search;
+
+const route = routes.find((candidate) => candidate.pattern.test(candidate.matchQuery ? pathWithQuery : path));
+
+if (route?.component && route.attach) {
+	mountApp(route.component, route.attach);
+}
+
+mountApp(FooterExtension, appendToBody);

@@ -1,15 +1,15 @@
 import { GM_deleteValues, GM_getValue, GM_listValues, GM_setValue } from "$";
 import { MassCompleteEntry, ModalProductDetails, ModalReservationDetails, ProductDetails, ReservationDefinition, ReservationDetails, ReservationSearchResponseType, ReservationSelectionModalData } from "./interfaces";
 
-export function GetContainer():Element | null {
+export function getContainer():Element | null {
 	return document.querySelector(".container");
 }
 
-export function GetParcelContainerParent():Element | null {
+export function getParcelContainerParent():Element | null {
 	return document.querySelector("#ReservationOverview > div:nth-child(2) > div.col-9")
 }
 
-export function GetReservationDetailsFromOverview(ReservationOverview?:HTMLFormElement):ReservationDetails| null {
+export function getReservationDetailsFromOverview(ReservationOverview?:HTMLFormElement):ReservationDetails| null {
 	const target = ReservationOverview ? ReservationOverview : document;
 	let reservationId = (target.querySelector("input[name='Reservation.ReservationNumber']") as HTMLInputElement).value;
 	
@@ -112,7 +112,7 @@ export async function fetchReservationDetails(reservationId: string):Promise<Res
 		let resultElement = document.createElement("div");
 		resultElement.innerHTML = result;
 
-		let overview = GetReservationDetailsFromOverview(resultElement.querySelector("#ReservationOverview") as HTMLFormElement);
+		let overview = getReservationDetailsFromOverview(resultElement.querySelector("#ReservationOverview") as HTMLFormElement);
 
 		return overview;
 		
@@ -214,7 +214,7 @@ export function setBusy(state: boolean) {
 	}
 }
 
-export function RetrieveModalData(modalElement:HTMLElement):ReservationSelectionModalData {
+export function retrieveModalData(modalElement:HTMLElement):ReservationSelectionModalData {
 	const amount = (<HTMLElement>modalElement.querySelector("#productReservationsModal > div > div > div.modal-header > h5")).innerText.trimStart()[0];
 	const barcode = (<HTMLElement>modalElement.querySelector("#productReservationsModal > div > div > div.modal-header > h5")).innerText.split("'")[1];
 	const name = (<HTMLElement>modalElement.querySelector("#productReservationsModal > div > div > div.modal-body > div > div > div.row.text-success > div:nth-child(1) > h3")).innerText.split("'")[1];

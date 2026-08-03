@@ -399,25 +399,23 @@ function getMassCompleteClass(reservationNumber: string) {
 												<div v-if="RVUtils.matchShopwareOrderNumber(reservation.saleOrderReference)">
 													<div class="card-body">
 														<div class="reservation-rows reservation-rows">
-															<div class="row nfTableHeader sw-modal-header">
-																<img :src="ShopwareLogoIconUrl"
-																	style="float: left; width: 25px; height: 25px; margin-right: 8px;" />
-																<h4 style="line-height: 22px;">Shopware Notitie</h4>
+															<div class="row nfTableHeader sw-header">
+																<img :src="ShopwareLogoIconUrl" class="sw-logo" />
+																<h4 class="sw-title">Shopware Notitie</h4>
 															</div>
 															<div class="reservation-rows ">
-																<div class="row nfTableRow sw-modal-body">
+																<div class="row nfTableRow sw-body">
 																	<div class="col">
 																		<div v-show="!swCommentBoxesEnabled || !reservation.swOrderData"
-																			class="loader"
-																			style="height: 20px; margin-top: -20px; top: 30px; justify-self: center; position: relative;">
+																			class="loader modal-loader">
 																		</div>
 																		<Transition>
-																			<textarea class="sw-modal-textarea"
+																			<textarea class="sw-textarea"
 																				v-if="reservation.swOrderData"
 																				v-model="reservation.swOrderData.customerComment"
 																				:disabled="!swCommentBoxesEnabled" :placeholder="swCommentBoxesEnabled ? 'Nog geen notitie...' : ''"></textarea>
 																		</Transition>
-																		<textarea class="sw-modal-textarea"
+																		<textarea class="sw-textarea"
 																			v-if="!reservation.swOrderData" disabled></textarea>
 																	</div>
 																	<div class="col-1.5">
@@ -504,25 +502,23 @@ function getMassCompleteClass(reservationNumber: string) {
 											<div v-if="RVUtils.matchShopwareOrderNumber(reservation.saleOrderReference)">
 												<div class="card-body">
 													<div class="reservation-rows reservation-rows">
-														<div class="row nfTableHeader sw-modal-header">
-															<img :src="ShopwareLogoIconUrl"
-																style="float: left; width: 25px; height: 25px; margin-right: 8px;" />
-															<h4 style="line-height: 22px;">Shopware Notitie</h4>
+														<div class="row nfTableHeader sw-header">
+															<img :src="ShopwareLogoIconUrl" class="sw-logo" />
+															<h4 class="sw-title">Shopware Notitie</h4>
 														</div>
 														<div class="reservation-rows ">
-															<div class="row nfTableRow sw-modal-body">
+															<div class="row nfTableRow sw-body">
 																<div class="col">
 																	<div v-show="!swCommentBoxesEnabled || !reservation.swOrderData"
-																		class="loader"
-																		style="height: 20px; margin-top: -20px; top: 30px; justify-self: center; position: relative;">
+																		class="loader modal-loader">
 																	</div>
 																	<Transition>
-																		<textarea class="sw-modal-textarea"
+																		<textarea class="sw-textarea"
 																			v-if="reservation.swOrderData"
 																			v-model="reservation.swOrderData.customerComment"
 																			:disabled="!swCommentBoxesEnabled" :placeholder="swCommentBoxesEnabled ? 'Nog geen notitie...' : ''"></textarea>
 																	</Transition>
-																	<textarea class="sw-modal-textarea"
+																	<textarea class="sw-textarea"
 																		v-if="!reservation.swOrderData" disabled></textarea>
 																</div>
 																<div class="col-1.5">
@@ -571,63 +567,27 @@ function getMassCompleteClass(reservationNumber: string) {
 
 .sw-btn {
 	width: 100%;
-	height: 35px;
-	background-color: #189eff;
+}
 
-	transition: all .15s ease-out;
-	display: inline-block;
-	border-radius: 4px;
-	padding: 2px 24px;
-	font-size: 14px;
-	outline: none;
-	font-weight: 600;
-	white-space: nowrap;
-	text-overflow: ellipsis;
-	vertical-align: middle;
-	text-decoration: none;
-	cursor: pointer;
-	user-select: none;
-	margin: 0;
+.sw-title {
+	line-height: 22px;
+}
+
+.modal-loader {
+	height: 20px;
+	margin-top: -20px;
+	top: 30px;
+	justify-self: center;
 	position: relative;
-
-	background: #189eff;
-	color: #fff;
-	line-height: 32px;
-	border: 0;
-	margin: 3px;
 }
 
-.sw-btn:hover {
-	background: #118cff;
-}
-
-.sw-btn:active {
-	background: #0e82ff;
-}
-
-.sw-btn:disabled:hover,
-.sw-btn:disabled {
-	background: #727272;
-}
-
-.sw-modal-header {
-	background-color: #243758;
-	color: #fff;
-}
-
-.sw-modal-body {
-	background-color: #f9fafb;
-	padding-right: 20px;
-}
-
-.sw-modal-textarea {
-	field-sizing: content;
+.sw-textarea {
 	min-height: 34px;
-	width: 100%;
-	margin-top: 4px;
-	padding-left: 5px;
-	border-radius: 4px;
 	font-size: 18px;
+}
+
+.sw-body {
+	padding-right: 20px;
 }
 
 .mc-amount-btn {
@@ -668,21 +628,21 @@ function getMassCompleteClass(reservationNumber: string) {
 }
 
 .btn-primary:disabled {
-    color: #fff;
-    background-color: #ccc;
-    border-color: #bbb;
+	color: #fff;
+	background-color: #ccc;
+	border-color: #bbb;
 }
 
 .form-control:disabled {
-    background-color: #eff6f3;
+	background-color: #eff6f3;
 	border: 1px solid #ced4da;
 }
 
-input[type=number]::-webkit-inner-spin-button, 
-input[type=number]::-webkit-outer-spin-button { 
-    -webkit-appearance: none;
-    -moz-appearance: none;
-    appearance: none;
-    margin: 0; 
+input[type=number]::-webkit-inner-spin-button,
+input[type=number]::-webkit-outer-spin-button {
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	appearance: none;
+	margin: 0;
 }
 </style>

@@ -1,6 +1,7 @@
 <script setup lang="ts">
-import { createApp, onMounted, ref, Transition } from 'vue';
+import { onMounted, ref, Transition } from 'vue';
 import * as RVUtils from '../../retailVistaUtils.ts';
+import { mountApp } from '../mount.ts';
 import addIconUrl from "../../assets/add.svg";
 import imageIconUrl from "../../assets/image.svg";
 import { MassCompleteStatus, ReservationDetails } from '../../interfaces.ts';
@@ -99,13 +100,9 @@ function setupSummary() {
 	backButton.href = "https://retailvista.net/bztrs/packingportal";
 	backButton.innerHTML = "<span class='material-icons'>chevron_left</span>Nieuwe zoekopdracht";
 
-	createApp(ReservationSummary).mount(
-		(() => {
-			const app = document.createElement('div');
-			document.querySelector("#ReservationSummary\\ mb-2")!.insertAdjacentElement("beforeend", app);
-			return app;
-		})(),
-	);
+	mountApp(ReservationSummary, (host) => {
+		document.querySelector("#ReservationSummary\\ mb-2")!.insertAdjacentElement("beforeend", host);
+	});
 }
 
 function autoAnnounceParcels(parcelContainerElement: Element) {
@@ -266,27 +263,6 @@ async function removeParcelItems(): Promise<void> {
 </template>
 
 <style scoped>
-.v-enter-active,
-.v-leave-active {
-	transition: opacity 0.25s ease, transform 0.1s ease;
-}
-
-.v-enter-from,
-.v-leave-to {
-	opacity: 0;
-	transform: scaleY(0);
-}
-
-.modal-enter-active,
-.modal-leave-active {
-	transition: opacity 0.25s ease, transform 0.1s ease;
-}
-
-.modal-enter-from,
-.modal-leave-to {
-	opacity: 0;
-}
-
 .container {
 	margin-right: 0px;
 	margin-left: 0px;

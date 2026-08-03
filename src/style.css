@@ -1,8 +1,107 @@
+/*
+ * Global stylesheet, injected into the portal page once from main.ts.
+ * Only rules shared by more than one component belong here -- anything that
+ * overrides a Bootstrap class the portal itself uses must stay `scoped` in its
+ * component, or it will restyle the page around us.
+ */
+
+/* ---- Transitions ---- *
+ * Default <Transition> classes, used unnamed by most of our components.
+ */
+.v-enter-active,
+.v-leave-active {
+	transition: opacity 0.25s ease, transform 0.1s ease;
+}
+
+.v-enter-from,
+.v-leave-to {
+	opacity: 0;
+	transform: scaleY(0);
+}
+
+/* <Transition name="modal"> -- fades without the vertical collapse. */
+.modal-enter-active,
+.modal-leave-active {
+	transition: opacity 0.25s ease, transform 0.1s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+	opacity: 0;
+}
+
+/* ---- Shopware note chrome ---- *
+ * Shared by ReservationSummary and the reservation cards in the selection modal.
+ */
+.sw-btn {
+	height: 35px;
+	transition: all .15s ease-out;
+	display: inline-block;
+	border-radius: 4px;
+	padding: 2px 24px;
+	font-size: 14px;
+	outline: none;
+	font-weight: 600;
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	vertical-align: middle;
+	text-decoration: none;
+	cursor: pointer;
+	user-select: none;
+	position: relative;
+	background: #189eff;
+	color: #fff;
+	line-height: 32px;
+	border: 0;
+	margin: 3px;
+}
+
+.sw-btn:hover {
+	background: #118cff;
+}
+
+.sw-btn:active {
+	background: #0e82ff;
+}
+
+.sw-btn:disabled:hover,
+.sw-btn:disabled {
+	background: #727272;
+}
+
+.sw-header {
+	background-color: #243758;
+	color: #fff;
+}
+
+.sw-body {
+	background-color: #f9fafb;
+	border-color: #d1d9e0;
+	padding: 5px;
+}
+
+.sw-textarea {
+	field-sizing: content;
+	width: 100%;
+	margin-top: 4px;
+	padding-left: 5px;
+	border-radius: 4px;
+	border: 1px solid #d1d9e0;
+}
+
+.sw-logo {
+	float: left;
+	width: 25px;
+	height: 25px;
+	margin-right: 8px;
+}
+
+/* ---- Loader ---- */
 .loader {
   width: 60px;
   aspect-ratio: 2;
   --_g: no-repeat radial-gradient(circle closest-side,#d1d9e0 90%,#0000);
-  background: 
+  background:
     var(--_g) 0%   50%,
     var(--_g) 50%  50%,
     var(--_g) 100% 50%;
