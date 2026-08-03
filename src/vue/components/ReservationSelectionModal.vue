@@ -1,19 +1,19 @@
 <script setup lang="ts">
-import { onMounted, ref, Transition } from "vue";
+import { onMounted, ref } from "vue";
+import * as Shopware from "../../shopware.ts";
+import { saveOrderComment } from "../../shopwareComments.ts";
 import * as RVUtils from "../../retailVistaUtils.ts";
-import ShopwareLogoIconUrl from "../../assets/shopware.svg"
-import * as Shopware from "../../shopware";
-import { MassCompleteEntry, MassCompleteStatus, ModalReservationDetails } from "../../interfaces.ts";
+import { MassCompleteEntry, MassCompleteStatus, ModalReservationDetails, ReservationSelectionModalData } from "../../interfaces.ts";
 import Settings from "../../settings.ts";
+import ReservationCard from "./ReservationCard.vue";
 import { GM, GM_addValueChangeListener } from "$";
-import { toast } from 'vue3-toastify';
 
 const emit = defineEmits(["open", "close"]);
-const props = defineProps({
-	modalData: { type: Object, required: true }
-});
+const props = defineProps<{
+	modalData: ReservationSelectionModalData;
+}>();
 
-const swToken = ref();
+const swToken = ref<Shopware.ShopwareToken>();
 const swCommentBoxesEnabled = ref(false);
 
 const countdown = ref(2);
@@ -37,14 +37,8 @@ onMounted(() => {
 });
 
 function onSaveButtonClick(orderData: Shopware.ShopwareOrderEntry, orderNumber: string) {
-	if (swToken) {
-		const updatePromise = Shopware.updateOrderComment(swToken.value, orderData);
-		
-		toast.promise(updatePromise, {
-			pending: `Order ${orderNumber} notitie wordt opgeslagen...`,
-			success: `Order ${orderNumber} notitie succesvol opgeslagen.`,
-			error: `Er is een fout opgetreden bij het opslaan van de notitie van order ${orderNumber}.`
-		});
+	if (swToken.value) {
+		saveOrderComment(swToken.value, orderData, orderNumber);
 	}
 
 	swCommentBoxesEnabled.value = false;
@@ -55,9 +49,9 @@ function onSaveButtonClick(orderData: Shopware.ShopwareOrderEntry, orderNumber: 
 }
 
 function retrieveCommentData() {
-	const reservationsToFetch:ModalReservationDetails[] = props.modalData.invalidReservations.concat((props.modalData).validReservations);
+	const reservationsToFetch:ModalReservationDetails[] = props.modalData.invalidReservations.concat(props.modalData.validReservations);
 
-	Promise.all(reservationsToFetch.map((reservation) => Shopware.shopwareGetOrderData(swToken.value, reservation.saleOrderReference))).then((responses) => {
+	Promise.all(reservationsToFetch.map((reservation) => Shopware.shopwareGetOrderData(swToken.value!, reservation.saleOrderReference))).then((responses) => {
 		responses.forEach((response, index) => {
 			reservationsToFetch[index].swOrderData = response.data[0];
 		});
@@ -123,7 +117,7 @@ function initMassComplete() {
 function setMassCompleteAmount(value: number) {
 	const totalReservations = props.modalData.singleLineReservations.length;
 	const clampedVal = Math.min(Math.min(Math.max(2, value), massCompleteMax), totalReservations);
-	
+
 	massCompleteAmount.value = clampedVal;
 }
 
@@ -138,7 +132,11 @@ async function startMassComplete() {
 
 		let tab = await GM.openInTab(reservation.url, { active: false });
 
-		const entry = <MassCompleteEntry> { reservationNumber: reservation.reservationNumber, status: MassCompleteStatus.idle, close: tab.close }
+		const entry: MassCompleteEntry = {
+			reservationNumber: String(reservation.reservationNumber),
+			status: MassCompleteStatus.idle,
+			close: tab.close
+		};
 
 		startedReservations.push(entry);
 		monitorMassCompleteEntry(entry);
@@ -164,31 +162,25 @@ function monitorMassCompleteEntry(entry: MassCompleteEntry) {
 	});
 }
 
-function getMassCompleteClass(reservationNumber: string) {
-	if (massCompleteStatus.value) {
-		const mcEntry = massCompleteStatus.value.find((x) => x.reservationNumber == reservationNumber)
+function getMassCompleteClass(reservationNumber: number) {
+	if (!massCompleteStatus.value) {
+		return undefined;
+	}
 
-		if (mcEntry) {
-			switch(mcEntry.status) {
-				case MassCompleteStatus.idle:
-					return "mc-progress-idle";
+	const mcEntry = massCompleteStatus.value.find((x) => x.reservationNumber == String(reservationNumber));
 
-				case MassCompleteStatus.started:
-					return "mc-progress-started";
+	switch(mcEntry?.status) {
+		case MassCompleteStatus.idle:
+			return "mc-progress-idle";
 
-				case MassCompleteStatus.finished:
-					return "mc-progress-finished";
+		case MassCompleteStatus.started:
+			return "mc-progress-started";
 
-				case MassCompleteStatus.failed:
-					return "mc-progress-failed";
+		case MassCompleteStatus.finished:
+			return "mc-progress-finished";
 
-				default:
-					return "mc-progress-failed";
-			}
-		} 
-		else {
+		default:
 			return "mc-progress-failed";
-		}
 	}
 }
 </script>
@@ -210,333 +202,124 @@ function getMassCompleteClass(reservationNumber: string) {
 						</button>
 					</div>
 					<div class="modal-body">
-						<div class="modal-body">
-
-
-							<div class="container my-2 text-left">
-								<div class="row text-success ">
-									<div class="col-6">
-										<h3>
-											Succesvol product '{{ modalData.searchProductName }}' gevonden
-										</h3>
-										<p>Het product komt voor in {{ modalData.searchProductAmount }} reserveringen.
-										</p>
-									</div>
-									<div class="col-6">
-										<div class="row product border border-success rounded">
-											<div class="col-9 product-details">
-												<h4 class="card-title">{{ modalData.searchProductName }}</h4>
-												<p class="card-text">{{ modalData.searchProductBarcode }}</p>
-											</div>
-											<div class="col-3 product-image">
-												<div class="float-right">
-													<img :src="modalData.searchProductImageUrl" class="img-fluid"
-														loading="lazy">
-												</div>
+						<div class="container my-2 text-left">
+							<div class="row text-success">
+								<div class="col-6">
+									<h3>
+										Succesvol product '{{ modalData.searchProductName }}' gevonden
+									</h3>
+									<p>Het product komt voor in {{ modalData.searchProductAmount }} reserveringen.</p>
+								</div>
+								<div class="col-6">
+									<div class="row product border border-success rounded">
+										<div class="col-9 product-details">
+											<h4 class="card-title">{{ modalData.searchProductName }}</h4>
+											<p class="card-text">{{ modalData.searchProductBarcode }}</p>
+										</div>
+										<div class="col-3 product-image">
+											<div class="float-right">
+												<img :src="modalData.searchProductImageUrl" class="img-fluid"
+													loading="lazy">
 											</div>
 										</div>
 									</div>
 								</div>
-
-								<div v-if="canAutoProceed()">
-									<div class="auto-select-countdown-container">
-										<hr>
-										<h4>Gaat automatisch verder over {{ countdown }} seconden...</h4>
-										<hr>
-									</div>
-								</div>
-
-								<div v-show="modalData.singleLineReservations.length > 0">
-									<div class="row">
-										<div class="col">
-											<h4>{{ modalData.singleLineReservations.length }} singleline reserveringen</h4>											<p>Deze reserveringen bevatten 1 stuk van het product.</p>
-										</div>
-									</div>
-
-
-									<div class="card mb-2" v-if="massCompleteShowDialog">
-										<div class="card-header">
-											<div class="row">
-												<div class="col-6">
-													<h4>Massa voltooien</h4>
-												</div>
-												<div class="col-2 pr-0">
-													<input type="number" class="form-control pr-0 combiInputButtonLeft" v-model.number="massCompleteAmount" :disabled="massCompleteStarted" @focusout="setMassCompleteAmount(massCompleteAmount)" >
-												</div>
-												<div class="col-1 pl-0 pr-0 mc-amount-btn">
-													<button class="btn btn-primary btn-block px-0 combiInputButtonRight combiInputButtonLeft" @click="setMassCompleteAmount(massCompleteAmount - 1)" :disabled="massCompleteStarted">-</button>
-												</div>
-												<div class="col-1 pl-0 pr-0 mc-amount-btn">
-													<button class="btn btn-primary btn-block px-0 combiInputButtonRight" @click="setMassCompleteAmount(massCompleteAmount + 1)" :disabled="massCompleteStarted">+</button>
-												</div>
-												<div class="col-3">
-													<button type="button" class="btn btn-primary btn-right btn-block" @click="startMassComplete()" :disabled="massCompleteStarted">Start voltooien</button>
-												</div>
-											</div>
-										</div>
-									</div>
-
-
-									<div class="singleline-reservations">
-										<template v-for="reservation in modalData.singleLineReservations">
-											<div class="card mb-2">
-												<div class="card-header">
-													<div class="row">
-														<div class="col-10">
-															<div class="row">
-																<div class="col-4">
-																	<div>Reservering: <b>{{
-																		reservation.reservationNumber }}</b></div>
-																	<div>Verkooporder referentiecode: <b>{{
-																		reservation.saleOrderReference }}</b></div>
-
-																</div>
-																<div class="col-4">
-																	<div>Status: <b>{{ reservation.status }}</b></div>
-																	<div>Logistieke status: <b>{{
-																		reservation.deliveryStatus }}</b></div>
-																</div>
-																<div class="col-4">
-																	<div> Klant: <b>{{ reservation.customer }}</b></div>
-																</div>
-															</div>
-														</div>
-														<div class="col-2">
-															<div class="float-right">
-																<Transition>
-																	<a href="javascript: void(0)"
-																		class="btn btn-primary"
-																		v-show="!massCompleteStarted"
-																		v-on:click="emit('open', reservation.url)"
-																		>Open&nbsp;<span
-																			class="material-icons">chevron_right</span></a>
-																</Transition>
-															</div>
-														</div>
-
-													</div>
-												</div>
-												<Transition>
-												<div class="mc-progress-bar" v-show="massCompleteStarted">
-													<div :class="getMassCompleteClass(reservation.reservationNumber)"></div>
-												</div>
-												</Transition>
-											</div>
-										</template>
-									</div>
-								</div>
-
-								<hr
-									v-show="modalData.singleLineReservations.length > 0 && modalData.validReservations.length > 0">
-
-								<div v-show="modalData.validReservations.length > 0">
-									<div class="row">
-										<div class="col">
-											<h4>{{ modalData.validReservations.length }} Reserveringen</h4>
-										</div>
-									</div>
-
-									<div class="valid-reservations">
-										<template v-for="reservation in modalData.validReservations">
-											<div class="card mb-2">
-												<div class="card-header">
-													<div class="row">
-														<div class="col-10">
-															<div class="row">
-																<div class="col-4">
-																	<div>Reservering: <b>{{
-																		reservation.reservationNumber }}</b></div>
-																	<div>Verkooporder referentiecode: <b>{{
-																		reservation.saleOrderReference }}</b></div>
-
-																</div>
-																<div class="col-4">
-																	<div>Status: <b>{{ reservation.status }}</b></div>
-																	<div>Logistieke status: <b>{{
-																		reservation.deliveryStatus }}</b></div>
-																</div>
-																<div class="col-4">
-																	<div> Klant: <b>{{ reservation.customer }}</b></div>
-																</div>
-															</div>
-														</div>
-														<div class="col-2">
-															<div class="float-right">
-																<Transition>
-																	<a href="javascript: void(0)"
-																		class="btn btn-primary"
-																		v-show="!massCompleteStarted"
-																		v-on:click="emit('open', reservation.url)"
-																		>Open&nbsp;<span
-																			class="material-icons">chevron_right</span></a>
-																</Transition>
-															</div>
-														</div>
-
-													</div>
-												</div>
-												<div class="card-body">
-													<div class="reservation-rows reservation-rows">
-														<div class="row nfTableHeader">
-															<div class="col-3 ">Artikel nr</div>
-															<div class="col-3">Omschrijving</div>
-															<div class="col-3">Hoofd barcode</div>
-															<div class="col-3">Geraapt aantal</div>
-														</div>
-
-														<div class="reservation-rows ">
-															<template v-for="product in reservation.products">
-																<div class="row nfTableRow ">
-																	<div class="col-3">{{ product.number }}</div>
-																	<div class="col-3">{{ product.description }}</div>
-																	<div class="col-3">{{ product.barcode }}</div>
-																	<div class="col-3 ">{{ product.amount }}</div>
-																</div>
-															</template>
-														</div>
-													</div>
-												</div>
-												<div v-if="RVUtils.matchShopwareOrderNumber(reservation.saleOrderReference)">
-													<div class="card-body">
-														<div class="reservation-rows reservation-rows">
-															<div class="row nfTableHeader sw-header">
-																<img :src="ShopwareLogoIconUrl" class="sw-logo" />
-																<h4 class="sw-title">Shopware Notitie</h4>
-															</div>
-															<div class="reservation-rows ">
-																<div class="row nfTableRow sw-body">
-																	<div class="col">
-																		<div v-show="!swCommentBoxesEnabled || !reservation.swOrderData"
-																			class="loader modal-loader">
-																		</div>
-																		<Transition>
-																			<textarea class="sw-textarea"
-																				v-if="reservation.swOrderData"
-																				v-model="reservation.swOrderData.customerComment"
-																				:disabled="!swCommentBoxesEnabled" :placeholder="swCommentBoxesEnabled ? 'Nog geen notitie...' : ''"></textarea>
-																		</Transition>
-																		<textarea class="sw-textarea"
-																			v-if="!reservation.swOrderData" disabled></textarea>
-																	</div>
-																	<div class="col-1.5">
-																		<button class="sw-btn"
-																			@click="onSaveButtonClick(reservation.swOrderData, reservation.saleOrderReference)"
-																			:disabled="!swCommentBoxesEnabled">Opslaan</button>
-																	</div>
-																</div>
-															</div>
-														</div>
-													</div>
-												</div>
-											</div>
-										</template>
-									</div>
-								</div>
-
-								<hr
-									v-show="modalData.validReservations.length > 0 && modalData.invalidReservations.length > 0">
-
-								<div class="row" v-show="modalData.invalidReservations.length > 0">
-									<div class="col">
-										<h4>{{ modalData.invalidReservations.length }} reserveringen zijn nog niet
-											volledig geraapt.</h4>
-										<div class="alert alert-danger">Onderstaande reserveringen bevatten het product,
-											maar hebben niet de juiste logistieke status, of zijn nog niet volledig
-											geraapt.</div>
-									</div>
-								</div>
-
-								<div class="invalid-reservations">
-
-									<template v-for="reservation in modalData.invalidReservations">
-										<div class="card mb-2">
-											<div class="card-header">
-												<div class="row">
-													<div class="col-10">
-														<div class="row">
-															<div class="col-4">
-																<div>Reservering: <b>{{ reservation.reservationNumber
-																}}</b></div>
-																<div>Verkooporder referentiecode: <b>{{
-																	reservation.saleOrderReference }}</b></div>
-
-															</div>
-															<div class="col-4">
-																<div>Status: <b>{{ reservation.status }}</b></div>
-																<div>Logistieke status: <b>{{ reservation.deliveryStatus
-																}}</b></div>
-															</div>
-															<div class="col-4">
-																<div> Klant: <b>{{ reservation.customer }}</b></div>
-															</div>
-														</div>
-													</div>
-													<div class="col-2">
-													</div>
-
-												</div>
-											</div>
-											<div class="card-body">
-												<div class="reservation-rows reservation-rows">
-													<div class="row nfTableHeader">
-														<div class="col-3 ">Artikel nr</div>
-														<div class="col-3">Omschrijving</div>
-														<div class="col-3">Hoofd barcode</div>
-														<div class="col-3">Geraapt aantal</div>
-													</div>
-													<div class="reservation-rows ">
-														<template v-for="product in reservation.products">
-															<div
-																:class="RVUtils.isAmountStringComplete(product.amount) ? 'row nfTableRow' : 'row nfTableRow bg-warning text-dark'">
-																<div class="col-3">{{ product.number }}</div>
-																<div class="col-3">{{ product.description }}
-																</div>
-																<div class="col-3">{{ product.barcode }}</div>
-																<div class="col-3 font-weight-bold">{{ product.amount }}
-																</div>
-															</div>
-														</template>
-													</div>
-												</div>
-											</div>
-											<div v-if="RVUtils.matchShopwareOrderNumber(reservation.saleOrderReference)">
-												<div class="card-body">
-													<div class="reservation-rows reservation-rows">
-														<div class="row nfTableHeader sw-header">
-															<img :src="ShopwareLogoIconUrl" class="sw-logo" />
-															<h4 class="sw-title">Shopware Notitie</h4>
-														</div>
-														<div class="reservation-rows ">
-															<div class="row nfTableRow sw-body">
-																<div class="col">
-																	<div v-show="!swCommentBoxesEnabled || !reservation.swOrderData"
-																		class="loader modal-loader">
-																	</div>
-																	<Transition>
-																		<textarea class="sw-textarea"
-																			v-if="reservation.swOrderData"
-																			v-model="reservation.swOrderData.customerComment"
-																			:disabled="!swCommentBoxesEnabled" :placeholder="swCommentBoxesEnabled ? 'Nog geen notitie...' : ''"></textarea>
-																	</Transition>
-																	<textarea class="sw-textarea"
-																		v-if="!reservation.swOrderData" disabled></textarea>
-																</div>
-																<div class="col-1.5">
-																	<button class="sw-btn"
-																		@click="onSaveButtonClick(reservation.swOrderData, reservation.saleOrderReference)"
-																		:disabled="!swCommentBoxesEnabled">Opslaan</button>
-																</div>
-															</div>
-														</div>
-													</div>
-												</div>
-											</div>
-										</div>
-									</template>
-								</div>
-
 							</div>
 
+							<div v-if="canAutoProceed()">
+								<div class="auto-select-countdown-container">
+									<hr>
+									<h4>Gaat automatisch verder over {{ countdown }} seconden...</h4>
+									<hr>
+								</div>
+							</div>
+
+							<div v-show="modalData.singleLineReservations.length > 0">
+								<div class="row">
+									<div class="col">
+										<h4>{{ modalData.singleLineReservations.length }} singleline reserveringen</h4>
+										<p>Deze reserveringen bevatten 1 stuk van het product.</p>
+									</div>
+								</div>
+
+								<div class="card mb-2" v-if="massCompleteShowDialog">
+									<div class="card-header">
+										<div class="row">
+											<div class="col-6">
+												<h4>Massa voltooien</h4>
+											</div>
+											<div class="col-2 pr-0">
+												<input type="number" class="form-control pr-0 combiInputButtonLeft"
+													v-model.number="massCompleteAmount" :disabled="massCompleteStarted"
+													@focusout="setMassCompleteAmount(massCompleteAmount)">
+											</div>
+											<div class="col-1 pl-0 pr-0 mc-amount-btn">
+												<button
+													class="btn btn-primary btn-block px-0 combiInputButtonRight combiInputButtonLeft"
+													@click="setMassCompleteAmount(massCompleteAmount - 1)"
+													:disabled="massCompleteStarted">-</button>
+											</div>
+											<div class="col-1 pl-0 pr-0 mc-amount-btn">
+												<button class="btn btn-primary btn-block px-0 combiInputButtonRight"
+													@click="setMassCompleteAmount(massCompleteAmount + 1)"
+													:disabled="massCompleteStarted">+</button>
+											</div>
+											<div class="col-3">
+												<button type="button" class="btn btn-primary btn-right btn-block"
+													@click="startMassComplete()"
+													:disabled="massCompleteStarted">Start voltooien</button>
+											</div>
+										</div>
+									</div>
+								</div>
+
+								<div class="singleline-reservations">
+									<ReservationCard v-for="reservation in modalData.singleLineReservations"
+										:key="reservation.reservationNumber" :reservation="reservation"
+										:show-open-button="!massCompleteStarted" :show-progress-bar="massCompleteStarted"
+										:progress-class="getMassCompleteClass(reservation.reservationNumber)"
+										@open="(url) => emit('open', url)" />
+								</div>
+							</div>
+
+							<hr
+								v-show="modalData.singleLineReservations.length > 0 && modalData.validReservations.length > 0">
+
+							<div v-show="modalData.validReservations.length > 0">
+								<div class="row">
+									<div class="col">
+										<h4>{{ modalData.validReservations.length }} Reserveringen</h4>
+									</div>
+								</div>
+
+								<div class="valid-reservations">
+									<ReservationCard v-for="reservation in modalData.validReservations"
+										:key="reservation.reservationNumber" :reservation="reservation" show-products
+										:show-open-button="!massCompleteStarted" show-note
+										:note-enabled="swCommentBoxesEnabled" @open="(url) => emit('open', url)"
+										@save-note="onSaveButtonClick(reservation.swOrderData, reservation.saleOrderReference)" />
+								</div>
+							</div>
+
+							<hr
+								v-show="modalData.validReservations.length > 0 && modalData.invalidReservations.length > 0">
+
+							<div class="row" v-show="modalData.invalidReservations.length > 0">
+								<div class="col">
+									<h4>{{ modalData.invalidReservations.length }} reserveringen zijn nog niet
+										volledig geraapt.</h4>
+									<div class="alert alert-danger">Onderstaande reserveringen bevatten het product,
+										maar hebben niet de juiste logistieke status, of zijn nog niet volledig
+										geraapt.</div>
+								</div>
+							</div>
+
+							<div class="invalid-reservations">
+								<ReservationCard v-for="reservation in modalData.invalidReservations"
+									:key="reservation.reservationNumber" :reservation="reservation" show-products
+									highlight-incomplete show-note :note-enabled="swCommentBoxesEnabled"
+									@save-note="onSaveButtonClick(reservation.swOrderData, reservation.saleOrderReference)" />
+							</div>
 						</div>
 					</div>
 					<div class="modal-footer">
@@ -565,66 +348,10 @@ function getMassCompleteClass(reservationNumber: string) {
 	overflow-y: auto;
 }
 
-.sw-btn {
-	width: 100%;
-}
-
-.sw-title {
-	line-height: 22px;
-}
-
-.modal-loader {
-	height: 20px;
-	margin-top: -20px;
-	top: 30px;
-	justify-self: center;
-	position: relative;
-}
-
-.sw-textarea {
-	min-height: 34px;
-	font-size: 18px;
-}
-
-.sw-body {
-	padding-right: 20px;
-}
-
 .mc-amount-btn {
 	-ms-flex: 0 0 4%;
 	flex: 0 0 4%;
 	max-width: 4%;
-}
-
-.mc-progress-bar {
-	background-color: rgb(211, 211, 211);
-	width: 100%;
-	height: 15px;
-	size: 5px;
-}
-
-.mc-progress-idle {
-	background-color: #c2b755;
-	width: 33.333%;
-	height: 100%;
-}
-
-.mc-progress-started {
-	background-color: #4ea0f7;
-	width: 66%;
-	height: 100%;
-}
-
-.mc-progress-finished {
-	background-color: #56e656;
-	width: 100%;
-	height: 100%;
-}
-
-.mc-progress-failed {
-	background-color: #ff0000;
-	width: 100%;
-	height: 100%;
 }
 
 .btn-primary:disabled {

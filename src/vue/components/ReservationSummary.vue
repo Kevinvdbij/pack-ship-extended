@@ -3,8 +3,8 @@ import { onMounted, ref } from 'vue';
 import ShopwareLogoIconUrl from "../../assets/shopware.svg";
 
 import * as Shopware from "../../shopware.ts";
+import { saveOrderComment } from '../../shopwareComments.ts';
 import { getCurrentOrderNumber, matchShopwareOrderNumber } from '../../retailVistaUtils.ts';
-import { toast } from 'vue3-toastify';
 
 const show = ref(false);
 const swCommentData = ref<string>();
@@ -13,7 +13,7 @@ const swOrderData = ref();
 let saveTimeoutId: number;
 const swCommentBoxEnabled = ref(false);
 
-const swToken = ref();
+const swToken = ref<Shopware.ShopwareToken>();
 
 onMounted(() => {
 	show.value = true;
@@ -42,14 +42,8 @@ function onSaveButtonClick() {
 	const orderNumber = getCurrentOrderNumber();
 	swOrderData.value.data[0].customerComment = swCommentData.value;
 
-	if (swToken) {
-		const updatePromise = Shopware.updateOrderComment(swToken.value, swOrderData.value.data[0]);
-
-		toast.promise(updatePromise, {
-			pending: `Order ${orderNumber} notitie wordt opgeslagen...`,
-			success: `Order ${orderNumber} notitie succesvol opgeslagen.`,
-			error: `Er is een fout opgetreden bij het opslaan van de notitie van order ${orderNumber}.`
-		});
+	if (swToken.value) {
+		saveOrderComment(swToken.value, swOrderData.value.data[0], orderNumber);
 	}
 
 	swCommentBoxEnabled.value = false;
