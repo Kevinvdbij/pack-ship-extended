@@ -8,6 +8,7 @@ import AddParcelsPage from './vue/pages/AddParcelsPage.vue';
 import FooterExtension from './vue/components/Footer.vue';
 import Settings from "./settings.ts"
 import "./style.css";
+import "vue3-toastify/dist/index.css";
 
 Settings.load();
 const path = window.location.pathname;

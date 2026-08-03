@@ -4,6 +4,7 @@ import ShopwareLogoIconUrl from "../../assets/shopware.svg";
 
 import * as Shopware from "../../shopware.ts";
 import { getCurrentOrderNumber, matchShopwareOrderNumber } from '../../retailVistaUtils.ts';
+import { toast } from 'vue3-toastify';
 
 const show = ref(false);
 const swCommentData = ref<string>();
@@ -38,10 +39,17 @@ function retrieveCommentData() {
 }
 
 function onSaveButtonClick() {
+	const orderNumber = getCurrentOrderNumber();
 	swOrderData.value.data[0].customerComment = swCommentData.value;
 
 	if (swToken) {
-		Shopware.shopwareUpdateOrderComment(swToken.value, swOrderData.value.data[0]);
+		const updatePromise = Shopware.updateOrderComment(swToken.value, swOrderData.value.data[0]);
+
+		toast.promise(updatePromise, {
+			pending: `Order ${orderNumber} notitie wordt opgeslagen...`,
+			success: `Order ${orderNumber} notitie succesvol opgeslagen.`,
+			error: `Er is een fout opgetreden bij het opslaan van de notitie van order ${orderNumber}.`
+		});
 	}
 
 	swCommentBoxEnabled.value = false;

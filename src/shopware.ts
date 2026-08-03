@@ -201,26 +201,27 @@ const shopwareApiUrl = "https://www.kampeerhalroden.nl";
 	}
 
 	// Function that updates order customer comment
-	export async function shopwareUpdateOrderComment(token: ShopwareToken, data: ShopwareOrderEntry): Promise<unknown> {
-		const ajaxSettings: JQuery.AjaxSettings = {
-			async: true,
-			crossDomain: true,
-			url: shopwareApiUrl + "/api/order/" + data.id,
+	export const updateOrderComment = async (token: ShopwareToken, data: ShopwareOrderEntry): Promise<Response> => {
+		const url = `${shopwareApiUrl}/api/order/${data.id}`;
+		
+		const options = {
 			method: "PATCH",
 			headers: {
 				"Content-Type": "application/json",
 				Accept: "application/vnd.api+json, application/json",
 				Authorization: "Bearer " + token.access_token,
 			},
-			// Filter out the rest of the data and send only the customer comment
-			data: JSON.stringify({
+			body: JSON.stringify({
 				customerComment: data.customerComment,
 			}),
 		};
 
-		console.log("Updating shopware order customer comment...");
-
-		return $.ajax(ajaxSettings);
+		return fetch(url, options).then((response) => {
+			if (!response.ok) {
+				throw new Error(`Failed to update order comment. Status: ${response.status}`);
+			}
+			return response;
+		});
 	}
 
 	export async function getImageUri(productEAN: string) {

@@ -6,6 +6,7 @@ import * as Shopware from "../../shopware";
 import { MassCompleteEntry, MassCompleteStatus, ModalReservationDetails } from "../../interfaces.ts";
 import Settings from "../../settings.ts";
 import { GM, GM_addValueChangeListener } from "$";
+import { toast } from 'vue3-toastify';
 
 const emit = defineEmits(["open", "close"]);
 const props = defineProps({
@@ -35,9 +36,15 @@ onMounted(() => {
 	initMassComplete();
 });
 
-function onSaveButtonClick(orderData: Shopware.ShopwareOrderEntry) {
+function onSaveButtonClick(orderData: Shopware.ShopwareOrderEntry, orderNumber: string) {
 	if (swToken) {
-		Shopware.shopwareUpdateOrderComment(swToken.value, orderData);
+		const updatePromise = Shopware.updateOrderComment(swToken.value, orderData);
+		
+		toast.promise(updatePromise, {
+			pending: `Order ${orderNumber} notitie wordt opgeslagen...`,
+			success: `Order ${orderNumber} notitie succesvol opgeslagen.`,
+			error: `Er is een fout opgetreden bij het opslaan van de notitie van order ${orderNumber}.`
+		});
 	}
 
 	swCommentBoxesEnabled.value = false;
@@ -50,11 +57,11 @@ function onSaveButtonClick(orderData: Shopware.ShopwareOrderEntry) {
 function retrieveCommentData() {
 	const reservationsToFetch:ModalReservationDetails[] = props.modalData.invalidReservations.concat((props.modalData).validReservations);
 
-	reservationsToFetch.forEach((reservation) => {
-		Shopware.shopwareGetOrderData(swToken.value, reservation.saleOrderReference).then((response) => {
-			reservation.swOrderData = response.data[0]
+	Promise.all(reservationsToFetch.map((reservation) => Shopware.shopwareGetOrderData(swToken.value, reservation.saleOrderReference))).then((responses) => {
+		responses.forEach((response, index) => {
+			reservationsToFetch[index].swOrderData = response.data[0];
 		});
-
+	}).then(() => {
 		swCommentBoxesEnabled.value = true;
 	});
 }
@@ -417,7 +424,7 @@ function getMassCompleteClass(reservationNumber: string) {
 																	</div>
 																	<div class="col-1.5">
 																		<button class="sw-btn"
-																			@click="onSaveButtonClick(reservation.swOrderData)"
+																			@click="onSaveButtonClick(reservation.swOrderData, reservation.saleOrderReference)"
 																			:disabled="!swCommentBoxesEnabled">Opslaan</button>
 																	</div>
 																</div>
@@ -522,7 +529,7 @@ function getMassCompleteClass(reservationNumber: string) {
 																</div>
 																<div class="col-1.5">
 																	<button class="sw-btn"
-																		@click="onSaveButtonClick(reservation.swOrderData)"
+																		@click="onSaveButtonClick(reservation.swOrderData, reservation.saleOrderReference)"
 																		:disabled="!swCommentBoxesEnabled">Opslaan</button>
 																</div>
 															</div>
