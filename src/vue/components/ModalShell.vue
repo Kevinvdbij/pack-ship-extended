@@ -21,7 +21,7 @@ const props = withDefaults(defineProps<{
 	// The panel's width. The dialogs differ in what they hold -- a form, a
 	// question, a product photo -- and little else, so this is the only knob
 	// they get.
-	size?: "sm" | "md" | "lg";
+	size?: "sm" | "md" | "lg" | "xl";
 	// A dialog raised over another one. The credentials prompt is the only case:
 	// it can open on a page that already has the settings dialog on it.
 	elevated?: boolean;
@@ -140,6 +140,12 @@ function onBackdropClick(event: MouseEvent) {
 
 .is-lg {
 	max-width: 780px;
+}
+
+/* The one dialog that is a screen rather than a question: the reservation
+   picker, which holds a list of reservations with their products under them. */
+.is-xl {
+	max-width: 1000px;
 }
 
 .pse-modal-head {

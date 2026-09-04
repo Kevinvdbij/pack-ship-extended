@@ -263,7 +263,6 @@
  * portal's own dialogs, which bring a backdrop element of their own.
  */
 :root body:has(.pse-modal) .loading,
-:root body:has(.pse-selection-backdrop) .loading,
 :root body:has(.modal-backdrop.show) .loading {
 	background: transparent;
 	backdrop-filter: none;

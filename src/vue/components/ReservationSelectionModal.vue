@@ -1,11 +1,14 @@
 <script setup lang="ts">
-import { onMounted, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import * as Shopware from "../../shopware.ts";
 import { saveOrderComment } from "../../shopwareComments.ts";
 import * as RVUtils from "../../retailVistaUtils.ts";
 import { MassCompleteEntry, MassCompleteStatus, ModalReservationDetails, ReservationSelectionModalData } from "../../interfaces.ts";
 import Settings from "../../settings.ts";
+import ModalShell from "./ModalShell.vue";
 import ReservationCard from "./ReservationCard.vue";
+import ReservationRow from "./ReservationRow.vue";
+import MassCompletePanel from "./MassCompletePanel.vue";
 import { GM, GM_addValueChangeListener } from "$";
 
 const emit = defineEmits(["open", "close"]);
@@ -26,14 +29,18 @@ const massCompleteMax = 50;
 const massCompleteThreshold = 2;
 const massCompleteStatus = ref<MassCompleteEntry[]>();
 
+// Before the first render rather than on mount: whether there is a mass complete
+// to offer decides whether the countdown notice is shown, and worked out a tick
+// later it is shown and then taken away again -- which on a dialog that has just
+// appeared reads as a flicker at the top of the list.
+initMassComplete();
+
 onMounted(() => {
 	Shopware.shopwareInitialize().then((token) => {
 		swToken.value = token;
 		retrieveCommentData();
 		autoSelectReservationCountdown();
 	});
-
-	initMassComplete();
 });
 
 function onSaveButtonClick(orderData: Shopware.ShopwareOrderEntry, orderNumber: string) {
@@ -162,223 +169,298 @@ function monitorMassCompleteEntry(entry: MassCompleteEntry) {
 	});
 }
 
-function getMassCompleteClass(reservationNumber: number) {
-	if (!massCompleteStatus.value) {
-		return undefined;
-	}
+// A reservation's place in the run, or nothing at all when there is no run or
+// when it was not one of the ones taken -- the operator can ask for fewer than
+// the list holds, and the rest are left alone rather than shown as waiting for
+// something that will never come.
+function statusFor(reservationNumber: number): MassCompleteStatus | undefined {
+	return massCompleteStatus.value?.find((entry) => entry.reservationNumber == String(reservationNumber))?.status;
+}
 
-	const mcEntry = massCompleteStatus.value.find((x) => x.reservationNumber == String(reservationNumber));
+// The run as a whole, which is what the panel reports. Counted off the same
+// entries the rows read, so the tally and the list can never disagree.
+const massCompleteFinished = computed(() => countStatus(MassCompleteStatus.finished));
+const massCompleteFailed = computed(() => countStatus(MassCompleteStatus.failed));
 
-	switch(mcEntry?.status) {
-		case MassCompleteStatus.idle:
-			return "mc-progress-idle";
-
-		case MassCompleteStatus.started:
-			return "mc-progress-started";
-
-		case MassCompleteStatus.finished:
-			return "mc-progress-finished";
-
-		default:
-			return "mc-progress-failed";
-	}
+function countStatus(status: MassCompleteStatus): number {
+	return massCompleteStatus.value?.filter((entry) => entry.status == status).length ?? 0;
 }
 </script>
 
 <template>
-	<div class="pse-selection-backdrop">
-		<div class="modal show" id="productReservationsModal" tabindex="-1" role="dialog" data-backdrop="static"
-			aria-modal="true" style="display: block;">
-			<div class="modal-dialog modal-xl" role="document">
-				<div class="modal-content">
-					<div class="modal-header">
-						<h5 class="modal-title">
-							{{ modalData.searchProductAmount }} reserveringen gevonden met product barcode '{{
-								modalData.searchProductBarcode }}'
-						</h5>
-						<button type="button" class="close" data-dismiss="modal" aria-label="Close"
-							@click="$emit('close')">
-							<span aria-hidden="true">×</span>
-						</button>
-					</div>
-					<div class="modal-body">
-						<div class="container my-2 text-left">
-							<div class="row text-success">
-								<div class="col-6">
-									<h3>
-										Succesvol product '{{ modalData.searchProductName }}' gevonden
-									</h3>
-									<p>Het product komt voor in {{ modalData.searchProductAmount }} reserveringen.</p>
-								</div>
-								<div class="col-6">
-									<div class="row product border border-success rounded">
-										<div class="col-9 product-details">
-											<h4 class="card-title">{{ modalData.searchProductName }}</h4>
-											<p class="card-text">{{ modalData.searchProductBarcode }}</p>
-										</div>
-										<div class="col-3 product-image">
-											<div class="float-right">
-												<img :src="modalData.searchProductImageUrl" class="img-fluid"
-													loading="lazy">
-											</div>
-										</div>
-									</div>
-								</div>
-							</div>
-
-							<div v-if="canAutoProceed()">
-								<div class="auto-select-countdown-container">
-									<hr>
-									<h4>Gaat automatisch verder over {{ countdown }} seconden...</h4>
-									<hr>
-								</div>
-							</div>
-
-							<div v-show="modalData.singleLineReservations.length > 0">
-								<div class="row">
-									<div class="col">
-										<h4>{{ modalData.singleLineReservations.length }} singleline reserveringen</h4>
-										<p>Deze reserveringen bevatten 1 stuk van het product.</p>
-									</div>
-								</div>
-
-								<div class="card mb-2" v-if="massCompleteShowDialog">
-									<div class="card-header">
-										<div class="row">
-											<div class="col-6">
-												<h4>Massa voltooien</h4>
-											</div>
-											<div class="col-2 pr-0">
-												<input type="number" class="form-control pr-0 combiInputButtonLeft"
-													v-model.number="massCompleteAmount" :disabled="massCompleteStarted"
-													@focusout="setMassCompleteAmount(massCompleteAmount)">
-											</div>
-											<div class="col-1 pl-0 pr-0 mc-amount-btn">
-												<button
-													class="btn btn-primary btn-block px-0 combiInputButtonRight combiInputButtonLeft"
-													@click="setMassCompleteAmount(massCompleteAmount - 1)"
-													:disabled="massCompleteStarted">-</button>
-											</div>
-											<div class="col-1 pl-0 pr-0 mc-amount-btn">
-												<button class="btn btn-primary btn-block px-0 combiInputButtonRight"
-													@click="setMassCompleteAmount(massCompleteAmount + 1)"
-													:disabled="massCompleteStarted">+</button>
-											</div>
-											<div class="col-3">
-												<button type="button" class="btn btn-primary btn-right btn-block"
-													@click="startMassComplete()"
-													:disabled="massCompleteStarted">Start voltooien</button>
-											</div>
-										</div>
-									</div>
-								</div>
-
-								<div class="singleline-reservations">
-									<ReservationCard v-for="reservation in modalData.singleLineReservations"
-										:key="reservation.reservationNumber" :reservation="reservation"
-										:show-open-button="!massCompleteStarted" :show-progress-bar="massCompleteStarted"
-										:progress-class="getMassCompleteClass(reservation.reservationNumber)"
-										@open="(url) => emit('open', url)" />
-								</div>
-							</div>
-
-							<hr
-								v-show="modalData.singleLineReservations.length > 0 && modalData.validReservations.length > 0">
-
-							<div v-show="modalData.validReservations.length > 0">
-								<div class="row">
-									<div class="col">
-										<h4>{{ modalData.validReservations.length }} Reserveringen</h4>
-									</div>
-								</div>
-
-								<div class="valid-reservations">
-									<ReservationCard v-for="reservation in modalData.validReservations"
-										:key="reservation.reservationNumber" :reservation="reservation" show-products
-										:show-open-button="!massCompleteStarted" show-note
-										:note-enabled="swCommentBoxesEnabled" @open="(url) => emit('open', url)"
-										@save-note="onSaveButtonClick(reservation.swOrderData, reservation.saleOrderReference)" />
-								</div>
-							</div>
-
-							<hr
-								v-show="modalData.validReservations.length > 0 && modalData.invalidReservations.length > 0">
-
-							<div class="row" v-show="modalData.invalidReservations.length > 0">
-								<div class="col">
-									<h4>{{ modalData.invalidReservations.length }} reserveringen zijn nog niet
-										volledig geraapt.</h4>
-									<div class="alert alert-danger">Onderstaande reserveringen bevatten het product,
-										maar hebben niet de juiste logistieke status, of zijn nog niet volledig
-										geraapt.</div>
-								</div>
-							</div>
-
-							<div class="invalid-reservations">
-								<ReservationCard v-for="reservation in modalData.invalidReservations"
-									:key="reservation.reservationNumber" :reservation="reservation" show-products
-									highlight-incomplete show-note :note-enabled="swCommentBoxesEnabled"
-									@save-note="onSaveButtonClick(reservation.swOrderData, reservation.saleOrderReference)" />
-							</div>
-						</div>
-					</div>
-					<div class="modal-footer">
-						<button type="button" class="btn btn-primary" data-dismiss="modal"
-							@click="$emit('close')">Sluiten</button>
-					</div>
-				</div>
+	<!-- Not dismissable by a click on the page behind it. This dialog is the
+	     result of a scan, and a stray click while reading down a list of twenty
+	     reservations would throw the search away -- and, once a mass complete is
+	     running, take the run's only progress readout with it. -->
+	<ModalShell :title="`${modalData.searchProductAmount} reserveringen met dit product`" size="xl"
+		:dismissable="false" @close="emit('close')">
+		<!-- What was scanned, at the top, because everything under it is a list
+		     of places this product turned up and the question being answered is
+		     always "of this one?". -->
+		<section class="pse-found">
+			<div class="pse-found-image">
+				<img v-if="modalData.searchProductImageUrl" :src="modalData.searchProductImageUrl" alt=""
+					loading="lazy" />
 			</div>
-		</div>
-	</div>
+
+			<div class="pse-found-text">
+				<h3 class="pse-found-name">{{ modalData.searchProductName }}</h3>
+				<p class="pse-found-barcode">{{ modalData.searchProductBarcode }}</p>
+			</div>
+
+			<div class="pse-found-count">
+				<span class="pse-found-count-number">{{ modalData.searchProductAmount }}</span>
+				<span class="pse-found-count-label">reserveringen</span>
+			</div>
+		</section>
+
+		<!-- The one thing on this screen that happens without being asked, so it
+		     is said plainly and where the eye already is. -->
+		<Transition>
+			<p class="pse-countdown" v-if="canAutoProceed()">
+				<span class="pse-countdown-mark" aria-hidden="true"></span>
+				Gaat automatisch verder over {{ countdown }} seconden...
+			</p>
+		</Transition>
+
+		<section class="pse-group" v-if="modalData.singleLineReservations.length > 0">
+			<header class="pse-group-head">
+				<h3 class="pse-group-title">
+					Singleline
+					<span class="pse-group-count">{{ modalData.singleLineReservations.length }}</span>
+				</h3>
+				<p class="pse-group-note">Deze reserveringen bevatten 1 stuk van het product.</p>
+			</header>
+
+			<MassCompletePanel v-if="massCompleteShowDialog"
+				:total="modalData.singleLineReservations.length" :max="massCompleteMax"
+				:amount="massCompleteAmount" :started="massCompleteStarted"
+				:finished="massCompleteFinished" :failed="massCompleteFailed"
+				@update:amount="setMassCompleteAmount" @start="startMassComplete()" />
+
+			<div class="pse-rows">
+				<ReservationRow v-for="reservation in modalData.singleLineReservations"
+					:key="reservation.reservationNumber" :reservation="reservation"
+					:status="statusFor(reservation.reservationNumber)"
+					:show-open="!massCompleteStarted"
+					@open="(url) => emit('open', url)" />
+			</div>
+		</section>
+
+		<section class="pse-group" v-if="modalData.validReservations.length > 0">
+			<header class="pse-group-head">
+				<h3 class="pse-group-title">
+					Reserveringen
+					<span class="pse-group-count">{{ modalData.validReservations.length }}</span>
+				</h3>
+				<p class="pse-group-note">Klaar om verwerkt te worden.</p>
+			</header>
+
+			<ReservationCard v-for="reservation in modalData.validReservations"
+				:key="reservation.reservationNumber" :reservation="reservation" show-products
+				:show-open-button="!massCompleteStarted" show-note :note-enabled="swCommentBoxesEnabled"
+				@open="(url) => emit('open', url)"
+				@save-note="onSaveButtonClick(reservation.swOrderData, reservation.saleOrderReference)" />
+		</section>
+
+		<section class="pse-group" v-if="modalData.invalidReservations.length > 0">
+			<header class="pse-group-head">
+				<h3 class="pse-group-title">
+					Nog niet volledig geraapt
+					<span class="pse-group-count">{{ modalData.invalidReservations.length }}</span>
+				</h3>
+				<p class="pse-group-note">
+					Deze reserveringen bevatten het product, maar hebben niet de juiste logistieke status of
+					zijn nog niet volledig geraapt. Ze kunnen hier niet geopend worden.
+				</p>
+			</header>
+
+			<ReservationCard v-for="reservation in modalData.invalidReservations"
+				:key="reservation.reservationNumber" :reservation="reservation" show-products
+				highlight-incomplete show-note :note-enabled="swCommentBoxesEnabled"
+				@save-note="onSaveButtonClick(reservation.swOrderData, reservation.saleOrderReference)" />
+		</section>
+
+		<template #footer>
+			<button type="button" class="pse-dialog-btn pse-dialog-btn-quiet" @click="emit('close')">
+				Sluiten
+			</button>
+		</template>
+	</ModalShell>
 </template>
 
 <style scoped>
-/* The dimmed page behind the reservation picker.
- *
- * The picker itself is still the portal-shaped markup it was built from -- one
- * card per reservation, laid out by `ReservationCard.vue` -- so it is not one of
- * the dialogs rebuilt on `ModalShell.vue`. What it can share is the scrim, which
- * is what makes a dialog look like it belongs to the same program as the one
- * before it. Taken from the same token, at the same depth, with the same blur.
- *
- * `fixed` rather than `absolute`: the page behind this scrolls, and an absolute
- * backdrop is only as tall as the document was when it opened. */
-.pse-selection-backdrop {
-	position: fixed;
-	inset: 0;
-	z-index: 100;
-	overflow-y: auto;
-	background-color: var(--pse-scrim);
-	backdrop-filter: blur(3px);
-	-webkit-backdrop-filter: blur(3px);
+/* ---- What was scanned ---- *
+ * A strip rather than a card: it is the heading of the list under it, and a card
+ * here would be the first of many boxes on a screen that is already a stack of
+ * them.
+ */
+.pse-found {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+	margin-bottom: 20px;
+	padding: 14px 16px;
+	border: 1px solid var(--pse-line);
+	border-radius: 14px;
+	background-color: var(--pse-well);
 }
 
-.modal {
-	overflow-y: auto;
+/* Sized whether or not the photo arrives, so the strip does not resize when a
+   product without one is scanned. */
+.pse-found-image {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	width: 58px;
+	height: 58px;
+	overflow: hidden;
+	border: 1px solid var(--pse-line);
+	border-radius: 11px;
+	background-color: #ffffff;
 }
 
-.mc-amount-btn {
-	-ms-flex: 0 0 4%;
-	flex: 0 0 4%;
-	max-width: 4%;
+.pse-found-image img {
+	max-width: 100%;
+	max-height: 100%;
+	object-fit: contain;
 }
 
-.btn-primary:disabled {
-	color: #fff;
-	background-color: #ccc;
-	border-color: #bbb;
+.pse-found-text {
+	flex: 1;
+	min-width: 0;
 }
 
-.form-control:disabled {
-	background-color: #eff6f3;
-	border: 1px solid #ced4da;
-}
-
-input[type=number]::-webkit-inner-spin-button,
-input[type=number]::-webkit-outer-spin-button {
-	-webkit-appearance: none;
-	-moz-appearance: none;
-	appearance: none;
+.pse-found-name {
 	margin: 0;
+	font-size: 15.5px;
+	font-weight: 650;
+	line-height: 1.3;
+	color: var(--pse-ink);
+}
+
+.pse-found-barcode {
+	margin: 3px 0 0;
+	font-size: 13px;
+	font-variant-numeric: tabular-nums;
+	color: var(--pse-ink-soft);
+}
+
+.pse-found-count {
+	display: flex;
+	align-items: baseline;
+	gap: 6px;
+	flex: none;
+}
+
+.pse-found-count-number {
+	font-size: 22px;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	line-height: 1;
+	color: var(--pse-brand-ink);
+}
+
+.pse-found-count-label {
+	font-size: 12.5px;
+	color: var(--pse-ink-soft);
+}
+
+/* ---- The countdown ---- *
+ * Green, because nothing is wrong: the extension is about to do the obvious
+ * thing, and this is the window in which to stop it by picking something else.
+ */
+.pse-countdown {
+	display: flex;
+	align-items: center;
+	gap: 9px;
+	margin: 0 0 20px;
+	padding: 11px 14px;
+	border: 1px solid var(--pse-brand);
+	border-radius: 12px;
+	background-color: var(--pse-brand-soft);
+	font-size: 13.5px;
+	font-weight: 600;
+	color: var(--pse-brand-ink);
+}
+
+.pse-countdown-mark {
+	width: 8px;
+	height: 8px;
+	flex: none;
+	border-radius: 50%;
+	background-color: var(--pse-brand);
+	animation: pse-countdown-tick 1s ease-in-out infinite;
+}
+
+@keyframes pse-countdown-tick {
+	50% {
+		opacity: 0.25;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.pse-countdown-mark {
+		animation: none;
+	}
+}
+
+/* ---- The three groups ---- *
+ * Each is a heading, a line saying what the group is, and its reservations. The
+ * groups used to be separated by rules; the space and the heading do that job
+ * without drawing anything, which matters on a screen that is already a column
+ * of bordered boxes.
+ */
+.pse-group + .pse-group {
+	margin-top: 26px;
+}
+
+.pse-group-head {
+	margin-bottom: 10px;
+}
+
+.pse-group-title {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin: 0;
+	font-size: 14px;
+	font-weight: 650;
+	letter-spacing: 0.02em;
+	color: var(--pse-ink);
+}
+
+/* The count belongs to the heading rather than being read into it, so the
+   heading stays a name and the number stays a number. */
+.pse-group-count {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	min-width: 22px;
+	height: 20px;
+	padding: 0 7px;
+	border-radius: 999px;
+	background-color: var(--pse-brand-soft);
+	font-size: 12px;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	color: var(--pse-brand-ink);
+}
+
+.pse-group-note {
+	margin: 4px 0 0;
+	font-size: 12.5px;
+	line-height: 1.45;
+	color: var(--pse-ink-soft);
+}
+
+/* One block of rows with one border around the lot -- see `ReservationRow.vue`,
+   which draws only the line between one row and the next. */
+.pse-rows {
+	overflow: hidden;
+	border: 1px solid var(--pse-line);
+	border-radius: 14px;
+	background-color: #ffffff;
 }
 </style>
