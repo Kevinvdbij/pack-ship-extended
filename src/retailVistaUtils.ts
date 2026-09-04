@@ -1,7 +1,8 @@
 import { GM_deleteValues, GM_getValue, GM_listValues, GM_setValue } from "$";
 import { MassCompleteEntry, ModalProductDetails, ModalReservationDetails, ProductDetails, ReservationDefinition, ReservationDetails, ReservationSearchResponseType, ReservationSelectionModalData } from "./interfaces";
-import { CONTAINER_SELECTOR, massCompleteEntryKey, SEARCH_BLOCK_SELECTOR, PACKING_PORTAL_URL, PARCEL_CONTAINER_PARENT_SELECTOR, RESERVATION_SUMMARY_SELECTOR, STORAGE_KEYS } from "./constants.ts";
+import { CONTAINER_SELECTOR, massCompleteEntryKey, HEADER_SELECTOR, SEARCH_BLOCK_SELECTOR, PACKING_PORTAL_URL, PARCEL_CONTAINER_PARENT_SELECTOR, RESERVATION_SUMMARY_SELECTOR, STORAGE_KEYS } from "./constants.ts";
 import { debug } from "./logger.ts";
+import { afterReveal } from "./reveal.ts";
 
 export function getContainer():Element | null {
 	return document.querySelector(CONTAINER_SELECTOR);
@@ -9,6 +10,32 @@ export function getContainer():Element | null {
 
 export function getSearchBlock():Element | null {
 	return document.querySelector(SEARCH_BLOCK_SELECTOR);
+}
+
+// Moves an element the portal rendered into a host of ours.
+//
+// Our layout then owns where the element sits while the portal keeps owning the
+// element itself, which is the difference between restyling a region and
+// rebuilding it: the portal's own inputs stay the inputs, so its form still
+// serialises them and every helper that looks one up by id still finds it.
+// Only the class list is ours, because the portal's is the styling being
+// replaced.
+export function adoptElement(host: Element, target: Element | null, className?: string) {
+	if (!target) {
+		return null;
+	}
+
+	if (className != undefined) {
+		target.className = className;
+	}
+
+	host.append(target);
+
+	return target;
+}
+
+export function getPortalHeader():Element | null {
+	return document.querySelector(HEADER_SELECTOR);
 }
 
 export function getParcelContainerParent():Element | null {
@@ -197,11 +224,29 @@ export function skipVerification(target:HTMLElement) {
 	form.submit();
 }
 
+// Puts the cursor back in the barcode field and empties it, so the next scan
+// lands there whole. The scanner types and presses return; if the cursor is
+// anywhere else the scan is lost, and if the field still holds the last one the
+// two run together -- so this is what keeps a run going without the mouse.
+//
+// Deferred until the page is on screen. Under the theme's cloak the field is
+// `visibility: hidden` and cannot be focused at all: the call is dropped and
+// the focus does not arrive later when the cloak lifts. That is invisible from
+// here -- `focus()` reports nothing -- so it is handled once, for every caller,
+// rather than left for each to remember. Already-visible callers, which is
+// every call made during a packing run, are unaffected: `afterReveal` runs them
+// on the spot.
 export function focusBarcodeInput() {
-	const barcodeInput = document.querySelector<HTMLInputElement>("#Productbarcode")!;
+	afterReveal(() => {
+		const barcodeInput = document.querySelector<HTMLInputElement>("#Productbarcode");
 
-	barcodeInput.focus();
-	barcodeInput.value = "";
+		if (!barcodeInput) {
+			return;
+		}
+
+		barcodeInput.focus();
+		barcodeInput.value = "";
+	});
 }
 
 export function setBusy(state: boolean) {

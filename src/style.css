@@ -5,6 +5,36 @@
  * component, or it will restyle the page around us.
  */
 
+/* ---- Palette ---- *
+ * Shared by every region we render on the portal's light pages. It lives here
+ * rather than on one component because the header and the search page are
+ * separate mounts and would otherwise each carry their own copy of the brand
+ * green -- which is exactly how two of ours end up not quite matching.
+ *
+ * The green is Kampeerhal Roden's own: `--bs-primary` from their storefront
+ * theme, not a colour picked to look close to the portal's buttons.
+ */
+:root {
+	/* The brand green as declared. Accents, focus rings, the logo. */
+	--pse-brand: #689f69;
+	/* The same green taken down until white text on it clears 4.5:1, for the
+	   things that are filled and carry a label. Their green as-is is a shade too
+	   light for that, and a button whose word is hard to read is not on brand
+	   either. */
+	--pse-brand-ink: #4b7f4d;
+	--pse-brand-ink-strong: #3f6b41;
+	--pse-brand-soft: rgba(104, 159, 105, 0.14);
+	--pse-brand-ring: rgba(104, 159, 105, 0.30);
+
+	/* Everything textual is mixed from one near-black green-grey, so the greys
+	   sit under the green rather than beside it. */
+	--pse-ink: #1b2b22;
+	--pse-ink-soft: #6b7d73;
+	--pse-ink-faint: #9aa8a0;
+	--pse-line: #e2eae5;
+	--pse-well: #f6f9f7;
+}
+
 /* ---- Transitions ---- *
  * Default <Transition> classes, used unnamed by most of our components.
  */
@@ -221,4 +251,18 @@
 		flex-wrap: wrap;
 		gap: 4px 16px;
 	}
+}
+
+
+/* ---- Replaced portal regions ---- *
+ * A region whose markup we have taken over: its useful parts have been moved
+ * into our own layout and what remains is kept in the document -- forms still
+ * serialise, ids can still be looked up -- but off the page.
+ *
+ * Global rather than scoped because the element wearing it is the portal's,
+ * not ours, so no component owns it. `display` rather than `visibility`, since
+ * an emptied block still reserves its full height otherwise.
+ */
+.pse-portal-replaced {
+	display: none !important;
 }

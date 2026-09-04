@@ -24,8 +24,26 @@ const FAILSAFE_MS = 3000;
 
 let revealed = false;
 
+// Work that has to wait for the page to be on screen. The theme hides it with
+// `visibility: hidden`, and a hidden element cannot take focus -- `focus()`
+// called under the cloak is dropped, and it does not come back once the cloak
+// lifts. Anything that puts the cursor somewhere therefore has to be queued
+// here rather than run at mount.
+const pendingWork: Array<() => void> = [];
+
 export function armReveal() {
 	setTimeout(reveal, FAILSAFE_MS);
+}
+
+// Runs `work` once the page is visible, or straight away if it already is.
+// Callers do not have to know which of the two it is.
+export function afterReveal(work: () => void) {
+	if (revealed) {
+		work();
+		return;
+	}
+
+	pendingWork.push(work);
 }
 
 export function reveal() {
@@ -35,4 +53,15 @@ export function reveal() {
 
 	revealed = true;
 	document.documentElement.classList.add(READY_CLASS);
+
+	// Drained after the class is on, so the queued work sees a visible page.
+	// Individually guarded: the reveal is what gives the operator a page back,
+	// so nothing queued behind it may take the rest of the queue down with it.
+	while (pendingWork.length > 0) {
+		try {
+			pendingWork.shift()!();
+		} catch (error) {
+			console.error("Pack&Ship Extended failed to run work queued for the reveal.", error);
+		}
+	}
 }

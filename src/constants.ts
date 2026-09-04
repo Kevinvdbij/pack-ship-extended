@@ -27,6 +27,11 @@ export const PARCEL_CONTAINER_PARENT_SELECTOR = "#ReservationOverview > div:nth-
 // against "the end", so it is exact while the document is still being parsed.
 export const SEARCH_BLOCK_SELECTOR = ".container > div.row.justify-content-md-center";
 
+// The portal's header band: a photo, the vendor's logo and the RetailVista
+// wordmark. Replaced wholesale by a header of ours, so this is both what we
+// hide and what we hang our own band off.
+export const HEADER_SELECTOR = ".row.nfmlcomp";
+
 // The footer cell we put our own controls into. The environment label sits in
 // the same row, so anything we add here late pushes it sideways -- which is why
 // the footer is mounted during the parse rather than at DOM-ready.

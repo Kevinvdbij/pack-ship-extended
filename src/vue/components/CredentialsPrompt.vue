@@ -2,6 +2,7 @@
 import { nextTick, onMounted, ref } from "vue";
 import shopwareIconUrl from "../../assets/shopware.svg";
 import { requestToken, setCredentials, ShopwareCredentials } from "../../shopware.ts";
+import { afterReveal } from "../../reveal.ts";
 
 const emit = defineEmits<{ saved: []; dismiss: [] }>();
 
@@ -17,7 +18,10 @@ function filledIn() {
 	return clientId.value.trim().length > 0 && clientSecret.value.trim().length > 0;
 }
 
-onMounted(() => nextTick(() => idField.value?.focus()));
+// `afterReveal` as well as `nextTick`: the prompt mounts with the footer, which
+// is while the page is still behind the theme's cloak, and a hidden field
+// cannot be focused at all -- see `src/reveal.ts`.
+onMounted(() => nextTick(() => afterReveal(() => idField.value?.focus())));
 
 async function save() {
 	if (!filledIn() || checking.value) {

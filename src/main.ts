@@ -9,6 +9,7 @@ import AddParcelsPage from './vue/pages/AddParcelsPage.vue';
 import LoginPage from './vue/pages/LoginPage.vue';
 import LogoutPage from './vue/pages/LogoutPage.vue';
 import FooterExtension from './vue/components/Footer.vue';
+import HeaderExtension from './vue/components/Header.vue';
 import Settings from "./settings.ts"
 import { applyConfiguredEnvironment, getEnvironmentSelect, hideEnvironmentPicker, lockEnvironmentPicker } from './environment.ts';
 import { applyDutchLanguage, hideLanguagePicker } from './language.ts';
@@ -82,11 +83,17 @@ const routes: Route[] = [
 	{
 		pattern: /outdoor\/packship/,
 		component: SearchReservationsPage,
-		// Directly after the portal's search block rather than at the end of the
-		// container: same place, but pinned to an element, so it is correct
-		// mid-parse and our block is in the portal's first paint.
+		// Directly after the portal's search block, which the page then takes
+		// apart: it lifts the portal's own inputs into its own card and hides
+		// what is left, so this is the block's position rather than a position
+		// beside it.
+		//
+		// No anchor, unlike the routes above. An anchor exists as soon as its
+		// opening tag is parsed, and a block that is only half parsed has only
+		// half the inputs to lift -- so this one waits for a finished document.
+		// It costs nothing: the reveal is gated on DOM-ready regardless, so
+		// nothing of the portal's version is on screen either way.
 		attach: (host) => RVUtils.getSearchBlock()?.insertAdjacentElement("afterend", host),
-		anchor: RVUtils.getSearchBlock,
 	},
 ];
 
@@ -106,7 +113,7 @@ armReveal();
 // them waits on the network: work that does renders a skeleton and fills it in
 // after the reveal, because holding the whole page on a request is reliably
 // worse than a region that arrives late.
-Promise.all([lockPicker(), lockLanguage(), mountFooter(), boot()])
+Promise.all([lockPicker(), lockLanguage(), mountHeader(), mountFooter(), boot()])
 	.catch((error) => console.error("Pack&Ship Extended failed to start.", error))
 	// One more frame for Vue to flush what the mounts queued, so the page is
 	// shown finished rather than mid-render.
@@ -148,6 +155,32 @@ function lockLanguage() {
 	}
 
 	hideLanguagePicker();
+}
+
+// The portal's header band is replaced rather than restyled: everything in it
+// goes, and our own band takes its place. Both happen against the same element,
+// so this waits for that element and nothing else -- the logo is bundled, so
+// there is no image to fetch and nothing to render late.
+//
+// Mounted during the parse. The band is the first thing in the document, so it
+// is parsed almost immediately and our version is in the portal's first paint;
+// there is no half-built state to wait out, because nothing is lifted out of
+// the portal's markup here.
+async function mountHeader() {
+	// The login page uses a bare layout with no band to replace.
+	if (route?.noFooter) {
+		return;
+	}
+
+	const header = await whenPresent(RVUtils.getPortalHeader);
+
+	if (!header) {
+		return;
+	}
+
+	header.classList.add("pse-portal-replaced");
+
+	mountApp(HeaderExtension, (host) => header.insertAdjacentElement("beforebegin", host));
 }
 
 // The footer row holds the environment label, so our controls have to be in it
