@@ -13,6 +13,53 @@
  * `<style scoped>` block.
  */
 
+/* ---- One page width, scrollbar or no scrollbar ---- *
+ * The band centres its contents on the viewport, and so does the search card
+ * under it. A page that scrolls has a scrollbar and a page that does not has
+ * none, which makes the viewport 15px narrower on one of them -- and everything
+ * centred in it moves by half of that. Going from the search page to the
+ * parcels page shifted the logo by 7.6px, measured, which is exactly the sort
+ * of thing that reads as the page twitching rather than as a scrollbar
+ * appearing.
+ *
+ * The gutter is reserved on every page instead, so it is there whether it is
+ * used or not and nothing centred has to move when it fills.
+ */
+html {
+	scrollbar-gutter: stable;
+}
+
+
+/* ---- Nothing animates behind the cloak ---- *
+ * The page is hidden until `src/reveal.ts` shows it, and until then there is
+ * nothing on screen for a transition to be seen by. Left enabled they are not
+ * merely pointless, they are the one thing that survives the cloak:
+ *
+ * The portal paints its own page first, in the vendor's blue, behind the cloak.
+ * Our stylesheet lands a moment later and recolours it -- and because Bootstrap
+ * gives every `.btn` a 150ms colour transition, that recolour is a fade rather
+ * than a correction. `reveal()` runs as soon as the boot is done, which is
+ * immediately after our CSS lands, so the page is shown part way through that
+ * fade and the buttons flash blue before settling into the house green.
+ *
+ * So transitions are suppressed for as long as the page is hidden. A colour
+ * that resolves under the cloak is then simply right when the page appears,
+ * instead of being animated towards right in front of the operator. Adding
+ * `pse-ready` switches them back on with everything already at its final value,
+ * so nothing is left mid-flight and hover keeps its polish.
+ *
+ * `transition` only. Animations are left alone -- the skeletons pulse while the
+ * page is still being built, which is the point of them.
+ *
+ * Here rather than in `src/styles/portal.css` because it is not about the
+ * vendor's markup: it applies to every element on the page, ours included, and
+ * what it is really about is the reveal.
+ */
+html:not(.pse-ready) * {
+	transition: none !important;
+}
+
+
 /* ---- Transitions ---- *
  * Default <Transition> classes, used unnamed by most of our components.
  */
@@ -27,9 +74,18 @@
 	transform: scaleY(0);
 }
 
-/* <Transition name="modal"> -- a plain fade of the backdrop. Scaling a
- * full-screen overlay reads as the dimmed page stretching, so the movement
- * belongs to the panel inside it, not to this element. */
+/* <Transition name="modal"> -- the one fade every dialog uses, in and out.
+ *
+ * Both directions are stated here rather than half of it here and half of it as
+ * a CSS animation on the panel, which is what it was: an animation fires on
+ * mount and has no reverse, so a dialog faded in twice -- once from the
+ * transition, once from its own keyframes -- and left instantly, with the scrim
+ * snapping off. Between two dialogs that read as a flash.
+ *
+ * The scrim fades and the panel moves. Scaling a full-screen overlay reads as
+ * the dimmed page stretching, so the movement belongs to the panel inside it,
+ * not to the element that covers the window.
+ */
 .modal-enter-active,
 .modal-leave-active {
 	transition: opacity 0.2s ease;
@@ -40,106 +96,300 @@
 	opacity: 0;
 }
 
-/* ---- Shopware note chrome ---- *
- * Shared by ReservationSummary and the reservation cards in the selection modal.
+.modal-enter-active .pse-modal-panel,
+.modal-leave-active .pse-modal-panel {
+	transition: transform 0.2s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+.modal-enter-from .pse-modal-panel,
+.modal-leave-to .pse-modal-panel {
+	transform: translateY(10px) scale(0.98);
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.modal-enter-active .pse-modal-panel,
+	.modal-leave-active .pse-modal-panel {
+		transition: none;
+	}
+}
+
+/* The Shopware note's chrome used to live here, shared by the sidebar and the
+ * reservation cards in the selection modal because each rendered its own copy
+ * of the box. There is one component now -- `ShopwareNote.vue` -- so the rules
+ * went into it, along with the standalone loader and the blink animation, which
+ * were only ever worn by the pieces of that box.
  */
-.sw-btn {
-	height: 35px;
-	transition: all .15s ease-out;
-	display: inline-block;
-	border-radius: 4px;
-	padding: 2px 24px;
+
+/* ---- Dialog actions ---- *
+ * The buttons along the bottom of a dialog. Here rather than in `ModalShell`
+ * because the shell only lays the row out -- what goes in it is each dialog's
+ * own, and every one of them needs the same two shapes.
+ *
+ * Two weights and no more: the one thing the dialog is for, filled, and
+ * everything else beside it as an outline. A row where two buttons both look
+ * like the answer is a row that has to be read before it can be used.
+ */
+.pse-dialog-btn {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 8px;
+	min-width: 104px;
+	height: 40px;
+	padding: 0 18px;
+	border: 1px solid transparent;
+	border-radius: 11px;
+	background-color: var(--pse-brand-ink);
+	font: inherit;
 	font-size: 14px;
-	outline: none;
-	font-weight: 600;
+	font-weight: 650;
+	color: #ffffff;
 	white-space: nowrap;
-	text-overflow: ellipsis;
-	vertical-align: middle;
-	text-decoration: none;
 	cursor: pointer;
-	user-select: none;
-	position: relative;
-	background: #189eff;
-	color: #fff;
-	line-height: 32px;
-	border: 0;
-	margin: 3px;
+	transition: background-color 0.15s ease, border-color 0.15s ease, color 0.15s ease;
 }
 
-.sw-btn:hover {
-	background: #118cff;
+.pse-dialog-btn:hover:not(:disabled) {
+	background-color: var(--pse-brand-ink-strong);
 }
 
-.sw-btn:active {
-	background: #0e82ff;
+.pse-dialog-btn:focus {
+	outline: none;
 }
 
-.sw-btn:disabled:hover,
-.sw-btn:disabled {
-	background: #727272;
+.pse-dialog-btn:focus-visible {
+	outline: none;
+	box-shadow: 0 0 0 3px var(--pse-brand-ring);
 }
 
-.sw-header {
-	background-color: #243758;
-	color: #fff;
+.pse-dialog-btn:disabled {
+	background-color: #dfe6e2;
+	color: #ffffff;
+	cursor: not-allowed;
 }
 
-.sw-body {
-	background-color: #f9fafb;
-	border-color: #d1d9e0;
-	padding: 5px;
+.pse-dialog-btn-quiet {
+	border-color: var(--pse-line);
+	background-color: #ffffff;
+	color: var(--pse-ink-soft);
 }
 
-.sw-textarea {
-	field-sizing: content;
+.pse-dialog-btn-quiet:hover:not(:disabled) {
+	border-color: var(--pse-ink-faint);
+	background-color: var(--pse-well);
+	color: var(--pse-ink);
+}
+
+.pse-dialog-btn-quiet:disabled {
+	border-color: var(--pse-line);
+	background-color: #ffffff;
+	color: var(--pse-ink-faint);
+}
+
+
+/* ---- Dialog fields ---- *
+ * The inputs inside a dialog, matching the ones on the cards outside it.
+ */
+.pse-dialog-label {
+	display: block;
+	/* `!important` because the portal's own stylesheet carries
+	 * `label { margin-bottom: 0rem !important }`. It is aimed at the vendor's
+	 * forms, but it is an element selector with a priority flag on it, so it
+	 * reaches into every dialog of ours as well and no amount of specificity
+	 * answers it -- our labels sat flush against their fields everywhere until
+	 * this was matched flag for flag. */
+	margin-bottom: 6px !important;
+	font-size: 11px;
+	font-weight: 650;
+	letter-spacing: 0.07em;
+	text-transform: uppercase;
+	color: var(--pse-ink-soft);
+}
+
+.pse-dialog-input {
+	box-sizing: border-box;
+	display: block;
 	width: 100%;
-	margin-top: 4px;
-	padding-left: 5px;
-	border-radius: 4px;
-	border: 1px solid #d1d9e0;
+	height: 42px;
+	margin: 0;
+	padding: 0 13px;
+	border: 1px solid var(--pse-line);
+	border-radius: 11px;
+	background-color: var(--pse-well);
+	font: inherit;
+	font-size: 14.5px;
+	color: var(--pse-ink);
+	transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
 }
 
-.sw-logo {
-	float: left;
-	width: 25px;
-	height: 25px;
-	margin-right: 8px;
+.pse-dialog-input:focus {
+	outline: none;
+	border-color: var(--pse-brand);
+	background-color: #ffffff;
+	box-shadow: 0 0 0 3px var(--pse-brand-ring);
 }
 
-/* ---- Loader ---- */
-.loader {
-  width: 60px;
-  aspect-ratio: 2;
-  --_g: no-repeat radial-gradient(circle closest-side,#d1d9e0 90%,#0000);
-  background:
-    var(--_g) 0%   50%,
-    var(--_g) 50%  50%,
-    var(--_g) 100% 50%;
-  background-size: calc(100%/3) 50%;
-  animation: l3 1s infinite linear;
-}
-@keyframes l3 {
-    20%{background-position:0%   0%, 50%  50%,100%  50%}
-    40%{background-position:0% 100%, 50%   0%,100%  50%}
-    60%{background-position:0%  50%, 50% 100%,100%   0%}
-    80%{background-position:0%  50%, 50%  50%,100% 100%}
+.pse-dialog-input:disabled {
+	color: var(--pse-ink-faint);
+	cursor: not-allowed;
 }
 
-.blinking {
-	animation: blink 0.75s infinite;
+/* A select, wearing the same shell as an input.
+ *
+ * The browser's own arrow is drawn hard against the right edge of the control
+ * and cannot be moved, which on a 11px radius sits inside the curve. So the
+ * native one is taken off and ours drawn as a background, inset far enough to
+ * clear the corner, with the padding to match so a long carrier name never runs
+ * underneath it.
+ */
+select.pse-dialog-input {
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	padding-right: 40px;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7d73' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 14px center;
+	background-size: 13px;
 }
 
-@keyframes blink {
-	0% {
-		opacity: 1;
+.pse-dialog-hint {
+	display: block;
+	margin-top: 6px;
+	font-size: 12.5px;
+	line-height: 1.4;
+	color: var(--pse-ink-soft);
+}
+
+
+/* ---- The select's own dropdown ---- *
+ * A native dropdown is drawn by the browser, and until recently nothing about
+ * it could be styled: our field had a 11px radius and the list that opened
+ * under it was a square-cornered box in the browser's own colours, which is the
+ * hard edge coming out of the rounded control.
+ *
+ * Chrome's customizable select fixes that -- `appearance: base-select` opts the
+ * control and its `::picker(select)` into being rendered as ordinary elements,
+ * which we can then style like every other surface in the extension. Behind
+ * `@supports`, so a browser without it keeps the native control it has always
+ * had rather than a half-styled one.
+ *
+ * The one block covers the portal's parcel dialog as well as our own. It is
+ * really one behaviour -- what a dropdown looks like here -- and splitting it
+ * along the usual ours/theirs line would leave two copies free to drift, which
+ * is the thing that split exists to prevent.
+ */
+@supports (appearance: base-select) {
+	select.pse-dialog-input,
+	select.pse-dialog-input::picker(select),
+	:root #editParcelModal .modal-body select,
+	:root #editParcelModal .modal-body select::picker(select) {
+		appearance: base-select;
 	}
 
-	50% {
-		opacity: 0.25;
+	/* The arrow is the control's own `::picker-icon` once it is styleable, so
+	   the one we were drawing as a background comes off -- two of them showed
+	   at once otherwise. */
+	select.pse-dialog-input,
+	:root #editParcelModal .modal-body select {
+		display: flex;
+		align-items: center;
+		gap: 10px;
+		padding: 0 14px;
+		background-image: none;
 	}
 
-	100% {
-		opacity: 1;
+	select.pse-dialog-input::picker-icon,
+	:root #editParcelModal .modal-body select::picker-icon {
+		color: var(--pse-ink-soft);
+		transition: transform 0.15s ease;
+	}
+
+	select.pse-dialog-input:open::picker-icon,
+	:root #editParcelModal .modal-body select:open::picker-icon {
+		transform: rotate(180deg);
+	}
+
+	/* The list itself: the card surface, held clear of the field it belongs to
+	   and capped so a long list of workplaces scrolls instead of running off
+	   the screen. */
+	select.pse-dialog-input::picker(select),
+	:root #editParcelModal .modal-body select::picker(select) {
+		margin-top: 6px;
+		padding: 6px;
+		max-height: 320px;
+		border: 1px solid var(--pse-line);
+		border-radius: 14px;
+		background-color: #ffffff;
+		box-shadow: 0 1px 2px rgba(20, 48, 33, 0.06), 0 18px 44px -20px rgba(11, 26, 18, 0.45);
+	}
+
+	/* And its scrollbar, once the list is long enough to need one.
+	 *
+	 * A scroll container puts the bar hard against its own inner edge, so the
+	 * browser's default ran the full height of the panel and straight through
+	 * both rounded corners -- a square bar in a round box. Drawn as a thumb on
+	 * an empty track instead: the transparent border with `background-clip`
+	 * insets it from the edge, and the margin on the track keeps it clear of the
+	 * corners at either end.
+	 *
+	 * The `::-webkit-` pseudo-elements rather than `scrollbar-width` and
+	 * `scrollbar-color`: they cannot be mixed -- Chrome drops these the moment
+	 * the standard properties are set on the same element -- and the standard
+	 * pair cannot inset the thumb, which is the whole problem here.
+	 *
+	 * Nested rather than written flat, because the build's CSS minifier refuses
+	 * to parse a `::-webkit-scrollbar` chained onto `::picker(select)`.
+	 */
+	select.pse-dialog-input::picker(select),
+	:root #editParcelModal .modal-body select::picker(select) {
+		&::-webkit-scrollbar {
+			width: 11px;
+		}
+
+		&::-webkit-scrollbar-track {
+			margin: 8px 0;
+			background: transparent;
+		}
+
+		&::-webkit-scrollbar-thumb {
+			border: 3px solid transparent;
+			border-radius: 999px;
+			background-color: var(--pse-line);
+			background-clip: content-box;
+		}
+
+		&::-webkit-scrollbar-thumb:hover {
+			background-color: var(--pse-ink-faint);
+		}
+	}
+
+	select.pse-dialog-input option,
+	:root #editParcelModal .modal-body select option {
+		padding: 9px 11px;
+		border-radius: 9px;
+		font-size: 14px;
+		color: var(--pse-ink);
+	}
+
+	select.pse-dialog-input option:hover,
+	:root #editParcelModal .modal-body select option:hover {
+		background-color: var(--pse-well);
+	}
+
+	select.pse-dialog-input option:checked,
+	:root #editParcelModal .modal-body select option:checked {
+		background-color: var(--pse-brand-soft);
+		color: var(--pse-brand-ink);
+		font-weight: 650;
+	}
+
+	/* The tick the browser adds in front of the chosen option, which pushes
+	   every label along by its width. The chosen one is already the one wearing
+	   the brand tint. */
+	select.pse-dialog-input option::checkmark,
+	:root #editParcelModal .modal-body select option::checkmark {
+		display: none;
 	}
 }
 
@@ -257,4 +507,188 @@
  */
 .pse-portal-replaced {
 	display: none !important;
+}
+
+
+/* ---- Product tables ---- *
+ * The card, the table and the row actions shared by the two pages that list a
+ * reservation's products: the parcels page, where the list is the work, and the
+ * add-parcels page, where it is reference for choosing what goes in the new
+ * parcel. Here rather than scoped to either, because both wear it -- the
+ * verification columns, the counts and the scan button stay with the page that
+ * has something to verify.
+ */
+
+.pse-products-head {
+	display: flex;
+	align-items: baseline;
+	justify-content: space-between;
+	gap: 16px;
+	margin-bottom: 12px;
+}
+
+.pse-products-title {
+	margin: 0;
+	font-size: 17px;
+	font-weight: 650;
+	line-height: 1.3;
+	color: var(--pse-ink);
+}
+
+.pse-products-card {
+	overflow: hidden;
+	border: 1px solid var(--pse-line);
+	border-radius: 16px;
+	background-color: #ffffff;
+	box-shadow: 0 1px 2px rgba(20, 48, 33, 0.04), 0 18px 40px -30px rgba(20, 48, 33, 0.45);
+}
+
+.pse-table {
+	width: 100%;
+	margin: 0;
+	border-collapse: collapse;
+	font-size: 14px;
+}
+
+.pse-table th {
+	padding: 11px 16px;
+	border-bottom: 1px solid var(--pse-line);
+	background-color: var(--pse-well);
+	font-size: 10.5px;
+	font-weight: 650;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--pse-ink-faint);
+	white-space: nowrap;
+}
+
+.pse-table td {
+	padding: 12px 16px;
+	border-top: 1px solid var(--pse-line);
+	vertical-align: middle;
+}
+
+.pse-table tbody tr:first-child td {
+	border-top: 0;
+}
+
+.pse-table-centre {
+	text-align: center;
+}
+
+.pse-table-right {
+	text-align: right;
+}
+
+/* The description is what identifies the row and is allowed the width; the
+   barcode is checked digit by digit against a label, so it is set in the
+   tabular face and never wraps. */
+.pse-cell-description {
+	width: 100%;
+	font-weight: 600;
+	color: var(--pse-ink);
+}
+
+.pse-cell-barcode {
+	font-variant-numeric: tabular-nums;
+	font-size: 13.5px;
+	color: var(--pse-ink-soft);
+	white-space: nowrap;
+}
+
+.pse-actions {
+	display: inline-flex;
+	gap: 6px;
+}
+
+.pse-action {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	width: 34px;
+	height: 34px;
+	padding: 0;
+	border: 1px solid transparent;
+	border-radius: 10px;
+	background-color: var(--pse-brand-ink);
+	cursor: pointer;
+	transition: background-color 0.15s ease, border-color 0.15s ease, opacity 0.15s ease;
+}
+
+.pse-action img {
+	display: block;
+	/* The icons are black line art; the filled button wants them white. */
+	filter: invert(1);
+}
+
+.pse-action:hover:not(:disabled) {
+	background-color: var(--pse-brand-ink-strong);
+}
+
+.pse-action:focus {
+	outline: none;
+}
+
+.pse-action:focus-visible {
+	outline: none;
+	box-shadow: 0 0 0 3px var(--pse-brand-ring);
+}
+
+.pse-action:disabled {
+	background-color: #dfe6e2;
+	cursor: not-allowed;
+}
+
+/* Looking at a product is a check, not a step in the packing -- so it is an
+   outline beside the filled add. */
+.pse-action-quiet {
+	border-color: var(--pse-line);
+	background-color: #ffffff;
+}
+
+.pse-action-quiet img {
+	filter: none;
+	opacity: 0.55;
+}
+
+.pse-action-quiet:hover:not(:disabled) {
+	border-color: var(--pse-brand);
+	background-color: var(--pse-brand-soft);
+}
+
+.pse-action-quiet:hover:not(:disabled) img {
+	opacity: 0.9;
+}
+
+
+/* ---- The way back to a new search ---- *
+ * Worn by the parcels page, beside its "Producten" heading, and by the
+ * add-parcels page, which mounts it as a row of its own. Shared so the two land
+ * in the same corner of the screen and read as the same control.
+ */
+/* The way out of this reservation. It sat in the portal's own row above the
+   whole layout, where it read as page furniture; here it is beside the heading
+   of the thing it leaves. */
+.pse-back {
+	display: inline-flex;
+	align-items: center;
+	gap: 3px;
+	flex: none;
+	padding: 4px 10px 4px 4px;
+	border-radius: 9px;
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--pse-ink-soft);
+	text-decoration: none;
+	transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.pse-back:hover {
+	background-color: var(--pse-brand-soft);
+	color: var(--pse-brand-ink);
+	text-decoration: none;
+}
+
+.pse-back-icon {
+	font-size: 19px;
 }

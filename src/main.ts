@@ -13,8 +13,9 @@ import HeaderExtension from './vue/components/Header.vue';
 import Settings from "./settings.ts"
 import { applyConfiguredEnvironment, getEnvironmentSelect, hideEnvironmentPicker, lockEnvironmentPicker } from './environment.ts';
 import { applyDutchLanguage, hideLanguagePicker } from './language.ts';
-import { ENVIRONMENT_FORM_SELECTOR, FOOTER_SLOT_SELECTOR } from './constants.ts';
+import { ENVIRONMENT_FORM_SELECTOR, FOOTER_SLOT_SELECTOR, MAIN_CONTENT_SELECTOR, PAGE_COLUMN_SELECTOR } from './constants.ts';
 import { armReveal, reveal } from './reveal.ts';
+import { pinFooter } from './stickyFooter.ts';
 // The portal's own elements first, ours second, so a tie between the two is
 // settled the way it reads: our markup wins on the page it is on. Both go up at
 // document-start, which is behind the cloak -- see `src/styles/cloak.css`.
@@ -81,7 +82,11 @@ const routes: Route[] = [
 	{
 		pattern: /outdoor\/packship\/Reservations\/Index\//,
 		component: VerifyProductsPage,
-		attach: appendToBody,
+		// Into the cell the portal's own page occupies, rather than past the end
+		// of the body: this route stands in for that page instead of adding to
+		// it, so it has to land where the page was and not under the footer.
+		attach: (host) => document.querySelector(MAIN_CONTENT_SELECTOR)?.append(host)
+			?? document.body.append(host),
 	},
 	{
 		pattern: /outdoor\/packship\/AddParcels\/Search\?ReservationNumber=/,
@@ -125,7 +130,7 @@ armReveal();
 // them waits on the network: work that does renders a skeleton and fills it in
 // after the reveal, because holding the whole page on a request is reliably
 // worse than a region that arrives late.
-Promise.all([lockPicker(), lockLanguage(), mountHeader(), mountFooter(), boot()])
+Promise.all([lockPicker(), lockLanguage(), mountHeader(), mountFooter(), pinFooter(), boot()])
 	.catch((error) => console.error("Pack&Ship Extended failed to start.", error))
 	// One more frame for Vue to flush what the mounts queued, so the page is
 	// shown finished rather than mid-render.
@@ -170,29 +175,55 @@ function lockLanguage() {
 }
 
 // The portal's header band is replaced rather than restyled: everything in it
-// goes, and our own band takes its place. Both happen against the same element,
-// so this waits for that element and nothing else -- the logo is bundled, so
-// there is no image to fetch and nothing to render late.
+// goes, and our own band takes its place. Mounted during the parse where there
+// is a band to replace -- it is the first thing in the document, so it is
+// parsed almost immediately and our version is in the portal's first paint.
 //
-// Mounted during the parse. The band is the first thing in the document, so it
-// is parsed almost immediately and our version is in the portal's first paint;
-// there is no half-built state to wait out, because nothing is lifted out of
-// the portal's markup here.
+// Not every page has one. The parcels page is served without a band at all,
+// which used to mean this waited out `whenPresent`'s full timeout for an
+// element that was never coming -- and since that timeout is longer than the
+// failsafe that shows the page, the reveal came from the failsafe rather than
+// from the boot being finished. Every trip into a reservation spent three
+// seconds on a blank screen for a header that did not exist. Those pages get
+// our band too, at the top of the column the portal lays its rows out in.
 async function mountHeader() {
-	// The login page uses a bare layout with no band to replace.
+	// The login page uses a bare layout and renders the band itself.
 	if (route?.bareLayout) {
 		return;
 	}
 
-	const header = await whenPresent(RVUtils.getPortalHeader);
+	const header = await findPortalHeader();
 
-	if (!header) {
+	if (header) {
+		header.classList.add("pse-portal-replaced");
+
+		mountApp(HeaderExtension, (host) => header.insertAdjacentElement("beforebegin", host));
+
 		return;
 	}
 
-	header.classList.add("pse-portal-replaced");
+	const column = document.querySelector(PAGE_COLUMN_SELECTOR);
 
-	mountApp(HeaderExtension, (host) => header.insertAdjacentElement("beforebegin", host));
+	if (!column) {
+		return;
+	}
+
+	mountApp(HeaderExtension, (host) => column.insertAdjacentElement("afterbegin", host));
+}
+
+// The portal's band, if this page has one.
+//
+// Two waits raced, because they answer different questions. `whenPresent` is
+// what puts our band in the first paint: it settles the moment the element is
+// parsed. But it only reports absence when its own timeout expires, and "this
+// page has no band" is a question the document answers by finishing without
+// one -- which happens in a few hundred milliseconds rather than several
+// seconds, and which is a real answer rather than a guess.
+function findPortalHeader(): Promise<Element | null> {
+	return Promise.race([
+		whenPresent(RVUtils.getPortalHeader),
+		domReady().then(RVUtils.getPortalHeader),
+	]);
 }
 
 // The footer row holds the environment label, so our controls have to be in it

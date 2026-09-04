@@ -176,7 +176,14 @@ async function handleResponse(response: string) {
 	}
 }
 
+// Both of these leave for another page, and the page they leave for takes a
+// moment to answer. Until it does the browser keeps this one on screen, looking
+// untouched -- which reads as a click that did not land, and gets clicked
+// again. The overlay is what says the click was taken; it goes away with the
+// page it was put on.
 function reopenReservation(reservationId: string) {
+	RVUtils.setBusy(true);
+
 	window.location.href = `${PACKING_PORTAL_URL}/Parcels?reservationId=${reservationId}&allowCashOnDelivery=False`;
 }
 
@@ -184,6 +191,8 @@ function openAddParcels(reservationNumber: string) {
 	if (!reservationNumber) {
 		return;
 	}
+
+	RVUtils.setBusy(true);
 
 	window.location.href = `${PACKING_PORTAL_URL}/AddParcels/Search?ReservationNumber=${reservationNumber}`;
 }

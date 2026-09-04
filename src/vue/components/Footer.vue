@@ -319,13 +319,39 @@ function masterSwitchToggle() {
 
 /* A live session, shown the way a status light is rather than spelled out --
    the same green the toggle uses for "on", so one colour means one thing. */
+/* The presence mark beside the name. It says the session is live, which is a
+   thing that is true right now rather than a fact on record -- so it has a
+   pulse, the way every other "still here" light does. A ring pushed outward and
+   faded rather than the dot itself blinking: the dot stays lit and stays the
+   same size, so nothing beside it moves and the bar never reflows. */
 .pse-dot {
 	width: 6px;
 	height: 6px;
 	flex: none;
 	border-radius: 50%;
 	background-color: var(--pse-on);
-	box-shadow: 0 0 0 3px rgba(168, 220, 171, 0.2);
+	animation: pse-dot-pulse 2.6s ease-out infinite;
+}
+
+@keyframes pse-dot-pulse {
+	0% {
+		box-shadow: 0 0 0 0 rgba(168, 220, 171, 0.5);
+	}
+
+	70% {
+		box-shadow: 0 0 0 7px rgba(168, 220, 171, 0);
+	}
+
+	100% {
+		box-shadow: 0 0 0 0 rgba(168, 220, 171, 0);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.pse-dot {
+		animation: none;
+		box-shadow: 0 0 0 3px rgba(168, 220, 171, 0.2);
+	}
 }
 
 .pse-version {

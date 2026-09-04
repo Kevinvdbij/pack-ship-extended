@@ -39,9 +39,19 @@ Selectors live in `src/constants.ts`. The ones that are load-bearing and easy to
 | `.row.nfmlcomp` | The header band. Hidden entirely; `Header.vue` mounts before it |
 | `.container > div.row.justify-content-md-center` | The search block. Hidden; its inputs and `#messages` are lifted out first |
 | `#frmReservations`, `#ReservationNumber`, `#Productbarcode` | The portal's search form and its two inputs |
+| `#ReservationSummary\ mb-2` | The reservation fields, read by `ReservationSidebar.vue` and then hidden. Keep it in the document — `getCurrentOrderNumber()` reads it and `#ReservationId` is inside it |
+| `#ParcelsContainer` | The parcel area on the parcels page. **Never move anything out of it:** the portal's `refresh()` replaces its entire contents after every parcel change |
+| `#tabs-parcels`, `#parcelsGroup` | Served empty and filled in after DOMContentLoaded by the portal's `init()` over AJAX. This is the region the skeleton stands in for |
+| `img.nfLogoSmall` | The vendor's wordmark on the pages served without a header band |
 
 The portal wraps its pages in `.container-fluid.text-center`, and that **inherits into anything we
 mount**. Any block of ours that contains text needs its own `text-align`.
+
+**Not every page has `.row.nfmlcomp`.** The parcels page and the verification step are served without a
+header band at all, and `whenPresent` only reports absence when its own timeout expires — which is
+longer than the reveal failsafe, so waiting for a band that never comes cost three seconds of blank
+screen on every trip into a reservation. `mountHeader()` races that lookup against `domReady()` and
+mounts our band at the top of `PAGE_COLUMN_SELECTOR` when the portal serves none.
 
 ## Two traps that have already cost time
 

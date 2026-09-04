@@ -155,6 +155,20 @@
 	padding: 0;
 	border: 0;
 	line-height: 1.5;
+	/* The one control in the vendor's half of the band, set to the weight our
+	   own controls beside it carry. Small, bold and tracked out a little: at
+	   this size that reads as deliberate rather than as a link that happens to
+	   be there, and it holds its own against the chips without being louder
+	   than them. */
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: 0.03em;
+	text-decoration: none;
+}
+
+:root .pse-footer-cell .btn-link:hover,
+:root .pse-footer-cell .btn-link:focus {
+	text-decoration: none;
 }
 
 /* And the reason a miss here reads as a flash rather than as a wrong colour:
@@ -213,10 +227,47 @@
  * spin (`.pse-spinner`).
  */
 :root .loading {
-	background: rgba(27, 43, 34, 0.28);
+	/* The dialogs' scrim, from the shared token, so a page that is waiting and a
+	   page that is asking a question dim to the same depth. */
+	background: var(--pse-scrim);
 	backdrop-filter: blur(3px);
 	-webkit-backdrop-filter: blur(3px);
-	animation: pse-busy-scrim 160ms ease-out;
+	/* Shown and hidden by opacity rather than by `display`, which is what the
+	   portal's own stylesheet toggles. `display` cannot be transitioned, so the
+	   overlay appeared instantly and vanished instantly -- and against a dialog
+	   that fades, an instant scrim on top of it is the flash. Held in the layout
+	   at all times instead, which costs nothing: it is `position: fixed`, so it
+	   takes no space, and `visibility` keeps it out of the way of the cursor. */
+	display: block !important;
+	opacity: 0;
+	visibility: hidden;
+	transition: opacity 0.2s ease, visibility 0.2s;
+}
+
+:root body.busy .loading {
+	opacity: 1;
+	visibility: visible;
+}
+
+/* Only one scrim at a time.
+ *
+ * The overlay and the dialogs dim to the same depth, and two of them over each
+ * other is twice that -- the page went almost black whenever work started while
+ * a dialog was open, and again for a moment on the way between two dialogs. The
+ * overlay is the one that gives way: it is always the thing on top, so it still
+ * reads as blocking, and what is underneath is already dimmed by whatever put
+ * the dialog there.
+ *
+ * `:has()` so this follows whatever is actually on screen rather than needing
+ * every dialog to remember to announce itself. The second selector is the
+ * portal's own dialogs, which bring a backdrop element of their own.
+ */
+:root body:has(.pse-modal) .loading,
+:root body:has(.pse-selection-backdrop) .loading,
+:root body:has(.modal-backdrop.show) .loading {
+	background: transparent;
+	backdrop-filter: none;
+	-webkit-backdrop-filter: none;
 }
 
 /* Centred by transform instead of the portal's fixed negative margins, so the
@@ -242,7 +293,14 @@
 	/* `.container-fluid.text-center` inherits into this, but the card is ours
 	   to state. */
 	text-align: center;
-	animation: pse-busy-card 200ms cubic-bezier(0.2, 0.9, 0.3, 1);
+	/* Moves with the scrim, and back again -- see the note above about why this
+	   is a transition rather than the keyframes it used to be. */
+	transform: translate(-50%, -50%) scale(0.96);
+	transition: transform 0.2s cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+:root body.busy .nfSpinner {
+	transform: translate(-50%, -50%) scale(1);
 }
 
 /* The five stretching bars, dropped in favour of the ring below. */
@@ -275,23 +333,10 @@
 	}
 }
 
-@keyframes pse-busy-scrim {
-	from {
-		opacity: 0;
-	}
-}
-
-@keyframes pse-busy-card {
-	from {
-		opacity: 0;
-		transform: translate(-50%, -46%) scale(0.96);
-	}
-}
-
 @media (prefers-reduced-motion: reduce) {
 	:root .loading,
 	:root .nfSpinner {
-		animation: none;
+		transition: none;
 	}
 
 	:root .nfSpinner::before {
@@ -339,4 +384,615 @@
 :root .pse-footer-login a:hover,
 :root .pse-footer-login a:focus {
 	color: #ffffff;
+}
+
+
+/* ---- The parcels page's parcel area ---- *
+ * Everything under "Pakketten" on the parcels page is the portal's, and it has
+ * to stay the portal's: `refresh()` replaces the whole of `#ParcelsContainer`
+ * with a fresh server render after every parcel change, so anything we moved
+ * out of it would be orphaned the first time a parcel was added and anything we
+ * put into it would be thrown away with the markup around it.
+ *
+ * So this region is restyled where it stands rather than rebuilt the way the
+ * search and login pages were. Same elements, same ids, same handlers -- ours
+ * is only the paint.
+ */
+
+/* The section heading, which Bootstrap sets as a display size. Brought down to
+   the size our own block headings use, so "Producten" and "Pakketten" read as
+   two sections of one page. */
+:root #ParcelsContainer h4 {
+	margin: 0 0 12px;
+	font-size: 17px;
+	font-weight: 650;
+	line-height: 1.3;
+	color: var(--pse-ink);
+}
+
+/* ---- The product scan dialog ---- *
+ * The portal's tinted strip holding the barcode field and its Scan button. Given
+ * the card surface the rest of the page uses; the two controls inside keep the
+ * combined shape the portal gives them, squared where they meet.
+ */
+:root .searchProductDialog {
+	margin: 0 0 22px;
+	padding: 14px !important;
+	border: 1px solid var(--pse-line);
+	border-radius: 14px;
+	background-color: #ffffff;
+	box-shadow: 0 1px 2px rgba(20, 48, 33, 0.04);
+}
+
+:root .searchProductDialog .form-control {
+	height: 46px;
+	border: 1px solid var(--pse-line);
+	border-right: 0;
+	border-radius: 11px 0 0 11px;
+	background-color: var(--pse-well);
+	font-size: 15px;
+	color: var(--pse-ink);
+}
+
+:root .searchProductDialog .form-control:focus {
+	border-color: var(--pse-brand);
+	background-color: #ffffff;
+	box-shadow: 0 0 0 3px var(--pse-brand-ring);
+}
+
+:root .searchProductDialog .btn {
+	height: 46px;
+	border: 0;
+	border-radius: 0 11px 11px 0;
+	background-color: var(--pse-brand-ink);
+	border-color: var(--pse-brand-ink);
+	font-size: 14.5px;
+	font-weight: 650;
+}
+
+:root .searchProductDialog .btn:hover {
+	background-color: var(--pse-brand-ink-strong);
+	border-color: var(--pse-brand-ink-strong);
+}
+
+/* ---- The parcel tabs ---- *
+ * One pill per parcel, plus the add button. Squared off into the same rounded
+ * chips the rest of the extension uses, and given room: this is a hit target
+ * aimed at with a box in one hand.
+ */
+:root #tabs-parcels {
+	gap: 8px;
+	margin-bottom: 14px !important;
+}
+
+:root #tabs-parcels .nav-item {
+	margin-right: 0 !important;
+}
+
+:root #tabs-parcels .btn-outline-primary {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 7px;
+	min-width: 62px;
+	height: 52px;
+	padding: 0 14px;
+	border: 1px solid var(--pse-line);
+	border-radius: 13px;
+	background-color: #ffffff;
+	font-weight: 650;
+	transition: border-color 0.15s ease, background-color 0.15s ease;
+}
+
+:root #tabs-parcels .btn-outline-primary:hover {
+	border-color: var(--pse-brand);
+	background-color: var(--pse-brand-soft);
+}
+
+/* The parcel currently being edited. Filled, so which pane is open is readable
+   at a glance rather than by comparing borders. */
+:root #tabs-parcels .btn-outline-primary.active {
+	border-color: var(--pse-brand-ink);
+	background-color: var(--pse-brand-ink);
+}
+
+:root #tabs-parcels .btn-outline-primary .tab-parcelnumber {
+	font-size: 15px;
+	color: var(--pse-ink-soft);
+}
+
+:root #tabs-parcels .btn-outline-primary.active .tab-parcelnumber {
+	color: #ffffff;
+}
+
+/* The parcel glyph, which is dark line art and disappears into the filled tab. */
+:root #tabs-parcels .btn-outline-primary.active img {
+	filter: brightness(0) invert(1);
+}
+
+/* ---- The parcel panes ---- */
+:root .parcels-content .card {
+	border: 1px solid var(--pse-line);
+	border-radius: 16px;
+	background-color: #ffffff;
+	box-shadow: 0 1px 2px rgba(20, 48, 33, 0.04), 0 18px 40px -30px rgba(20, 48, 33, 0.45);
+	overflow: hidden;
+}
+
+:root .parcels-content .card-header {
+	padding: 15px 18px;
+	border-bottom: 1px solid var(--pse-line);
+	background-color: var(--pse-well);
+}
+
+:root .parcels-content .card-title {
+	margin: 0;
+	font-size: 15.5px;
+	font-weight: 650;
+	color: var(--pse-ink);
+}
+
+:root .parcels-content .card-text {
+	margin: 3px 0 0;
+	font-size: 12.5px;
+	line-height: 1.45;
+	color: var(--pse-ink-soft);
+}
+
+:root .parcels-content .card-body {
+	padding: 6px 18px 14px;
+}
+
+/* The article table inside a parcel. Bootstrap's `.table` draws a rule under
+   every row and a heavy one under the head; held to the hairline the product
+   table above it uses. */
+:root .parcels-content .table th,
+:root .parcels-content .table td {
+	padding: 11px 0;
+	border-color: var(--pse-line);
+	vertical-align: middle;
+}
+
+:root .parcels-content .table thead th,
+:root .parcels-content .table tbody tr:first-child th {
+	border-top: 0;
+	border-bottom: 1px solid var(--pse-line);
+	font-size: 10.5px;
+	font-weight: 650;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--pse-ink-faint);
+}
+
+/* The edit and delete controls in a parcel's header, and the announce button
+   under the panes. Bootstrap's pill radii squared to the extension's. */
+:root .parcels-content .btn,
+:root #ParcelsContainer > div > div:last-child .btn {
+	border-radius: 10px;
+	font-size: 13.5px;
+	font-weight: 650;
+}
+
+/* Except where a button is one half of a joined control.
+ *
+ * The amount on a parcel line is a field with a "one less" button welded to its
+ * right: Bootstrap squares the inside edges of the pair and laps them by a
+ * pixel so the two read as one box. The blanket radius above undid half of
+ * that, rounding the button's left edge so it curved away from the square edge
+ * of the field it is attached to.
+ *
+ * The join is squared again here, and the field's outer corners are brought up
+ * from Bootstrap's 3px to the same 10px, so the pair comes out as one shape in
+ * the extension's radius rather than as two in different ones.
+ */
+:root .parcels-content .input-group > .form-control:first-child {
+	border-top-left-radius: 10px;
+	border-bottom-left-radius: 10px;
+}
+
+:root .parcels-content .input-group-append .btn {
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+}
+
+:root .parcels-content .input-group-prepend .btn {
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
+/* ---- The parcel area before it has arrived ---- *
+ * `#tabs-parcels` and its panes are served empty and filled in by the portal's
+ * own `init()` after DOMContentLoaded, over AJAX. Waiting for that would mean
+ * holding the whole page on a request; revealing without it means a gap where
+ * the parcels go. So the gap is furnished: `CreateParcelsPage.vue` marks the
+ * group while the tabs are empty, and this draws the shape of what is coming.
+ *
+ * Sized to the real thing -- one tab chip and one parcel card -- so the swap
+ * moves as little as it can.
+ */
+:root .pse-parcels-loading {
+	position: relative;
+	min-height: 232px;
+}
+
+:root .pse-parcels-loading > * {
+	visibility: hidden;
+}
+
+:root .pse-parcels-loading::before {
+	content: "";
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 62px;
+	height: 52px;
+	border-radius: 13px;
+	background-color: var(--pse-line);
+	animation: pse-parcels-pulse 1.4s ease-in-out infinite;
+}
+
+:root .pse-parcels-loading::after {
+	content: "";
+	position: absolute;
+	top: 66px;
+	left: 0;
+	right: 0;
+	height: 166px;
+	border: 1px solid var(--pse-line);
+	border-radius: 16px;
+	background-color: var(--pse-well);
+	animation: pse-parcels-pulse 1.4s ease-in-out infinite;
+	animation-delay: 0.15s;
+}
+
+@keyframes pse-parcels-pulse {
+	50% {
+		opacity: 0.45;
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	:root .pse-parcels-loading::before,
+	:root .pse-parcels-loading::after {
+		animation: none;
+	}
+}
+
+
+/* ---- The footer band, pinned ---- *
+ * Switched on by `src/stickyFooter.ts`, which also measures the band and
+ * publishes its height as `--pse-footer-height`. See that file for why the band
+ * is pinned at all; this is only how.
+ */
+
+/* `!important` because the app pages carry Bootstrap's `.position-relative`,
+ * which is itself `!important` -- the `:root` prefix settles specificity but
+ * cannot outrank that on its own. */
+:root.pse-fixed-footer .footer {
+	position: fixed !important;
+	right: 0;
+	bottom: 0;
+	left: 0;
+	/* Above the page and under every dialog: ours sit at 100 and 200, Bootstrap's
+	   modals at 1040 and 1050, and the portal's busy scrim at 1990. */
+	z-index: 10;
+}
+
+/* The band is out of the flow now, so the space it used to take has to be given
+ * back -- otherwise the end of a long page finishes underneath it.
+ *
+ * Padding on the body is what reserves it, and on its own that is not enough.
+ * The portal sizes this page as a stack of fixed heights -- `.vh-100` on the
+ * wrapper and `h-100` all the way down to the container the page sits in -- so
+ * a page with more in it than fits does not make the document taller, it
+ * overflows a box that stays exactly one viewport tall. Overflow is painted
+ * past the padding edge, so the end of a long page finished underneath the
+ * band: with two parcels in the list the announce button sat behind it.
+ *
+ * So the chain is turned from fixed heights into a minimum on the wrapper and
+ * content sizing below it. A page then grows the document the way it looks
+ * like it should, the body's padding lands under all of it, and a short page
+ * still fills the screen because the minimum is what is left after the band.
+ *
+ * Only `height` is relaxed, and to `auto` rather than to a percentage minimum:
+ * `min-height: 100%` against an ancestor that is now itself auto is circular,
+ * and resolving it locks the renderer up.
+ */
+:root.pse-fixed-footer .retailvista-packing-ui {
+	height: auto !important;
+	min-height: calc(100vh - var(--pse-footer-height, 56px));
+}
+
+:root.pse-fixed-footer .mainContainer .container-fluid.h-100,
+:root.pse-fixed-footer .mainContainer .container-fluid > div.d-flex.flex-column.h-100,
+:root.pse-fixed-footer .mainContent > .container.h-100 {
+	height: auto !important;
+}
+
+:root.pse-fixed-footer body {
+	padding-bottom: var(--pse-footer-height, 56px);
+}
+
+/* ---- The page's own top margin ---- *
+ * The portal opens the reservation pages with `p-5`, which is 39px of padding
+ * above the first thing on them. The search page starts its card 28px under the
+ * band, and two screens in the same flow should not start at two different
+ * heights -- so this comes down to match, which is also 11px more of the page
+ * on screen before anything has to be scrolled.
+ *
+ * Top only. The padding at the bottom is what keeps the announce button clear
+ * of the footer band, and the sides are what hold the page off the window edge.
+ */
+:root .mainContent > .container.p-5 {
+	padding-top: 28px !important;
+}
+
+/* ---- and its width ---- *
+ * The portal gives the parcels page `container container-lg`, whose own
+ * stylesheet takes it to 1800px, and the add-parcels page a bare `container`,
+ * which Bootstrap caps at 1140px. Same markup underneath -- the same overview,
+ * the same `col-3` beside the same `col-9` -- laid out at two different widths,
+ * so the reservation column came out 243px on one page and 368px on the other
+ * and the sidebar had to wrap everything in it.
+ *
+ * Given the wider of the two, once, for both. Stated here rather than by adding
+ * the portal's class to the element, because the point is that these pages
+ * match each other -- and a rule says that where a copied class name only
+ * happens to.
+ */
+:root .mainContent > .container.p-5 {
+	max-width: 1800px;
+}
+
+
+/* ---- The overlay we supply ---- *
+ * `setBusy()` builds the portal's own overlay markup on the pages the portal
+ * does not serve one for -- the login page. The rules above style it along with
+ * theirs; these are only what the portal's own stylesheet would have said about
+ * when it is shown, which is not loaded everywhere this can be called from.
+ */
+:root .loading.pse-busy-supplied {
+	display: none;
+}
+
+:root body.busy .loading.pse-busy-supplied {
+	display: block;
+}
+
+
+/* ---- The portal's own dialogs ---- *
+ * The parcel editor -- which is both "add" and "edit" -- and the confirmation
+ * that deletes one. Bootstrap modals the portal builds, fills over AJAX and
+ * re-renders, so they cannot be rebuilt as ours are; they are matched to
+ * `ModalShell.vue` here instead, against the same palette tokens, so a dialog
+ * of theirs and a dialog of ours are the same object.
+ */
+:root .modal-backdrop.show {
+	background-color: var(--pse-scrim);
+	opacity: 1;
+}
+
+:root #editParcelModal .modal-content,
+:root #deleteParcelModal .modal-content {
+	border: 0;
+	border-radius: var(--pse-dialog-radius);
+	background-color: #ffffff;
+	box-shadow: var(--pse-dialog-shadow);
+}
+
+:root #editParcelModal .modal-header,
+:root #deleteParcelModal .modal-header {
+	align-items: center;
+	padding: 17px 20px;
+	border-bottom: 1px solid var(--pse-line);
+}
+
+:root #editParcelModal .modal-title,
+:root #deleteParcelModal .modal-title {
+	font-size: 16px;
+	font-weight: 650;
+	line-height: 1.3;
+	color: var(--pse-ink);
+}
+
+/* Bootstrap draws this as a bare multiplication sign at 1.5rem with its own
+   opacity. Given the box, the radius and the hover our own close control has,
+   so the two are the same button. */
+:root #editParcelModal .close,
+:root #deleteParcelModal .close {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	width: 32px;
+	height: 32px;
+	margin: 0;
+	padding: 0;
+	border-radius: 9px;
+	background-color: transparent;
+	font-size: 21px;
+	font-weight: 400;
+	line-height: 1;
+	color: var(--pse-ink-faint);
+	opacity: 1;
+	text-shadow: none;
+	transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+:root #editParcelModal .close:hover,
+:root #deleteParcelModal .close:hover {
+	background-color: var(--pse-well);
+	color: var(--pse-ink);
+	opacity: 1;
+}
+
+:root #editParcelModal .modal-body,
+:root #deleteParcelModal .modal-body {
+	padding: 20px;
+	font-size: 14px;
+	line-height: 1.5;
+	color: var(--pse-ink);
+}
+
+:root #editParcelModal .modal-footer,
+:root #deleteParcelModal .modal-footer {
+	justify-content: flex-end;
+	gap: 9px;
+	padding: 15px 20px;
+	border-top: 1px solid var(--pse-line);
+}
+
+/* Bootstrap spaces footer buttons with a margin on every child, which fights the
+   gap above and leaves the row off-centre against our own dialogs. */
+:root #editParcelModal .modal-footer > *,
+:root #deleteParcelModal .modal-footer > * {
+	margin: 0;
+}
+
+/* The delete dialog puts its two answers in a wrapper of its own rather than
+   directly in the footer, so the row has to be laid out one level in as well. */
+:root #deleteParcelModal #deleteBtns {
+	display: flex;
+	justify-content: flex-end;
+	gap: 9px;
+}
+
+/* The two shapes our own dialogs use: the thing the dialog is for, filled, and
+   everything else beside it as an outline. */
+:root #editParcelModal .modal-footer .btn,
+:root #deleteParcelModal .modal-footer .btn {
+	min-width: 104px;
+	height: 40px;
+	padding: 0 18px;
+	border: 1px solid transparent;
+	border-radius: 11px;
+	font-size: 14px;
+	font-weight: 650;
+	line-height: 38px;
+}
+
+:root #editParcelModal .modal-footer .btn-primary,
+:root #deleteParcelModal .modal-footer .btn-primary,
+:root #deleteParcelModal .modal-footer .btn-danger {
+	background-color: var(--pse-brand-ink);
+	border-color: var(--pse-brand-ink);
+	color: #ffffff;
+}
+
+:root #editParcelModal .modal-footer .btn-primary:hover,
+:root #deleteParcelModal .modal-footer .btn-primary:hover {
+	background-color: var(--pse-brand-ink-strong);
+	border-color: var(--pse-brand-ink-strong);
+}
+
+/* Except the one that destroys something. It keeps a red of its own -- muted to
+   sit in this palette rather than Bootstrap's -- because it is the one answer in
+   either dialog that cannot be taken back. */
+:root #deleteParcelModal .modal-footer .btn-danger {
+	background-color: #a3372c;
+	border-color: #a3372c;
+}
+
+:root #deleteParcelModal .modal-footer .btn-danger:hover {
+	background-color: #8d2f25;
+	border-color: #8d2f25;
+}
+
+:root #editParcelModal .modal-footer .btn-secondary,
+:root #deleteParcelModal .modal-footer .btn-secondary {
+	border-color: var(--pse-line);
+	background-color: #ffffff;
+	color: var(--pse-ink-soft);
+}
+
+:root #editParcelModal .modal-footer .btn-secondary:hover,
+:root #deleteParcelModal .modal-footer .btn-secondary:hover {
+	border-color: var(--pse-ink-faint);
+	background-color: var(--pse-well);
+	color: var(--pse-ink);
+}
+
+/* The parcel editor's own fields, which arrive over AJAX after the dialog is
+   open: the carrier picker, the weight, the dimensions. Given the same shell as
+   the fields on our cards. */
+:root #editParcelModal .modal-body .form-control,
+:root #editParcelModal .modal-body select {
+	height: 42px;
+	padding: 0 13px;
+	border: 1px solid var(--pse-line);
+	border-radius: 11px;
+	background-color: var(--pse-well);
+	font-size: 14.5px;
+	color: var(--pse-ink);
+}
+
+/* The same select treatment as our own dialogs: the browser's arrow is drawn
+   against the right edge and cannot be moved, which on this radius puts it
+   inside the curve. Ours is a background, inset clear of the corner. */
+:root #editParcelModal .modal-body select {
+	appearance: none;
+	-webkit-appearance: none;
+	-moz-appearance: none;
+	padding-right: 40px;
+	background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7d73' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E");
+	background-repeat: no-repeat;
+	background-position: right 14px center;
+	background-size: 13px;
+}
+
+/* The weight and its "gram" tag are one control, the way the parcel line's
+   amount and its button are: Bootstrap squares the inside edges so the pair
+   reads as a single box, and the blanket radius above rounded them apart
+   again. Squared where they meet, rounded on the outside, and the tag given the
+   field's own surface so it reads as part of it rather than as a chip stuck to
+   the end. */
+:root #editParcelModal .modal-body .input-group > .form-control:first-child {
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+}
+
+:root #editParcelModal .modal-body .input-group-append .input-group-text,
+:root #editParcelModal .modal-body .input-group-append .btn {
+	height: 42px;
+	padding: 0 14px;
+	border: 1px solid var(--pse-line);
+	border-left: 0;
+	border-top-left-radius: 0;
+	border-bottom-left-radius: 0;
+	border-top-right-radius: 11px;
+	border-bottom-right-radius: 11px;
+	background-color: var(--pse-line);
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--pse-ink-soft);
+}
+
+:root #editParcelModal .modal-body .input-group-prepend .input-group-text {
+	height: 42px;
+	padding: 0 14px;
+	border: 1px solid var(--pse-line);
+	border-right: 0;
+	border-top-right-radius: 0;
+	border-bottom-right-radius: 0;
+	border-top-left-radius: 11px;
+	border-bottom-left-radius: 11px;
+	background-color: var(--pse-line);
+	font-size: 13px;
+	font-weight: 600;
+	color: var(--pse-ink-soft);
+}
+
+:root #editParcelModal .modal-body .form-control:focus,
+:root #editParcelModal .modal-body select:focus {
+	border-color: var(--pse-brand);
+	background-color: #ffffff;
+	box-shadow: 0 0 0 3px var(--pse-brand-ring);
+}
+
+:root #editParcelModal .modal-body label {
+	margin-bottom: 6px;
+	font-size: 11px;
+	font-weight: 650;
+	letter-spacing: 0.07em;
+	text-transform: uppercase;
+	color: var(--pse-ink-soft);
 }

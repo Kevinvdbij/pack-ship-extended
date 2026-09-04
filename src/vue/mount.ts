@@ -3,12 +3,18 @@ import { debug } from "../logger.ts";
 
 // The portal renders its own markup, so every component of ours needs a host
 // element created and placed into that markup before it can be mounted.
-export function mountApp(component: Component, attach: (host: HTMLDivElement) => void) {
+export function mountApp(
+	component: Component,
+	attach: (host: HTMLDivElement) => void,
+	// Root props, for the components that are handed their data rather than
+	// reading it off the page themselves.
+	props?: Record<string, unknown>,
+) {
 	const host = document.createElement("div");
 
 	attach(host);
 
-	createApp(component).mount(host);
+	createApp(component, props).mount(host);
 }
 
 // Resolves once the portal's markup is complete.

@@ -1,5 +1,14 @@
 <script setup lang="ts">
 import logoUrl from "../../assets/kampeerhal-roden.svg";
+import { PACKING_PORTAL_URL } from "../../constants.ts";
+
+// The mark doubles as the way home, the way a site's own logo does: a new
+// search is where every job on this portal starts, and the operator is often
+// several screens deep with no other route back.
+//
+// Not on the login page, which passes `linked: false`. There is no session
+// there, so the only thing behind the link is the page you are already on.
+withDefaults(defineProps<{ linked?: boolean }>(), { linked: true });
 
 // The band at the top of every page. On the pages the portal gives a header to
 // it replaces one, and on the login page -- which is served with a bare layout
@@ -25,7 +34,10 @@ import logoUrl from "../../assets/kampeerhal-roden.svg";
 <template>
 	<header class="pse-header">
 		<div class="pse-header-inner">
-			<img class="pse-header-logo" :src="logoUrl" alt="Kampeerhal Roden" />
+			<a v-if="linked" class="pse-header-link" :href="PACKING_PORTAL_URL" title="Nieuwe zoekopdracht">
+				<img class="pse-header-logo" :src="logoUrl" alt="Kampeerhal Roden" />
+			</a>
+			<img v-else class="pse-header-logo" :src="logoUrl" alt="Kampeerhal Roden" />
 		</div>
 	</header>
 </template>
@@ -52,6 +64,29 @@ import logoUrl from "../../assets/kampeerhal-roden.svg";
 	max-width: 980px;
 	margin: 0 auto;
 	padding: 16px 24px;
+}
+
+/* The hit area is the mark and a little around it, not the width of the band:
+   a header-wide link is a thing you set off by accident.
+ *
+ * No hover state. A tinted panel behind the logo made the mark look like a
+ * button someone had dropped into the band; the mark is the brand, and putting
+ * a background on it is the one thing it should not do. The pointer is what
+ * says it can be clicked. */
+.pse-header-link {
+	display: inline-flex;
+	margin: -6px -8px;
+	padding: 6px 8px;
+	border-radius: 10px;
+}
+
+.pse-header-link:focus {
+	outline: none;
+}
+
+.pse-header-link:focus-visible {
+	outline: none;
+	box-shadow: 0 0 0 3px var(--pse-brand-ring);
 }
 
 .pse-header-logo {

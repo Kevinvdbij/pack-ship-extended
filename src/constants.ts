@@ -47,6 +47,39 @@ export const LOGIN_FOOTER_CONTAINER_SELECTOR = "footer > div.container";
 // space has to be escaped for querySelector to accept it.
 export const RESERVATION_SUMMARY_SELECTOR = "#ReservationSummary\\ mb-2";
 
+// The column that block sits in, which is what the sidebar mounts into. The
+// block itself is read for its fields and then hidden rather than removed:
+// `getCurrentOrderNumber()` still reads the sale order reference straight out
+// of it, and `#ReservationId` is one of its children.
+export const RESERVATION_SIDEBAR_SELECTOR = "#ReservationOverview > div:nth-child(2) > div.col-3";
+
+// The portal's parcel area on the parcels page: the tab strip and the panes
+// under it. Both are served empty and filled in after DOMContentLoaded by the
+// portal's own `init()`, which fetches the carriers over AJAX -- so this is the
+// one region of that page that cannot be part of the reveal, and gets a
+// skeleton instead. See `CreateParcelsPage.vue`.
+export const PARCEL_GROUP_SELECTOR = "#parcelsGroup";
+export const PARCEL_TABS_SELECTOR = "#tabs-parcels";
+
+// The portal's own product scan dialog on the parcels page.
+export const PRODUCT_SCAN_DIALOG_SELECTOR = ".searchProductDialog";
+
+// The flex column every portal page lays its rows out in: the header band, the
+// page content, the footer. Used as the fallback anchor for our own header band
+// on the pages the portal serves without one -- the parcels page among them.
+// See `mountHeader()` in `src/main.ts`.
+export const PAGE_COLUMN_SELECTOR = ".retailvista-packing-ui .container-fluid > div.d-flex.flex-column";
+
+// The cell inside that column which holds the page itself, between the band and
+// the footer. Where a page of ours goes when it stands in for the portal's --
+// see `VerifyProductsPage.vue`.
+export const MAIN_CONTENT_SELECTOR = "div.col-12.mainContent";
+
+// The vendor's small wordmark and the back control, which the pages without a
+// header band carry instead of one. Addressed by the image because the row
+// around it has nothing else to name it by.
+export const VENDOR_BAND_LOGO_SELECTOR = "img.nfLogoSmall";
+
 // Keys used with the GM value store.
 export const STORAGE_KEYS = {
 	settings: "PSE_Settings",

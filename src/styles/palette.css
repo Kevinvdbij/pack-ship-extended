@@ -30,6 +30,19 @@
 	--pse-line: #e2eae5;
 	--pse-well: #f6f9f7;
 
+	/* ---- Dialogs ---- *
+	 * Shared by every modal in the extension and by the portal's own two, which
+	 * `src/styles/portal.css` restyles to match. Declared here so a dialog of
+	 * ours and a dialog of theirs cannot drift apart.
+	 */
+	/* The dimmed page behind a dialog. Mixed from the same near-black green as
+	   the text, so the page reads as darkened rather than as greyed out. */
+	--pse-scrim: rgba(20, 35, 27, 0.52);
+	/* A dialog sits well above the page, so it gets a deeper shadow than the
+	   cards do -- close and tight for the edge, wide and soft for the lift. */
+	--pse-dialog-shadow: 0 1px 2px rgba(20, 48, 33, 0.06), 0 28px 64px -24px rgba(11, 26, 18, 0.55);
+	--pse-dialog-radius: 20px;
+
 	/* ---- The portal's own chrome ---- *
 	 * Only `src/styles/portal.css` uses these: they restyle Bootstrap classes
 	 * the portal renders, which nothing of ours wears. Kept here so the two

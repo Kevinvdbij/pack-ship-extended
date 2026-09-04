@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { onMounted, useTemplateRef } from "vue";
 import { clearCurrentUser, setCurrentUser } from "../../currentUser.ts";
-import { adoptElement } from "../../retailVistaUtils.ts";
+import { adoptElement, setBusy } from "../../retailVistaUtils.ts";
 import { afterReveal } from "../../reveal.ts";
 import { LOGIN_FOOTER_CONTAINER_SELECTOR } from "../../constants.ts";
 import Header from "../components/Header.vue";
@@ -77,6 +77,12 @@ function replacePortalLoginBlock() {
 	// behind. Nothing here prevents the default: the portal's own post is what
 	// logs in, this only listens in on it.
 	document.querySelector(`#${LOGIN_FORM_ID}`)?.addEventListener("submit", () => {
+		// The portal's post takes a moment and the browser keeps this page up
+		// until it answers, so the overlay is what says the sign-in was taken.
+		// This page is served without one of the portal's, so `setBusy` supplies
+		// the markup -- see `ensureBusyOverlay`.
+		setBusy(true);
+
 		const userName = document.querySelector<HTMLInputElement>(USER_NAME_INPUT)?.value.trim();
 		const companyNumber = document.querySelector<HTMLInputElement>(COMPANY_INPUT)?.value.trim() ?? "";
 
@@ -136,7 +142,7 @@ function prepareFooter() {
 	     page is served with a bare layout, so there is no header of the portal's
 	     for it to be mounted against. The component itself is the same one, so
 	     the logo is in the same place before and after signing in. -->
-	<Header />
+	<Header :linked="false" />
 
 	<div class="pse-login">
 		<div class="pse-login-card">

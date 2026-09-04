@@ -1,6 +1,6 @@
 import { GM_deleteValues, GM_getValue, GM_listValues, GM_setValue } from "$";
 import { MassCompleteEntry, ModalProductDetails, ModalReservationDetails, ProductDetails, ReservationDefinition, ReservationDetails, ReservationSearchResponseType, ReservationSelectionModalData } from "./interfaces";
-import { CONTAINER_SELECTOR, massCompleteEntryKey, HEADER_SELECTOR, SEARCH_BLOCK_SELECTOR, PACKING_PORTAL_URL, PARCEL_CONTAINER_PARENT_SELECTOR, RESERVATION_SUMMARY_SELECTOR, STORAGE_KEYS } from "./constants.ts";
+import { CONTAINER_SELECTOR, massCompleteEntryKey, HEADER_SELECTOR, SEARCH_BLOCK_SELECTOR, PACKING_PORTAL_URL, PARCEL_CONTAINER_PARENT_SELECTOR, RESERVATION_SIDEBAR_SELECTOR, RESERVATION_SUMMARY_SELECTOR, STORAGE_KEYS } from "./constants.ts";
 import { debug } from "./logger.ts";
 import { afterReveal } from "./reveal.ts";
 
@@ -40,6 +40,18 @@ export function getPortalHeader():Element | null {
 
 export function getParcelContainerParent():Element | null {
 	return document.querySelector(PARCEL_CONTAINER_PARENT_SELECTOR)
+}
+
+// The column the reservation sidebar mounts into.
+//
+// Addressed by its position in the overview first, which is what the parcels
+// page serves, and by the summary block's own parent as a fallback -- the
+// add-parcels page lays the same block out in a column of its own shape, and
+// either way the column is "whatever the summary is sitting in".
+export function getReservationSidebarColumn():Element | null {
+	return document.querySelector(RESERVATION_SIDEBAR_SELECTOR)
+		?? document.querySelector(RESERVATION_SUMMARY_SELECTOR)?.parentElement
+		?? null;
 }
 
 export function getReservationDetailsFromOverview(ReservationOverview?:HTMLFormElement):ReservationDetails| null {
@@ -250,12 +262,45 @@ export function focusBarcodeInput() {
 }
 
 export function setBusy(state: boolean) {
-	if (state == true) {
-		$("body").addClass("busy");
+	if (state) {
+		ensureBusyOverlay();
+		document.body.classList.add("busy");
 	}
 	else {
-		$("body").removeClass("busy");
+		document.body.classList.remove("busy");
 	}
+}
+
+// The portal renders the busy overlay into the pages that use it, and does not
+// render one at all on the login page -- which is exactly where signing in needs
+// to say that something is happening, since the post that follows can sit there
+// for a second with nothing on screen to show for it.
+//
+// So the element the portal would have served is supplied, wearing the portal's
+// own class names. `src/styles/portal.css` already restyles that markup into
+// the extension's own overlay, and this way there is one overlay with one set of
+// rules rather than a second implementation for the one page that lacks it.
+function ensureBusyOverlay() {
+	if (document.querySelector(".loading")) {
+		return;
+	}
+
+	const overlay = document.createElement("div");
+	// The extra class is what the display rules hang off: the portal's own
+	// stylesheet is what hides `.loading` until `body.busy`, and it is not
+	// loaded on every page this can be called from.
+	overlay.className = "loading pse-busy-supplied";
+
+	const spinner = document.createElement("div");
+	spinner.className = "nfSpinner";
+
+	const banner = document.createElement("h5");
+	banner.className = "loadingBanner";
+	banner.textContent = "Laden...";
+
+	spinner.append(banner);
+	overlay.append(spinner);
+	document.body.append(overlay);
 }
 
 export function retrieveModalData(modalElement:HTMLElement):ReservationSelectionModalData {

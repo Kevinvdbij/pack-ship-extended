@@ -186,7 +186,7 @@ function getMassCompleteClass(reservationNumber: number) {
 </script>
 
 <template>
-	<div class="settings-modal">
+	<div class="pse-selection-backdrop">
 		<div class="modal show" id="productReservationsModal" tabindex="-1" role="dialog" data-backdrop="static"
 			aria-modal="true" style="display: block;">
 			<div class="modal-dialog modal-xl" role="document">
@@ -333,15 +333,24 @@ function getMassCompleteClass(reservationNumber: number) {
 </template>
 
 <style scoped>
-.settings-modal {
-	position: absolute;
-	width: 100% !important;
-	height: 100% !important;
-	left: 0;
-	top: 0;
-	background: rgba(51, 51, 51, 0.7);
+/* The dimmed page behind the reservation picker.
+ *
+ * The picker itself is still the portal-shaped markup it was built from -- one
+ * card per reservation, laid out by `ReservationCard.vue` -- so it is not one of
+ * the dialogs rebuilt on `ModalShell.vue`. What it can share is the scrim, which
+ * is what makes a dialog look like it belongs to the same program as the one
+ * before it. Taken from the same token, at the same depth, with the same blur.
+ *
+ * `fixed` rather than `absolute`: the page behind this scrolls, and an absolute
+ * backdrop is only as tall as the document was when it opened. */
+.pse-selection-backdrop {
+	position: fixed;
+	inset: 0;
 	z-index: 100;
-	background-color: rgba(0, 0, 0, 0.5);
+	overflow-y: auto;
+	background-color: var(--pse-scrim);
+	backdrop-filter: blur(3px);
+	-webkit-backdrop-filter: blur(3px);
 }
 
 .modal {

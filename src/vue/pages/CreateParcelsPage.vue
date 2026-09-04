@@ -2,12 +2,16 @@
 import { onMounted, ref, Transition } from 'vue';
 import * as RVUtils from '../../retailVistaUtils.ts';
 import { mountApp } from '../mount.ts';
-import { PACKING_PORTAL_URL, RESERVATION_SUMMARY_SELECTOR } from '../../constants.ts';
+import {
+	PACKING_PORTAL_URL,
+	PARCEL_GROUP_SELECTOR,
+	PARCEL_TABS_SELECTOR,
+} from '../../constants.ts';
 import { debug } from '../../logger.ts';
 import addIconUrl from "../../assets/add.svg";
 import imageIconUrl from "../../assets/image.svg";
 import { MassCompleteStatus, ReservationDetails } from '../../interfaces.ts';
-import ReservationSummary from '../components/ReservationSummary.vue';
+import ReservationSidebar from '../components/ReservationSidebar.vue';
 import ImageModal from '../components/ImageModal.vue';
 import Settings from '../../settings.ts';
 import * as Shopware from "../../shopware.ts";
@@ -38,8 +42,9 @@ onMounted(() => {
 			observeParcelContainer();
 		});
 
-	setupSummary();
-	
+	setupSidebar();
+	markParcelsLoading();
+
 	RVUtils.setLastOpenReservation({
 		id: RVUtils.getCurrentReservationId(),
 		number: RVUtils.getCurrentReservationNumber()
@@ -103,16 +108,65 @@ function observeParcelContainer() {
 	}
 }
 
-function setupSummary() {
-	const overviewElement = <HTMLElement>document.querySelector("#ReservationOverview");
-	const backButton = <HTMLLinkElement>overviewElement.querySelector("div:nth-child(1) > div > a")
+// The parcel area is the one region of this page that cannot be part of the
+// reveal. The portal serves `#tabs-parcels` and its panes empty and fills them
+// in from `init()`, which runs on document-ready and fetches the carriers over
+// AJAX -- so holding the page back for it would mean holding the whole screen
+// on a request, and letting it through unmarked means revealing a page with a
+// gap where the parcels go.
+//
+// So the gap is furnished instead: a class on the portal's own element, which
+// `src/styles/portal.css` draws a placeholder into, taken off again the moment
+// the tabs have something in them.
+//
+// Marked by class rather than by mounting something of ours in there, because
+// the portal's `refresh()` replaces the entire contents of `#ParcelsContainer`
+// with a fresh render on every parcel change. Anything of ours inside it would
+// be thrown away with the markup it was next to -- and so is this class, which
+// is why the observer puts it back rather than only ever removing it.
+function markParcelsLoading() {
+	const container = document.querySelector("#ParcelsContainer");
 
-	backButton.href = PACKING_PORTAL_URL;
-	backButton.innerHTML = "<span class='material-icons'>chevron_left</span>Nieuwe zoekopdracht";
+	if (!container) {
+		return;
+	}
 
-	mountApp(ReservationSummary, (host) => {
-		document.querySelector(RESERVATION_SUMMARY_SELECTOR)!.insertAdjacentElement("beforeend", host);
-	});
+	const sync = () => {
+		const group = document.querySelector(PARCEL_GROUP_SELECTOR);
+		const tabs = document.querySelector(PARCEL_TABS_SELECTOR);
+
+		if (!group) {
+			return;
+		}
+
+		group.classList.toggle("pse-parcels-loading", !tabs || tabs.childElementCount == 0);
+	};
+
+	sync();
+
+	new MutationObserver(sync).observe(container, { childList: true, subtree: true });
+}
+
+// The column beside the parcels: which reservation this is, who it is for, and
+// the customer's note. Mounted ahead of the portal's own summary block, which
+// `ReservationSidebar` reads for its fields and then hides.
+//
+// The portal's back control goes with it: the sidebar renders that link itself,
+// so the row it sat in is hidden rather than relabelled. It pointed at the
+// carrier list, which is not a step in this flow -- the way back from a
+// reservation here is a new search.
+function setupSidebar() {
+	const overviewElement = document.querySelector("#ReservationOverview");
+
+	overviewElement?.querySelector(":scope > div:nth-child(1)")?.classList.add("pse-portal-replaced");
+
+	const column = RVUtils.getReservationSidebarColumn();
+
+	if (!column) {
+		return;
+	}
+
+	mountApp(ReservationSidebar, (host) => column.insertAdjacentElement("afterbegin", host));
 }
 
 function autoAnnounceParcels(parcelContainerElement: Element) {
@@ -143,24 +197,23 @@ function processAutoComplete() {
 	}
 }
 
-function verifiedClass(required: number, collected: number): string {
-	const normal = "collected-text";
-	const warn = "collected-text collected-text-warn blinking"
-	const alert = "collected-text collected-text-alert blinking";
-	const resolved = "collected-text collected-text-resolved"
-
+// How a row's count is set. A single-unit row is the ordinary case and stays
+// quiet; a row that needs several of the same product is where a packer loses
+// count, so it is called out until it is complete and then marked done.
+function countClass(required: number, collected: number): string {
 	if (required > 1 && required == collected) {
-		return resolved;
+		return "pse-count pse-count-resolved";
 	}
-	else if (required > 1 && collected == 0) {
-		return alert;
+
+	if (required > 1 && collected == 0) {
+		return "pse-count pse-count-alert";
 	}
-	else if (required > 1 && collected > 0) {
-		return warn;
+
+	if (required > 1 && collected > 0) {
+		return "pse-count pse-count-warn";
 	}
-	else {
-		return normal;
-	}
+
+	return "pse-count";
 }
 
 async function removeParcelItems(): Promise<void> {
@@ -189,7 +242,7 @@ async function removeParcelItems(): Promise<void> {
 				location.href = "javascript:void(update());";
 			}, i * 250);
 		}
-		
+
 		return new Promise(resolve => setTimeout(resolve, 250 + (removeButtons.length * 250)));
 	}
 }
@@ -202,163 +255,212 @@ async function removeParcelItems(): Promise<void> {
 				@close="showImageModal = false;" />
 		</Transition>
 	</Teleport>
-	<div v-if="showReservationDetails && reservationDetails" id="ReservationContainer">
-		<div class="reservation">
-			<h4>Producten</h4>
-			<div class="container my-2">
-				<div class="row">
-					<div class="col">
-						<table class="table">
-							<tbody>
-								<tr>
-									<th>Omschrijving</th>
-									<th>Hoofd barcode</th>
-									<th>Gescand</th>
-									<th>Verzameld</th>
-									<th>Actie</th>
-								</tr>
-								<template v-for="product in reservationDetails?.products">
-									<tr>
-										<td>
-											<span>{{ product.description }}</span>
-										</td>
-										<td>
-											<span>{{ product.mainBarcode }}</span>
-										</td>
-										<td>
-											<span
-												:class="verifiedClass(product.requiredQuantity, product.verifiedQuantity)">{{
-													product.verifiedQuantity }} van {{ product.requiredQuantity
-												}}</span>
-										</td>
-										<td>
-											<span v-if="product.verifiedQuantity < product.requiredQuantity"
-												class="text-warning"><span
-													class="material-icons">close</span></span>
-											<span v-if="product.verifiedQuantity >= product.requiredQuantity"
-												class="text-success"><span class="material-icons">done</span></span>
-										</td>
-										<td>
-											<div style="display: inline-flex; gap: 5px;">
-												<button @click="onClickAddProduct(product.mainBarcode)"
-													type="button" class="btn btn-primary action-icon"
-													v-bind:disabled="product.verifiedQuantity >= product.requiredQuantity">
-													<img class="action-icon-image" :src="addIconUrl" width="26"
-														height="26" />
-												</button>
-												<button @click="onClickShowImage(product.mainBarcode)"
-													type="button" class="btn btn-primary action-icon">
-													<img class="action-icon-image" :src="imageIconUrl" width="26"
-														height="26" />
-												</button>
-											</div>
-										</td>
-									</tr>
-								</template>
-							</tbody>
-						</table>
-						<div class="mt-2 alert alert-info">Om producten te verzamelen, scan of voer de barcode in
-						</div>
-					</div>
-				</div>
-			</div>
+
+	<section class="pse-products">
+		<header class="pse-products-head">
+			<h2 class="pse-products-title">Producten</h2>
+			<a class="pse-back" :href="PACKING_PORTAL_URL">
+				<span class="material-icons pse-back-icon" aria-hidden="true">chevron_left</span>
+				Nieuwe zoekopdracht
+			</a>
+		</header>
+
+		<div class="pse-products-card">
+			<table class="pse-table">
+				<thead>
+					<tr>
+						<th>Omschrijving</th>
+						<th>Hoofd barcode</th>
+						<th>Gescand</th>
+						<th class="pse-table-centre">Verzameld</th>
+						<th class="pse-table-right">Actie</th>
+					</tr>
+				</thead>
+
+				<tbody v-if="showReservationDetails && reservationDetails">
+					<tr v-for="product in reservationDetails.products" :key="product.itemId">
+						<td class="pse-cell-description">{{ product.description }}</td>
+						<td class="pse-cell-barcode">{{ product.mainBarcode }}</td>
+						<td>
+							<span :class="countClass(product.requiredQuantity, product.verifiedQuantity)">
+								{{ product.verifiedQuantity }} van {{ product.requiredQuantity }}
+							</span>
+						</td>
+						<td class="pse-table-centre">
+							<span v-if="product.verifiedQuantity >= product.requiredQuantity"
+								class="material-icons pse-mark pse-mark-done">check_circle</span>
+							<span v-else class="material-icons pse-mark pse-mark-open">radio_button_unchecked</span>
+						</td>
+						<td class="pse-table-right">
+							<div class="pse-actions">
+								<button type="button" class="pse-action" title="Product toevoegen"
+									:disabled="product.verifiedQuantity >= product.requiredQuantity"
+									@click="onClickAddProduct(product.mainBarcode)">
+									<img :src="addIconUrl" width="18" height="18" alt="Toevoegen" />
+								</button>
+								<button type="button" class="pse-action pse-action-quiet" title="Afbeelding tonen"
+									@click="onClickShowImage(product.mainBarcode)">
+									<img :src="imageIconUrl" width="18" height="18" alt="Afbeelding" />
+								</button>
+							</div>
+						</td>
+					</tr>
+				</tbody>
+
+				<!-- The same number of rows as the table above, so the real one drops
+				     in without moving anything. Shown only when the details lost the
+				     race with the boot's reveal; on a cache hit -- which is every
+				     reservation opened through the search -- the table is there from
+				     the first paint and this never renders. -->
+				<tbody v-else aria-hidden="true">
+					<tr v-for="row in expectedProductCount" :key="row" class="pse-skeleton-row">
+						<td v-for="cell in 5" :key="cell"><span class="pse-skeleton-cell"></span></td>
+					</tr>
+				</tbody>
+			</table>
 		</div>
-	</div>
-	<!-- Same outer structure and the same number of rows as the table above, so
-	     the real one drops in without moving anything. Shown only when the
-	     details lost the race with the boot's reveal; on a cache hit the table
-	     is there from the first paint and this never renders. -->
-	<div v-else id="ReservationContainer" aria-hidden="true">
-		<div class="reservation">
-			<h4>Producten</h4>
-			<div class="container my-2">
-				<div class="row">
-					<div class="col">
-						<table class="table">
-							<tbody>
-								<tr>
-									<th>Omschrijving</th>
-									<th>Hoofd barcode</th>
-									<th>Gescand</th>
-									<th>Verzameld</th>
-									<th>Actie</th>
-								</tr>
-								<tr v-for="row in expectedProductCount" :key="row" class="skeleton-row">
-									<td v-for="cell in 5" :key="cell"><span class="skeleton-cell"></span></td>
-								</tr>
-							</tbody>
-						</table>
-						<div class="mt-2 alert alert-info">Om producten te verzamelen, scan of voer de barcode in
-						</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
+
+		<p class="pse-products-hint">
+			<span class="material-icons pse-products-hint-icon" aria-hidden="true">info</span>
+			Om producten te verzamelen, scan of voer de barcode in.
+		</p>
+	</section>
 </template>
 
 <style scoped>
-/* The action buttons are what set a row's height, so the skeleton's cells match
-   their box rather than the text next to them. */
-.skeleton-row td {
-	height: 52px;
+.pse-products {
+	box-sizing: border-box;
+	margin-bottom: 26px;
+	color: var(--pse-ink);
+	/* The portal wraps the page in `.container-fluid.text-center`. */
+	text-align: left;
+}
+
+.pse-products :deep(*) {
+	box-sizing: border-box;
+}
+
+/* ---- The count ---- *
+ * A single-unit row is the ordinary case and stays quiet. A row that needs
+ * several of the same product is where a packer loses count, so it is called
+ * out until it is complete -- red while none are in the box, amber part way --
+ * and then settles into a plain done state rather than staying loud.
+ *
+ * The old version blinked all three of those at 0.75s. A number that is being
+ * read off is the wrong thing to flash: the count is what has to be legible,
+ * and it was legible half the time.
+ */
+.pse-count {
+	display: inline-block;
+	padding: 3px 9px;
+	border-radius: 8px;
+	font-size: 13px;
+	font-weight: 600;
+	font-variant-numeric: tabular-nums;
+	white-space: nowrap;
+	color: var(--pse-ink);
+}
+
+/* The two unfinished states breathe. A row that needs several of the same
+   product is where a packer loses count, so it has to catch the eye from across
+   the counter -- but the thing being caught is a number that then has to be
+   read, which is why this is a slow swell of the badge rather than the 0.75s
+   blink it replaced. The colour never leaves and the digits never move. */
+.pse-count-warn,
+.pse-count-alert {
+	animation: pse-count-breathe 2.4s ease-in-out infinite;
+}
+
+.pse-count-warn {
+	background-color: rgba(226, 160, 46, 0.18);
+	color: #8a5a10;
+}
+
+.pse-count-alert {
+	background-color: rgba(176, 58, 46, 0.12);
+	color: #a3372c;
+}
+
+@keyframes pse-count-breathe {
+	50% {
+		background-color: rgba(226, 160, 46, 0.42);
+	}
+}
+
+/* The one that is genuinely wrong swells further, and in its own colour. */
+.pse-count-alert {
+	animation-name: pse-count-breathe-alert;
+}
+
+@keyframes pse-count-breathe-alert {
+	50% {
+		background-color: rgba(176, 58, 46, 0.30);
+	}
+}
+
+.pse-count-resolved {
+	background-color: var(--pse-brand-soft);
+	color: var(--pse-brand-ink);
+}
+
+.pse-mark {
+	font-size: 21px;
 	vertical-align: middle;
 }
 
-.skeleton-cell {
+.pse-mark-done {
+	color: var(--pse-brand);
+}
+
+.pse-mark-open {
+	color: var(--pse-ink-faint);
+}
+
+/* The action buttons are what set a row's height, so the skeleton's cells match
+   their box rather than the text next to them. */
+.pse-skeleton-row td {
+	height: 58px;
+}
+
+.pse-skeleton-cell {
 	display: block;
-	height: 16px;
-	border-radius: 4px;
-	background-color: #EFF6F3;
-}
-
-.container {
-	margin-right: 0px;
-	margin-left: 0px;
-}
-
-.action-icon {
-	width: 26px;
-	height: 26px;
-	display: flex;
-	justify-content: center;
-	align-items: center;
-}
-
-.action-icon-image {
-	filter: invert(1);
-}
-
-.collected-text {
-	background-color: transparent;
-	color: black;
-	padding: 5px;
-	padding-inline: 8px;
-	font-size: small;
-	font-weight: normal;
+	height: 12px;
 	border-radius: 6px;
+	background-color: var(--pse-line);
+	animation: pse-products-pulse 1.4s ease-in-out infinite;
 }
 
-.collected-text-warn {
-	background-color: #ff8800;
-	color: white;
-	font-size: medium;
-	font-weight: bold;
+@keyframes pse-products-pulse {
+	50% {
+		opacity: 0.45;
+	}
 }
 
-.collected-text-alert {
-	background-color: red;
-	color: white;
-	font-size: medium;
-	font-weight: bold;
+.pse-products-hint {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	margin: 12px 0 0;
+	padding: 10px 13px;
+	border: 1px solid var(--pse-brand-ring);
+	border-radius: 12px;
+	background-color: var(--pse-brand-soft);
+	font-size: 13px;
+	font-weight: 550;
+	line-height: 1.4;
+	color: var(--pse-brand-ink);
 }
 
-.collected-text-resolved {
-	background-color: #ccc;
-	color: rgb(255, 255, 255);
-	padding: 5px;
-	padding-inline: 8px;
-	font-size: medium;
-	font-weight: bold;
+.pse-products-hint-icon {
+	flex: none;
+	font-size: 18px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+	.pse-skeleton-cell,
+	.pse-count-warn,
+	.pse-count-alert {
+		animation: none;
+	}
 }
 </style>
