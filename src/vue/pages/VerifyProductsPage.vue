@@ -21,6 +21,12 @@ import LoadingPanel from "../components/LoadingPanel.vue";
 // has actually been painted -- otherwise the browser leaves the old page up,
 // commits the new document, and the card we built is never on screen at all.
 
+// How long to wait for those frames before going ahead without them. Long enough
+// that an ordinary visible load is never cut short by it -- two frames is 33ms
+// at 60Hz -- and short enough that a tab which stops painting mid-step is not
+// left standing.
+const PAINT_TIMEOUT_MS = 400;
+
 // Read before anything is hidden or submitted: the rows on this screen are the
 // same ones the parcels page needs, so caching them here is what lets that page
 // render its product table from the first paint instead of fetching them again.
@@ -46,12 +52,46 @@ onMounted(() => {
 	document.querySelector(VENDOR_BAND_LOGO_SELECTOR)?.closest(".row")
 		?.classList.add("pse-portal-replaced");
 
-	// Queued behind the reveal, then behind two frames of it. `afterReveal` gets
-	// the cloak off; the frames are what make the difference between a card that
+	// Queued behind the reveal, then behind the paint. `afterReveal` gets the
+	// cloak off; `whenPainted` is what makes the difference between a card that
 	// exists and a card that has been painted. A navigation started before the
 	// paint is a navigation the operator sees as more white screen.
-	afterReveal(() => requestAnimationFrame(() => requestAnimationFrame(submit)));
+	afterReveal(() => whenPainted(submit));
 });
+
+// Runs `work` once this page has had a chance to be drawn.
+//
+// Two frames, because one only gets us to the frame our card was rendered in and
+// the second is the one after it has been put on screen -- but frames are the
+// wrong thing to wait for in a tab nobody is looking at. A hidden tab is not
+// painted at all and `requestAnimationFrame` never fires in one, so this page
+// simply stopped here: a mass complete opens every reservation in a background
+// tab, and every one of them sat on the verification step until the operator
+// clicked it into view, which then ran the whole run by hand one tab at a time.
+//
+// So a hidden page does not wait: there is no paint to wait for and nothing to
+// spare the operator, since they are not looking at it. The timer covers the
+// case in between -- a tab that was visible at mount and is put behind another
+// before its frames come round -- so the step can be delayed by a paint but
+// never held by the lack of one.
+function whenPainted(work: () => void) {
+	let ran = false;
+
+	const once = () => {
+		if (!ran) {
+			ran = true;
+			work();
+		}
+	};
+
+	if (document.hidden) {
+		once();
+		return;
+	}
+
+	requestAnimationFrame(() => requestAnimationFrame(once));
+	setTimeout(once, PAINT_TIMEOUT_MS);
+}
 
 function submit() {
 	try {
