@@ -1,7 +1,7 @@
 <script setup lang="ts">
-import { onMounted, ref, Transition } from 'vue';
+import { computed, onMounted, ref, Transition } from 'vue';
 import * as RVUtils from '../../retailVistaUtils.ts';
-import { mountApp } from '../mount.ts';
+import { domReady, mountApp } from '../mount.ts';
 import {
 	PACKING_PORTAL_URL,
 	PARCEL_GROUP_SELECTOR,
@@ -10,33 +10,53 @@ import {
 import { debug } from '../../logger.ts';
 import addIconUrl from "../../assets/add.svg";
 import imageIconUrl from "../../assets/image.svg";
-import { MassCompleteStatus, ReservationDetails } from '../../interfaces.ts';
+import { MassCompleteStatus, ParcelItem, VerificationRow } from '../../interfaces.ts';
 import ReservationSidebar from '../components/ReservationSidebar.vue';
 import ImageModal from '../components/ImageModal.vue';
 import Settings from '../../settings.ts';
 import * as Shopware from "../../shopware.ts";
 
-const showReservationDetails = ref(false);
+const showRows = ref(false);
 
-// The portal already renders one verified-quantity input per reservation row,
-// so the number of products is known from its markup before ours has any data.
-// That makes the skeleton the same height as the table replacing it, so filling
-// it in moves nothing on the page -- a second paint that shifts no existing
-// content is the closest a fetch-driven block can get to not flickering.
-const expectedProductCount = document.querySelectorAll(
-	"input[name^='VerificationReservationRows'][name$='.VerifiedQuantity']"
-).length;
-
-let reservationDetails = ref<ReservationDetails>();
+// The table is the portal's own rows, read straight out of the hidden inputs
+// it serves this page with -- one `VerificationReservationRows[n]` group per
+// picking instruction, each carrying what was picked and what has been
+// scanned -- then folded into one line per product. Nothing is joined to a
+// second list, and nothing is fetched.
+//
+// The fold is the point. A product picked from two locations is served as two
+// or three rows, each with what that instruction asked for rather than what it
+// got, and the portal spreads the scans over them. Shown row by row that reads
+// "11 van 8, 11 van 6, 11 van 3" for an order of eleven; folded it reads
+// "11 van 11". The scanned side is counted from the parcel items -- what is in
+// the boxes -- rather than from the rows, so it does not depend on which row
+// the portal credited a scan to.
+//
+// The rows are in the served markup, so the table has its data before anything
+// ours has run; the skeleton below only ever stands in for the parcel clearing
+// this page does on entry.
+//
+// Read once here, in the first paint, and again at DOM-ready if this look came
+// up empty: this page mounts as soon as its anchor is parsed, which can be
+// before the parser has reached the inputs.
+const rows = ref<VerificationRow[]>(RVUtils.getVerificationRows());
+const parcelItems = ref<ParcelItem[]>(RVUtils.getParcelItems());
+const lines = computed(() => RVUtils.groupVerificationRows(rows.value, parcelItems.value));
 const showImageModal = ref(false);
 const imageModalUrl = ref("");
 
 onMounted(() => {
-	getReservationDetails()
-		.then(() => removeParcelItems())
+	domReady()
+		.then(() => {
+			if (rows.value.length == 0) {
+				rows.value = RVUtils.getVerificationRows();
+			}
+
+			return removeParcelItems();
+		})
 		.then(() => {
 			updateVerifiedQuantities();
-			showReservationDetails.value = true;
+			showRows.value = true;
 
 			processAutoComplete();
 			observeParcelContainer();
@@ -50,26 +70,6 @@ onMounted(() => {
 		number: RVUtils.getCurrentReservationNumber()
 	});
 });
-
-async function getReservationDetails() {
-	const cachedReservations = RVUtils.retrieveCachedReservationDetails();
-
-	const cacheHit = cachedReservations.find((reservation) => reservation.id == RVUtils.getCurrentReservationNumber());
-	if (cacheHit) {
-		reservationDetails.value = cacheHit;
-		debug("Reservation cache hit");
-
-		return reservationDetails.value;
-	}
-	else {
-		debug("Reservation cache miss");
-		await RVUtils.fetchReservationDetails(RVUtils.getCurrentReservationId()).then((details) => {
-			reservationDetails.value = details!;
-
-			return reservationDetails.value;
-		});
-	}
-}
 
 function onClickAddProduct(barcode: string) {
 	let barcodeInput = document.querySelector("#productBarcode") as HTMLInputElement;
@@ -86,13 +86,12 @@ async function onClickShowImage(productEAN: string) {
 	showImageModal.value = true;
 }
 
+// Re-reads the parcel items, and with them the rows' own counts. The portal
+// rewrites the whole parcel container on every parcel change, so both are read
+// afresh rather than patched.
 function updateVerifiedQuantities() {
-	reservationDetails.value?.products.forEach((product) => {
-		const itemId = RVUtils.getReservationRowIndexFromItemId(product.itemId);
-		const quantity = <HTMLInputElement>document.querySelector(`input[name='VerificationReservationRows[${itemId}].VerifiedQuantity']`);
-
-		product.verifiedQuantity = parseInt(quantity.value)
-	})
+	parcelItems.value = RVUtils.getParcelItems();
+	rows.value = RVUtils.getVerificationRows();
 }
 
 function observeParcelContainer() {
@@ -107,7 +106,6 @@ function observeParcelContainer() {
 		observer.observe(parcelContainerElement, config);
 	}
 }
-
 // The parcel area is the one region of this page that cannot be part of the
 // reveal. The portal serves `#tabs-parcels` and its panes empty and fills them
 // in from `init()`, which runs on document-ready and fetches the carriers over
@@ -188,9 +186,11 @@ function processAutoComplete() {
 		RVUtils.updateMassCompleteStatus( { reservationNumber: orderNumber, status: MassCompleteStatus.started });
 		debug("Mass complete started for reservation", orderNumber);
 
-		reservationDetails.value?.products.forEach((product) => {
-			for(let i = 0; i < product.requiredQuantity; i++) {
-				document.querySelector<HTMLInputElement>("#productBarcode")!.value = product.mainBarcode;
+		// What each product still lacks, not what it asks for: a product that
+		// arrives partly scanned would otherwise be scanned past its quantity.
+		lines.value.forEach((line) => {
+			for (let i = line.verifiedQuantity; i < line.requiredQuantity; i++) {
+				document.querySelector<HTMLInputElement>("#productBarcode")!.value = line.mainBarcode;
 				document.querySelector<HTMLButtonElement>("#verifyProduct")!.click();
 			}
 		});
@@ -277,8 +277,8 @@ async function removeParcelItems(): Promise<void> {
 					</tr>
 				</thead>
 
-				<tbody v-if="showReservationDetails && reservationDetails">
-					<tr v-for="product in reservationDetails.products" :key="product.itemId">
+				<tbody v-if="showRows">
+					<tr v-for="product in lines" :key="product.key">
 						<td class="pse-cell-description">{{ product.description }}</td>
 						<td class="pse-cell-barcode">{{ product.mainBarcode }}</td>
 						<td>
@@ -308,12 +308,11 @@ async function removeParcelItems(): Promise<void> {
 				</tbody>
 
 				<!-- The same number of rows as the table above, so the real one drops
-				     in without moving anything. Shown only when the details lost the
-				     race with the boot's reveal; on a cache hit -- which is every
-				     reservation opened through the search -- the table is there from
-				     the first paint and this never renders. -->
+				     in without moving anything. Shown only while the parcels the page
+				     was opened with are being cleared, which is when the counts are
+				     changing under it; a reservation opened clean never renders it. -->
 				<tbody v-else aria-hidden="true">
-					<tr v-for="row in expectedProductCount" :key="row" class="pse-skeleton-row">
+					<tr v-for="line in lines" :key="line.key" class="pse-skeleton-row">
 						<td v-for="cell in 5" :key="cell"><span class="pse-skeleton-cell"></span></td>
 					</tr>
 				</tbody>

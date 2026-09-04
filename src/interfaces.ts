@@ -14,6 +14,37 @@ export interface ProductDetails {
 	verifiedQuantity: number,
 }
 
+// One row of the parcels page, as the portal serves it: one per picking
+// instruction, so a product picked from more than one location arrives as
+// several rows for the same `productId`, each with its own `itemId`.
+export interface VerificationRow extends ProductDetails {
+	rowIndex: string,
+	productId: string,
+	// What the instruction asked for. `requiredQuantity` is what was picked.
+	requestedQuantity: number,
+}
+
+// One product in one parcel, as the portal serves it under
+// `Items[p].Items[i]`. What has actually been scanned into a box, tied back to
+// the reservation row it was scanned against.
+export interface ParcelItem {
+	rowId: string,
+	mainBarcode: string,
+	amount: number,
+}
+
+// What the parcels table shows: the rows of one product folded together, so a
+// split pick is one line with the whole of what has to go in the box.
+export interface ProductLine {
+	key: string,
+	productId: string,
+	description: string,
+	mainBarcode: string,
+	requiredQuantity: number,
+	verifiedQuantity: number,
+	rows: VerificationRow[],
+}
+
 export enum ReservationSearchResponseType {
 	ContinueVerification = 1,
 	RefreshMain,

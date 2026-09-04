@@ -1,5 +1,5 @@
 import { GM_deleteValues, GM_getValue, GM_listValues, GM_setValue } from "$";
-import { MassCompleteEntry, ModalProductDetails, ModalReservationDetails, ProductDetails, ReservationDefinition, ReservationDetails, ReservationSearchResponseType, ReservationSelectionModalData } from "./interfaces";
+import { MassCompleteEntry, ModalProductDetails, ModalReservationDetails, ParcelItem, ProductDetails, ProductLine, ReservationDefinition, ReservationDetails, ReservationSearchResponseType, ReservationSelectionModalData, VerificationRow } from "./interfaces";
 import { CONTAINER_SELECTOR, massCompleteEntryKey, HEADER_SELECTOR, SEARCH_BLOCK_SELECTOR, PACKING_PORTAL_URL, PARCEL_CONTAINER_PARENT_SELECTOR, RESERVATION_SIDEBAR_SELECTOR, RESERVATION_SUMMARY_SELECTOR, STORAGE_KEYS } from "./constants.ts";
 import { debug } from "./logger.ts";
 import { afterReveal } from "./reveal.ts";
@@ -60,6 +60,11 @@ export function getReservationDetailsFromOverview(ReservationOverview?:HTMLFormE
 	
 	// One hidden input group per row, indexed from 0. Read the ItemId inputs to
 	// learn which indices exist rather than probing until one is missing.
+	//
+	// The quantity is `PickedQty`, what the picker actually took, not
+	// `ProductQuantity`, which is what the picking instruction asked for. The
+	// two differ when a location ran short and the rest was picked elsewhere as
+	// a further row -- see `getVerificationRows`.
 	const products:Array<ProductDetails> = Array
 		.from(target.querySelectorAll<HTMLInputElement>("input[name^='ReservationRowsNotInCarriers['][name$='].ItemId']"))
 		.map((itemIdInput) => {
@@ -72,7 +77,7 @@ export function getReservationDetailsFromOverview(ReservationOverview?:HTMLFormE
 				number: field("ProductNumber"),
 				description: field("ProductDescription"),
 				mainBarcode: field("ProductMainBarcode"),
-				requiredQuantity: Number(field("ProductQuantity").split(",").shift()),
+				requiredQuantity: parseQuantity(field("PickedQty") || field("ProductQuantity")),
 				verifiedQuantity: 0
 			};
 		});
@@ -86,6 +91,119 @@ export function getReservationDetailsFromOverview(ReservationOverview?:HTMLFormE
 // Pulls the numeric index out of a name like "ReservationRowsNotInCarriers[3].ItemId".
 function rowIndexFromName(name: string) {
 	return name.split("[").pop()!.split("]").shift()!;
+}
+
+// The portal writes quantities with a decimal part, "8,000" for eight, and
+// serves an empty value for a row that has nothing scanned yet.
+function parseQuantity(value: string | undefined) {
+	return Number((value ?? "").split(",").shift()) || 0;
+}
+
+// The reservation rows as the parcels page serves them: one hidden input group
+// per row under `VerificationReservationRows[n]`.
+//
+// A row is a picking instruction, not an order line. When a location runs
+// short the picker takes what is there and the remainder is issued as another
+// instruction -- so one product can arrive as several rows, each with its own
+// `ItemId`, the same `ProductId`, and two quantities: `ProductQuantity` is what
+// that instruction asked for and `PickedQty` is what was actually taken. Only
+// the picked ones add up to the order; the requested ones overlap, since a
+// re-issued instruction asks again for what the last one did not get.
+//
+// `VerifiedQuantity` is the portal's own scan count for the row. It is read for
+// reference, but the count shown comes from the parcel items instead -- see
+// `groupVerificationRows` for why.
+export function getVerificationRows(target: ParentNode = document): VerificationRow[] {
+	return Array
+		.from(target.querySelectorAll<HTMLInputElement>("input[name^='VerificationReservationRows['][name$='].ItemId']"))
+		.map((itemIdInput) => {
+			const index = rowIndexFromName(itemIdInput.name);
+			const field = (name: string) =>
+				target.querySelector<HTMLInputElement>(`input[name='VerificationReservationRows[${index}].${name}']`)?.value;
+
+			return {
+				rowIndex: index,
+				itemId: itemIdInput.value,
+				productId: field("ProductId") ?? "",
+				number: field("ProductNumber") ?? "",
+				description: field("ProductDescription") ?? "",
+				mainBarcode: field("ProductMainBarcode") ?? "",
+				requestedQuantity: parseQuantity(field("ProductQuantity")),
+				requiredQuantity: parseQuantity(field("PickedQty") || field("ProductQuantity")),
+				verifiedQuantity: parseQuantity(field("VerifiedQuantity"))
+			};
+		});
+}
+
+// The products scanned into parcels so far: one hidden input group per
+// product per parcel under `Items[p].Items[i]`, each naming the reservation
+// row it was scanned against and how many. A product scanned twice against the
+// same row may come as one item of two or two items of one, so callers add the
+// amounts up rather than count the items.
+export function getParcelItems(target: ParentNode = document): ParcelItem[] {
+	return Array
+		.from(target.querySelectorAll<HTMLInputElement>("input[name^='Items['][name$='].ReservationRowId']"))
+		.map((rowIdInput) => {
+			const prefix = rowIdInput.name.slice(0, -"ReservationRowId".length);
+			const field = (name: string) =>
+				target.querySelector<HTMLInputElement>(`input[name='${prefix}${name}']`)?.value;
+
+			return {
+				rowId: rowIdInput.value,
+				mainBarcode: field("ProductMainBarcode") ?? "",
+				amount: parseQuantity(field("Amount"))
+			};
+		})
+		.filter((item) => item.amount > 0);
+}
+
+// Folds the rows of one product into one line, in the order the products first
+// appear. Grouped by the product's id, with the barcode as the fallback for a
+// row served without one -- the barcode is what gets scanned, so two rows that
+// answer to the same scan belong on the same line either way.
+//
+// Required is the sum of what was picked across the rows. Scanned is the sum of
+// what sits in the parcels for those rows, which is the box itself and does not
+// depend on how the portal spreads a scan over the rows of a split product: it
+// has been seen to fill the rows one after another, and the count shown here
+// is the same whichever row a scan landed on. A parcel item is matched to its
+// line by row id, or by barcode when its row is not among these.
+export function groupVerificationRows(rows: VerificationRow[], parcelItems: ParcelItem[] = []): ProductLine[] {
+	const lines = new Map<string, ProductLine>();
+
+	rows.forEach((row) => {
+		const key = row.productId || row.mainBarcode;
+		const line = lines.get(key);
+
+		if (line) {
+			line.rows.push(row);
+			line.requiredQuantity += row.requiredQuantity;
+		}
+		else {
+			lines.set(key, {
+				key,
+				productId: row.productId,
+				description: row.description,
+				mainBarcode: row.mainBarcode,
+				requiredQuantity: row.requiredQuantity,
+				verifiedQuantity: 0,
+				rows: [row],
+			});
+		}
+	});
+
+	const all = Array.from(lines.values());
+
+	parcelItems.forEach((item) => {
+		const line = all.find((candidate) => candidate.rows.some((row) => row.itemId == item.rowId))
+			?? all.find((candidate) => candidate.mainBarcode == item.mainBarcode);
+
+		if (line) {
+			line.verifiedQuantity += item.amount;
+		}
+	});
+
+	return all;
 }
 
 export function cacheReservationDetails(reservationDetails:ReservationDetails) {
@@ -171,13 +289,6 @@ export async function fetchReservationDetails(reservationId: string):Promise<Res
 
 		return null;
 	}
-}
-
-export function getReservationRowIndexFromItemId(itemId: string) {
-	const itemIdInput = Array.from(document.querySelectorAll<HTMLInputElement>(
-		"input[name^='VerificationReservationRows['][name$='].ItemId']")).find((x) => x.value == itemId);
-
-	return itemIdInput?.getAttribute("name")?.split("VerificationReservationRows[").pop()?.split("].ItemId").shift()
 }
 
 export async function fetchReservation(url:string): Promise<string> {
