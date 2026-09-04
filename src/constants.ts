@@ -1,6 +1,6 @@
 // Values that more than one module needs to agree on.
 
-export const PACKING_PORTAL_URL = "https://retailvista.net/bztrs/packingportal";
+export const PACKING_PORTAL_URL = "https://retailvista.net/outdoor/packship";
 
 export const SHOPWARE_URL = "https://www.kampeerhalroden.nl";
 

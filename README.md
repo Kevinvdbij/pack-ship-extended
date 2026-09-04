@@ -4,7 +4,7 @@ A Tampermonkey userscript that extends the RetailVista Pack&Ship packing portal 
 improvements: cached reservation details, automatic verification and finalisation, a product overview
 with add/image buttons, mass completion of single-line reservations, and inline Shopware order notes.
 
-Runs on `https://retailvista.net/bztrs/packingportal*`.
+Runs on `https://retailvista.net/outdoor/packship*`.
 
 ## Stack
 

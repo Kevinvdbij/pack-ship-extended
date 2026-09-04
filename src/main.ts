@@ -26,31 +26,31 @@ const appendToBody = (host: HTMLDivElement) => document.body.append(host);
 // First match wins, so the catch-all search page has to come last.
 const routes: Route[] = [
 	{
-		pattern: /bztrs\/packingportal\/CompleteReservations/,
+		pattern: /outdoor\/packship\/CompleteReservations/,
 		component: CompletedPage,
 		attach: appendToBody,
 	},
 	{
-		pattern: /bztrs\/packingportal\/Parcels/,
+		pattern: /outdoor\/packship\/Parcels/,
 		component: CreateParcelsPage,
 		attach: (host) => RVUtils.getParcelContainerParent()?.insertAdjacentElement("afterbegin", host),
 	},
 	{
-		pattern: /bztrs\/packingportal\/Reservations\/Index\//,
+		pattern: /outdoor\/packship\/Reservations\/Index\//,
 		component: VerifyProductsPage,
 		attach: appendToBody,
 	},
 	{
-		pattern: /bztrs\/packingportal\/AddParcels\/Search\?ReservationNumber=/,
+		pattern: /outdoor\/packship\/AddParcels\/Search\?ReservationNumber=/,
 		matchQuery: true,
 		component: AddParcelsPage,
 		attach: appendToBody,
 	},
 	{
-		pattern: /bztrs\/packingportal\/AnnounceParcels/,
+		pattern: /outdoor\/packship\/AnnounceParcels/,
 	},
 	{
-		pattern: /bztrs\/packingportal/,
+		pattern: /outdoor\/packship/,
 		component: SearchReservationsPage,
 		attach: (host) => RVUtils.getContainer()?.append(host),
 	},

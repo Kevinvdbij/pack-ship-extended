@@ -153,7 +153,7 @@ export async function fetchReservation(url:string): Promise<string> {
 export async function reservationSearchRequest(formData: string): Promise<string> {
 	return new Promise((resolve) => {
 		$.ajax({
-			url: "/bztrs/packingportal/Reservations/Search",
+			url: "/outdoor/packship/Reservations/Search",
 			type: "GET",
 			data: formData,
 			success: function(data: string) {
@@ -189,7 +189,7 @@ export function skipVerification(target:HTMLElement) {
 		.forEach((collected) => collected.value = "true");
 
 	const form = target.querySelector("#ReservationOverview") as HTMLFormElement;
-	form.action = "/bztrs/packingportal/Reservations/Update";
+	form.action = "/outdoor/packship/Reservations/Update";
 	form.submit();
 }
 
