@@ -4,6 +4,11 @@ A Tampermonkey userscript that extends the RetailVista Pack&Ship packing portal 
 improvements: cached reservation details, automatic verification and finalisation, a product overview
 with add/image buttons, mass completion of single-line reservations, and inline Shopware order notes.
 
+The environment ("Omgeving") picker is configured per computer rather than per session. The portal
+keeps that choice on the user session, so someone logging in carries the previous workplace along and
+prints at the wrong location. Pinning it in the settings modal hides the portal's dropdown and pushes
+the configured value back into the session on every page load.
+
 Runs on `https://retailvista.net/outdoor/packship*`.
 
 ## Stack
@@ -39,7 +44,9 @@ npm run build
 | `src/vue/components/` | Shared UI (selection modal, Shopware note, footer, modals) |
 | `src/retailVistaUtils.ts` | DOM scraping and requests against the portal |
 | `src/shopware.ts` | Shopware Admin/Store API client |
-| `src/settings.ts` | Settings persisted through `GM_setValue` |
+| `src/settings.ts` | Settings persisted through `GM_setValue`, edited in the footer's settings modal |
+| `src/environment.ts` | Pins the portal's environment ("Omgeving") to the machine |
+| `src/currentUser.ts` | Name of the logged-in employee, captured on the Login page and shown in the footer |
 
 ## Editor setup
 

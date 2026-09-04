@@ -1,4 +1,4 @@
-import { GM_getValue } from "$";
+import { GM_getValue, GM_setValue } from "$";
 import { SHOPWARE_URL, STORAGE_KEYS } from "./constants.ts";
 import { debug } from "./logger.ts";
 
@@ -20,6 +20,33 @@ export interface ShopwareOrderEntry {
 
 export interface ShopwareSearchResponse {
 	data: ShopwareOrderEntry[];
+}
+
+export interface ShopwareCredentials {
+	clientId: string;
+	clientSecret: string;
+}
+
+// The integration's client credentials. Kept out of the script itself so the
+// secret lives only in the browser profile it was entered on.
+export function getCredentials(): ShopwareCredentials {
+	return {
+		clientId: GM_getValue(STORAGE_KEYS.swClientId, ""),
+		clientSecret: GM_getValue(STORAGE_KEYS.swClientSecret, ""),
+	};
+}
+
+export function setCredentials(credentials: ShopwareCredentials) {
+	GM_setValue(STORAGE_KEYS.swClientId, credentials.clientId.trim());
+	GM_setValue(STORAGE_KEYS.swClientSecret, credentials.clientSecret.trim());
+
+	debug("Stored Shopware client credentials.");
+}
+
+export function hasCredentials(): boolean {
+	const credentials = getCredentials();
+
+	return credentials.clientId.length > 0 && credentials.clientSecret.length > 0;
 }
 
 // Public storefront key, safe to ship with the script.
@@ -68,6 +95,16 @@ export async function shopwareInitialize(): Promise<ShopwareToken> {
 }
 
 export async function getToken(): Promise<ShopwareToken> {
+	if (!hasCredentials()) {
+		throw new Error("No Shopware client credentials configured. Set them in the Pack&Ship Extended settings.");
+	}
+
+	return requestToken(getCredentials());
+}
+
+// Asks Shopware for a token with the credentials handed in rather than the
+// stored ones, so a pair can be checked before it is written to the store.
+export async function requestToken(credentials: ShopwareCredentials): Promise<ShopwareToken> {
 	const url = `${SHOPWARE_URL}/api/oauth/token`;
 
 	const options = {
@@ -78,8 +115,8 @@ export async function getToken(): Promise<ShopwareToken> {
 		},
 		body: JSON.stringify({
 			grant_type: "client_credentials",
-			client_id: GM_getValue(STORAGE_KEYS.swClientId),
-			client_secret: GM_getValue(STORAGE_KEYS.swClientSecret)
+			client_id: credentials.clientId.trim(),
+			client_secret: credentials.clientSecret.trim()
 		}),
 	}
 

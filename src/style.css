@@ -19,10 +19,12 @@
 	transform: scaleY(0);
 }
 
-/* <Transition name="modal"> -- fades without the vertical collapse. */
+/* <Transition name="modal"> -- a plain fade of the backdrop. Scaling a
+ * full-screen overlay reads as the dimmed page stretching, so the movement
+ * belongs to the panel inside it, not to this element. */
 .modal-enter-active,
 .modal-leave-active {
-	transition: opacity 0.25s ease, transform 0.1s ease;
+	transition: opacity 0.2s ease;
 }
 
 .modal-enter-from,
@@ -129,6 +131,21 @@
 	}
 
 	100% {
+		opacity: 1;
+	}
+}
+
+/* Shared by anything that appears in space already reserved for it: the
+ * environment field in the footer, the reservation table over its skeleton.
+ * Opacity only -- these all fade in where they already are, so there is
+ * nothing to move.
+ */
+@keyframes pse-fade-in {
+	from {
+		opacity: 0;
+	}
+
+	to {
 		opacity: 1;
 	}
 }

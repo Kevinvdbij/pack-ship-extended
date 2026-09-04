@@ -1,14 +1,18 @@
 import { GM_deleteValues, GM_getValue, GM_listValues, GM_setValue } from "$";
 import { MassCompleteEntry, ModalProductDetails, ModalReservationDetails, ProductDetails, ReservationDefinition, ReservationDetails, ReservationSearchResponseType, ReservationSelectionModalData } from "./interfaces";
-import { massCompleteEntryKey, PACKING_PORTAL_URL, RESERVATION_SUMMARY_SELECTOR, STORAGE_KEYS } from "./constants.ts";
+import { CONTAINER_SELECTOR, massCompleteEntryKey, SEARCH_BLOCK_SELECTOR, PACKING_PORTAL_URL, PARCEL_CONTAINER_PARENT_SELECTOR, RESERVATION_SUMMARY_SELECTOR, STORAGE_KEYS } from "./constants.ts";
 import { debug } from "./logger.ts";
 
 export function getContainer():Element | null {
-	return document.querySelector(".container");
+	return document.querySelector(CONTAINER_SELECTOR);
+}
+
+export function getSearchBlock():Element | null {
+	return document.querySelector(SEARCH_BLOCK_SELECTOR);
 }
 
 export function getParcelContainerParent():Element | null {
-	return document.querySelector("#ReservationOverview > div:nth-child(2) > div.col-9")
+	return document.querySelector(PARCEL_CONTAINER_PARENT_SELECTOR)
 }
 
 export function getReservationDetailsFromOverview(ReservationOverview?:HTMLFormElement):ReservationDetails| null {

@@ -14,21 +14,29 @@ import * as Shopware from "../../shopware.ts";
 
 const showReservationDetails = ref(false);
 
+// The portal already renders one verified-quantity input per reservation row,
+// so the number of products is known from its markup before ours has any data.
+// That makes the skeleton the same height as the table replacing it, so filling
+// it in moves nothing on the page -- a second paint that shifts no existing
+// content is the closest a fetch-driven block can get to not flickering.
+const expectedProductCount = document.querySelectorAll(
+	"input[name^='VerificationReservationRows'][name$='.VerifiedQuantity']"
+).length;
+
 let reservationDetails = ref<ReservationDetails>();
 const showImageModal = ref(false);
 const imageModalUrl = ref("");
 
 onMounted(() => {
-	getReservationDetails().then(() => {
-
-		removeParcelItems().then(() => {
+	getReservationDetails()
+		.then(() => removeParcelItems())
+		.then(() => {
 			updateVerifiedQuantities();
 			showReservationDetails.value = true;
 
 			processAutoComplete();
 			observeParcelContainer();
 		});
-	});
 
 	setupSummary();
 	
@@ -194,73 +202,123 @@ async function removeParcelItems(): Promise<void> {
 				@close="showImageModal = false;" />
 		</Transition>
 	</Teleport>
-	<Transition>
-		<div v-if="showReservationDetails && reservationDetails" id="ReservationContainer">
-			<div class="reservation">
-				<h4>Producten</h4>
-				<div class="container my-2">
-					<div class="row">
-						<div class="col">
-							<table class="table">
-								<tbody>
+	<div v-if="showReservationDetails && reservationDetails" id="ReservationContainer" class="details-fade">
+		<div class="reservation">
+			<h4>Producten</h4>
+			<div class="container my-2">
+				<div class="row">
+					<div class="col">
+						<table class="table">
+							<tbody>
+								<tr>
+									<th>Omschrijving</th>
+									<th>Hoofd barcode</th>
+									<th>Gescand</th>
+									<th>Verzameld</th>
+									<th>Actie</th>
+								</tr>
+								<template v-for="product in reservationDetails?.products">
 									<tr>
-										<th>Omschrijving</th>
-										<th>Hoofd barcode</th>
-										<th>Gescand</th>
-										<th>Verzameld</th>
-										<th>Actie</th>
+										<td>
+											<span>{{ product.description }}</span>
+										</td>
+										<td>
+											<span>{{ product.mainBarcode }}</span>
+										</td>
+										<td>
+											<span
+												:class="verifiedClass(product.requiredQuantity, product.verifiedQuantity)">{{
+													product.verifiedQuantity }} van {{ product.requiredQuantity
+												}}</span>
+										</td>
+										<td>
+											<span v-if="product.verifiedQuantity < product.requiredQuantity"
+												class="text-warning"><span
+													class="material-icons">close</span></span>
+											<span v-if="product.verifiedQuantity >= product.requiredQuantity"
+												class="text-success"><span class="material-icons">done</span></span>
+										</td>
+										<td>
+											<div style="display: inline-flex; gap: 5px;">
+												<button @click="onClickAddProduct(product.mainBarcode)"
+													type="button" class="btn btn-primary action-icon"
+													v-bind:disabled="product.verifiedQuantity >= product.requiredQuantity">
+													<img class="action-icon-image" :src="addIconUrl" width="26"
+														height="26" />
+												</button>
+												<button @click="onClickShowImage(product.mainBarcode)"
+													type="button" class="btn btn-primary action-icon">
+													<img class="action-icon-image" :src="imageIconUrl" width="26"
+														height="26" />
+												</button>
+											</div>
+										</td>
 									</tr>
-									<template v-for="product in reservationDetails?.products">
-										<tr>
-											<td>
-												<span>{{ product.description }}</span>
-											</td>
-											<td>
-												<span>{{ product.mainBarcode }}</span>
-											</td>
-											<td>
-												<span
-													:class="verifiedClass(product.requiredQuantity, product.verifiedQuantity)">{{
-														product.verifiedQuantity }} van {{ product.requiredQuantity
-													}}</span>
-											</td>
-											<td>
-												<span v-if="product.verifiedQuantity < product.requiredQuantity"
-													class="text-warning"><span
-														class="material-icons">close</span></span>
-												<span v-if="product.verifiedQuantity >= product.requiredQuantity"
-													class="text-success"><span class="material-icons">done</span></span>
-											</td>
-											<td>
-												<div style="display: inline-flex; gap: 5px;">
-													<button @click="onClickAddProduct(product.mainBarcode)"
-														type="button" class="btn btn-primary action-icon"
-														v-bind:disabled="product.verifiedQuantity >= product.requiredQuantity">
-														<img class="action-icon-image" :src="addIconUrl" width="26"
-															height="26" />
-													</button>
-													<button @click="onClickShowImage(product.mainBarcode)"
-														type="button" class="btn btn-primary action-icon">
-														<img class="action-icon-image" :src="imageIconUrl" width="26"
-															height="26" />
-													</button>
-												</div>
-											</td>
-										</tr>
-									</template>
-								</tbody>
-							</table>
-							<div class="mt-2 alert alert-info">Om producten te verzamelen, scan of voer de barcode in
-							</div>
+								</template>
+							</tbody>
+						</table>
+						<div class="mt-2 alert alert-info">Om producten te verzamelen, scan of voer de barcode in
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-	</Transition>
+	</div>
+	<!-- Same outer structure and the same number of rows as the table above, so
+	     the real one drops in without moving anything. Shown only when the
+	     details lost the race with the boot's reveal; on a cache hit the table
+	     is there from the first paint and this never renders. -->
+	<div v-else id="ReservationContainer" aria-hidden="true">
+		<div class="reservation">
+			<h4>Producten</h4>
+			<div class="container my-2">
+				<div class="row">
+					<div class="col">
+						<table class="table">
+							<tbody>
+								<tr>
+									<th>Omschrijving</th>
+									<th>Hoofd barcode</th>
+									<th>Gescand</th>
+									<th>Verzameld</th>
+									<th>Actie</th>
+								</tr>
+								<tr v-for="row in expectedProductCount" :key="row" class="skeleton-row">
+									<td v-for="cell in 5" :key="cell"><span class="skeleton-cell"></span></td>
+								</tr>
+							</tbody>
+						</table>
+						<div class="mt-2 alert alert-info">Om producten te verzamelen, scan of voer de barcode in
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
 </template>
 
 <style scoped>
+/* The skeleton already holds the space, so this only fades the content in --
+   no collapse or grow, which would move the page the skeleton exists to keep
+   still. */
+.details-fade {
+	animation: pse-fade-in 0.25s ease-out;
+}
+
+/* The action buttons are what set a row's height, so the skeleton's cells match
+   their box rather than the text next to them. */
+.skeleton-row td {
+	height: 52px;
+	vertical-align: middle;
+}
+
+.skeleton-cell {
+	display: block;
+	height: 16px;
+	border-radius: 4px;
+	background-color: #EFF6F3;
+}
+
 .container {
 	margin-right: 0px;
 	margin-left: 0px;
