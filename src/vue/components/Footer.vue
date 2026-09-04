@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref, Teleport, Transition } from 'vue';
+import { ref, Teleport, Transition } from 'vue';
 import Modal from "../components/SettingsModal.vue";
 import CredentialsPrompt from "../components/CredentialsPrompt.vue";
 import pkg from "../../../package.json";
@@ -9,7 +9,6 @@ import { getCurrentUser, onCurrentUserChange } from '../../currentUser.ts';
 import { FOOTER_SLOT_SELECTOR } from '../../constants.ts';
 import { hasCredentials } from '../../shopware.ts';
 
-const show = ref(false);
 const showModal = ref(false);
 
 const masterSwitch = ref(Settings.autoMasterSwitch);
@@ -25,9 +24,6 @@ const showCredentialsPrompt = ref(!hasCredentials());
 const currentUser = ref(getCurrentUser());
 onCurrentUserChange((user) => currentUser.value = user);
 
-onMounted(() => {
-	show.value = true;
-});
 
 // Picked up again after the modal saves, which may have flipped it. 
 function syncMasterSwitch() {
@@ -52,23 +48,15 @@ function masterSwitchToggle() {
 	     the first try, and it is mounted as soon as the footer slot is parsed
 	     rather than at DOM-ready. -->
 	<Teleport :to="FOOTER_SLOT_SELECTOR">
-		<Transition>
-			<button v-if="show" type="button" class="toggle-button" @click="masterSwitchToggle()">
-				<img :src="powerIconUrl" :class="masterSwitch ? 'power-button-icon-on' : 'power-button-icon-off'" />
-			</button>
-		</Transition>
-		<Transition>
-			<div v-if="show && currentUser" class="col ml-2 current-user" :title="`Ingelogd sinds ${new Date(currentUser.loggedInAt).toLocaleString('nl-NL')}`">
-				Ingelogd als <b>{{ currentUser.userName }}</b>
-			</div>
-		</Transition>
-		<Transition>
-			<div v-if="show" class="col ml-2">Pack&Ship Extended Versie {{ pkg.version }}</div>
-		</Transition>
-		<Transition>
-			<button v-if="show" type="button" class="nav-link btn btn-link remove-padding col ml-3"
-				@click="showModal = true;">Instellingen</button>
-		</Transition>
+		<button type="button" class="toggle-button" @click="masterSwitchToggle()">
+			<img :src="powerIconUrl" :class="masterSwitch ? 'power-button-icon-on' : 'power-button-icon-off'" />
+		</button>
+		<div v-if="currentUser" class="col ml-2 current-user" :title="`Ingelogd sinds ${new Date(currentUser.loggedInAt).toLocaleString('nl-NL')}`">
+			Ingelogd als <b>{{ currentUser.userName }}</b>
+		</div>
+		<div class="col ml-2">Pack&Ship Extended Versie {{ pkg.version }}</div>
+		<button type="button" class="nav-link btn btn-link remove-padding col ml-3"
+			@click="showModal = true;">Instellingen</button>
 	</Teleport>
 
 	<Teleport to="body">

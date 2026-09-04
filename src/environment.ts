@@ -26,7 +26,7 @@ export interface EnvironmentOption {
 // eligible to be painted: not during the parse, not on a slow load, not between
 // our replacing it and anything else running.
 //
-// The rule is better still if it is duplicated in the Stylus theme:
+// The rule belongs in the Stylus theme as well:
 //
 //     select#EnviromentId { display: none !important; }
 //
@@ -41,28 +41,14 @@ export interface EnvironmentOption {
 //
 // Hidden rather than disabled, either way: a disabled control is left out of the
 // serialized form, and that form is what carries the value to the portal.
-// Put on the field once our label is in it, which is what triggers the fade.
-const READY_CLASS = "pse-environment-ready";
-
 let pickerStyle: HTMLStyleElement | undefined;
 
-// Two rules, doing different jobs. The dropdown is taken out of the layout for
-// good, because it is never coming back on this page. The field around it --
-// the portal's "Omgeving:" label and the value beside it -- is only made
-// invisible, so it still occupies its space: the footer is laid out once, and
-// the field fades in where it already was instead of appearing and shoving the
-// row around.
+// Only the dropdown, and only ever hidden: it is never coming back on a page
+// where an environment is configured. The field around it needs no gating of
+// its own -- the page is not shown until the boot has finished, so the label is
+// always in place by the time anything is on screen.
 export function hideEnvironmentPicker() {
-	setPickerStyle(`
-		${ENVIRONMENT_SELECT_SELECTOR} { display: none !important; }
-
-		${ENVIRONMENT_FORM_SELECTOR} { visibility: hidden !important; }
-
-		${ENVIRONMENT_FORM_SELECTOR}.${READY_CLASS} {
-			visibility: visible !important;
-			animation: pse-fade-in 0.25s ease-out;
-		}
-	`);
+	setPickerStyle(`${ENVIRONMENT_SELECT_SELECTOR} { display: none !important; }`);
 }
 
 function setPickerStyle(rule: string) {
@@ -82,11 +68,7 @@ function setPickerStyle(rule: string) {
 // even when something outside the script -- the Stylus theme carrying the same
 // rule -- is what is hiding it.
 export function showEnvironmentPicker() {
-	setPickerStyle(`
-		${ENVIRONMENT_SELECT_SELECTOR} { display: inline-block !important; }
-
-		${ENVIRONMENT_FORM_SELECTOR} { visibility: visible !important; }
-	`);
+	setPickerStyle(`${ENVIRONMENT_SELECT_SELECTOR} { display: inline-block !important; }`);
 }
 
 export function getEnvironmentSelect(): HTMLSelectElement | null {
@@ -200,7 +182,6 @@ function syncEnvironmentPicker(select: HTMLSelectElement, environmentId: number)
 
 	if (!(environmentId > 0)) {
 		showEnvironmentPicker();
-		container.classList.remove(READY_CLASS);
 		label?.remove();
 
 		return;
@@ -220,6 +201,4 @@ function syncEnvironmentPicker(select: HTMLSelectElement, environmentId: number)
 
 	label.textContent = environmentLabel(environmentId);
 
-	// Last, so the field fades in complete rather than mid-swap.
-	container.classList.add(READY_CLASS);
 }

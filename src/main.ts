@@ -13,6 +13,7 @@ import Settings from "./settings.ts"
 import { applyConfiguredEnvironment, getEnvironmentSelect, hideEnvironmentPicker, lockEnvironmentPicker } from './environment.ts';
 import { applyDutchLanguage, hideLanguagePicker } from './language.ts';
 import { FOOTER_SLOT_SELECTOR } from './constants.ts';
+import { armReveal, reveal } from './reveal.ts';
 import "./style.css";
 import "vue3-toastify/dist/index.css";
 
@@ -96,10 +97,21 @@ const pathWithQuery = path + window.location.search;
 
 const route = routes.find((candidate) => candidate.pattern.test(candidate.matchQuery ? pathWithQuery : path));
 
-lockPicker();
-lockLanguage();
-mountFooter();
-boot();
+// Armed first, before anything that can fail: the theme hides the page whether
+// or not the rest of this runs, so something has to be guaranteed to show it.
+armReveal();
+
+// Each of these waits on a different piece of the portal's markup, so they run
+// concurrently and the page is shown once the last of them is done. None of
+// them waits on the network: work that does renders a skeleton and fills it in
+// after the reveal, because holding the whole page on a request is reliably
+// worse than a region that arrives late.
+Promise.all([lockPicker(), lockLanguage(), mountFooter(), boot()])
+	.catch((error) => console.error("Pack&Ship Extended failed to start.", error))
+	// One more frame for Vue to flush what the mounts queued, so the page is
+	// shown finished rather than mid-render.
+	.then(() => nextTick())
+	.then(reveal);
 
 // Takes the portal's environment dropdown off the page before the parser has
 // reached it, and puts our label in its place once it has.
@@ -185,6 +197,6 @@ async function boot() {
 
 		await nextTick();
 	} catch (error) {
-		console.error("Pack&Ship Extended failed to start.", error);
+		console.error("Pack&Ship Extended failed to mount.", error);
 	}
 }

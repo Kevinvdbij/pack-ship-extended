@@ -202,7 +202,7 @@ async function removeParcelItems(): Promise<void> {
 				@close="showImageModal = false;" />
 		</Transition>
 	</Teleport>
-	<div v-if="showReservationDetails && reservationDetails" id="ReservationContainer" class="details-fade">
+	<div v-if="showReservationDetails && reservationDetails" id="ReservationContainer">
 		<div class="reservation">
 			<h4>Producten</h4>
 			<div class="container my-2">
@@ -298,13 +298,6 @@ async function removeParcelItems(): Promise<void> {
 </template>
 
 <style scoped>
-/* The skeleton already holds the space, so this only fades the content in --
-   no collapse or grow, which would move the page the skeleton exists to keep
-   still. */
-.details-fade {
-	animation: pse-fade-in 0.25s ease-out;
-}
-
 /* The action buttons are what set a row's height, so the skeleton's cells match
    their box rather than the text next to them. */
 .skeleton-row td {

@@ -135,17 +135,3 @@
 	}
 }
 
-/* Shared by anything that appears in space already reserved for it: the
- * environment field in the footer, the reservation table over its skeleton.
- * Opacity only -- these all fade in where they already are, so there is
- * nothing to move.
- */
-@keyframes pse-fade-in {
-	from {
-		opacity: 0;
-	}
-
-	to {
-		opacity: 1;
-	}
-}

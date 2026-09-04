@@ -5,7 +5,6 @@ import Modal from "../components/ReservationSelectionModal.vue";
 import * as RVUtils from "../../retailVistaUtils.ts";
 import { PACKING_PORTAL_URL } from "../../constants.ts";
 
-const show = ref(false);
 const showModal = ref(false);
 
 const modalData = ref<ReservationSelectionModalData>();
@@ -13,7 +12,6 @@ const lastOpenReservation = ref(RVUtils.getLastOpenReservation());
 const lastCompletedReservation = ref(RVUtils.getLastCompletedReservation());
 
 onMounted(() => {
-	show.value = true;
 	RVUtils.focusBarcodeInput();
 });
 
@@ -91,36 +89,34 @@ function openReservation(url: string) {
 				@open="(reservationId: string) => openReservation(reservationId)" />
 		</Transition>
 	</Teleport>
-	<Transition>
-		<div class="extension-container" v-if="show">
-			<div class="row justify-content-md-center">
-				<div class="col-12 mx-5">
-					<div class="row justify-content-md-center extension-content">
-						<div class="col-md-5">
-							<div class="form-group pt-3">
-								<button type="submit" class="btn btn-primary btn-block" :disabled="!lastOpenReservation ||
-									lastOpenReservation.id == '' ||
-									lastCompletedReservation && lastOpenReservation.id == lastCompletedReservation.id"
-									@click="reopenReservation(lastOpenReservation.id)">Laatst geopende
-									reservering</button>
-							</div>
+	<div class="extension-container">
+		<div class="row justify-content-md-center">
+			<div class="col-12 mx-5">
+				<div class="row justify-content-md-center extension-content">
+					<div class="col-md-5">
+						<div class="form-group pt-3">
+							<button type="submit" class="btn btn-primary btn-block" :disabled="!lastOpenReservation ||
+								lastOpenReservation.id == '' ||
+								lastCompletedReservation && lastOpenReservation.id == lastCompletedReservation.id"
+								@click="reopenReservation(lastOpenReservation.id)">Laatst geopende
+								reservering</button>
 						</div>
-						<div class="col-md-1 p-2">
-							<div class="vr" style="height:100%;"></div>
-						</div>
-						<div class="col-md-5">
-							<div class="form-group pt-3">
-								<button type="submit" class="btn btn-primary btn-block"
-									:disabled="!lastCompletedReservation || lastCompletedReservation.id == ''"
-									@click="openAddParcels(lastCompletedReservation.number)">Laatst voltooide
-									reservering</button>
-							</div>
+					</div>
+					<div class="col-md-1 p-2">
+						<div class="vr" style="height:100%;"></div>
+					</div>
+					<div class="col-md-5">
+						<div class="form-group pt-3">
+							<button type="submit" class="btn btn-primary btn-block"
+								:disabled="!lastCompletedReservation || lastCompletedReservation.id == ''"
+								@click="openAddParcels(lastCompletedReservation.number)">Laatst voltooide
+								reservering</button>
 						</div>
 					</div>
 				</div>
 			</div>
 		</div>
-	</Transition>
+	</div>
 </template>
 
 <style scoped>
