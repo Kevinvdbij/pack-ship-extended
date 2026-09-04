@@ -1,0 +1,71 @@
+/* ---- The select dropdown's scrollbar ---- *
+ * Split out of `src/style.css`, and imported as raw text by `src/main.ts`
+ * rather than as a stylesheet, for one reason: lightningcss -- the minifier the
+ * build runs every other stylesheet through -- fails outright on
+ * `::picker(select)::-webkit-scrollbar`, and takes the whole build down with
+ * it. Text it never parses is text it cannot refuse.
+ *
+ * What it draws: Chrome's default scrollbar in the picker is the wide one with
+ * a stepper button at each end, drawn hard against the panel's inner edge -- so
+ * it ran the full height straight through both rounded corners and put two
+ * little arrows in a card that has no other chrome on it. A thumb on an empty
+ * track instead: the transparent border with `background-clip` insets it from
+ * the edge, and the margin on the track holds it clear of the corners at either
+ * end.
+ *
+ * The `::-webkit-` pseudo-elements rather than `scrollbar-width` and
+ * `scrollbar-color`: they cannot be mixed -- Chrome drops these the moment the
+ * standard properties are set on the same element -- and the standard pair can
+ * neither inset the thumb nor hold it off the corners, which is the whole point
+ * of the exercise.
+ *
+ * Spelled out flat, one selector per rule. Chrome matches a
+ * `::-webkit-scrollbar` chained onto `::picker(select)` only written this way:
+ * the same thing nested as `&::-webkit-scrollbar` inside the picker's own rule
+ * parses, survives the build and then matches nothing, because nesting resolves
+ * the parent into an `:is()` that a pseudo-element cannot live in.
+ *
+ * The values track `src/style.css`: `--pse-line` for the thumb, `--pse-ink-faint`
+ * on hover, and a track margin a little over the picker's 14px corner radius.
+ */
+@supports (appearance: base-select) {
+	select.pse-dialog-input::picker(select)::-webkit-scrollbar {
+		width: 11px;
+	}
+
+	select.pse-dialog-input::picker(select)::-webkit-scrollbar-track {
+		margin: 10px 0;
+		background: transparent;
+	}
+
+	select.pse-dialog-input::picker(select)::-webkit-scrollbar-thumb {
+		border: 3px solid transparent;
+		border-radius: 999px;
+		background-color: var(--pse-line);
+		background-clip: content-box;
+	}
+
+	select.pse-dialog-input::picker(select)::-webkit-scrollbar-thumb:hover {
+		background-color: var(--pse-ink-faint);
+	}
+
+	:root #editParcelModal .modal-body select::picker(select)::-webkit-scrollbar {
+		width: 11px;
+	}
+
+	:root #editParcelModal .modal-body select::picker(select)::-webkit-scrollbar-track {
+		margin: 10px 0;
+		background: transparent;
+	}
+
+	:root #editParcelModal .modal-body select::picker(select)::-webkit-scrollbar-thumb {
+		border: 3px solid transparent;
+		border-radius: 999px;
+		background-color: var(--pse-line);
+		background-clip: content-box;
+	}
+
+	:root #editParcelModal .modal-body select::picker(select)::-webkit-scrollbar-thumb:hover {
+		background-color: var(--pse-ink-faint);
+	}
+}

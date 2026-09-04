@@ -22,6 +22,11 @@ import { pinFooter } from './stickyFooter.ts';
 import "./styles/portal.css";
 import "./style.css";
 import "vue3-toastify/dist/index.css";
+// The one sheet that has to go up by hand: see the file for why the build's CSS
+// pipeline cannot carry it. Last, so it sits after `style.css` the way it would
+// have if it were still part of it, and onto `documentElement` rather than
+// `head`, which does not exist yet at document-start.
+import pickerScrollbarCss from "./styles/pickerScrollbar.css?raw";
 
 interface Route {
 	pattern: RegExp;
@@ -45,6 +50,10 @@ interface Route {
 	// its own minimal footer instead -- see `LoginPage.vue`.
 	bareLayout?: boolean;
 }
+
+const pickerScrollbarStyle = document.createElement("style");
+pickerScrollbarStyle.textContent = pickerScrollbarCss;
+document.documentElement.append(pickerScrollbarStyle);
 
 const appendToBody = (host: HTMLDivElement) => document.body.append(host);
 

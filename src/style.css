@@ -301,6 +301,9 @@ select.pse-dialog-input {
 
 	select.pse-dialog-input::picker-icon,
 	:root #editParcelModal .modal-body select::picker-icon {
+		/* The control is a flex row of value and arrow, so without this the
+		   arrow follows the value instead of holding the right-hand end. */
+		margin-left: auto;
 		color: var(--pse-ink-soft);
 		transition: transform 0.15s ease;
 	}
@@ -324,45 +327,8 @@ select.pse-dialog-input {
 		box-shadow: 0 1px 2px rgba(20, 48, 33, 0.06), 0 18px 44px -20px rgba(11, 26, 18, 0.45);
 	}
 
-	/* And its scrollbar, once the list is long enough to need one.
-	 *
-	 * A scroll container puts the bar hard against its own inner edge, so the
-	 * browser's default ran the full height of the panel and straight through
-	 * both rounded corners -- a square bar in a round box. Drawn as a thumb on
-	 * an empty track instead: the transparent border with `background-clip`
-	 * insets it from the edge, and the margin on the track keeps it clear of the
-	 * corners at either end.
-	 *
-	 * The `::-webkit-` pseudo-elements rather than `scrollbar-width` and
-	 * `scrollbar-color`: they cannot be mixed -- Chrome drops these the moment
-	 * the standard properties are set on the same element -- and the standard
-	 * pair cannot inset the thumb, which is the whole problem here.
-	 *
-	 * Nested rather than written flat, because the build's CSS minifier refuses
-	 * to parse a `::-webkit-scrollbar` chained onto `::picker(select)`.
-	 */
-	select.pse-dialog-input::picker(select),
-	:root #editParcelModal .modal-body select::picker(select) {
-		&::-webkit-scrollbar {
-			width: 11px;
-		}
-
-		&::-webkit-scrollbar-track {
-			margin: 8px 0;
-			background: transparent;
-		}
-
-		&::-webkit-scrollbar-thumb {
-			border: 3px solid transparent;
-			border-radius: 999px;
-			background-color: var(--pse-line);
-			background-clip: content-box;
-		}
-
-		&::-webkit-scrollbar-thumb:hover {
-			background-color: var(--pse-ink-faint);
-		}
-	}
+	/* Its scrollbar is not here: see `src/styles/pickerScrollbar.css`, which
+	   cannot go through the build's CSS pipeline. */
 
 	select.pse-dialog-input option,
 	:root #editParcelModal .modal-body select option {
@@ -421,6 +387,14 @@ select.pse-dialog-input {
 	gap: 22px;
 }
 
+/* See `.pse-footer-row` below for both of these: the cell wraps for the same
+   reason the row does, and its row gap is the same 10px of bar overhang plus
+   the gap that should be seen. */
+.pse-footer-cell {
+	flex-wrap: wrap;
+	row-gap: 20px;
+}
+
 /* The logout control is the portal's own element, so its colour belongs to
    `src/styles/portal.css`. Its focus ring is here instead, because the reason
    for suppressing it is ours: Bootstrap sizes that ring for a filled button and
@@ -470,31 +444,55 @@ select.pse-dialog-input {
 	gap: 6px 22px;
 }
 
-/* Narrow enough and the row's cells stop fitting side by side and stack. The
-   band is then two lines tall whatever we do, so the rules that were keeping it
-   to one line stop being worth their cost: the cells are given room to breathe
-   instead of being held tight against each other. */
-@media (max-width: 991px) {
-	.pse-footer-row {
-		flex-wrap: wrap;
-		row-gap: 10px;
-	}
+/* The row's cells stack the moment they stop fitting side by side, which is
+   Bootstrap's `.row` wrapping and not a breakpoint: it happens at whatever
+   width this footer's own text runs out of room at, and on a 1030px window that
+   is well above the 991px the stacked layout used to be written under. So the
+   spacing that the stacked band needs is unconditional -- a row gap does
+   nothing at all while the row is one line -- and only the alignment, which has
+   to be one thing or the other, is left to a query.
 
-	.pse-footer-cell {
-		flex-wrap: wrap;
-		gap: 10px 18px;
-	}
+   22px rather than the 12px it looks like: our bar hangs 5px past its line box
+   at each end (see `Footer.vue`), so a gap measured between line boxes is 10px
+   larger than the gap between the things drawn in them. Without it the vendor's
+   build line ran into the bar's capsule. */
+.pse-footer-row {
+	row-gap: 22px;
+}
 
-	/* Stacked, the right-hand cell is no longer on the right: left-aligned with
-	   the rest rather than stranded under the far end of a row that is not
-	   there any more. */
+/* Stacked, the cells read as lines of a block, and a block whose lines do not
+   share a left edge reads as broken. They do not by default: the vendor nests
+   the logout control in a row and column of its own inside this cell and puts
+   Bootstrap's `ml-2` on it, which is invisible while the cell is a strip laid
+   out end to end and is a 6.5px step the moment it is the first thing on a line
+   of its own. */
+.pse-footer-cell > .row > .col.ml-2 {
+	margin-left: 0 !important;
+}
+
+/* The one thing that cannot be left to hold in both layouts. Side by side, this
+   cell is the right-hand end of the row and its text is set against the right
+   edge; stacked, it is a line of its own and belongs at the left with
+   everything else. There is no way to ask CSS whether a flex line wrapped, so
+   the switch is a width -- Bootstrap's `xl`, which is the first breakpoint
+   above the ~1190px this row's content actually needs. */
+@media (max-width: 1199.98px) {
 	.pse-footer-end {
 		justify-content: flex-start;
-		flex-wrap: wrap;
-		gap: 4px 16px;
 	}
 }
 
+/* Narrower still and this cell runs out of room for its own two items. It is
+   allowed to break into two lines only here: given room to wrap at any width it
+   takes it, and the build line and the environment stack on a band that had
+   space for them side by side. They are given a little less air than there is
+   between the cells above, so the two still read as one block. */
+@media (max-width: 991px) {
+	.pse-footer-end {
+		flex-wrap: wrap;
+		gap: 6px 16px;
+	}
+}
 
 /* ---- Replaced portal regions ---- *
  * A region whose markup we have taken over: its useful parts have been moved

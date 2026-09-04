@@ -176,10 +176,4 @@ function save() {
 	-webkit-text-security: disc;
 	text-security: disc;
 }
-
-/* A select is not sized by the shared field rule's padding the way an input is,
-   and it needs room for the arrow the browser draws. */
-select.pse-dialog-input {
-	padding-right: 34px;
-}
 </style>

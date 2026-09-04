@@ -388,15 +388,6 @@ function masterSwitchToggle() {
 	.pse-bar:not(.is-minimal) .pse-brand {
 		display: none;
 	}
-
-	/* The pull-in only earns its keep while the band is one line tall and the
-	   bar is what would make it taller. Once the cells stack, the surplus it
-	   hides is surplus the row above and below actually needs, and the bar
-	   crowds them instead. */
-	.pse-bar {
-		margin-top: 0;
-		margin-bottom: 0;
-	}
 }
 
 @media (max-width: 767px) {
