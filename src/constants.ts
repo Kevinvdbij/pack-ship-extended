@@ -75,6 +75,20 @@ export const PAGE_COLUMN_SELECTOR = ".retailvista-packing-ui .container-fluid > 
 // see `VerifyProductsPage.vue`.
 export const MAIN_CONTENT_SELECTOR = "div.col-12.mainContent";
 
+// The completed page's own block, and the button in it that closes a finished
+// reservation off and goes back to the search. `CompletedPage.vue` stands in for
+// the block and clicks the button; both stay in the document, since the button
+// is what actually does the work and the block carries the hidden inputs the
+// reservation's number and id are read from.
+//
+// The button is addressed by its position, which is how the portal's own
+// markup gives it to us -- there is nothing else on it to name it by. Every
+// use of it is guarded: a position that moves should leave the operator on the
+// vendor's screen, which they can finish by hand, rather than on ours with a
+// button that does nothing.
+export const COMPLETED_CONTAINER_SELECTOR = "#ReservationContainer";
+export const COMPLETED_PROCEED_SELECTOR = "#ReservationContainer > div:nth-child(11) > div > button";
+
 // The vendor's small wordmark and the back control, which the pages without a
 // header band carry instead of one. Addressed by the image because the row
 // around it has nothing else to name it by.

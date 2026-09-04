@@ -78,7 +78,10 @@ const routes: Route[] = [
 	{
 		pattern: /outdoor\/packship\/CompleteReservations/,
 		component: CompletedPage,
-		attach: appendToBody,
+		// Into the cell the portal's own page occupies, like the verification
+		// step: this route stands in for that page rather than adding to it.
+		attach: (host) => document.querySelector(MAIN_CONTENT_SELECTOR)?.append(host)
+			?? document.body.append(host),
 	},
 	{
 		pattern: /outdoor\/packship\/Parcels/,
