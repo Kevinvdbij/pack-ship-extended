@@ -26,18 +26,15 @@ export interface EnvironmentOption {
 // eligible to be painted: not during the parse, not on a slow load, not between
 // our replacing it and anything else running.
 //
-// The rule belongs in the Stylus theme as well:
+// Injected from here rather than kept in a stylesheet, because whether the
+// dropdown should be hidden depends on what is configured and CSS cannot know
+// that. There is no race to lose: the cloak in `src/styles/cloak.css` keeps the
+// page off screen until the boot is done, so a rule that goes up at
+// document-start is in force before anything is visible.
 //
-//     select#EnviromentId { display: none !important; }
-//
-// A userscript cannot guarantee it beats the first paint. Tampermonkey runs
-// inside an extension service worker that Chrome lets sleep, so on the first
-// navigation of a session the worker has to start before anything is injected
-// and document-start arrives after the page is on screen -- which is why the
-// dropdown flashes on a cold load and not on a refresh. Stylus injects a
-// stylesheet rather than running a script and does not have that problem, so
-// the theme is the reliable place for the rule and this is the fallback for a
-// browser without it.
+// The element is appended to `documentElement`, which exists at document-start
+// when `document.head` does not, and the rule carries an id and `!important`,
+// so it wins wherever in the cascade it lands.
 //
 // Hidden rather than disabled, either way: a disabled control is left out of the
 // serialized form, and that form is what carries the value to the portal.
@@ -64,9 +61,9 @@ function setPickerStyle(rule: string) {
 	pickerStyle.textContent = rule;
 }
 
-// Puts the dropdown back rather than merely dropping our rule, so it returns
-// even when something outside the script -- the Stylus theme carrying the same
-// rule -- is what is hiding it.
+// Puts the dropdown back with a rule of its own rather than merely dropping the
+// one that hides it, so the control returns even if something else on the page
+// -- a leftover style, a future rule of ours -- is also hiding it.
 export function showEnvironmentPicker() {
 	setPickerStyle(`${ENVIRONMENT_SELECT_SELECTOR} { display: inline-block !important; }`);
 }

@@ -1,39 +1,17 @@
+@import "./styles/palette.css";
+
 /*
  * Global stylesheet, injected into the portal page once from main.ts.
  * Only rules shared by more than one component belong here -- anything that
  * overrides a Bootstrap class the portal itself uses must stay `scoped` in its
  * component, or it will restyle the page around us.
- */
-
-/* ---- Palette ---- *
- * Shared by every region we render on the portal's light pages. It lives here
- * rather than on one component because the header and the search page are
- * separate mounts and would otherwise each carry their own copy of the brand
- * green -- which is exactly how two of ours end up not quite matching.
  *
- * The green is Kampeerhal Roden's own: `--bs-primary` from their storefront
- * theme, not a colour picked to look close to the portal's buttons.
+ * This file is for our own markup. Rules that restyle the vendor's elements
+ * live in `src/styles/portal.css` -- both are bundled into the userscript and
+ * both go up at document-start, so the split is about what a rule is for rather
+ * than about when it arrives. The palette above is shared by them and by every
+ * `<style scoped>` block.
  */
-:root {
-	/* The brand green as declared. Accents, focus rings, the logo. */
-	--pse-brand: #689f69;
-	/* The same green taken down until white text on it clears 4.5:1, for the
-	   things that are filled and carry a label. Their green as-is is a shade too
-	   light for that, and a button whose word is hard to read is not on brand
-	   either. */
-	--pse-brand-ink: #4b7f4d;
-	--pse-brand-ink-strong: #3f6b41;
-	--pse-brand-soft: rgba(104, 159, 105, 0.14);
-	--pse-brand-ring: rgba(104, 159, 105, 0.30);
-
-	/* Everything textual is mixed from one near-black green-grey, so the greys
-	   sit under the green rather than beside it. */
-	--pse-ink: #1b2b22;
-	--pse-ink-soft: #6b7d73;
-	--pse-ink-faint: #9aa8a0;
-	--pse-line: #e2eae5;
-	--pse-well: #f6f9f7;
-}
 
 /* ---- Transitions ---- *
  * Default <Transition> classes, used unnamed by most of our components.
@@ -193,9 +171,10 @@
 	gap: 22px;
 }
 
-/* The logout control's colour is the Stylus theme's job -- ours arrives after
-   first paint and flashes. Its focus ring is not: Bootstrap sizes that for a
-   filled button and it reads as a stray box around a word here. */
+/* The logout control is the portal's own element, so its colour belongs to
+   `src/styles/portal.css`. Its focus ring is here instead, because the reason
+   for suppressing it is ours: Bootstrap sizes that ring for a filled button and
+   it reads as a stray box beside the bar we mount into this cell. */
 .pse-footer-cell .btn-link:focus {
 	box-shadow: none;
 }

@@ -1,6 +1,8 @@
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import monkey from 'vite-plugin-monkey';
+import { userstyle } from './build/userstyle.ts';
+import { version } from './package.json' with { type: 'json' };
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -16,7 +18,8 @@ export default defineConfig({
         namespace: 'npm/vite-plugin-monkey',
         match: ['https://retailvista.net/outdoor/packship*'],
         // The regions we rewrite are cloaked before the portal's first paint
-        // (see src/cloak.ts), which only works if we are running by then.
+        // (see src/styles/portal.css), which only works if we are running by
+        // then.
         'run-at': 'document-start',
         license: "MIT",
       },
@@ -26,5 +29,9 @@ export default defineConfig({
       // been painted -- and a cloak that goes up after the paint it was meant
       // to prevent is worse than none.
     }),
+    // The companion Stylus style, built from `src/styles/` alongside the
+    // userscript and versioned with it. Both halves have to be installed
+    // together, so both are produced by the same command.
+    userstyle(version),
   ],
 });

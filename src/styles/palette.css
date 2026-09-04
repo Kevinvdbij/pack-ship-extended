@@ -1,0 +1,49 @@
+/*
+ * The brand palette, and the single place either half of the extension gets a
+ * colour from.
+ *
+ * It lives on its own because both stylesheets in the userscript draw on it:
+ * `src/style.css`, which styles our markup, and `src/styles/portal.css`, which
+ * restyles the vendor's. Declared once, so a change to the green moves the
+ * portal's buttons and ours together and there is no second copy to drift.
+ *
+ * The green is Kampeerhal Roden's own: `--bs-primary` from their storefront
+ * theme, not a colour picked to look close to the portal's buttons.
+ */
+:root {
+	/* The brand green as declared. Accents, focus rings, the logo. */
+	--pse-brand: #689f69;
+	/* The same green taken down until white text on it clears 4.5:1, for the
+	   things that are filled and carry a label. Their green as-is is a shade too
+	   light for that, and a button whose word is hard to read is not on brand
+	   either. */
+	--pse-brand-ink: #4b7f4d;
+	--pse-brand-ink-strong: #3f6b41;
+	--pse-brand-soft: rgba(104, 159, 105, 0.14);
+	/* The portal's spinner fills, which sit over content and need to be seen
+	   through rather than merely tinted. */
+	--pse-brand-translucent: rgba(104, 159, 105, 0.8);
+	--pse-brand-ring: rgba(104, 159, 105, 0.30);
+
+	/* Everything textual is mixed from one near-black green-grey, so the greys
+	   sit under the green rather than beside it. */
+	--pse-ink: #1b2b22;
+	--pse-ink-soft: #6b7d73;
+	--pse-ink-faint: #9aa8a0;
+	--pse-line: #e2eae5;
+	--pse-well: #f6f9f7;
+
+	/* ---- The portal's own chrome ---- *
+	 * Only `src/styles/portal.css` uses these: they restyle Bootstrap classes
+	 * the portal renders, which nothing of ours wears. Kept here so the two
+	 * stylesheets still answer to one palette.
+	 */
+	/* The dark band behind the footer, and the container border. */
+	--pse-chrome-dark: #3e5f42;
+	/* The tint behind the portal's remaining dialogs and read-only fields. */
+	--pse-chrome-tint: #EFF6F3;
+	/* Bootstrap's active/hover step down from the brand green. */
+	--pse-chrome-active: #537f5f;
+	/* Muted text on the dark band -- the logout link, the build line. */
+	--pse-chrome-on-dark: #C8D6CB;
+}

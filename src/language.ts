@@ -7,13 +7,15 @@ import { debug } from "./logger.ts";
 // and the session is corrected to Dutch on every page.
 //
 // Same reasoning as the environment picker for hiding it with a stylesheet
-// rather than the `hidden` attribute, and for installing that stylesheet at
-// document-start: an author `display` rule from Bootstrap outranks the UA one,
-// and the rule has to be up before the parser reaches the control so there is
-// no window in which it can be painted. The rule is worth duplicating in the
-// Stylus theme for the same reason:
+// rather than the `hidden` attribute: an author `display` rule from Bootstrap
+// outranks the UA one, and a rule of ours with `!important` does not lose that
+// argument. Same reasoning for injecting it at document-start, too -- the page
+// is cloaked until the boot is done, so there is no window in which the control
+// could be painted.
 //
-//     form#selectLanguage { display: none !important; }
+// It is kept in this module rather than in `src/styles/portal.css` only to sit
+// beside the code that forces the language. Unlike the environment there is no
+// configured state gating it, so it could equally have been a plain rule.
 //
 // The whole field goes, label and all -- unlike the environment field, nothing
 // of ours takes its place, so leaving its space reserved would leave a hole.

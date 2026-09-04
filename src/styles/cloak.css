@@ -1,0 +1,32 @@
+/*
+ * The entire companion Stylus style. One rule, and the only CSS in the whole
+ * extension that the userscript cannot deliver itself.
+ *
+ * The portal renders its markup server-side, so every region we change is on
+ * screen in the portal's version first unless something gets there before the
+ * first paint. A userscript cannot: Tampermonkey injects from an extension
+ * service worker that Chrome is free to leave asleep, so on the first
+ * navigation of a session `document-start` arrives after the page is already
+ * painted. Stylus injects a stylesheet rather than running a script and has no
+ * such problem.
+ *
+ * So the script does not race the paint. It hides the page instead, builds
+ * everything behind the cover, and shows the result once, complete --
+ * `src/reveal.ts` adds `pse-ready` when the boot is done, and adds it from a
+ * three-second failsafe regardless.
+ *
+ * Everything else lives in the userscript, and this rule is why it can. While
+ * the page is cloaked there is nothing on screen to flash, so a stylesheet the
+ * script injects at document-start is in force long before anything is visible
+ * -- even though it lost the race the cloak was written to win. That is the
+ * whole trick: win the race once, here, and nothing else has to run it.
+ *
+ * `visibility` rather than `display`: the layout is still built and every
+ * element still has its box, so the regions we measure and mount into are where
+ * they will be, and the reveal costs no reflow.
+ *
+ * Generated -- see `build/userstyle.ts`. Edit this file, not the Stylus editor.
+ */
+html:not(.pse-ready) body > * {
+	visibility: hidden !important;
+}

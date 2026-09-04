@@ -15,6 +15,10 @@ import { applyConfiguredEnvironment, getEnvironmentSelect, hideEnvironmentPicker
 import { applyDutchLanguage, hideLanguagePicker } from './language.ts';
 import { ENVIRONMENT_FORM_SELECTOR, FOOTER_SLOT_SELECTOR } from './constants.ts';
 import { armReveal, reveal } from './reveal.ts';
+// The portal's own elements first, ours second, so a tie between the two is
+// settled the way it reads: our markup wins on the page it is on. Both go up at
+// document-start, which is behind the cloak -- see `src/styles/cloak.css`.
+import "./styles/portal.css";
 import "./style.css";
 import "vue3-toastify/dist/index.css";
 
@@ -104,9 +108,17 @@ const pathWithQuery = path + window.location.search;
 
 const route = routes.find((candidate) => candidate.pattern.test(candidate.matchQuery ? pathWithQuery : path));
 
-// Armed first, before anything that can fail: the theme hides the page whether
+// Armed first, before anything that can fail: the cloak hides the page whether
 // or not the rest of this runs, so something has to be guaranteed to show it.
 armReveal();
+
+// The one route with a bare layout, and the only one where the portal renders
+// its own wordmark. Marked on `<html>` so `src/styles/portal.css` can fence the
+// rule that replaces it: the selector for that image is positional, and the
+// same shape of path matches other images elsewhere in the portal.
+if (route?.noFooter) {
+	document.documentElement.classList.add("pse-login");
+}
 
 // Each of these waits on a different piece of the portal's markup, so they run
 // concurrently and the page is shown once the last of them is done. None of

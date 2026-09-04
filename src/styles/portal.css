@@ -1,0 +1,227 @@
+/*
+ * The portal's own elements, restyled. Bundled into the userscript and injected
+ * at document-start along with `src/style.css`.
+ *
+ * These used to be a Stylus style, on the grounds that a rule which restyles
+ * something the portal paints has to be up before that paint or it flashes.
+ * That is true, and the cloak in `src/styles/cloak.css` is what satisfies it:
+ * the page is hidden until `src/reveal.ts` shows it, so a rule injected at
+ * document-start is in force well before anything is on screen. Nothing here
+ * needs to beat the paint, because the paint has nothing to show.
+ *
+ * Kept apart from `src/style.css` even so. That file styles our markup, this
+ * one styles the vendor's, and the two are read and changed for different
+ * reasons: ours moves when a component does, this moves when the portal does.
+ *
+ * ---- Why every selector starts with `:root` ----
+ *
+ * These override Bootstrap classes the portal also declares, at the same
+ * specificity, so the winner would otherwise be whichever stylesheet comes last
+ * in the document -- and a script-injected `<style>` can land either side of
+ * the portal's `<head>` depending on when Tampermonkey gets to it. `:root` adds
+ * a pseudo-class to every selector, which puts each rule one step above the
+ * portal's equivalent and settles it on specificity instead of on order.
+ *
+ * It is applied uniformly, including to the rules that carry `!important` and
+ * would win anyway, so there is one rule to follow rather than a judgement to
+ * make per selector.
+ */
+
+/* ---- Portal chrome ---- *
+ * The vendor's blue, restated in the house green. These are pages we have not
+ * taken over; the ones we have draw on the same palette from `src/style.css`.
+ */
+:root .mainContainerBorder {
+	border: 1px solid var(--pse-chrome-dark);
+}
+
+:root .footer {
+	background-color: var(--pse-chrome-dark);
+}
+
+/* ---- Primary buttons ---- */
+:root .btn-primary {
+	background-color: var(--pse-brand);
+	border-color: var(--pse-brand);
+}
+
+:root .btn-primary:hover {
+	background-color: var(--pse-chrome-active);
+	border-color: var(--pse-chrome-active);
+}
+
+:root .btn-primary:focus,
+:root .btn-primary.focus,
+:root .btn-primary:not(:disabled):not(.disabled):active:focus,
+:root .btn-primary:not(:disabled):not(.disabled).active:focus,
+:root .show > .btn-primary.dropdown-toggle:focus {
+	box-shadow: 0 0 0 0.2rem var(--pse-brand-ring);
+}
+
+:root .btn-primary:not(:disabled):not(.disabled):active,
+:root .btn-primary:not(:disabled):not(.disabled).active,
+:root .show > .btn-primary.dropdown-toggle {
+	background-color: var(--pse-chrome-active);
+	border-color: var(--pse-chrome-active);
+}
+
+/* The back control on the parcels page, which `CreateParcelsPage.vue` relabels
+ * but does not restyle. */
+:root .backButton {
+	background-color: var(--pse-brand);
+}
+
+/* ---- Outline buttons ---- *
+ * The parcel tabs on the parcels page, which is the one place the portal uses
+ * them.
+ */
+:root .retailvista-packing-ui .btn-outline-primary {
+	border-color: var(--pse-brand);
+}
+
+:root .retailvista-packing-ui .btn-outline-primary:not(:disabled):not(.disabled).active {
+	background-color: var(--pse-brand);
+	border-color: var(--pse-brand);
+}
+
+:root .retailvista-packing-ui .btn-outline-primary .tab-parcelnumber {
+	color: var(--pse-brand);
+}
+
+:root .retailvista-packing-ui .btn-outline-primary:hover,
+:root .btn-outline-primary:not(:disabled):not(.disabled):active,
+:root .btn-outline-primary:not(:disabled):not(.disabled).active,
+:root .show > .btn-outline-primary.dropdown-toggle {
+	background-color: var(--pse-chrome-tint);
+	border-color: var(--pse-chrome-active);
+}
+
+:root .btn-outline-primary:not(:disabled):not(.disabled):active:focus,
+:root .btn-outline-primary:not(:disabled):not(.disabled).active:focus,
+:root .show > .btn-outline-primary.dropdown-toggle:focus {
+	box-shadow: 0 0 0 0.2rem var(--pse-brand-ring);
+}
+
+/* Bootstrap's focus ring on a button is sized for a filled control and reads as
+ * a stray box here. Suppressed for buttons generally, after the rules above, so
+ * the ones that do want a ring keep the one they asked for. */
+:root .btn:focus,
+:root .btn.focus,
+:root .btn-outline-primary:focus,
+:root .btn-outline-primary.focus {
+	box-shadow: 0 0 0 0.2rem rgba(0, 0, 0, 0);
+}
+
+/* The logout link, which sits on the dark footer band beside our own bar.
+ *
+ * Every state is named, not just the resting one. Bootstrap colours this
+ * control as `.btn-link:hover, .btn-link:focus, .btn-link:disabled` -- each
+ * (0,2,0), the same as our `:root .btn-link` -- so any state we leave unstated
+ * is a tie that document order settles, and the portal's stylesheet is the one
+ * in `<head>`. Stating them puts each of ours a pseudo-class ahead of its
+ * counterpart, which is what the `:root` prefix is for everywhere else in this
+ * file; a state-carrying selector just needs matching state by state.
+ *
+ * `.focus` alongside `:focus` because Bootstrap sets that class itself on
+ * click, and `:active` because it is the frame between the two. */
+:root .btn-link,
+:root .btn-link:disabled,
+:root .btn-link.disabled {
+	color: var(--pse-chrome-on-dark);
+}
+
+:root .btn-link:hover,
+:root .btn-link:focus,
+:root .btn-link.focus,
+:root .btn-link:active {
+	color: #ffffff;
+}
+
+/* And the reason a miss here reads as a flash rather than as a wrong colour:
+ * `.btn-link` is a `.btn`, and Bootstrap gives every `.btn` a 150ms colour
+ * transition. Anything that resolves late is then faded in over an eighth of a
+ * second instead of simply being right, which is long enough to read as the
+ * vendor's blue washing out. Nothing about this control animates on purpose --
+ * it is a word on a band -- so the transition buys nothing and costs exactly
+ * this. */
+:root .btn-link {
+	transition: none;
+}
+
+/* ---- Fields and surfaces ---- */
+:root .form-control:focus {
+	box-shadow: 0 0 0 0.2rem var(--pse-brand-ring);
+	border-color: var(--pse-chrome-active);
+}
+
+:root .form-control:disabled,
+:root .readonlyInput[readonly] {
+	background-color: var(--pse-chrome-tint);
+}
+
+/* The dialogs the portal still owns: the carrier and product searches on the
+ * parcels page. Its reservation search is not among them any more -- that block
+ * is lifted apart and hidden by `SearchReservationsPage.vue`. */
+:root .searchCarrierDialog,
+:root .searchProductDialog {
+	background-color: var(--pse-chrome-tint);
+}
+
+:root .alert-info {
+	color: var(--pse-chrome-active);
+	background-color: var(--pse-chrome-tint);
+	border-color: var(--pse-chrome-active);
+}
+
+/* Against the dark footer band, where the vendor's grey is too close to the
+ * background to read. */
+:root .text-muted {
+	color: lightgray !important;
+}
+
+/* ---- Spinner ---- *
+ * The portal's own busy indicator, still shown for work we do not intercept.
+ */
+:root .nfSpinner {
+	border: 2px solid var(--pse-brand);
+}
+
+:root .nfSpinner > div {
+	background-color: var(--pse-brand-translucent);
+}
+
+/* ---- Substituted images ---- *
+ * The portal serves the vendor's artwork as plain `<img>` tags with no class to
+ * hook, so each is collapsed to nothing and its replacement drawn as a
+ * background on the padding that is left. The padding values are the
+ * replacement's own dimensions.
+ *
+ * The header band's logos are not among them any more: `Header.vue` replaces
+ * that band wholesale and hides the portal's, so the rules that used to swap
+ * the images inside it had nothing left to act on.
+ */
+
+/* The add-parcel button on the parcels page. */
+:root #add-parcel > img {
+	height: 0 !important;
+	width: 0 !important;
+	padding-left: 42px !important;
+	padding-top: 42px !important;
+	background: url("https://i.imgur.com/zJ9sNJR.png") no-repeat !important;
+}
+
+/* The vendor's wordmark on the login page, which uses a bare layout with no
+ * header band for `Header.vue` to replace.
+ *
+ * Gated on the class `main.ts` puts on `<html>` for that route rather than on a
+ * URL, because the selector is only unambiguous there: the same shape of path
+ * matches other images elsewhere in the portal. The Stylus style used to scope
+ * it with a second `@-moz-document` block; a route the script already knows is
+ * a better fence than a second copy of the URL. */
+:root.pse-login body > div > div > div > div > div:nth-child(1) > div > img {
+	height: 0 !important;
+	width: 0 !important;
+	padding-left: 204px !important;
+	padding-top: 34px !important;
+	background: url("https://i.imgur.com/xtIKtxu.png") no-repeat !important;
+}

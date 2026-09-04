@@ -229,7 +229,7 @@ export function skipVerification(target:HTMLElement) {
 // anywhere else the scan is lost, and if the field still holds the last one the
 // two run together -- so this is what keeps a run going without the mouse.
 //
-// Deferred until the page is on screen. Under the theme's cloak the field is
+// Deferred until the page is on screen. Under the cloak the field is
 // `visibility: hidden` and cannot be focused at all: the call is dropped and
 // the focus does not arrive later when the cloak lifts. That is invisible from
 // here -- `focus()` reports nothing -- so it is handled once, for every caller,

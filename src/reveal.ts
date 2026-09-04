@@ -7,12 +7,14 @@
 // extension service worker that the browser is free to have asleep, so it has
 // no way to guarantee it runs before the first paint, and a rule that goes up
 // after the paint it was meant to prevent is worse than none. The rule lives in
-// the Stylus theme instead, which is delivered as a stylesheet and applies
+// `src/styles/cloak.css` instead, delivered as a Stylus style, which applies
 // whether or not any script has run:
 //
 //     html:not(.pse-ready) body > * { visibility: hidden !important; }
 //
-// All this module does is take it off again.
+// All this module does is take it off again -- and because that one rule holds
+// the page back, every other stylesheet of ours can be injected by the script
+// on its own schedule.
 
 const READY_CLASS = "pse-ready";
 

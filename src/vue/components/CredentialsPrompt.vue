@@ -19,7 +19,7 @@ function filledIn() {
 }
 
 // `afterReveal` as well as `nextTick`: the prompt mounts with the footer, which
-// is while the page is still behind the theme's cloak, and a hidden field
+// is while the page is still behind the cloak, and a hidden field
 // cannot be focused at all -- see `src/reveal.ts`.
 onMounted(() => nextTick(() => afterReveal(() => idField.value?.focus())));
 
