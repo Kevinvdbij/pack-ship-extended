@@ -12,7 +12,7 @@ import FooterExtension from './vue/components/Footer.vue';
 import Settings from "./settings.ts"
 import { applyConfiguredEnvironment, getEnvironmentSelect, hideEnvironmentPicker, lockEnvironmentPicker } from './environment.ts';
 import { applyDutchLanguage, hideLanguagePicker } from './language.ts';
-import { FOOTER_SLOT_SELECTOR } from './constants.ts';
+import { ENVIRONMENT_FORM_SELECTOR, FOOTER_SLOT_SELECTOR } from './constants.ts';
 import { armReveal, reveal } from './reveal.ts';
 import "./style.css";
 import "vue3-toastify/dist/index.css";
@@ -160,9 +160,91 @@ async function mountFooter() {
 		return;
 	}
 
-	await whenPresent(() => document.querySelector(FOOTER_SLOT_SELECTOR));
+	const slot = await whenPresent(() => document.querySelector(FOOTER_SLOT_SELECTOR));
+
+	centreFooterRow(slot);
 
 	mountApp(FooterExtension, appendToBody);
+
+	// After the mount, not before: our bar is what the slot was waited on for,
+	// and the vendor line only has somewhere to go once the far end of the
+	// footer has been parsed as well.
+	await moveVendorBuildLine();
+}
+
+// The portal's footer cells let their contents sit where the line box puts
+// them, which was fine when everything in the band was one size of text. Our
+// bar is taller than the text beside it, so the logout link and the version
+// line ended up riding high against it. Centring the row and the cell we mount
+// into settles all three against the same middle.
+//
+// Classes rather than inline styles, so the rules are in the stylesheet with
+// the rest of the footer's and a look at the DOM shows what is ours.
+function centreFooterRow(slot: Element | null) {
+	const cell = slot?.parentElement;
+
+	if (!cell) {
+		return;
+	}
+
+	cell.classList.add("pse-footer-cell");
+	cell.parentElement?.classList.add("pse-footer-row");
+}
+
+// The portal prints its own build numbers into the same footer cell we mount
+// into, which put two versions side by side with nothing to say which one was
+// ours. It is still worth having -- support asks for it now and then -- so it
+// is moved to the far end of the footer beside the environment label rather
+// than dropped, which clears the space in front of our bar and puts the two
+// pieces of "which system is this" information together.
+//
+// Found by walking for the text rather than by a selector: the portal renders
+// it as a bare node among others in that cell, so there is nothing to address.
+// Only text nodes are touched, so no element of theirs is hidden or moved and
+// the logout link beside it cannot be caught by the match.
+async function moveVendorBuildLine() {
+	// The environment picker sits at the far end of the same footer row, so it
+	// doubles as the wait for that end having been parsed and as the anchor the
+	// line is moved to. Without it there is nowhere better for the line to go,
+	// so it stays where the portal put it -- out of the way is not worth losing
+	// it over.
+	const target = (await whenPresent(() => document.querySelector(ENVIRONMENT_FORM_SELECTOR)))?.parentElement;
+	const footer = document.querySelector("footer");
+
+	if (!target || !footer) {
+		return;
+	}
+
+	const vendor = /NedFox|retail platform/i;
+	const walker = document.createTreeWalker(footer, NodeFilter.SHOW_TEXT);
+	const lines: Text[] = [];
+
+	for (let node = walker.nextNode(); node; node = walker.nextNode()) {
+		if (vendor.test(node.nodeValue ?? "")) {
+			lines.push(node as Text);
+		}
+	}
+
+	if (lines.length == 0) {
+		return;
+	}
+
+	const moved = document.createElement("span");
+	moved.className = "pse-vendor";
+	moved.textContent = lines.map((line) => line.nodeValue?.trim()).filter(Boolean).join(" ");
+
+	for (const line of lines) {
+		line.nodeValue = "";
+	}
+
+	// Both halves of the footer's right end are reference text, so the cell is
+	// laid out as one muted line rather than left as two things that happen to
+	// have landed in the same box -- see `.pse-footer-end`.
+	target.classList.add("pse-footer-end");
+
+	// Ahead of the environment, which is the one thing in the footer that is
+	// read on purpose rather than glanced at.
+	target.prepend(moved);
 }
 
 async function boot() {
