@@ -11,6 +11,8 @@ export function saveOrderComment(token: ShopwareToken, orderData: ShopwareOrderE
 		pending: `Order ${orderNumber} notitie wordt opgeslagen...`,
 		success: `Order ${orderNumber} notitie succesvol opgeslagen.`,
 		error: `Er is een fout opgetreden bij het opslaan van de notitie van order ${orderNumber}.`
+	}).catch((error) => {
+		console.error("Failed to save order comment.", error);
 	});
 
 	return updatePromise;

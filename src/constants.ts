@@ -12,8 +12,10 @@ export const RESERVATION_SUMMARY_SELECTOR = "#ReservationSummary\\ mb-2";
 export const STORAGE_KEYS = {
 	settings: "PSE_Settings",
 	reservationCache: "PSE_Reservation_Cache",
-	lastOpenReservation: "PSE_LastOpenReservation",
-	lastCompletedReservation: "PSE_LastCompletedReservation",
+	lastOpenReservation: "PSE_Last_Open_Reservation",
+	lastCompletedReservation: "PSE_Last_Completed_Reservation",
+	swClientId: "PSE_Shopware_Client_Id",
+	swClientSecret: "PSE_Shopware_Client_Secret",
 	// Suffixed with a reservation number, one key per mass complete entry.
 	massCompleteEntryPrefix: "PSE_MCEntry_",
 } as const;
