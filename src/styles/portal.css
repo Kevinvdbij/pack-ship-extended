@@ -179,15 +179,104 @@
 	color: lightgray !important;
 }
 
-/* ---- Spinner ---- *
- * The portal's own busy indicator, still shown for work we do not intercept.
+/* ---- Busy overlay ---- *
+ * The portal's own busy indicator, shown while `RVUtils.setBusy(true)` holds
+ * `busy` on `<body>`, for work we do not intercept.
+ *
+ * Its markup is `div.loading > div.nfSpinner > (5 x div.rect#, h5.loadingBanner)`:
+ * a full-viewport layer with no backdrop of its own, holding a white box that
+ * is positioned by negative margins and animates five stretching bars. All of
+ * that is restyled here rather than replaced -- we do not own the element, so
+ * we work with the nodes it gives us: the layer becomes a dimmed, blurred
+ * scrim, the box becomes a centred card, the bars are dropped, and the ring
+ * spinner is drawn on the card itself so it matches the one our own buttons
+ * spin (`.pse-spinner`).
  */
-:root .nfSpinner {
-	border: 2px solid var(--pse-brand);
+:root .loading {
+	background: rgba(27, 43, 34, 0.28);
+	backdrop-filter: blur(3px);
+	-webkit-backdrop-filter: blur(3px);
+	animation: pse-busy-scrim 160ms ease-out;
 }
 
+/* Centred by transform instead of the portal's fixed negative margins, so the
+   card is free to size to its own content. */
+:root .nfSpinner {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 16px;
+	top: 50%;
+	left: 50%;
+	margin: 0;
+	transform: translate(-50%, -50%);
+	width: auto;
+	height: auto;
+	min-width: 200px;
+	padding: 30px 38px;
+	background-color: #ffffff;
+	border: 1px solid var(--pse-line);
+	border-radius: 16px;
+	box-shadow: 0 18px 46px rgba(27, 43, 34, 0.18);
+	/* `.container-fluid.text-center` inherits into this, but the card is ours
+	   to state. */
+	text-align: center;
+	animation: pse-busy-card 200ms cubic-bezier(0.2, 0.9, 0.3, 1);
+}
+
+/* The five stretching bars, dropped in favour of the ring below. */
 :root .nfSpinner > div {
-	background-color: var(--pse-brand-translucent);
+	display: none;
+}
+
+:root .nfSpinner::before {
+	content: "";
+	width: 34px;
+	height: 34px;
+	border: 3px solid var(--pse-brand-ring);
+	border-top-color: var(--pse-brand);
+	border-radius: 50%;
+	animation: pse-busy-spin 0.7s linear infinite;
+}
+
+:root .nfSpinner .loadingBanner {
+	margin: 0;
+	width: auto;
+	font-size: 15px;
+	font-weight: 600;
+	letter-spacing: 0.01em;
+	color: var(--pse-ink);
+}
+
+@keyframes pse-busy-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+@keyframes pse-busy-scrim {
+	from {
+		opacity: 0;
+	}
+}
+
+@keyframes pse-busy-card {
+	from {
+		opacity: 0;
+		transform: translate(-50%, -46%) scale(0.96);
+	}
+}
+
+@media (prefers-reduced-motion: reduce) {
+	:root .loading,
+	:root .nfSpinner {
+		animation: none;
+	}
+
+	:root .nfSpinner::before {
+		animation-duration: 1.6s;
+	}
 }
 
 /* ---- Substituted images ---- *

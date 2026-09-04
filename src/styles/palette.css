@@ -20,9 +20,6 @@
 	--pse-brand-ink: #4b7f4d;
 	--pse-brand-ink-strong: #3f6b41;
 	--pse-brand-soft: rgba(104, 159, 105, 0.14);
-	/* The portal's spinner fills, which sit over content and need to be seen
-	   through rather than merely tinted. */
-	--pse-brand-translucent: rgba(104, 159, 105, 0.8);
 	--pse-brand-ring: rgba(104, 159, 105, 0.30);
 
 	/* Everything textual is mixed from one near-black green-grey, so the greys
