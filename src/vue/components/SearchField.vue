@@ -92,6 +92,17 @@ onMounted(() => {
 	color: var(--pse-ink-faint);
 }
 
+/* Chrome paints a filled-in field its own pale blue and will not take a
+   `background-color` for it -- the only thing that covers it is an inset shadow
+   wide enough to fill the box. Worth doing rather than living with: the login
+   fields are filled in from the password manager on most visits, so the blue is
+   what the card looks like most of the time it is seen. */
+.pse-field-shell :deep(.pse-input:-webkit-autofill),
+.pse-field-shell :deep(.pse-input:-webkit-autofill:hover) {
+	-webkit-text-fill-color: var(--pse-ink);
+	box-shadow: 0 0 0 100px var(--pse-well) inset;
+}
+
 /* The field lifts off the card's tint when it is the one being typed into, so
    which input the scanner is pointed at is readable from across the counter. */
 .pse-field-shell :deep(.pse-input:focus) {
@@ -99,5 +110,11 @@ onMounted(() => {
 	border-color: var(--pse-brand);
 	background-color: #ffffff;
 	box-shadow: 0 0 0 3px var(--pse-brand-ring);
+}
+
+/* The same lift for a filled-in field, which has to state both shadows at once:
+   the inset one is still what stands in for its background. */
+.pse-field-shell :deep(.pse-input:-webkit-autofill:focus) {
+	box-shadow: 0 0 0 100px #ffffff inset, 0 0 0 3px var(--pse-brand-ring);
 }
 </style>

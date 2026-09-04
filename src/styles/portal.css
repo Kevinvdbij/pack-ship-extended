@@ -137,6 +137,26 @@
 	color: #ffffff;
 }
 
+/* And its size, which is what sets the height of the whole band. The portal's
+ * `.footer` gives both layouts the same 18px of padding, so what a footer ends
+ * up being is however tall its tallest cell is -- and on these pages that is
+ * this control. Bootstrap sizes it as a filled button, 38px of padding and
+ * border around a word, which is 19px of band that nothing is drawn in and 19px
+ * more than the login page's footer, where there is no button and the row is a
+ * line of text.
+ *
+ * Taken back to the line of text it looks like. Our own bar is 15px once its
+ * pull-in is counted, so the row is the text's height either way and both
+ * footers come out at the same 56px.
+ *
+ * Fenced to the cell `main.ts` marks, because `.btn-link` is Bootstrap's and
+ * the portal is free to use it somewhere that does want a button's size. */
+:root .pse-footer-cell .btn-link {
+	padding: 0;
+	border: 0;
+	line-height: 1.5;
+}
+
 /* And the reason a miss here reads as a flash rather than as a wrong colour:
  * `.btn-link` is a `.btn`, and Bootstrap gives every `.btn` a 150ms colour
  * transition. Anything that resolves late is then faded in over an eighth of a
@@ -299,18 +319,24 @@
 	background: url("https://i.imgur.com/zJ9sNJR.png") no-repeat !important;
 }
 
-/* The vendor's wordmark on the login page, which uses a bare layout with no
- * header band for `Header.vue` to replace.
- *
- * Gated on the class `main.ts` puts on `<html>` for that route rather than on a
- * URL, because the selector is only unambiguous there: the same shape of path
- * matches other images elsewhere in the portal. The Stylus style used to scope
- * it with a second `@-moz-document` block; a route the script already knows is
- * a better fence than a second copy of the URL. */
-:root.pse-login body > div > div > div > div > div:nth-child(1) > div > img {
-	height: 0 !important;
-	width: 0 !important;
-	padding-left: 204px !important;
-	padding-top: 34px !important;
-	background: url("https://i.imgur.com/xtIKtxu.png") no-repeat !important;
+/* The vendor's wordmark on the login page is not among them either, for the
+ * same reason: `LoginPage.vue` now renders that page as our own markup and
+ * hides the layout the image was in, so the rule that used to swap it -- a
+ * positional selector fenced to the login route by a class on `<html>` -- had
+ * nothing left to act on, and the class it was fenced with had nothing left to
+ * fence. */
+
+/* ---- The login page's footer ---- *
+ * The portal's `Privacy` link, which sits on the dark band beside our minimal
+ * bar. Bootstrap's link blue is barely legible on that green, and the link is
+ * reference text like the copyright line it follows -- so it is given the same
+ * muted white the logout link on the other pages wears.
+ */
+:root .pse-footer-login a {
+	color: var(--pse-chrome-on-dark);
+}
+
+:root .pse-footer-login a:hover,
+:root .pse-footer-login a:focus {
+	color: #ffffff;
 }

@@ -37,6 +37,12 @@ export const HEADER_SELECTOR = ".row.nfmlcomp";
 // the footer is mounted during the parse rather than at DOM-ready.
 export const FOOTER_SLOT_SELECTOR = "footer > div > div > div.col-auto.mr-auto.text-left > div";
 
+// The login page is served with a bare layout, and its footer with it: one
+// container holding a copyright line instead of the row of controls above.
+// There is nothing in it to mount beside, so `LoginPage.vue` lays the container
+// out itself and makes the slot the minimal bar goes into.
+export const LOGIN_FOOTER_CONTAINER_SELECTOR = "footer > div.container";
+
 // The portal renders this container with an id that contains a space, so the
 // space has to be escaped for querySelector to accept it.
 export const RESERVATION_SUMMARY_SELECTOR = "#ReservationSummary\\ mb-2";

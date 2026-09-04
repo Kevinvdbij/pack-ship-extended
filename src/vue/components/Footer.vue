@@ -10,6 +10,24 @@ import { getCurrentUser, onCurrentUserChange } from '../../currentUser.ts';
 import { FOOTER_SLOT_SELECTOR } from '../../constants.ts';
 import { hasCredentials } from '../../shopware.ts';
 
+// The same bar in two shapes. The full one is the control strip on the pages
+// behind the login; `minimal` drops everything that needs a session -- the
+// automatic-handling switch, who is signed in, the settings the two of them are
+// configured from -- and leaves the build number, which is the part that is
+// worth having on any page at all.
+//
+// One component rather than two, because the shape is the point: whatever the
+// bar carries, it is recognisably the same bar in the same place.
+const props = withDefaults(defineProps<{
+	minimal?: boolean;
+	// Where the bar mounts. The login page builds its own slot and passes the
+	// element, since the portal serves no footer of the shape below there.
+	to?: string | HTMLElement;
+}>(), {
+	minimal: false,
+	to: FOOTER_SLOT_SELECTOR,
+});
+
 const showModal = ref(false);
 
 const masterSwitch = ref(Settings.autoMasterSwitch);
@@ -18,7 +36,11 @@ const masterSwitch = ref(Settings.autoMasterSwitch);
 // asked about up front rather than left to surface as a failed order lookup.
 // "Later" only holds for this page: the next load asks again, which is the
 // point -- the script cannot do its work until the pair is there.
-const showCredentialsPrompt = ref(!hasCredentials());
+//
+// Not asked on the minimal bar: there is no session to do the work the
+// credentials are for, and a dialog over the login form would be the first
+// thing somebody meets on a page they came to sign in on.
+const showCredentialsPrompt = ref(!props.minimal && !hasCredentials());
 
 // Undefined when no login has been observed, in which case the badge stays
 // hidden rather than guessing.
@@ -65,20 +87,20 @@ function masterSwitchToggle() {
 	     Bootstrap classes are deliberately not borrowed, so the bar keeps its
 	     shape whatever the portal decides `.col` and `.btn-link` should look
 	     like around it. -->
-	<Teleport :to="FOOTER_SLOT_SELECTOR">
-		<div class="pse-bar">
-			<button type="button" class="pse-pill pse-toggle" :class="masterSwitch ? 'is-on' : 'is-off'"
+	<Teleport :to="to">
+		<div class="pse-bar" :class="{ 'is-minimal': minimal }">
+			<button v-if="!minimal" type="button" class="pse-pill pse-toggle" :class="masterSwitch ? 'is-on' : 'is-off'"
 				:aria-pressed="masterSwitch" :title="masterSwitchTitle" @click="masterSwitchToggle()">
 				<img class="pse-icon" :src="powerIconUrl" alt="" />
 				<span class="pse-toggle-label">{{ masterSwitchLabel }}</span>
 			</button>
 
-			<span class="pse-divider" aria-hidden="true"></span>
+			<span v-if="!minimal" class="pse-divider" aria-hidden="true"></span>
 
 			<!-- Identity in the middle: who is logged in, and which build of
 			     ours is doing the work. Both read-only, so they sit between the
 			     two controls rather than competing with them for the ends. -->
-			<span v-if="currentUser" class="pse-user" :title="loginTitle">
+			<span v-if="currentUser && !minimal" class="pse-user" :title="loginTitle">
 				<span class="pse-dot" aria-hidden="true"></span>
 				<span class="pse-user-name">{{ currentUser.userName }}</span>
 			</span>
@@ -88,17 +110,19 @@ function masterSwitchToggle() {
 				<span class="pse-version-number">v{{ pkg.version }}</span>
 			</span>
 
-			<span class="pse-divider" aria-hidden="true"></span>
+			<span v-if="!minimal" class="pse-divider" aria-hidden="true"></span>
 
-			<button type="button" class="pse-pill pse-settings" title="Pack&Ship Extended instellingen"
-				@click="showModal = true;">
+			<button v-if="!minimal" type="button" class="pse-pill pse-settings"
+				title="Pack&Ship Extended instellingen" @click="showModal = true;">
 				<img class="pse-icon" :src="settingsIconUrl" alt="" />
 				<span class="pse-settings-label">Instellingen</span>
 			</button>
 		</div>
 	</Teleport>
 
-	<Teleport to="body">
+	<!-- Both of these are opened from controls the minimal bar does not carry,
+	     so with those gone there is nothing left to render here either. -->
+	<Teleport v-if="!minimal" to="body">
 		<!-- Named, so the modal fades instead of taking the default vertical
 		     collapse that suits the small footer items. -->
 		<Transition name="modal">
@@ -153,6 +177,16 @@ function masterSwitchToggle() {
 	color: var(--pse-ink);
 	white-space: nowrap;
 	vertical-align: middle;
+}
+
+/* With only the build number left there is no strip of controls to draw a
+   capsule around, and one drawn around a single line of muted text reads as a
+   button that cannot be pressed. The pull-in goes with it: nothing here stands
+   proud of a line of text any more, so there is no surplus height to hide. */
+.pse-bar.is-minimal {
+	margin: 0;
+	padding: 0;
+	background-color: transparent;
 }
 
 /* The portal's own footer rules reach everything inside this cell, and Bootstrap
@@ -305,6 +339,12 @@ function masterSwitchToggle() {
 	text-transform: uppercase;
 }
 
+/* The padding is what holds the version off the pills beside it; on its own it
+   is the start of the row and lines up with the band's own edge instead. */
+.pse-bar.is-minimal .pse-version {
+	padding-left: 0;
+}
+
 .pse-version-number {
 	font-variant-numeric: tabular-nums;
 	letter-spacing: 0.02em;
@@ -316,7 +356,10 @@ function masterSwitchToggle() {
    settings label (its gear is unambiguous). The toggle keeps its word, because
    its icon is the same in both states. */
 @media (max-width: 991px) {
-	.pse-brand {
+	/* Only while the bar is a strip of controls. On the minimal one the name is
+	   what says whose version number this is, and dropping it would leave a
+	   number on the band with nothing to attach it to. */
+	.pse-bar:not(.is-minimal) .pse-brand {
 		display: none;
 	}
 

@@ -207,6 +207,19 @@
 	font-weight: 600;
 }
 
+/* The login page's footer, which the portal serves as a single container of its
+   own text rather than as the row above. `LoginPage.vue` gathers that text into
+   one `.pse-footer-end` and puts a slot for the minimal bar in front of it, so
+   all that is left here is to lay the two out the way the row lays out its
+   cells: ours at the left end, the vendor's reference text at the right. */
+.pse-footer-login {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	flex-wrap: wrap;
+	gap: 6px 22px;
+}
+
 /* Narrow enough and the row's cells stop fitting side by side and stack. The
    band is then two lines tall whatever we do, so the rules that were keeping it
    to one line stop being worth their cost: the cells are given room to breathe

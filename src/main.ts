@@ -38,8 +38,11 @@ interface Route {
 	// so the host lands above content that has not streamed in yet. Those
 	// routes leave this unset and mount once the document is complete.
 	anchor?: () => Element | null;
-	// The login page uses a bare layout without the footer we extend.
-	noFooter?: boolean;
+	// The login page is served with a bare layout: no header band to replace, no
+	// footer of the shape the other pages carry, and no session for the
+	// environment and language to be corrected on. It renders its own header and
+	// its own minimal footer instead -- see `LoginPage.vue`.
+	bareLayout?: boolean;
 }
 
 const appendToBody = (host: HTMLDivElement) => document.body.append(host);
@@ -49,8 +52,13 @@ const routes: Route[] = [
 	{
 		pattern: /outdoor\/packship\/Identity\/Account\/Login/,
 		component: LoginPage,
-		attach: appendToBody,
-		noFooter: true,
+		// Ahead of the portal's footer rather than at the end of the body: this
+		// page is rendered end to end, so its band, its card and the footer have
+		// to come out in that order. Appending would put the page under its own
+		// footer.
+		attach: (host) => document.querySelector("footer")?.insertAdjacentElement("beforebegin", host)
+			?? document.body.append(host),
+		bareLayout: true,
 	},
 	{
 		pattern: /outdoor\/packship\/Identity\/Account\/Logout/,
@@ -112,14 +120,6 @@ const route = routes.find((candidate) => candidate.pattern.test(candidate.matchQ
 // or not the rest of this runs, so something has to be guaranteed to show it.
 armReveal();
 
-// The one route with a bare layout, and the only one where the portal renders
-// its own wordmark. Marked on `<html>` so `src/styles/portal.css` can fence the
-// rule that replaces it: the selector for that image is positional, and the
-// same shape of path matches other images elsewhere in the portal.
-if (route?.noFooter) {
-	document.documentElement.classList.add("pse-login");
-}
-
 // Each of these waits on a different piece of the portal's markup, so they run
 // concurrently and the page is shown once the last of them is done. None of
 // them waits on the network: work that does renders a skeleton and fills it in
@@ -143,7 +143,7 @@ Promise.all([lockPicker(), lockLanguage(), mountHeader(), mountFooter(), boot()]
 async function lockPicker() {
 	// Nothing configured: the portal's dropdown is the interface, and hiding it
 	// would take away the only way to set one.
-	if (route?.noFooter || !(Settings.environmentId > 0)) {
+	if (route?.bareLayout || !(Settings.environmentId > 0)) {
 		return;
 	}
 
@@ -162,7 +162,7 @@ async function lockPicker() {
 // no label to wait for either -- only the session to correct, which happens at
 // DOM-ready along with the environment.
 function lockLanguage() {
-	if (route?.noFooter) {
+	if (route?.bareLayout) {
 		return;
 	}
 
@@ -180,7 +180,7 @@ function lockLanguage() {
 // the portal's markup here.
 async function mountHeader() {
 	// The login page uses a bare layout with no band to replace.
-	if (route?.noFooter) {
+	if (route?.bareLayout) {
 		return;
 	}
 
@@ -201,7 +201,7 @@ async function mountHeader() {
 // footer renders comes from the GM value store, so waiting for its slot to be
 // parsed is the only wait it needs.
 async function mountFooter() {
-	if (route?.noFooter) {
+	if (route?.bareLayout) {
 		return;
 	}
 
@@ -314,7 +314,7 @@ async function boot() {
 			mountApp(route.component, route.attach);
 		}
 
-		if (!route?.noFooter) {
+		if (!route?.bareLayout) {
 			// Corrects the portal session over AJAX, without a reload. Left
 			// until the document is ready because it goes through the portal's
 			// own jQuery change handler.

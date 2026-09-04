@@ -1,6 +1,12 @@
 <script setup lang="ts">
 import logoUrl from "../../assets/kampeerhal-roden.svg";
 
+// The band at the top of every page. On the pages the portal gives a header to
+// it replaces one, and on the login page -- which is served with a bare layout
+// and no band at all -- `LoginPage.vue` renders it as the page's own. Same
+// component either way, so the mark is in the same place on the screen before
+// and after signing in.
+//
 // Replaces the portal's header band, which spent 250px of the screen on a stock
 // photo of somebody folding boxes, the vendor's logo and the RetailVista
 // wordmark -- none of which the operator needs while packing.
