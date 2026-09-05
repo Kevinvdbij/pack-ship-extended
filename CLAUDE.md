@@ -3,6 +3,15 @@
 Read `README.md` first — it covers the stack, the load behaviour and the companion Stylus style.
 This file is the part that only matters while making changes.
 
+## Releasing
+
+Don't. Finish the change, build it so it is known to compile, and stop there — Kevin cuts the
+release when he is ready for one. `npm version` tags and the tag publishes to Greasy Fork, so a
+release is a decision about what reaches the packing floor rather than the last step of a fix.
+
+Commit the work if the task called for it, and say the build is ready. Bump and push only when
+asked for a release in so many words.
+
 ## Inspecting the live portal
 
 The portal is behind a login and its markup is not in this repo, so anything about its DOM has to be
