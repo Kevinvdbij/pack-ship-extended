@@ -6,6 +6,7 @@ import { MassCompleteStatus } from '../../interfaces.ts';
 import { afterPaint, afterReveal } from '../../reveal.ts';
 import { standInForPortalPage } from '../../standIn.ts';
 import ReservationSidebar from '../components/ReservationSidebar.vue';
+import CopyButton from '../components/CopyButton.vue';
 import {
 	COMPLETED_CONTAINER_SELECTOR, COMPLETED_HEADING_SELECTOR, COMPLETED_PROCEED_SELECTOR,
 	COMPLETED_STEP_DETAIL_SELECTOR, COMPLETED_STEP_ERROR_SELECTOR, COMPLETED_STEP_SELECTOR,
@@ -253,6 +254,15 @@ function readParcelLines(card: Element): ParcelLine[] {
 	return lines;
 }
 
+// The parcel's own barcode, among the portal's `Label: value` cells. It is the
+// number that gets pasted into a carrier's track and trace, so it is the one
+// field on this card with a copy control beside it. Matched on the label rather
+// than on the shape of the value: the portal translates the label, and every
+// language it is served in keeps the word.
+function isBarcode(label: string): boolean {
+	return /barcode/i.test(label);
+}
+
 function splitField(value: string): { label: string; value: string } | null {
 	const separator = value.indexOf(":");
 
@@ -495,7 +505,13 @@ function updateAutoComplete() {
 							<dl class="pse-done-parcel-fields" v-if="parcel.fields.length">
 								<template v-for="field in parcel.fields" :key="field.label">
 									<dt>{{ field.label }}</dt>
-									<dd>{{ field.value }}</dd>
+									<dd>
+										<span class="pse-copy-cell">
+											{{ field.value }}
+											<CopyButton v-if="isBarcode(field.label)" :value="field.value"
+												:label="field.label" />
+										</span>
+									</dd>
 								</template>
 							</dl>
 
@@ -504,8 +520,9 @@ function updateAutoComplete() {
 									<span class="pse-done-parcel-amount">{{ line.amount }}×</span>
 									<span class="pse-done-parcel-product">
 										<span class="pse-done-parcel-product-name">{{ line.name }}</span>
-										<span class="pse-done-parcel-barcode" v-if="line.barcode">
+										<span class="pse-done-parcel-barcode pse-copy-cell" v-if="line.barcode">
 											{{ line.barcode }}
+											<CopyButton :value="line.barcode" label="Barcode" />
 										</span>
 									</span>
 								</li>

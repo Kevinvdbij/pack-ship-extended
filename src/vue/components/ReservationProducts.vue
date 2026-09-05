@@ -4,6 +4,7 @@ import imageIconUrl from "../../assets/image.svg";
 import { ProductDetails } from "../../interfaces.ts";
 import * as Shopware from "../../shopware.ts";
 import ImageModal from "./ImageModal.vue";
+import CopyButton from "./CopyButton.vue";
 
 // What the reservation is for, as a plain list.
 //
@@ -56,7 +57,12 @@ async function onClickShowImage(productEAN: string) {
 				<tbody>
 					<tr v-for="product in products" :key="product.itemId">
 						<td class="pse-cell-description">{{ product.description }}</td>
-						<td class="pse-cell-barcode">{{ product.mainBarcode }}</td>
+						<td class="pse-cell-barcode">
+							<span class="pse-copy-cell">
+								{{ product.mainBarcode }}
+								<CopyButton :value="product.mainBarcode" label="Barcode" />
+							</span>
+						</td>
 						<td class="pse-cell-quantity">{{ product.requiredQuantity }}</td>
 						<td class="pse-table-right">
 							<div class="pse-actions">

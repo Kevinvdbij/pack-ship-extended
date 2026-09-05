@@ -594,6 +594,76 @@ select.pse-dialog-input {
 	white-space: nowrap;
 }
 
+/* ---- Copy controls ---- *
+ * `CopyButton.vue`, which has no stylesheet of its own: it is mounted in the
+ * sidebar, in the product tables and beside every barcode this extension
+ * renders, so its look is declared once here rather than scoped to whichever
+ * component happened to need it first.
+ */
+
+/* Quiet at rest and never hidden: a control that only appears on hover is one
+   nobody finds, and this is on a screen used at arm's length with a scanner in
+   the other hand. It sits in the flow rather than floating over the value, so
+   nothing is covered up while it is being read. */
+.pse-copy {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	flex: none;
+	width: 26px;
+	height: 26px;
+	padding: 0;
+	border: 0;
+	border-radius: 8px;
+	background-color: transparent;
+	color: var(--pse-ink-faint);
+	cursor: pointer;
+	transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.pse-copy:hover {
+	background-color: var(--pse-well);
+	color: var(--pse-ink);
+}
+
+.pse-copy:focus {
+	outline: none;
+}
+
+.pse-copy:focus-visible {
+	outline: none;
+	box-shadow: 0 0 0 3px var(--pse-brand-ring);
+}
+
+/* The tick is the whole acknowledgement -- no toast, no moving anything. It is
+   a copy, and the only question it has to answer is whether it happened. */
+.pse-copy.is-copied {
+	color: var(--pse-brand-ink);
+	background-color: var(--pse-brand-soft);
+}
+
+/* And when it did not. Rare, and worth one glance rather than a dialog: the
+   value is on screen beside it either way. */
+.pse-copy.is-failed {
+	color: #a3372c;
+	background-color: rgba(176, 58, 46, 0.10);
+}
+
+.pse-copy-icon {
+	font-size: 15px;
+	line-height: 1;
+}
+
+
+/* A value with its copy control beside it, which is how every barcode is set:
+   the two are one thing to the eye, and the button is on the baseline of the
+   value rather than floating at the end of the cell. */
+.pse-copy-cell {
+	display: inline-flex;
+	align-items: center;
+	gap: 2px;
+}
+
 .pse-actions {
 	display: inline-flex;
 	gap: 6px;

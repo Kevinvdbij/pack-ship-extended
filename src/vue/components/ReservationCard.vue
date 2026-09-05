@@ -2,6 +2,7 @@
 import { ModalReservationDetails } from "../../interfaces.ts";
 import { isAmountStringComplete, matchShopwareOrderNumber } from "../../retailVistaUtils.ts";
 import ShopwareNote from "./ShopwareNote.vue";
+import CopyButton from "./CopyButton.vue";
 
 // One reservation in the picker, for the two groups that have something to look
 // at: the ones that hold several of the scanned product, and the ones that hold
@@ -94,7 +95,12 @@ function isShort(amount: string) {
 					<tr v-for="(product, index) in reservation.products" :key="index">
 						<td class="pse-cell-barcode">{{ product.number }}</td>
 						<td class="pse-cell-description">{{ product.description }}</td>
-						<td class="pse-cell-barcode">{{ product.barcode }}</td>
+						<td class="pse-cell-barcode">
+							<span class="pse-copy-cell">
+								{{ product.barcode }}
+								<CopyButton :value="product.barcode" label="Barcode" />
+							</span>
+						</td>
 						<td class="pse-table-right">
 							<span class="pse-rescard-amount" :class="{ 'is-short': isShort(product.amount) }">
 								{{ product.amount }}

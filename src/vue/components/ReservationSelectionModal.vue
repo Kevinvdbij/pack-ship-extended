@@ -9,6 +9,7 @@ import ModalShell from "./ModalShell.vue";
 import ReservationCard from "./ReservationCard.vue";
 import ReservationRow from "./ReservationRow.vue";
 import MassCompletePanel from "./MassCompletePanel.vue";
+import CopyButton from "./CopyButton.vue";
 import { GM, GM_addValueChangeListener } from "$";
 
 const emit = defineEmits(["open", "close"]);
@@ -247,7 +248,10 @@ function countStatus(status: MassCompleteStatus): number {
 
 			<div class="pse-found-text">
 				<h3 class="pse-found-name">{{ modalData.searchProductName }}</h3>
-				<p class="pse-found-barcode">{{ modalData.searchProductBarcode }}</p>
+				<p class="pse-found-barcode pse-copy-cell">
+					{{ modalData.searchProductBarcode }}
+					<CopyButton :value="modalData.searchProductBarcode" label="Barcode" />
+				</p>
 			</div>
 
 			<div class="pse-found-count">

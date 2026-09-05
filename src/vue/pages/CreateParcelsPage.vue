@@ -13,6 +13,7 @@ import addIconUrl from "../../assets/add.svg";
 import imageIconUrl from "../../assets/image.svg";
 import { MassCompleteStatus, ParcelItem, VerificationRow } from '../../interfaces.ts';
 import ReservationSidebar from '../components/ReservationSidebar.vue';
+import CopyButton from '../components/CopyButton.vue';
 import ImageModal from '../components/ImageModal.vue';
 import Settings from '../../settings.ts';
 import * as Shopware from "../../shopware.ts";
@@ -344,7 +345,12 @@ async function removeParcelItems(): Promise<void> {
 				<tbody v-if="showRows">
 					<tr v-for="product in lines" :key="product.key">
 						<td class="pse-cell-description">{{ product.description }}</td>
-						<td class="pse-cell-barcode">{{ product.mainBarcode }}</td>
+						<td class="pse-cell-barcode">
+							<span class="pse-copy-cell">
+								{{ product.mainBarcode }}
+								<CopyButton :value="product.mainBarcode" label="Barcode" />
+							</span>
+						</td>
 						<td>
 							<span :class="countClass(product.requiredQuantity, product.verifiedQuantity)">
 								{{ product.verifiedQuantity }} van {{ product.requiredQuantity }}
