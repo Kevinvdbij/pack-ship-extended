@@ -55,6 +55,52 @@ withDefaults(defineProps<{ linked?: boolean }>(), { linked: true });
 	border-bottom: 1px solid var(--pse-line);
 }
 
+/* In the installed app, this band *is* the window's title bar.
+   `window-controls-overlay` hands the page the whole window and floats the
+   close and minimise buttons over the top right of it, so rather than keeping
+   its own height and starting below their strip -- which spends the space the
+   overlay just handed us -- the band moves up into that strip and lines its
+   contents up with the buttons. The page below it gains the band's full height.
+
+   `env(titlebar-area-height)` is how deep that strip is, and every one of these
+   rules is inside the overlay's own media query, so a browser tab is untouched.
+
+   The band takes the other job a title bar has as well: it is what the window
+   is dragged by. The logo opts back out, because a link inside a drag region
+   cannot be clicked.
+
+   Nothing sits at the right end of the band, which is where the buttons are. If
+   anything ever does, it needs holding off them by
+   `100vw - env(titlebar-area-width) - env(titlebar-area-x)`. */
+@media (display-mode: window-controls-overlay) {
+	.pse-header {
+		-webkit-app-region: drag;
+		app-region: drag;
+	}
+
+	.pse-header-inner {
+		/* Matched to the buttons' strip, so the band and the window controls
+		   are one row rather than two things of different heights sharing an
+		   edge. The padding is what stops the mark touching the top of the
+		   screen; the strip is short, so there is little of it to give. */
+		min-height: env(titlebar-area-height, 0px);
+		padding-top: 4px;
+		padding-bottom: 4px;
+	}
+
+	/* Sized to the strip rather than kept at its full 34px: the mark has to sit
+	   inside a title bar now, and a title bar is shorter than the band was. */
+	.pse-header-logo {
+		height: 24px;
+	}
+
+	.pse-header-link,
+	.pse-header-logo {
+		-webkit-app-region: no-drag;
+		app-region: no-drag;
+	}
+}
+
 /* Held to the same width as the search card below, so the logo starts on the
    card's left edge instead of at the window's. */
 .pse-header-inner {

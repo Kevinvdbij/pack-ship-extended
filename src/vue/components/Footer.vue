@@ -3,12 +3,14 @@ import { computed, ref, Teleport, Transition } from 'vue';
 import Modal from "../components/SettingsModal.vue";
 import CredentialsPrompt from "../components/CredentialsPrompt.vue";
 import pkg from "../../../package.json";
+import installIconUrl from "../../assets/install.svg";
 import powerIconUrl from "../../assets/power.svg";
 import settingsIconUrl from "../../assets/settings.svg";
 import Settings from '../../settings.ts';
 import { getCurrentUser, onCurrentUserChange } from '../../currentUser.ts';
 import { FOOTER_SLOT_SELECTOR } from '../../constants.ts';
 import { hasCredentials } from '../../shopware.ts';
+import { canInstall, installApp } from '../../pwa.ts';
 
 // The same bar in two shapes. The full one is the control strip on the pages
 // behind the login; `minimal` drops everything that needs a session -- the
@@ -69,6 +71,14 @@ function syncMasterSwitch() {
 	showCredentialsPrompt.value = !hasCredentials();
 }
 
+// Chrome only raises the install dialog from a user gesture, which is what this
+// click is. Whether it is accepted is Chrome's business and the operator's --
+// the pill disappears either way, because the event behind it is spent, and
+// comes back if Chrome offers again.
+function install() {
+	installApp();
+}
+
 // Not entirely happy with this but works.
 function masterSwitchToggle() {
 	Settings.autoMasterSwitch = !Settings.autoMasterSwitch;
@@ -109,6 +119,20 @@ function masterSwitchToggle() {
 				<span class="pse-brand">P&amp;S Extended</span>
 				<span class="pse-version-number">v{{ pkg.version }}</span>
 			</span>
+
+			<!-- Present only while Chrome is actually willing to install: it
+			     hands us the prompt when the manifest is accepted and this
+			     machine has no copy yet, and takes it back once one is
+			     installed. On the minimal bar as well as the full one -- the
+			     login screen is where a station is set up, and installing needs
+			     no session. -->
+			<span v-if="canInstall" class="pse-divider" aria-hidden="true"></span>
+
+			<button v-if="canInstall" type="button" class="pse-pill pse-install"
+				title="Pack&amp;Ship als app op deze computer installeren" @click="install()">
+				<img class="pse-icon" :src="installIconUrl" alt="" />
+				<span class="pse-install-label">App installeren</span>
+			</button>
 
 			<span v-if="!minimal" class="pse-divider" aria-hidden="true"></span>
 
@@ -274,6 +298,22 @@ function masterSwitchToggle() {
 	filter: brightness(0) invert(84%) sepia(29%) saturate(958%) hue-rotate(324deg) brightness(101%) contrast(92%);
 }
 
+/* The one control in the bar that is offered rather than always there, so it
+   gets a well of its own to sit in: it has to be noticeable the once, and the
+   bar it appears in is otherwise settled. */
+.pse-install {
+	color: var(--pse-ink-strong);
+	background-color: rgba(255, 255, 255, 0.14);
+}
+
+.pse-install:hover {
+	background-color: rgba(255, 255, 255, 0.24);
+}
+
+.pse-install .pse-icon {
+	filter: brightness(0) invert(1);
+}
+
 .pse-settings {
 	color: var(--pse-ink);
 }
@@ -393,6 +433,17 @@ function masterSwitchToggle() {
 @media (max-width: 767px) {
 	.pse-settings-label {
 		display: none;
+	}
+
+	/* Unlike the gear, this icon is not self-explanatory, so it keeps a word --
+	   just a shorter one. */
+	.pse-install-label {
+		font-size: 0;
+	}
+
+	.pse-install-label::after {
+		content: "App";
+		font-size: 12.5px;
 	}
 }
 </style>

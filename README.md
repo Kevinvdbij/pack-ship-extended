@@ -81,6 +81,45 @@ request is worse than a region arriving late. The reservation table is the one c
 skeleton sized from the portal's own row inputs and fills it in afterwards, so the swap moves
 nothing.
 
+## Installing it as an app
+
+The station runs the portal in a window of its own rather than in a tab, which is what `src/pwa.ts`
+is for. RetailVista serves no web app manifest, so the script builds one and declares it
+as a `data:` URL, icons and all. The icons are `src/assets/pwa-icon.svg` and its maskable twin,
+rasterised to PNG through a canvas at runtime: a userscript has nowhere to keep a binary, and a
+base64 PNG inlined into the bundle is a wall of characters nobody can check against the logo.
+
+**The manifest has to be a `data:` URL, not a `blob:` one.** A blob looks like the better fit -- it
+is same-origin with the page that made it, and it fetches from the page perfectly well -- but Chrome
+will not install from one. With a blob manifest declared it never offers; with the identical manifest
+as a data URL it offers immediately. Same for the icons inside it. Both were checked against the live
+portal, and both are the kind of thing that is invisible until someone tries to install and cannot.
+
+`display` is `standalone`, and deliberately not `fullscreen`: Chrome on desktop does not support that
+mode at all -- it belongs to Android and ChromeOS, and on Windows it falls straight back to
+`standalone`.
+
+**Fullscreen was tried and taken back out.** A footer button using the Fullscreen API, the
+`window-controls-overlay` display mode, and Chrome's `AutomaticFullscreenAllowedForUrls` policy were
+each built and each failed for a different reason: the Fullscreen API belongs to a *document*, so
+this portal loses it on every click through to the next page; the overlay and `fullscreen` display
+modes are not granted to an installed app here; and the policy grants a permission that Chrome then
+declines to honour -- `navigator.permissions.query` reports `granted` and `requestFullscreen()`
+rejects with `TypeError: not granted` on the same visible, focused page. What does work is F11, which
+is the *window's* fullscreen and survives a navigation, and Chrome's `--kiosk` flag from a shortcut
+that starts its own instance (`--user-data-dir`), measured at the full 1536x960. Neither is something
+the userscript can reach, which is why there is no fullscreen code here.
+
+**There is no service worker, and there cannot be one.** A worker script has to be a same-origin
+*file*, and registering one from a blob is refused. So the installed app is a window onto the live
+portal rather than something that works offline -- which is the right shape for it anyway, since
+every screen it has is a request against RetailVista.
+
+Installing is offered from the footer bar: an "App installeren" pill that appears only while Chrome
+has actually offered (`beforeinstallprompt`), and disappears once a copy is installed. Chrome's own
+menu offers the same thing under *Casten, opslaan en delen -> Pagina installeren als app*, and both
+routes use the manifest above.
+
 ## Stack
 
 Vue 3 (`<script setup>` SFCs) + TypeScript, bundled into a single userscript by
@@ -130,6 +169,7 @@ npm run build
 | `build/userstyle.ts` | The Vite plugin that wraps the cloak into an installable style |
 | `src/reveal.ts` | Shows the page once the boot is done, and the failsafe that shows it regardless |
 | `src/environment.ts` | Pins the portal's environment ("Omgeving") to the machine |
+| `src/pwa.ts` | The web app manifest, so the portal installs as an app |
 | `src/currentUser.ts` | Name of the logged-in employee, captured on the Login page and shown in the footer |
 
 ## Editor setup

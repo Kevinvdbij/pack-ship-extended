@@ -1,0 +1,20 @@
+<!-- The same tile for launchers that crop the icon to a shape of their own.
+     A maskable icon is only guaranteed to keep the middle 80% of its width, so
+     the mark is drawn smaller and the corners are left square and full of
+     green: whatever shape is cut out of it, it comes out as a filled tile with
+     the mark centred in it.
+
+     No double dash in this comment, and no rounding either: see `pwa-icon.svg`.
+     -->
+<svg width="512" height="512" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+	<defs>
+		<linearGradient id="tile" x1="0" y1="0" x2="0.35" y2="1">
+			<stop offset="0" stop-color="#7fb480"/>
+			<stop offset="1" stop-color="#48793f"/>
+		</linearGradient>
+	</defs>
+	<rect width="100" height="100" rx="0" fill="url(#tile)"/>
+	<g transform="translate(29 28.1) scale(0.8719)">
+		<path d="M24.412 35.6565V11.098L41.6909 43.6364L24.412 35.6565ZM22.0017 0.496094L19.282 1.47322L22.4577 7.45001L0 49.7435L24.0863 38.6205L48.1725 49.7435L25.6985 7.43372L28.8579 1.48951L26.1382 0.528665L24.0863 4.40462L22.018 0.512379L22.0017 0.496094Z" fill="#ffffff"/>
+	</g>
+</svg>

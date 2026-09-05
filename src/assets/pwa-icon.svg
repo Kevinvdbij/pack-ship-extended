@@ -1,0 +1,32 @@
+<!-- The installed app's icon: the brand mark on a tile of its own, which is the
+     one place it stands without the wordmark beside it.
+
+     A launcher icon is small and sits among other small icons, so it is the
+     tile that has to be recognisable before the drawing inside it is. Hence a
+     filled green tile with the mark in white, rather than the mark in green on
+     white: at 24px the white one reads as a blank square with something faint
+     in it. The mark is sized to fill the tile with only its own margin left
+     around it, and the tile carries a soft top to bottom gradient so it has a
+     little depth next to the flat tiles Windows puts beside it.
+
+     The rounding is drawn in rather than left to the launcher. Chrome hands an
+     `any` icon over exactly as it is, so a square one stays square.
+
+     Rasterised to a PNG at runtime by `src/pwa.ts` rather than shipped as one:
+     a userscript has nowhere to put a binary, and a PNG inlined as base64 is a
+     wall of characters no one can check against the logo.
+
+     Because it is rasterised, this file is parsed as XML, and XML forbids a
+     double dash inside a comment. The house em dash cannot be used in here. -->
+<svg width="512" height="512" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+	<defs>
+		<linearGradient id="tile" x1="0" y1="0" x2="0.35" y2="1">
+			<stop offset="0" stop-color="#7fb480"/>
+			<stop offset="1" stop-color="#48793f"/>
+		</linearGradient>
+	</defs>
+	<rect width="100" height="100" rx="22" fill="url(#tile)"/>
+	<g transform="translate(25 23.93) scale(1.0379)">
+		<path d="M24.412 35.6565V11.098L41.6909 43.6364L24.412 35.6565ZM22.0017 0.496094L19.282 1.47322L22.4577 7.45001L0 49.7435L24.0863 38.6205L48.1725 49.7435L25.6985 7.43372L28.8579 1.48951L26.1382 0.528665L24.0863 4.40462L22.018 0.512379L22.0017 0.496094Z" fill="#ffffff"/>
+	</g>
+</svg>

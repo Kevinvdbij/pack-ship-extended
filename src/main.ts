@@ -15,6 +15,7 @@ import { applyConfiguredEnvironment, getEnvironmentSelect, hideEnvironmentPicker
 import { applyDutchLanguage, hideLanguagePicker } from './language.ts';
 import { ENVIRONMENT_FORM_SELECTOR, FOOTER_SLOT_SELECTOR, MAIN_CONTENT_SELECTOR, PAGE_COLUMN_SELECTOR } from './constants.ts';
 import { armReveal, reveal } from './reveal.ts';
+import { installManifest } from './pwa.ts';
 import { pinFooter } from './stickyFooter.ts';
 // The portal's own elements first, ours second, so a tie between the two is
 // settled the way it reads: our markup wins on the page it is on. Both go up at
@@ -136,6 +137,11 @@ const route = routes.find((candidate) => candidate.pattern.test(candidate.matchQ
 // Armed first, before anything that can fail: the cloak hides the page whether
 // or not the rest of this runs, so something has to be guaranteed to show it.
 armReveal();
+
+// The manifest that makes the portal installable as an app. Not part
+// of the group below and not waited on: nothing on screen depends on it, and
+// Chrome reads it on its own schedule once the link is up.
+installManifest();
 
 // Each of these waits on a different piece of the portal's markup, so they run
 // concurrently and the page is shown once the last of them is done. None of
