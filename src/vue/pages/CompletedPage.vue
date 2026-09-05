@@ -155,6 +155,31 @@ onMounted(() => {
 	parcelsUrl.value = readParcelsUrl();
 	parcels.value = readParcels(container);
 
+	const finished = {
+		id: RVUtils.getCurrentReservationId(),
+		number: RVUtils.getCurrentReservationNumber()
+	};
+
+	RVUtils.setLastCompletedReservation(finished);
+
+	// And into the list the search screen shows. A parcel announced afterwards
+	// lands on this same screen, and is recorded too: from the list's point of
+	// view it is the same reservation finished again, later and with a parcel
+	// more, which is what the entry ends up saying.
+	//
+	// Written before the run is told this reservation is finished, because that
+	// is what gets this tab closed: the tab that started the mass complete
+	// closes each one the moment it reports in, and a store that commits its
+	// writes asynchronously can lose one issued in the moment before the tab
+	// goes away.
+	RVUtils.recordCompletedReservation({
+		...finished,
+		completedAt: Date.now(),
+		customer: RVUtils.getCurrentCustomerName(),
+		parcels: parcels.value.length,
+		failed: failed.value
+	});
+
 	updateAutoComplete();
 
 	container.classList.add("pse-portal-replaced");
@@ -178,25 +203,6 @@ onMounted(() => {
 		?.classList.add("pse-portal-replaced");
 
 	replaced.value = true;
-
-	const finished = {
-		id: RVUtils.getCurrentReservationId(),
-		number: RVUtils.getCurrentReservationNumber()
-	};
-
-	RVUtils.setLastCompletedReservation(finished);
-
-	// And into the list the search screen shows. A parcel announced afterwards
-	// lands on this same screen, and is recorded too: from the list's point of
-	// view it is the same reservation finished again, later and with a parcel
-	// more, which is what the entry ends up saying.
-	RVUtils.recordCompletedReservation({
-		...finished,
-		completedAt: Date.now(),
-		customer: RVUtils.getCurrentCustomerName(),
-		parcels: parcels.value.length,
-		failed: failed.value
-	});
 
 	// A refused reservation is where the automatic run stops, switch or no
 	// switch. Everything after this screen assumes the parcels are on their way,

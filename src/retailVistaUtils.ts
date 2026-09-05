@@ -1,6 +1,6 @@
 import { GM_deleteValues, GM_getValue, GM_listValues, GM_setValue } from "$";
 import { CompletedReservation, MassCompleteEntry, ModalProductDetails, ModalReservationDetails, ParcelItem, ProductDetails, ProductLine, ReservationDefinition, ReservationDetails, ReservationSearchResponseType, ReservationSelectionModalData, VerificationRow } from "./interfaces";
-import { COMPLETED_HISTORY_LIMIT, CONTAINER_SELECTOR, massCompleteEntryKey, HEADER_SELECTOR, SEARCH_BLOCK_SELECTOR, PACKING_PORTAL_URL, PARCEL_CONTAINER_PARENT_SELECTOR, RESERVATION_SIDEBAR_SELECTOR, RESERVATION_SUMMARY_SELECTOR, STORAGE_KEYS } from "./constants.ts";
+import { COMPLETED_HISTORY_LIMIT, completedEntryKey, CONTAINER_SELECTOR, massCompleteEntryKey, HEADER_SELECTOR, SEARCH_BLOCK_SELECTOR, PACKING_PORTAL_URL, PARCEL_CONTAINER_PARENT_SELECTOR, RESERVATION_SIDEBAR_SELECTOR, RESERVATION_SUMMARY_SELECTOR, STORAGE_KEYS } from "./constants.ts";
 import { debug } from "./logger.ts";
 import { afterReveal } from "./reveal.ts";
 
@@ -256,31 +256,60 @@ export function getLastCompletedReservation():ReservationDefinition {
 	return GM_getValue(STORAGE_KEYS.lastCompletedReservation);
 }
 
-// The finished reservations, newest first. Anything the store hands back that
-// is not a list is treated as no history: this is a convenience panel, and a
-// value written by an older build is not worth failing the search screen over.
+// The finished reservations, newest first.
+//
+// One key each -- see `completedEntryPrefix` -- so the list is assembled on
+// read rather than kept as a value that has to be rewritten whole. Anything in
+// the store that does not read as an entry is skipped: this is a convenience
+// panel, and a value left by an older version is not worth failing the search
+// screen over.
 export function getCompletedHistory(): Array<CompletedReservation> {
-	const history = GM_getValue(STORAGE_KEYS.completedHistory, []);
-
-	return Array.isArray(history) ? history as Array<CompletedReservation> : [];
+	return completedEntryKeys()
+		.map((key) => GM_getValue(key) as CompletedReservation)
+		.filter((entry) => entry && typeof entry.completedAt == "number")
+		.sort((first, second) => second.completedAt - first.completedAt)
+		.slice(0, COMPLETED_HISTORY_LIMIT);
 }
 
-// Adds a reservation to the front of the history.
+// Records one finished reservation.
 //
-// The same reservation can reach the completed screen more than once -- a
-// parcel added afterwards finishes on it again -- so an entry for a number
-// already in the list replaces it rather than sitting above it. What is kept is
-// the newer of the two: it has the later time and the fuller parcel count.
+// The reservation's number is the key, so a reservation that reaches the
+// completed screen twice -- which is what adding a parcel afterwards does --
+// replaces its entry instead of gaining a second one, and two tabs finishing at
+// the same moment write to two different keys.
 export function recordCompletedReservation(reservation: CompletedReservation) {
-	const history = getCompletedHistory().filter((entry) => entry.number != reservation.number);
+	GM_setValue(completedEntryKey(reservation.number), reservation);
 
-	history.unshift(reservation);
+	pruneCompletedHistory();
+}
 
-	GM_setValue(STORAGE_KEYS.completedHistory, history.slice(0, COMPLETED_HISTORY_LIMIT));
+// Drops the oldest entries once there are more than the panel keeps.
+//
+// Safe to run from several tabs at once: the entries it selects are the oldest
+// by their own timestamp, so an entry another tab has just written is never
+// among them, and deleting a key twice is deleting it once.
+function pruneCompletedHistory() {
+	const keys = completedEntryKeys();
+
+	if (keys.length <= COMPLETED_HISTORY_LIMIT) {
+		return;
+	}
+
+	const stale = keys
+		.map((key) => ({ key, completedAt: (GM_getValue(key) as CompletedReservation)?.completedAt ?? 0 }))
+		.sort((first, second) => second.completedAt - first.completedAt)
+		.slice(COMPLETED_HISTORY_LIMIT)
+		.map((entry) => entry.key);
+
+	GM_deleteValues(stale);
 }
 
 export function clearCompletedHistory() {
-	GM_setValue(STORAGE_KEYS.completedHistory, []);
+	GM_deleteValues(completedEntryKeys());
+}
+
+function completedEntryKeys(): string[] {
+	return GM_listValues().filter((key) => key.startsWith(STORAGE_KEYS.completedEntryPrefix));
 }
 
 export function getCurrentReservationNumber() {

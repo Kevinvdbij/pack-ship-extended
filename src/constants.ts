@@ -173,7 +173,15 @@ export const STORAGE_KEYS = {
 	reservationCache: "PSE_Reservation_Cache",
 	lastOpenReservation: "PSE_Last_Open_Reservation",
 	lastCompletedReservation: "PSE_Last_Completed_Reservation",
-	completedHistory: "PSE_Completed_History",
+	// One key per finished reservation, suffixed with its number.
+	//
+	// Not one key holding the list: a mass complete finishes up to fifty
+	// reservations in tabs that all reach the completed screen within a second
+	// of each other, and a list would have every one of them read it, add
+	// itself, and write the whole thing back -- so all but the last write would
+	// be overwritten by a copy taken before it. Separate keys cannot collide,
+	// which is the same reason the run's own state is stored this way.
+	completedEntryPrefix: "PSE_Completed_",
 	currentUser: "PSE_Current_User",
 	swClientId: "PSE_Shopware_Client_Id",
 	swClientSecret: "PSE_Shopware_Client_Secret",
@@ -181,11 +189,19 @@ export const STORAGE_KEYS = {
 	massCompleteEntryPrefix: "PSE_MCEntry_",
 } as const;
 
-// How many finished reservations the search screen keeps. Long enough to cover
-// a shift's worth of "which one was that again", short enough that the panel
-// stays a list rather than an archive -- and it is scrolled, so the number is
-// about what is worth storing rather than what fits.
-export const COMPLETED_HISTORY_LIMIT = 40;
+// How many finished reservations the search screen keeps.
+//
+// Comfortably more than the fifty a single mass complete can finish, so a run
+// that size cannot push the whole of the morning's work out of the list in one
+// go and leave nothing but itself.
+//
+// It is also what keeps the store from growing: one key is written per
+// reservation and the oldest beyond this count are deleted as new ones arrive.
+export const COMPLETED_HISTORY_LIMIT = 80;
+
+export function completedEntryKey(reservationNumber: string) {
+	return `${STORAGE_KEYS.completedEntryPrefix}${reservationNumber}`;
+}
 
 export function massCompleteEntryKey(reservationNumber: string) {
 	return `${STORAGE_KEYS.massCompleteEntryPrefix}${reservationNumber}`;
