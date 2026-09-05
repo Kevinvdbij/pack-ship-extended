@@ -5,10 +5,12 @@ import Settings from '../../settings.ts';
 import { MassCompleteStatus } from '../../interfaces.ts';
 import { afterPaint, afterReveal } from '../../reveal.ts';
 import { standInForPortalPage } from '../../standIn.ts';
+import { mountApp } from '../mount.ts';
+import ReservationSidebar from '../components/ReservationSidebar.vue';
 import {
 	COMPLETED_CONTAINER_SELECTOR, COMPLETED_HEADING_SELECTOR, COMPLETED_PROCEED_SELECTOR,
 	COMPLETED_STEP_DETAIL_SELECTOR, COMPLETED_STEP_ERROR_SELECTOR, COMPLETED_STEP_SELECTOR,
-	PACKING_PORTAL_URL, VENDOR_BAND_LOGO_SELECTOR
+	MAIN_CONTENT_SELECTOR, PACKING_PORTAL_URL, PARCELS_RETURN_HASH, VENDOR_BAND_LOGO_SELECTOR
 } from '../../constants.ts';
 
 // One step of the portal's own account of what it did with the reservation.
@@ -110,13 +112,24 @@ onMounted(() => {
 
 	updateAutoComplete();
 
-	container.classList.add("pse-portal-replaced");
+	// A reservation that went out is finished with: the card says so, the button
+	// closes it, and nothing else on the page is going to be read. One that was
+	// refused is the opposite -- it is about to be looked into, and everything
+	// the screen knows about it is worth having. So the two cases hide different
+	// amounts of the portal's page.
+	if (failed.value) {
+		restorePortalPage = keepPortalDetail(container);
+		mountSidebar();
+		liftCardAboveDetail();
+	} else {
+		container.classList.add("pse-portal-replaced");
 
-	// And with it everything else the portal laid out in this cell -- the
-	// reservation sidebar above all, which otherwise stands there beside a card
-	// that has been pushed below the whole page it replaces.
-	if (root.value) {
-		restorePortalPage = standInForPortalPage(root.value);
+		// And with it everything else the portal laid out in this cell -- the
+		// reservation sidebar above all, which otherwise stands there beside a
+		// card that has been pushed below the whole page it replaces.
+		if (root.value) {
+			restorePortalPage = standInForPortalPage(root.value);
+		}
 	}
 
 	// This page is served without a header band, and carries the vendor's small
@@ -148,6 +161,95 @@ onMounted(() => {
 	// background tab, where frames never come; see `afterPaint`.
 	afterReveal(() => afterPaint(finalize));
 });
+
+// What the portal's own block keeps on a refused reservation: the parcels, with
+// their carrier, their weight and what is in them. That is the part the operator
+// is coming back to look at, so it is left standing and given the chrome of a
+// card; what our own card already says is hidden.
+//
+// Hidden by what the rows hold rather than by their position: the failure adds
+// rows to this block, so counting from the top means counting differently on the
+// two pages this markup serves.
+function keepPortalDetail(container: Element): () => void {
+	const hidden: Element[] = [];
+
+	const hide = (element: Element | null | undefined) => {
+		if (!element || element.classList.contains("pse-portal-replaced")) {
+			return;
+		}
+
+		element.classList.add("pse-portal-replaced");
+		hidden.push(element);
+	};
+
+	// The portal's heading and its finish button, both of which our card
+	// carries -- and the rule between them, which separates nothing once they
+	// are gone.
+	hide(container.querySelector(COMPLETED_HEADING_SELECTOR)?.closest(".row"));
+	hide(proceedButton()?.closest(".row"));
+
+	for (const rule of container.querySelectorAll(":scope > hr")) {
+		hide(rule);
+	}
+
+	const detail = container.querySelector(".container");
+	const steps = detail?.querySelector(".list-group")?.closest(".row");
+
+	if (!detail || !steps) {
+		return () => undo(hidden);
+	}
+
+	detail.classList.add("pse-portal-detail");
+
+	// Everything down to and including the list of steps: that is the portal's
+	// version of the verdict, which our card has already given. What follows it
+	// is the reservation's own detail, and stays.
+	for (const row of detail.children) {
+		hide(row);
+
+		if (row == steps) {
+			break;
+		}
+	}
+
+	return () => {
+		detail.classList.remove("pse-portal-detail");
+		undo(hidden);
+	};
+}
+
+function undo(hidden: Element[]) {
+	for (const element of hidden) {
+		element.classList.remove("pse-portal-replaced");
+	}
+}
+
+// The same column of facts every other page with a reservation open carries --
+// who it is for, where it is going, and the webshop reference, which is the one
+// thing on this screen that gets looked up somewhere else and so is the one
+// thing with a copy button on it.
+//
+// The portal renders those facts on this page too; this reads them out of its
+// block and hides it, the way it does on the parcels page.
+function mountSidebar() {
+	const column = RVUtils.getReservationSidebarColumn();
+
+	if (!column) {
+		return;
+	}
+
+	mountApp(ReservationSidebar, (host) => column.insertAdjacentElement("afterbegin", host));
+}
+
+// Our card is appended past the end of the cell, which is behind the detail we
+// have just kept. It is the answer to what happened, so it goes first.
+function liftCardAboveDetail() {
+	const main = root.value?.closest(MAIN_CONTENT_SELECTOR);
+
+	if (main && root.value) {
+		main.prepend(root.value);
+	}
+}
 
 // The portal's account of what it did, filtered down to the steps it marked as
 // failed. The mark is the icon's class: the wording is translated and the step
@@ -203,7 +305,11 @@ function readParcelsUrl(): string {
 		return "";
 	}
 
-	return `${PACKING_PORTAL_URL}/Parcels?reservationId=${encodeURIComponent(reservationId)}&allowCashOnDelivery=False`;
+	// The hash is what tells that page this is a return: it keeps the parcels it
+	// would otherwise clear on the way in, and leaves the announcing to the
+	// operator. See `PARCELS_RETURN_HASH`.
+	return `${PACKING_PORTAL_URL}/Parcels?reservationId=${encodeURIComponent(reservationId)}`
+		+ `&allowCashOnDelivery=False${PARCELS_RETURN_HASH}`;
 }
 
 // Back to the step that can be repeated. The page it leaves for takes a moment
@@ -276,7 +382,7 @@ function updateAutoComplete() {
 	     the portal's page is hidden around, so it has to exist before there is
 	     anything to put in it. -->
 	<div ref="root">
-		<div class="pse-done" v-if="replaced">
+		<div class="pse-done" :class="{ 'is-failed': failed }" v-if="replaced">
 			<!-- Two cards, not one card with the failure written into it: the
 			     screens say opposite things and are acted on differently, and
 			     the operator has to be able to tell them apart from a step back
@@ -394,6 +500,14 @@ function updateAutoComplete() {
 	border-radius: 50%;
 	background-color: var(--pse-brand-soft);
 	color: var(--pse-brand-ink);
+}
+
+/* On a failure the card is not the whole screen: the reservation's own detail is
+   kept underneath it, so the card takes the room it needs and hands the rest
+   over rather than centring itself in a window it no longer owns. */
+.pse-done.is-failed {
+	min-height: 0;
+	padding-bottom: 8px;
 }
 
 /* A refused reservation. The card is the same card -- same shape, same weight --

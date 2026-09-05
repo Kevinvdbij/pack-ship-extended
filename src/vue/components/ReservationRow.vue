@@ -35,9 +35,10 @@ const STATES = {
 	[MassCompleteStatus.started]: { label: "Bezig", modifier: "is-busy" },
 	[MassCompleteStatus.finished]: { label: "Afgerond", modifier: "is-done" },
 	[MassCompleteStatus.failed]: { label: "Mislukt", modifier: "is-failed" },
+	[MassCompleteStatus.stopped]: { label: "Gestopt", modifier: "is-stopped" },
 };
 
-// Anything that is not one of the four is treated as a failure, which is what
+// Anything that is not one of the five is treated as a failure, which is what
 // the old progress bar did: a run whose tab never reported back is not idle,
 // and showing it as still queued would leave a row that never resolves.
 const state = computed(() => props.status == undefined
@@ -196,6 +197,14 @@ const state = computed(() => props.status == undefined
 .pse-row-state.is-queued {
 	background-color: var(--pse-well);
 	color: var(--pse-ink-faint);
+}
+
+/* A reservation the run never got to, because it was stopped. Nothing happened
+   to it, so it is marked the way the queue is rather than the way a failure is
+   -- but named, because the run is over and it is not coming back to it. */
+.pse-row-state.is-stopped {
+	background-color: var(--pse-well);
+	color: var(--pse-ink-soft);
 }
 
 .pse-row-state.is-busy {

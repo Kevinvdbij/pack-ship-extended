@@ -97,5 +97,9 @@ export enum MassCompleteStatus {
 	idle = 0,
 	started = 1,
 	finished = 2,
-	failed = 3
+	failed = 3,
+	// Not a verdict on the reservation but on the run: one of the others failed,
+	// the run was stopped, and this reservation's tab was closed before it got
+	// anywhere. It is untouched and can be packed normally.
+	stopped = 4
 }

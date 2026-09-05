@@ -6,6 +6,7 @@ import {
 	PACKING_PORTAL_URL,
 	PARCEL_GROUP_SELECTOR,
 	PARCEL_TABS_SELECTOR,
+	PARCELS_RETURN_HASH,
 } from '../../constants.ts';
 import { debug } from '../../logger.ts';
 import addIconUrl from "../../assets/add.svg";
@@ -17,6 +18,14 @@ import Settings from '../../settings.ts';
 import * as Shopware from "../../shopware.ts";
 
 const showRows = ref(false);
+
+// Sent back here by the completed screen after the carrier refused the
+// announcement. Everything this page does on its own is off for the trip: the
+// parcels are kept rather than cleared, and nothing is announced or scanned
+// until the operator says so. They came back to change something, and a page
+// that empties the boxes and immediately re-announces them would carry them
+// straight to the same error with the same parcel.
+const returning = window.location.hash == PARCELS_RETURN_HASH;
 
 // The table is the portal's own rows, read straight out of the hidden inputs
 // it serves this page with -- one `VerificationReservationRows[n]` group per
@@ -52,7 +61,7 @@ onMounted(() => {
 				rows.value = RVUtils.getVerificationRows();
 			}
 
-			return removeParcelItems();
+			return returning ? undefined : removeParcelItems();
 		})
 		.then(() => {
 			updateVerifiedQuantities();
@@ -168,6 +177,10 @@ function setupSidebar() {
 }
 
 function autoAnnounceParcels(parcelContainerElement: Element) {
+	if (returning) {
+		return;
+	}
+
 	if (!Settings.autoMasterSwitch && !RVUtils.isMassCompleteReservation(RVUtils.getCurrentReservationNumber())) {
 		return;
 	}
@@ -180,6 +193,10 @@ function autoAnnounceParcels(parcelContainerElement: Element) {
 }
 
 function processAutoComplete() {
+	if (returning) {
+		return;
+	}
+
 	const orderNumber = RVUtils.getCurrentReservationNumber();
 
 	if (RVUtils.isMassCompleteReservation(orderNumber)) {

@@ -92,6 +92,20 @@ export const COMPLETED_CONTAINER_SELECTOR = "#ReservationContainer";
 // went out or was refused. Taken off the page rather than written here, the way
 // the finish button's label is: it is the portal's verdict, in the portal's
 // words, and a copy of it here would drift.
+// Marks a trip back to the parcels page as a return rather than a fresh entry.
+//
+// The parcels page clears the boxes it finds on the way in -- a reservation is
+// packed from empty, and a leftover parcel from an abandoned attempt would be
+// shipped with the next one. Coming back from a refused announcement is the one
+// case where that is exactly wrong: the parcels are the work that was just done,
+// the announcement is all that failed, and clearing them means packing the order
+// twice.
+//
+// A hash rather than a query parameter: the portal reads its own query string on
+// this page and this is nothing to do with it, so it goes where the server never
+// sees it.
+export const PARCELS_RETURN_HASH = "#pse-return";
+
 export const COMPLETED_HEADING_SELECTOR = "#ReservationContainer h3";
 
 // What the portal did with the reservation, one list item per step -- announced

@@ -25,13 +25,17 @@ const props = defineProps<{
 	// waiting for a tab.
 	finished: number;
 	failed: number;
+	// The run was cut short by a reservation the carrier refused, and the tabs
+	// that had not finished were closed. What is not counted above is not on its
+	// way any more.
+	stopped: boolean;
 }>();
 
 const emit = defineEmits<{ "update:amount": [value: number]; start: [] }>();
 
 const settled = computed(() => props.finished + props.failed);
 
-const done = computed(() => props.started && settled.value >= props.amount);
+const done = computed(() => props.started && (props.stopped || settled.value >= props.amount));
 
 // Nought until the run starts, so the bar is not drawn part-full before anything
 // has happened.
@@ -48,7 +52,7 @@ function step(by: number) {
 </script>
 
 <template>
-	<section class="pse-mc" :class="{ 'is-running': started && !done, 'is-done': done }">
+	<section class="pse-mc" :class="{ 'is-running': started && !done, 'is-done': done, 'is-stopped': stopped }">
 		<div class="pse-mc-head">
 			<span class="pse-mc-icon" aria-hidden="true">
 				<svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="2"
@@ -69,6 +73,13 @@ function step(by: number) {
 				</p>
 				<p class="pse-mc-subtitle" v-else-if="!done">
 					{{ settled }} van {{ amount }} afgerond — laat dit scherm openstaan.
+				</p>
+				<!-- A stopped run is reported before the ordinary verdict: the
+				     count on its own would read as a run that finished with a
+				     few failures, and what happened is that it was called off. -->
+				<p class="pse-mc-subtitle" v-else-if="stopped">
+					Gestopt na een mislukte reservering. {{ finished }} afgerond, de rest is niet
+					geprobeerd — het tabblad met de fout staat nog open.
 				</p>
 				<p class="pse-mc-subtitle" v-else-if="failed > 0">
 					{{ finished }} afgerond, {{ failed }} mislukt. Mislukte reserveringen staan hieronder.
@@ -102,7 +113,7 @@ function step(by: number) {
 			     the controls that produced it. -->
 			<div class="pse-mc-tally" v-else>
 				<span class="pse-mc-tally-count">{{ settled }}<span class="pse-mc-tally-of">/{{ amount }}</span></span>
-				<span class="pse-mc-tally-label">{{ done ? "klaar" : "afgerond" }}</span>
+				<span class="pse-mc-tally-label">{{ stopped ? "gestopt" : done ? "klaar" : "afgerond" }}</span>
 			</div>
 		</div>
 
@@ -139,6 +150,23 @@ function step(by: number) {
 .pse-mc.is-done {
 	border-color: var(--pse-brand);
 	background-color: var(--pse-brand-soft);
+}
+
+/* A run that was called off is finished, but it is not the green verdict: what
+   it ended on is the same failure the rows below carry. Declared after
+   `is-done`, which it overrides -- a stopped run counts as done. */
+.pse-mc.is-stopped {
+	border-color: var(--pse-alert-soft);
+	background-color: var(--pse-alert-wash);
+}
+
+.pse-mc.is-stopped .pse-mc-icon {
+	border-color: var(--pse-alert-soft);
+	color: var(--pse-alert-ink);
+}
+
+.pse-mc.is-stopped .pse-mc-progress-fill {
+	background-color: var(--pse-alert);
 }
 
 .pse-mc-head {
@@ -324,7 +352,24 @@ function step(by: number) {
 /* The controls are the first thing to run out of room, and they are the widest
    thing on the row. Given a line of their own rather than being squeezed. */
 @media (max-width: 720px) {
-	.pse-mc-head {
+	/* A run that was called off is finished, but it is not the green verdict: what
+   it ended on is the same failure the rows below carry. Declared after
+   `is-done`, which it overrides -- a stopped run counts as done. */
+.pse-mc.is-stopped {
+	border-color: var(--pse-alert-soft);
+	background-color: var(--pse-alert-wash);
+}
+
+.pse-mc.is-stopped .pse-mc-icon {
+	border-color: var(--pse-alert-soft);
+	color: var(--pse-alert-ink);
+}
+
+.pse-mc.is-stopped .pse-mc-progress-fill {
+	background-color: var(--pse-alert);
+}
+
+.pse-mc-head {
 		flex-wrap: wrap;
 	}
 

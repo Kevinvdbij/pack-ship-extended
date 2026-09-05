@@ -29,6 +29,12 @@ const massCompleteMax = 50;
 const massCompleteThreshold = 2;
 const massCompleteStatus = ref<MassCompleteEntry[]>();
 
+// A run that was cut short by a reservation the carrier refused. The rest of
+// the run is not attempted: whatever stopped the one is likely to stop the next
+// -- a carrier that is down, an account that is out of labels -- and a run that
+// carries on regardless turns one reservation to sort out into twenty.
+const massCompleteStopped = ref(false);
+
 // Before the first render rather than on mount: whether there is a mass complete
 // to offer decides whether the countdown notice is shown, and worked out a tick
 // later it is shown and then taken away again -- which on a dialog that has just
@@ -165,8 +171,44 @@ function monitorMassCompleteEntry(entry: MassCompleteEntry) {
 			if (newValue == MassCompleteStatus.finished) {
 				entry.close?.();
 			}
+
+			if (newValue == MassCompleteStatus.failed) {
+				stopMassComplete(entry);
+			}
 		}
 	});
+}
+
+// Stops the run around the reservation that failed.
+//
+// Its own tab is left open -- it is the screen that says what the carrier
+// refused, and the only place the announcement can be tried again. The tabs
+// that had not finished are closed, and the reservations in them are marked as
+// what they are: not attempted.
+//
+// A tab closed mid-flight may have got as far as building its parcels, so the
+// mark says stopped rather than untouched. The reservation itself is not
+// finished either way, and the operator picks it up from the list like any
+// other.
+function stopMassComplete(failed: MassCompleteEntry) {
+	if (massCompleteStopped.value) {
+		return;
+	}
+
+	massCompleteStopped.value = true;
+
+	for (const entry of massCompleteStatus.value ?? []) {
+		if (entry.reservationNumber == failed.reservationNumber) {
+			continue;
+		}
+
+		if (entry.status == MassCompleteStatus.finished || entry.status == MassCompleteStatus.failed) {
+			continue;
+		}
+
+		entry.close?.();
+		entry.status = MassCompleteStatus.stopped;
+	}
 }
 
 // A reservation's place in the run, or nothing at all when there is no run or
@@ -236,6 +278,7 @@ function countStatus(status: MassCompleteStatus): number {
 				:total="modalData.singleLineReservations.length" :max="massCompleteMax"
 				:amount="massCompleteAmount" :started="massCompleteStarted"
 				:finished="massCompleteFinished" :failed="massCompleteFailed"
+				:stopped="massCompleteStopped"
 				@update:amount="setMassCompleteAmount" @start="startMassComplete()" />
 
 			<div class="pse-rows">
