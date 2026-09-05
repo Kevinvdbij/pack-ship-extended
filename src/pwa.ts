@@ -1,3 +1,4 @@
+import { GM_getValue, GM_setValue } from "$";
 import { ref } from "vue";
 import iconSvg from "./assets/pwa-icon.svg?raw";
 import maskableSvg from "./assets/pwa-icon-maskable.svg?raw";
@@ -131,7 +132,7 @@ export function installManifest() {
 }
 
 async function buildManifest() {
-	const [icon, maskable] = await Promise.all([rasterise(iconSvg), rasterise(maskableSvg)]);
+	const [icon, maskable] = await icons();
 
 	return {
 		// A stable id, so reinstalling or changing anything below updates the
@@ -162,8 +163,8 @@ async function buildManifest() {
 		background_color: "#ffffff",
 		theme_color: "#ffffff",
 		icons: [
-			{ src: icon, sizes: "512x512", type: "image/png", purpose: "any" },
-			{ src: maskable, sizes: "512x512", type: "image/png", purpose: "maskable" },
+			{ src: icon, sizes: `${ICON_SIZE}x${ICON_SIZE}`, type: "image/png", purpose: "any" },
+			{ src: maskable, sizes: `${ICON_SIZE}x${ICON_SIZE}`, type: "image/png", purpose: "maskable" },
 		],
 	};
 }
@@ -186,13 +187,61 @@ function link(manifest: object) {
 	(document.head ?? document.documentElement).append(element);
 }
 
+// The rasterised icons, drawn once per machine and then kept.
+//
+// They have to be **byte-identical on every page load**, and rasterising them
+// afresh does not manage it: Skia dithers the tile's gradient a little
+// differently each time, so the PNG comes out with different bytes. A `data:`
+// URL is its own content, so a different PNG is a different icon URL, and
+// Chrome reads a changed icon URL as the app's identity having changed -- it
+// then offers "App update available" on every single load, for an icon that
+// looks exactly the same.
+//
+// So the pair is stored in the GM value store the first time and reused after
+// that, keyed by the drawings they came from: change either SVG and the key
+// changes with it, so the cache cannot outlive what it was made from.
+const ICON_CACHE_KEY = "pse-icons";
+
+async function icons(): Promise<[string, string]> {
+	const key = `${ICON_SIZE}:${fingerprint(iconSvg + maskableSvg)}`;
+	const cached = GM_getValue<{ key?: string; icon?: string; maskable?: string }>(ICON_CACHE_KEY);
+
+	if (cached?.key == key && cached.icon && cached.maskable) {
+		return [cached.icon, cached.maskable];
+	}
+
+	const drawn = await Promise.all([rasterise(iconSvg), rasterise(maskableSvg)]);
+
+	GM_setValue(ICON_CACHE_KEY, { key, icon: drawn[0], maskable: drawn[1] });
+
+	return drawn;
+}
+
+// Enough to notice a changed drawing, which is all this has to do -- it guards
+// a cache of our own making, not anything a stranger can write to.
+function fingerprint(source: string) {
+	let hash = 0;
+
+	for (let index = 0; index < source.length; index++) {
+		hash = (Math.imul(hash, 31) + source.charCodeAt(index)) | 0;
+	}
+
+	return hash.toString(36);
+}
+
+// 256 rather than 512. Windows draws these at 48px and below almost everywhere,
+// keeps a 256 in the shortcut for the largest Explorer view, and never asks for
+// more -- and the gradient makes a 512 PNG four times the weight for a size
+// nothing displays. The manifest carries the bytes inline, so its size is the
+// icons' size.
+const ICON_SIZE = 256;
+
 // An SVG through a canvas and back out as a `data:` PNG. Chrome will not take
 // an SVG as an installable icon, and the shape of the mark is worth keeping in
 // a form a person can read -- so it is stored as the drawing and turned into
 // what Chrome wants here. The result goes straight into the manifest, which is
 // itself a data URL, so the whole thing is one string with nothing to fetch.
 async function rasterise(svg: string) {
-	const size = 512;
 	const image = new Image();
 
 	// Loaded as an image, which means the file is parsed as XML rather than as
@@ -204,8 +253,8 @@ async function rasterise(svg: string) {
 	await image.decode();
 
 	const canvas = document.createElement("canvas");
-	canvas.width = canvas.height = size;
-	canvas.getContext("2d")?.drawImage(image, 0, 0, size, size);
+	canvas.width = canvas.height = ICON_SIZE;
+	canvas.getContext("2d")?.drawImage(image, 0, 0, ICON_SIZE, ICON_SIZE);
 
 	return canvas.toDataURL("image/png");
 }
