@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Pack&Ship Extended
 // @namespace    npm/vite-plugin-monkey
-// @version      1.0.25
+// @version      1.0.26
 // @description  Extension for the RetailVista Pack&Ship application with plenty of QOL improvements.
 // @license      MIT
 // @icon         https://www.kampeerhalroden.nl/media/e9/9d/08/1703346720/favicon.ico
@@ -9202,7 +9202,7 @@
 	var package_default = {
 		name: "pack-ship-extended",
 		"private": true,
-		version: "1.0.25",
+		version: "1.0.26",
 		type: "module",
 		scripts: {
 			"dev": "vite",
