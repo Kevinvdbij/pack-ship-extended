@@ -229,7 +229,7 @@
 :root .loading {
 	/* The dialogs' scrim, from the shared token, so a page that is waiting and a
 	   page that is asking a question dim to the same depth. */
-	background: var(--pse-scrim);
+	background-color: var(--pse-scrim);
 	backdrop-filter: blur(3px);
 	-webkit-backdrop-filter: blur(3px);
 	/* Shown and hidden by opacity rather than by `display`, which is what the
@@ -241,7 +241,12 @@
 	display: block !important;
 	opacity: 0;
 	visibility: hidden;
-	transition: opacity 0.2s ease, visibility 0.2s;
+	/* The scrim's own two properties are timed to Bootstrap's backdrop rather
+	   than to this element's fade -- see the handover below, which is the only
+	   thing that moves them. */
+	transition: opacity 0.2s ease, visibility 0.2s,
+		background-color 0.15s linear, backdrop-filter 0.15s linear,
+		-webkit-backdrop-filter 0.15s linear;
 }
 
 :root body.busy .loading {
@@ -249,14 +254,29 @@
 	visibility: visible;
 }
 
-/* Only one scrim at a time.
+/* Only one scrim at a time, handed over rather than swapped.
  *
  * The overlay and the dialogs dim to the same depth, and two of them over each
  * other is twice that -- the page went almost black whenever work started while
- * a dialog was open, and again for a moment on the way between two dialogs. The
- * overlay is the one that gives way: it is always the thing on top, so it still
- * reads as blocking, and what is underneath is already dimmed by whatever put
- * the dialog there.
+ * a dialog was open. The overlay is the one that gives way: it is always the
+ * thing on top, so it still reads as blocking, and what is underneath is already
+ * dimmed by whatever put the dialog there.
+ *
+ * Giving way instantly is its own fault, though, and it is the one seen on the
+ * way into the parcel editor: the portal raises the overlay, fetches, and then
+ * inserts Bootstrap's backdrop, which starts at nothing and fades in over 150ms.
+ * The moment that element existed this rule matched, our scrim was gone in the
+ * same frame, and for those 150ms neither layer was dimming anything -- the
+ * page flashed out from under the dialog that was arriving.
+ *
+ * So the two cross-fade instead, on Bootstrap's own 150ms linear: ours leaves at
+ * the rate theirs arrives, and since both are the same colour at the same depth
+ * what is on screen throughout is one scrim rather than two or none. It reads as
+ * one background being handed over, which is what it is.
+ *
+ * `blur(0px)` rather than `none`, which is not a value the blur can be
+ * interpolated towards -- the filter would snap and take the handover's point
+ * with it.
  *
  * `:has()` so this follows whatever is actually on screen rather than needing
  * every dialog to remember to announce itself. The second selector is the
@@ -264,9 +284,9 @@
  */
 :root body:has(.pse-modal) .loading,
 :root body:has(.modal-backdrop.show) .loading {
-	background: transparent;
-	backdrop-filter: none;
-	-webkit-backdrop-filter: none;
+	background-color: transparent;
+	backdrop-filter: blur(0px);
+	-webkit-backdrop-filter: blur(0px);
 }
 
 /* Centred by transform instead of the portal's fixed negative margins, so the
@@ -766,8 +786,20 @@
  * `ModalShell.vue` here instead, against the same palette tokens, so a dialog
  * of theirs and a dialog of ours are the same object.
  */
-:root .modal-backdrop.show {
+/* The colour goes on the element and the opacity on `.show`, which is not where
+ * it started: both were on `.show`, and Bootstrap fades a backdrop out by taking
+ * that class off and letting the opacity transition run. So at the moment the
+ * dialog was dismissed the colour fell back to Bootstrap's own `#000` while the
+ * layer was still at full opacity, and the page went properly black for the
+ * 150ms of the fade -- the flash on the way out of the parcel editor.
+ *
+ * Stated apart, the scrim keeps our colour for the whole of both fades and only
+ * its opacity moves. */
+:root .modal-backdrop {
 	background-color: var(--pse-scrim);
+}
+
+:root .modal-backdrop.show {
 	opacity: 1;
 }
 
