@@ -7,7 +7,7 @@
 // script shows it again -- so a build that versioned one and not the other
 // would leave nothing to tell which pair a machine is running.
 
-export const USERSTYLE_NAME = "NedFox KHR Style";
+export const USERSTYLE_NAME = "Pack & Ship Extended Style";
 export const USERSTYLE_ID = "555698";
 
 // The `@-moz-document url-prefix(...)` target. Stylus matches this itself; the
