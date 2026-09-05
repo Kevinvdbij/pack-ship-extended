@@ -1,0 +1,7 @@
+# The build is not line-ending agnostic: the userscript embeds the stylesheets
+# as JavaScript string literals, so a CRLF working tree bakes \r\n escapes into
+# the bundle where a LF one bakes \n. The two artefacts are committed and then
+# rebuilt on Linux in CI, which compares them, so the checkout has to be the
+# same on both. LF everywhere, regardless of platform or of what a machine's
+# core.autocrlf says.
+* text=auto eol=lf
