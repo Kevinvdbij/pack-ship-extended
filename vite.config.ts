@@ -1,8 +1,39 @@
+import { existsSync } from 'node:fs';
 import { defineConfig } from 'vite';
 import vue from '@vitejs/plugin-vue';
 import monkey from 'vite-plugin-monkey';
 import { userstyle } from './build/userstyle.ts';
 import { version } from './package.json' with { type: 'json' };
+
+// `npm run dev` opens the dev userscript's install page, and vite-plugin-monkey
+// hands that to whatever `BROWSER` names, falling back to the machine's default
+// browser. The default here is Firefox, which has neither Tampermonkey nor a
+// session on the portal, so the page it opens is of no use to anybody.
+//
+// Chrome by full path rather than by name: `open` resolves a bare "chrome"
+// through the registry's App Paths, which is one more thing to be wrong on a
+// machine where it is not registered. Only when nothing has set it already, so
+// `BROWSER=none npm run dev` and the like still work from the shell.
+process.env.BROWSER ??= chromePath();
+
+function chromePath() {
+	const suffix = String.raw`\Google\Chrome\Application\chrome.exe`;
+
+	const candidates = [
+		process.env.PROGRAMFILES,
+		process.env["PROGRAMFILES(X86)"],
+		process.env.LOCALAPPDATA,
+	];
+
+	// The bare name as a last resort. Chrome is not on `PATH` on Windows, so
+	// this leans on the registry's App Paths, which is what `open` falls back
+	// to -- worth having, not worth relying on.
+	return candidates
+		.filter((base) => base != undefined)
+		.map((base) => base + suffix)
+		.find((candidate) => existsSync(candidate))
+		?? "chrome";
+}
 
 // https://vitejs.dev/config/
 export default defineConfig({
