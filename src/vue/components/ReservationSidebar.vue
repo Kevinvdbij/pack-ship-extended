@@ -21,36 +21,42 @@ import CopyButton from "./CopyButton.vue";
 // reads the sale order reference straight out of it, and `#ReservationId`,
 // which the whole page identifies itself by, is one of its children.
 
-// The two fields worth reading at a glance rather than looking up. Matched by
-// the portal's own labels; anything not named here is rendered as an ordinary
-// row, so a label we have not seen is shown rather than dropped.
-const CHIP_LABELS = ["Status", "Logistieke status"];
+// The two fields worth reading at a glance rather than looking up.
+//
+// Matched on the portal's own labels, in either of the two languages it serves
+// them in: the session is corrected to Dutch on every page, but that correction
+// goes through after the markup has been rendered, so a page can be read here
+// while its labels still say "Logistic status". Matching one spelling meant
+// those pages quietly lost their chips and showed two more ordinary rows.
+//
+// A pattern rather than a list of every spelling, because both languages agree
+// on the stem. Anything that matches neither is rendered as an ordinary row, so
+// a label we have not seen is shown rather than dropped.
+const CHIP_PATTERNS = [/^status$/i, /^logisti/i];
+
+const isChip = (label: string) => CHIP_PATTERNS.some((pattern) => pattern.test(label));
 
 const heading = ref("");
 const fields = ref<Array<{ label: string; value: string }>>([]);
 const addressLabel = ref("");
 const address = ref<string[]>([]);
 
-// The address as it is set: one line per line, which is how it is written on a
-// label and therefore how it belongs on the clipboard.
-const addressText = computed(() => address.value.join("\n"));
+const chips = computed(() => fields.value.filter((field) => isChip(field.label)));
+const rows = computed(() => fields.value.filter((field) => !isChip(field.label)));
 
-const chips = computed(() => fields.value.filter((field) => CHIP_LABELS.includes(field.label)));
-const rows = computed(() => fields.value.filter((field) => !CHIP_LABELS.includes(field.label)));
+// The one row that gets copied rather than read: the webshop's order reference,
+// which is what gets pasted into Shopware or into a mail to a customer. The
+// reservation number above and the barcodes elsewhere are the rest of what is
+// worth copying; everything else in this column is read where it stands.
+//
+// Matched on a pattern for the same reason the chips are: this row is
+// "Verkooporder referentiecode" on a corrected page and "Saleorder
+// referencecode" on one still being served in English, and a list holding only
+// the first left the add-parcels screen without a control on the one field it is
+// most often opened for.
+const REFERENCE_PATTERN = /referen(tie|ce)/i;
 
-// Every row is copyable, and the address with them.
-//
-// It used to be a list of labels -- the order reference, and nothing else --
-// which failed twice. It failed by language: the portal serves this page in
-// English until our own correction has gone through, and "Saleorder
-// referencecode" is not the string the list held, so the add-parcels screen had
-// no copy control on the one field it is most often opened for. And it failed by
-// judgement: the customer number, the transport and the address are pasted
-// somewhere else just as often, and a control that is only on some rows is one
-// the operator has to look for.
-//
-// So there is no list. Anything the portal put in this column can be taken out
-// of it.
+const isCopyable = (label: string) => REFERENCE_PATTERN.test(label);
 
 // The heading reads "Reservering 395258"; what belongs on the clipboard is the
 // number on its own.
@@ -245,21 +251,13 @@ function onOpen() {
 					<dd class="pse-sidebar-value">
 						<span class="pse-sidebar-value-text">{{ row.value }}</span>
 
-						<CopyButton :value="row.value" :label="row.label" />
+						<CopyButton v-if="isCopyable(row.label)" :value="row.value" :label="row.label" />
 					</dd>
 				</template>
 			</dl>
 
 			<div v-if="address.length" class="pse-sidebar-address">
-				<span class="pse-sidebar-label pse-sidebar-address-label">
-					{{ addressLabel }}
-
-					<!-- The whole block, lines and all: an address is copied to be
-					     written somewhere as an address, so it goes onto the
-					     clipboard the way it is set here rather than as one run-on
-					     line. -->
-					<CopyButton :value="addressText" :label="addressLabel" />
-				</span>
+				<span class="pse-sidebar-label">{{ addressLabel }}</span>
 				<p class="pse-sidebar-address-body">
 					<span v-for="(line, index) in address" :key="index">{{ line }}</span>
 				</p>
@@ -382,13 +380,6 @@ function onOpen() {
 .pse-sidebar-value-text {
 	min-width: 0;
 	overflow-wrap: anywhere;
-}
-
-/* The label and its control on one line, the way the heading carries its own. */
-.pse-sidebar-address-label {
-	display: flex;
-	align-items: center;
-	gap: 4px;
 }
 
 .pse-sidebar-address {
