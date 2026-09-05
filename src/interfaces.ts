@@ -86,6 +86,22 @@ export interface ReservationDefinition {
 	number: string
 }
 
+// One finished reservation, as the search screen lists it afterwards. Written
+// on the completed screen and read nowhere else, so it holds what that screen
+// knows and what the list shows -- not a copy of the reservation.
+export interface CompletedReservation extends ReservationDefinition {
+	// When it was finished, as epoch milliseconds. Stored rather than formatted
+	// so the list can say "zojuist" as well as a clock time.
+	completedAt: number,
+	// How many parcels went out with it. Zero on a reservation whose
+	// announcement was refused before any parcel was made.
+	parcels: number,
+	// The announcement was refused. Kept in the list rather than left out of it:
+	// a reservation that did not go out is the one most likely to be looked for
+	// again.
+	failed?: boolean
+}
+
 export interface MassCompleteEntry {
 	reservationNumber: string,
 	status: MassCompleteStatus,

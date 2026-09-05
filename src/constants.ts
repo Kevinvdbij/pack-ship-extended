@@ -160,18 +160,32 @@ export const COMPLETED_PROCEED_FALLBACK_SELECTOR = "#ReservationContainer button
 // around it has nothing else to name it by.
 export const VENDOR_BAND_LOGO_SELECTOR = "img.nfLogoSmall";
 
+// Dispatched on `document` when the settings dialog has written its changes.
+//
+// The dialog lives in the footer's mount and the pages live in their own, so a
+// setting one of them shows cannot be reached from the other by any of Vue's
+// own means. What crosses between two apps on the same document is an event.
+export const SETTINGS_SAVED_EVENT = "pse:settings-saved";
+
 // Keys used with the GM value store.
 export const STORAGE_KEYS = {
 	settings: "PSE_Settings",
 	reservationCache: "PSE_Reservation_Cache",
 	lastOpenReservation: "PSE_Last_Open_Reservation",
 	lastCompletedReservation: "PSE_Last_Completed_Reservation",
+	completedHistory: "PSE_Completed_History",
 	currentUser: "PSE_Current_User",
 	swClientId: "PSE_Shopware_Client_Id",
 	swClientSecret: "PSE_Shopware_Client_Secret",
 	// Suffixed with a reservation number, one key per mass complete entry.
 	massCompleteEntryPrefix: "PSE_MCEntry_",
 } as const;
+
+// How many finished reservations the search screen keeps. Long enough to cover
+// a shift's worth of "which one was that again", short enough that the panel
+// stays a list rather than an archive -- and it is scrolled, so the number is
+// about what is worth storing rather than what fits.
+export const COMPLETED_HISTORY_LIMIT = 40;
 
 export function massCompleteEntryKey(reservationNumber: string) {
 	return `${STORAGE_KEYS.massCompleteEntryPrefix}${reservationNumber}`;

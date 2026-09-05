@@ -6,8 +6,10 @@ import SearchPanel from "../components/SearchPanel.vue";
 import SearchField from "../components/SearchField.vue";
 import SearchNotice from "../components/SearchNotice.vue";
 import ResumeButton from "../components/ResumeButton.vue";
+import CompletedHistoryPanel from "../components/CompletedHistoryPanel.vue";
 import * as RVUtils from "../../retailVistaUtils.ts";
-import { PACKING_PORTAL_URL } from "../../constants.ts";
+import { PACKING_PORTAL_URL, SETTINGS_SAVED_EVENT } from "../../constants.ts";
+import Settings from "../../settings.ts";
 import { playSound } from "../../sounds.ts";
 
 // The portal's own search form. It stays in the document -- hidden, emptied of
@@ -23,6 +25,21 @@ const modalData = ref<ReservationSelectionModalData>();
 
 const lastOpenReservation = ref(RVUtils.getLastOpenReservation());
 const lastCompletedReservation = ref(RVUtils.getLastCompletedReservation());
+
+// What this workplace has finished, newest first. Read once: nothing on this
+// page adds to it -- the entries are written on the completed screen, which is
+// a page away and arrives here as a fresh load.
+const completedHistory = ref(RVUtils.getCompletedHistory());
+
+// Whether the log is shown, which is the only thing the setting decides -- the
+// entries are written on the completed screen regardless, so a workplace that
+// switches it back on finds everything packed in the meantime already in it.
+const showHistory = ref(Settings.showCompletedHistory);
+
+// The panel is there when it is switched on and has something in it. An empty
+// log is a column of nothing beside the card, and the card is better off with
+// the width.
+const hasHistory = computed(() => showHistory.value && completedHistory.value.length > 0);
 
 // The reservation to add a parcel to. This form is ours end to end -- it only
 // ever navigates to a URL -- so unlike the search fields there is no portal
@@ -51,6 +68,12 @@ const canAddToCompleted = computed(() => Boolean(lastCompletedReservation.value?
 onMounted(() => {
 	replacePortalSearchBlock();
 	keepScannerFocused();
+
+	// The dialog that carries the switch is the footer's mount, not this one, so
+	// the change arrives as an event rather than as a value this page can watch.
+	// Without it the panel would only answer the switch on the next page load,
+	// which on this screen can be a whole shift away.
+	document.addEventListener(SETTINGS_SAVED_EVENT, () => showHistory.value = Settings.showCompletedHistory);
 
 	RVUtils.focusBarcodeInput();
 });
@@ -301,6 +324,15 @@ function openAddParcels(reservationNumber: string) {
 	window.location.href = `${PACKING_PORTAL_URL}/AddParcels/Search?ReservationNumber=${reservationNumber}`;
 }
 
+// The list is a convenience and throwing it away costs nothing that cannot be
+// packed again, so it goes without a dialog in the way. What it does clear is
+// only ours: the portal's own overview is untouched.
+function clearHistory() {
+	RVUtils.clearCompletedHistory();
+
+	completedHistory.value = [];
+}
+
 function openReservation(url: string) {
 	RVUtils.fetchReservation(url).then((response) => {
 		handleResponse(response);
@@ -325,72 +357,82 @@ function openReservation(url: string) {
 		<SearchNotice v-if="notice" :title="notice.title" :detail="notice.detail" :tone="notice.tone"
 			@dismiss="dismissNotice()" />
 
-		<div class="pse-card">
-			<SearchPanel title="Zoek reservering" subtitle="Scan een product of vul een reserveringsnummer in.">
-				<template #icon>
-					<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-						stroke-linecap="round" stroke-linejoin="round">
-						<circle cx="11" cy="11" r="7" />
-						<path d="M20 20l-3.6-3.6" />
-					</svg>
-				</template>
+		<div class="pse-layout" :class="{ 'pse-layout-history': hasHistory }">
+			<div class="pse-main">
+				<div class="pse-card">
+					<SearchPanel title="Zoek reservering" subtitle="Scan een product of vul een reserveringsnummer in.">
+						<template #icon>
+							<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+								stroke-linecap="round" stroke-linejoin="round">
+								<circle cx="11" cy="11" r="7" />
+								<path d="M20 20l-3.6-3.6" />
+							</svg>
+						</template>
 
-				<SearchField label="Reservering nr" :adopt="RESERVATION_NUMBER_INPUT" />
-				<SearchField label="Product barcode" :adopt="BARCODE_INPUT" />
+						<SearchField label="Reservering nr" :adopt="RESERVATION_NUMBER_INPUT" />
+						<SearchField label="Product barcode" :adopt="BARCODE_INPUT" />
 
-				<button type="submit" class="pse-submit pse-submit-end" :form="RESERVATION_FORM_ID"
-					:disabled="searching">
-					<span class="pse-spinner" v-if="searching" aria-hidden="true"></span>
-					{{ searching ? "Bezig met zoeken" : "Zoek" }}
-				</button>
-			</SearchPanel>
+						<button type="submit" class="pse-submit pse-submit-end" :form="RESERVATION_FORM_ID"
+							:disabled="searching">
+							<span class="pse-spinner" v-if="searching" aria-hidden="true"></span>
+							{{ searching ? "Bezig met zoeken" : "Zoek" }}
+						</button>
+					</SearchPanel>
 
-			<span class="pse-card-split" aria-hidden="true"></span>
+					<span class="pse-card-split" aria-hidden="true"></span>
 
-			<SearchPanel title="Pakket toevoegen" subtitle="Voor een reservering die al verwerkt is.">
-				<template #icon>
-					<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
-						stroke-linecap="round" stroke-linejoin="round">
-						<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z" />
-						<path d="M4 7.5l8 4.5 8-4.5" />
-						<path d="M12 12v9" />
-					</svg>
-				</template>
+					<SearchPanel title="Pakket toevoegen" subtitle="Voor een reservering die al verwerkt is.">
+						<template #icon>
+							<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2"
+								stroke-linecap="round" stroke-linejoin="round">
+								<path d="M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z" />
+								<path d="M4 7.5l8 4.5 8-4.5" />
+								<path d="M12 12v9" />
+							</svg>
+						</template>
 
-				<!-- A form of ours, so a return key here submits this panel and not
-				     the search beside it. -->
-				<form class="pse-form" @submit.prevent="openAddParcels(addParcelsNumber)">
-					<SearchField label="Reservering nr" placeholder="Bijv. 1234567" v-model="addParcelsNumber" />
+						<!-- A form of ours, so a return key here submits this panel and not
+						     the search beside it. -->
+						<form class="pse-form" @submit.prevent="openAddParcels(addParcelsNumber)">
+							<SearchField label="Reservering nr" placeholder="Bijv. 1234567" v-model="addParcelsNumber" />
 
-					<button type="submit" class="pse-submit pse-submit-end" :disabled="!addParcelsNumber">
-						Zoek
-					</button>
-				</form>
-			</SearchPanel>
-		</div>
+							<button type="submit" class="pse-submit pse-submit-end" :disabled="!addParcelsNumber">
+								Zoek
+							</button>
+						</form>
+					</SearchPanel>
+				</div>
 
-		<div class="pse-resume-row">
-			<ResumeButton label="Laatst geopende reservering" :reservation-number="lastOpenReservation?.number"
-				:disabled="!canReopen" @click="reopenReservation(lastOpenReservation.id)">
-				<template #icon>
-					<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
-						stroke-linecap="round" stroke-linejoin="round">
-						<path d="M3.5 12a8.5 8.5 0 1 0 2.9-6.4" />
-						<path d="M3 4v4.5h4.5" />
-					</svg>
-				</template>
-			</ResumeButton>
+				<div class="pse-resume-row">
+					<ResumeButton label="Laatst geopende reservering" :reservation-number="lastOpenReservation?.number"
+						:disabled="!canReopen" @click="reopenReservation(lastOpenReservation.id)">
+						<template #icon>
+							<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+								stroke-linecap="round" stroke-linejoin="round">
+								<path d="M3.5 12a8.5 8.5 0 1 0 2.9-6.4" />
+								<path d="M3 4v4.5h4.5" />
+							</svg>
+						</template>
+					</ResumeButton>
 
-			<ResumeButton label="Laatst voltooide reservering" :reservation-number="lastCompletedReservation?.number"
-				:disabled="!canAddToCompleted" @click="openAddParcels(lastCompletedReservation.number)">
-				<template #icon>
-					<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
-						stroke-linecap="round" stroke-linejoin="round">
-						<circle cx="12" cy="12" r="8.5" />
-						<path d="M12 8.5v7M8.5 12h7" />
-					</svg>
-				</template>
-			</ResumeButton>
+					<ResumeButton label="Laatst voltooide reservering" :reservation-number="lastCompletedReservation?.number"
+						:disabled="!canAddToCompleted" @click="openAddParcels(lastCompletedReservation.number)">
+						<template #icon>
+							<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"
+								stroke-linecap="round" stroke-linejoin="round">
+								<circle cx="12" cy="12" r="8.5" />
+								<path d="M12 8.5v7M8.5 12h7" />
+							</svg>
+						</template>
+					</ResumeButton>
+				</div>
+			</div>
+
+			<!-- Beside the card rather than under it: it is looked at while the
+			     search is being typed, not after it. -->
+			<CompletedHistoryPanel v-if="hasHistory" :entries="completedHistory"
+				@open="(reservationNumber: string) => openAddParcels(reservationNumber)"
+				@clear="clearHistory()" />
 		</div>
 	</div>
 </template>
@@ -402,8 +444,10 @@ function openReservation(url: string) {
 	box-sizing: border-box;
 	/* Narrower than the portal's full-width container: two forms and two
 	   shortcuts do not need the whole screen, and holding them to a column keeps
-	   the fields at a length that can be taken in at a glance. */
-	max-width: 980px;
+	   the fields at a length that can be taken in at a glance. The width is set
+	   on the layout below, which needs more of it once the log is beside the
+	   card -- and exactly this much when it is not. */
+	width: 100%;
 	margin: 28px auto 56px;
 	padding: 0 24px;
 	color: var(--pse-ink);
@@ -428,6 +472,28 @@ function openReservation(url: string) {
    when there is one, so an ordinary load still opens with the card. */
 .pse-search :deep(.pse-notice) {
 	margin-bottom: 18px;
+}
+
+/* The card and its shortcuts, with the log of finished reservations beside
+   them. Without the log this is one column of the width the page always had:
+   the search does not spread out because there is nothing to its right. */
+.pse-layout {
+	display: grid;
+	max-width: 980px;
+	margin: 0 auto;
+}
+
+.pse-layout-history {
+	/* The log is a fixed column and the card takes what is left, so the fields
+	   keep their length as the screen grows rather than the two sharing the
+	   change. */
+	grid-template-columns: minmax(0, 1fr) 322px;
+	gap: 20px;
+	max-width: 1300px;
+}
+
+.pse-main {
+	min-width: 0;
 }
 
 /* One card holding both forms, rather than two panels side by side. They are
@@ -541,6 +607,16 @@ function openReservation(url: string) {
 /* Below this the two columns are narrower than the fields in them are useful,
    so the card stacks: same order, one column, and the split turns from a
    vertical rule into a horizontal one. */
+/* Below this the card is squeezed by the column beside it before the fields
+   are: the log goes under the card and both take the full width, which is also
+   where the panel drops its fixed height. */
+@media (max-width: 1120px) {
+	.pse-layout-history {
+		grid-template-columns: minmax(0, 1fr);
+		max-width: 980px;
+	}
+}
+
 @media (max-width: 860px) {
 	.pse-search {
 		padding: 0 16px;

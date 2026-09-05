@@ -5,6 +5,7 @@ import { getCredentials, setCredentials } from "../../shopware.ts";
 import { applyConfiguredEnvironment, getEnvironmentOptions } from "../../environment.ts";
 import ModalShell from "./ModalShell.vue";
 import { previewSound, type SoundKind } from "../../sounds.ts";
+import { SETTINGS_SAVED_EVENT } from "../../constants.ts";
 
 const emit = defineEmits<{ close: []; save: [] }>();
 
@@ -41,6 +42,7 @@ const soundSwitches = ref<Record<SoundKind, boolean>>({
 const environmentOptions = getEnvironmentOptions();
 
 const masterSwitch = ref(Settings.autoMasterSwitch);
+const showCompletedHistory = ref(Settings.showCompletedHistory);
 const environmentId = ref(Settings.environmentId);
 
 const credentials = getCredentials();
@@ -56,7 +58,12 @@ function save() {
 	Settings.soundSuccess = soundSwitches.value.success;
 	Settings.soundWarning = soundSwitches.value.warning;
 	Settings.soundError = soundSwitches.value.error;
+	Settings.showCompletedHistory = showCompletedHistory.value;
 	Settings.save();
+
+	// The pages are mounted separately from this footer, so anything of theirs
+	// that a setting decides is told rather than watched.
+	document.dispatchEvent(new CustomEvent(SETTINGS_SAVED_EVENT));
 
 	setCredentials({ clientId: clientId.value, clientSecret: clientSecret.value });
 
@@ -80,6 +87,17 @@ function save() {
 				<span class="pse-settings-switch-title">Automatische afhandeling</span>
 				<span class="pse-dialog-hint">
 					Verifieert, kondigt aan en rondt reserveringen af zonder tussenkomst.
+				</span>
+			</span>
+		</label>
+
+		<label class="pse-settings-switch">
+			<input type="checkbox" class="pse-settings-checkbox" v-model="showCompletedHistory" />
+			<span class="pse-settings-switch-text">
+				<span class="pse-settings-switch-title">Afgeronde reserveringen tonen</span>
+				<span class="pse-dialog-hint">
+					Zet de lijst met afgeronde reserveringen naast het zoekscherm. Uit betekent alleen verbergen:
+					de lijst wordt bijgehouden en staat er compleet weer zodra je hem aanzet.
 				</span>
 			</span>
 		</label>

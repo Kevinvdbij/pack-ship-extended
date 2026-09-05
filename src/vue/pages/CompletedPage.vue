@@ -179,9 +179,22 @@ onMounted(() => {
 
 	replaced.value = true;
 
-	RVUtils.setLastCompletedReservation({
+	const finished = {
 		id: RVUtils.getCurrentReservationId(),
 		number: RVUtils.getCurrentReservationNumber()
+	};
+
+	RVUtils.setLastCompletedReservation(finished);
+
+	// And into the list the search screen shows. A parcel announced afterwards
+	// lands on this same screen, and is recorded too: from the list's point of
+	// view it is the same reservation finished again, later and with a parcel
+	// more, which is what the entry ends up saying.
+	RVUtils.recordCompletedReservation({
+		...finished,
+		completedAt: Date.now(),
+		parcels: parcels.value.length,
+		failed: failed.value
 	});
 
 	// A refused reservation is where the automatic run stops, switch or no

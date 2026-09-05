@@ -17,6 +17,11 @@ type SettingsData = {
 	// wait was long enough for the dropdown to be painted before we could
 	// replace it.
 	environmentName: string,
+	// Whether the search screen shows the log of finished reservations. Display
+	// only: the log is written on the completed screen either way, so turning it
+	// off hides what is there rather than stopping it being kept -- and turning
+	// it back on shows the reservations packed while it was off.
+	showCompletedHistory: boolean,
 	// The audible cues, one switch each -- see `src/sounds.ts`. A scan that
 	// landed, a scan that landed wrong, and a step that failed.
 	soundSuccess: boolean,
@@ -32,6 +37,7 @@ function defaults(): SettingsData {
 		autoSelect: true,
 		environmentId: -1,
 		environmentName: "",
+		showCompletedHistory: true,
 		soundSuccess: true,
 		soundWarning: true,
 		soundError: true
@@ -57,6 +63,7 @@ const Settings = {
 			autoSelect: this.autoSelect,
 			environmentId: this.environmentId,
 			environmentName: this.environmentName,
+			showCompletedHistory: this.showCompletedHistory,
 			soundSuccess: this.soundSuccess,
 			soundWarning: this.soundWarning,
 			soundError: this.soundError

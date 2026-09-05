@@ -1,6 +1,6 @@
 import { GM_deleteValues, GM_getValue, GM_listValues, GM_setValue } from "$";
-import { MassCompleteEntry, ModalProductDetails, ModalReservationDetails, ParcelItem, ProductDetails, ProductLine, ReservationDefinition, ReservationDetails, ReservationSearchResponseType, ReservationSelectionModalData, VerificationRow } from "./interfaces";
-import { CONTAINER_SELECTOR, massCompleteEntryKey, HEADER_SELECTOR, SEARCH_BLOCK_SELECTOR, PACKING_PORTAL_URL, PARCEL_CONTAINER_PARENT_SELECTOR, RESERVATION_SIDEBAR_SELECTOR, RESERVATION_SUMMARY_SELECTOR, STORAGE_KEYS } from "./constants.ts";
+import { CompletedReservation, MassCompleteEntry, ModalProductDetails, ModalReservationDetails, ParcelItem, ProductDetails, ProductLine, ReservationDefinition, ReservationDetails, ReservationSearchResponseType, ReservationSelectionModalData, VerificationRow } from "./interfaces";
+import { COMPLETED_HISTORY_LIMIT, CONTAINER_SELECTOR, massCompleteEntryKey, HEADER_SELECTOR, SEARCH_BLOCK_SELECTOR, PACKING_PORTAL_URL, PARCEL_CONTAINER_PARENT_SELECTOR, RESERVATION_SIDEBAR_SELECTOR, RESERVATION_SUMMARY_SELECTOR, STORAGE_KEYS } from "./constants.ts";
 import { debug } from "./logger.ts";
 import { afterReveal } from "./reveal.ts";
 
@@ -254,6 +254,33 @@ export function setLastCompletedReservation(reservationDefinition: ReservationDe
 
 export function getLastCompletedReservation():ReservationDefinition {
 	return GM_getValue(STORAGE_KEYS.lastCompletedReservation);
+}
+
+// The finished reservations, newest first. Anything the store hands back that
+// is not a list is treated as no history: this is a convenience panel, and a
+// value written by an older build is not worth failing the search screen over.
+export function getCompletedHistory(): Array<CompletedReservation> {
+	const history = GM_getValue(STORAGE_KEYS.completedHistory, []);
+
+	return Array.isArray(history) ? history as Array<CompletedReservation> : [];
+}
+
+// Adds a reservation to the front of the history.
+//
+// The same reservation can reach the completed screen more than once -- a
+// parcel added afterwards finishes on it again -- so an entry for a number
+// already in the list replaces it rather than sitting above it. What is kept is
+// the newer of the two: it has the later time and the fuller parcel count.
+export function recordCompletedReservation(reservation: CompletedReservation) {
+	const history = getCompletedHistory().filter((entry) => entry.number != reservation.number);
+
+	history.unshift(reservation);
+
+	GM_setValue(STORAGE_KEYS.completedHistory, history.slice(0, COMPLETED_HISTORY_LIMIT));
+}
+
+export function clearCompletedHistory() {
+	GM_setValue(STORAGE_KEYS.completedHistory, []);
 }
 
 export function getCurrentReservationNumber() {
