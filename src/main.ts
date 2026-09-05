@@ -58,6 +58,25 @@ document.documentElement.append(pickerScrollbarStyle);
 
 const appendToBody = (host: HTMLDivElement) => document.body.append(host);
 
+// The cell the portal's own page occupies, for the routes that stand in for a
+// page rather than adding to it. Written out rather than as
+// `querySelector(...)?.append(host) ?? document.body.append(host)`: `append()`
+// answers `undefined`, so that fallback fires even when the cell was found and
+// moves the host it just placed to the end of the body -- under the footer,
+// off the screen, with the portal's version of the page already hidden behind
+// it. That is the blank completed screen.
+function mountIntoMainContent(host: HTMLDivElement) {
+	const main = document.querySelector(MAIN_CONTENT_SELECTOR);
+
+	if (main) {
+		main.append(host);
+
+		return;
+	}
+
+	appendToBody(host);
+}
+
 // First match wins, so the catch-all search page has to come last.
 const routes: Route[] = [
 	{
@@ -81,8 +100,7 @@ const routes: Route[] = [
 		component: CompletedPage,
 		// Into the cell the portal's own page occupies, like the verification
 		// step: this route stands in for that page rather than adding to it.
-		attach: (host) => document.querySelector(MAIN_CONTENT_SELECTOR)?.append(host)
-			?? document.body.append(host),
+		attach: (host) => mountIntoMainContent(host),
 	},
 	{
 		pattern: /outdoor\/packship\/Parcels/,
@@ -98,8 +116,7 @@ const routes: Route[] = [
 		// Into the cell the portal's own page occupies, rather than past the end
 		// of the body: this route stands in for that page instead of adding to
 		// it, so it has to land where the page was and not under the footer.
-		attach: (host) => document.querySelector(MAIN_CONTENT_SELECTOR)?.append(host)
-			?? document.body.append(host),
+		attach: (host) => mountIntoMainContent(host),
 	},
 	{
 		pattern: /outdoor\/packship\/AddParcels\/Search\?ReservationNumber=/,
