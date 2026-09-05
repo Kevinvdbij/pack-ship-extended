@@ -50,18 +50,20 @@ jobs:
 
       # Greasy Fork re-fetches the sync URL when it is poked, and the poke has
       # to come from here rather than from a GitHub webhook on the repository.
-      # A push webhook fires the instant the tag lands, which is ~25s before
-      # this job has finished building and publishing the release; Greasy Fork
-      # would fetch releases/latest while it still points at the previous one,
-      # see the version it already holds, and correctly do nothing. Sending it
-      # ourselves, last, means the release it goes looking for is there.
+      # A push webhook fires the instant the tag lands, some twenty-five seconds
+      # before this job has finished building and publishing the release. Greasy
+      # Fork would fetch releases/latest while it still pointed at the previous
+      # one, see the version it already held, and correctly do nothing. Sending
+      # it ourselves, last, means the release it goes looking for is there.
       #
-      # The secret is the full webhook URL from the Greasy Fork account page.
-      # Greasy Fork wants a GitHub-shaped push payload: it reads the repository
-      # out of it and updates whichever of your scripts sync from a URL there.
+      # This is a GitHub webhook delivery, made by hand: Greasy Fork is given
+      # the same POST that GitHub would have sent, signed with the shared secret
+      # the way GitHub signs one. Hence two settings rather than one -- the
+      # endpoint (a repository variable; it is not sensitive) and the secret.
       - name: Tell Greasy Fork to sync
         env:
-          WEBHOOK: ${{ secrets.GREASYFORK_WEBHOOK }}
+          WEBHOOK_URL: ${{ vars.GREASYFORK_WEBHOOK_URL }}
+          WEBHOOK_SECRET: ${{ secrets.GREASYFORK_WEBHOOK }}
         run: |
           # Greasy Fork reads the repository out of the payload and updates
           # whichever of your scripts sync from a URL there. Built with jq so
@@ -72,10 +74,16 @@ jobs:
             --arg name "$GITHUB_REPOSITORY" \
             '{ref: $ref, repository: {html_url: $url, full_name: $name}}' > payload.json
 
-          code="$(curl -sS -o response.txt -w '%{http_code}' -X POST "$WEBHOOK" \
+          # The signature is over the exact bytes sent, so the file is what gets
+          # hashed and what gets posted -- never a re-rendered copy of it.
+          signature="$(openssl dgst -sha256 -hmac "$WEBHOOK_SECRET" -hex < payload.json | awk '{print $NF}')"
+
+          code="$(curl -sS -o response.txt -w '%{http_code}' -X POST "$WEBHOOK_URL" \
             -H 'Content-Type: application/json' \
             -H 'X-GitHub-Event: push' \
-            --data @payload.json)"
+            -H "X-GitHub-Delivery: $GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" \
+            -H "X-Hub-Signature-256: sha256=$signature" \
+            --data-binary @payload.json)"
 
           # The response body names the scripts it updated, or says why it
           # updated none. That is the only report of whether this worked, so it
