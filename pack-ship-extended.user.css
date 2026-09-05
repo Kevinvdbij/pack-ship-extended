@@ -1,12 +1,12 @@
 /* ==UserStyle==
 @name           Pack & Ship Extended Style
 @namespace      NedFoxKHR
-@version        1.0.32
+@version        1.0.34
 @description    Companion to the Pack&Ship Extended userscript. Hides the portal until the script has built the page; the script carries every other rule. Generated from src/styles/cloak.css -- do not edit in Stylus.
 @author         Kevin van der Bij
 @license        MIT
-@downloadURL    https://update.greasyfork.org/scripts/555698/Pack%20%26%20Ship%20Extended%20Style.user.css
-@updateURL      https://update.greasyfork.org/scripts/555698/Pack%20%26%20Ship%20Extended%20Style.meta.css
+@downloadURL    https://update.greasyfork.org/scripts/594402/Pack%20%26%20Ship%20Extended%20Style.user.css
+@updateURL      https://update.greasyfork.org/scripts/594402/Pack%20%26%20Ship%20Extended%20Style.meta.css
 ==/UserStyle== */
 
 @-moz-document url-prefix("https://retailvista.net/outdoor/packship") {
