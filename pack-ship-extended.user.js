@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Pack&Ship Extended
 // @namespace    npm/vite-plugin-monkey
-// @version      1.0.18
+// @version      1.0.21
 // @description  Extension for the RetailVista Pack&Ship application with plenty of QOL improvements.
 // @license      MIT
 // @icon         https://www.kampeerhalroden.nl/media/e9/9d/08/1703346720/favicon.ico
@@ -8929,12 +8929,13 @@
 	var package_default = {
 		name: "pack-ship-extended",
 		"private": true,
-		version: "1.0.18",
+		version: "1.0.21",
 		type: "module",
 		scripts: {
 			"dev": "vite",
 			"build": "vue-tsc -b && vite build",
-			"preview": "vite preview"
+			"preview": "vite preview",
+			"version": "npm run build && node build/stage-artefacts.mjs && git add pack-ship-extended.user.js pack-ship-extended.user.css"
 		},
 		dependencies: {
 			"@types/jquery": "^4.0.0",
