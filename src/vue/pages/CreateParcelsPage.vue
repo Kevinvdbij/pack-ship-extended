@@ -27,6 +27,10 @@ const showRows = ref(false);
 // straight to the same error with the same parcel.
 const returning = window.location.hash == PARCELS_RETURN_HASH;
 
+// The portal's scan field on this page, which it names differently from the one
+// on the search page.
+const SCAN_INPUT = "#productBarcode";
+
 // The table is the portal's own rows, read straight out of the hidden inputs
 // it serves this page with -- one `VerificationReservationRows[n]` group per
 // picking instruction, each carrying what was picked and what has been
@@ -67,12 +71,18 @@ onMounted(() => {
 			updateVerifiedQuantities();
 			showRows.value = true;
 
+			// After the parcels have been cleared, not before: clearing runs
+			// the portal's own update through the page, and anything focused
+			// ahead of it loses the cursor again when the answer lands.
+			RVUtils.focusBarcodeInput(SCAN_INPUT);
+
 			processAutoComplete();
 			observeParcelContainer();
 		});
 
 	setupSidebar();
 	markParcelsLoading();
+	keepScannerFocused();
 
 	RVUtils.setLastOpenReservation({
 		id: RVUtils.getCurrentReservationId(),
@@ -110,6 +120,7 @@ function observeParcelContainer() {
 		const config = { attributes: true, childList: true, subtree: true };
 		const observer = new MutationObserver(() => {
 			updateVerifiedQuantities();
+			restoreScannerFocus();
 			autoAnnounceParcels(parcelContainerElement);
 		});
 		observer.observe(parcelContainerElement, config);
@@ -152,6 +163,42 @@ function markParcelsLoading() {
 	sync();
 
 	new MutationObserver(sync).observe(container, { childList: true, subtree: true });
+}
+
+// The cursor belongs in the scan field for the whole of this step, whether or
+// not anything is handling itself: this is where the packer works, the scanner
+// types into whatever has the cursor, and a scan that lands anywhere else is
+// lost with nothing on screen to say so.
+//
+// Two things take it away. The portal rewrites the whole parcel area after every
+// parcel change -- `refresh()` -- and the cursor goes with the markup it was in;
+// and a click on the page rather than on a control leaves focus on `body`.
+// Neither is someone going somewhere on purpose, so the field takes it back.
+function keepScannerFocused() {
+	document.addEventListener("focusout", (event) => {
+		if (event.target != document.querySelector(SCAN_INPUT)) {
+			return;
+		}
+
+		// Where focus went is not known until the browser has moved it, which
+		// happens after this event.
+		setTimeout(restoreScannerFocus);
+	});
+}
+
+// Only from nowhere. Landing on another field, a button or a dialog is the
+// operator going there, and taking the cursor off them mid-edit would be worse
+// than a missed scan -- the parcel's weight is typed into one of those fields.
+function restoreScannerFocus() {
+	if (document.activeElement && document.activeElement != document.body) {
+		return;
+	}
+
+	if (showImageModal.value) {
+		return;
+	}
+
+	RVUtils.focusBarcodeInput(SCAN_INPUT);
 }
 
 // The column beside the parcels: which reservation this is, who it is for, and

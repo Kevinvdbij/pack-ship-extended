@@ -43,9 +43,15 @@ export const FOOTER_SLOT_SELECTOR = "footer > div > div > div.col-auto.mr-auto.t
 // out itself and makes the slot the minimal bar goes into.
 export const LOGIN_FOOTER_CONTAINER_SELECTOR = "footer > div.container";
 
-// The portal renders this container with an id that contains a space, so the
-// space has to be escaped for querySelector to accept it.
-export const RESERVATION_SUMMARY_SELECTOR = "#ReservationSummary\\ mb-2";
+// The reservation's own facts, as the portal lays them out beside its pages.
+//
+// Matched on the start of the id rather than on the whole of it: the parcels
+// page renders it as `ReservationSummary mb-2` -- an id with a space in it,
+// which is the portal's doing -- and the completed page renders the same block
+// as plain `ReservationSummary`. Written out in full it matched one page and
+// silently missed the other, which is why the completed screen had no sidebar
+// of ours and showed the portal's raw block underneath instead.
+export const RESERVATION_SUMMARY_SELECTOR = "[id^='ReservationSummary']";
 
 // The column that block sits in, which is what the sidebar mounts into. The
 // block itself is read for its fields and then hidden rather than removed:
@@ -117,6 +123,16 @@ export const COMPLETED_HEADING_SELECTOR = "#ReservationContainer h3";
 // screen the operator is held on when a step fails, so both are read out and
 // shown rather than summarised: "it did not go out" is not enough to act on.
 export const COMPLETED_STEP_SELECTOR = "#ReservationContainer li.list-group-item";
+
+// The parcels as this screen renders them: one card each, with the parcel's own
+// number and carrier as its title, a row of `Label: value` cells under it, and a
+// table of what is in it. Read out and re-rendered as ours -- on a refused
+// reservation this is what the operator is looking at while deciding what to
+// change, and the vendor's version of it under a card of ours is the seam that
+// made this screen look like two pages stacked.
+export const COMPLETED_PARCEL_SELECTOR = "#ReservationContainer .parcels .card";
+export const COMPLETED_PARCEL_TITLE_SELECTOR = ".card-title";
+export const COMPLETED_PARCEL_FIELD_SELECTOR = ".card-text > div";
 export const COMPLETED_STEP_ERROR_SELECTOR = ".material-icons.text-error";
 export const COMPLETED_STEP_DETAIL_SELECTOR = ".pl-2";
 export const COMPLETED_PROCEED_SELECTOR = "#ReservationContainer > div:nth-child(11) > div > button";

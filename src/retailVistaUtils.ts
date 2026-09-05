@@ -347,7 +347,7 @@ export function skipVerification(target:HTMLElement) {
 	form.submit();
 }
 
-// Puts the cursor back in the barcode field and empties it, so the next scan
+// Puts the cursor back in a barcode field and empties it, so the next scan
 // lands there whole. The scanner types and presses return; if the cursor is
 // anywhere else the scan is lost, and if the field still holds the last one the
 // two run together -- so this is what keeps a run going without the mouse.
@@ -359,9 +359,12 @@ export function skipVerification(target:HTMLElement) {
 // rather than left for each to remember. Already-visible callers, which is
 // every call made during a packing run, are unaffected: `afterReveal` runs them
 // on the spot.
-export function focusBarcodeInput() {
+//
+// The search page's field by default; the parcels page passes its own, which the
+// portal names differently.
+export function focusBarcodeInput(selector = "#Productbarcode") {
 	afterReveal(() => {
-		const barcodeInput = document.querySelector<HTMLInputElement>("#Productbarcode");
+		const barcodeInput = document.querySelector<HTMLInputElement>(selector);
 
 		if (!barcodeInput) {
 			return;

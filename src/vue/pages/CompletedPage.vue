@@ -5,12 +5,12 @@ import Settings from '../../settings.ts';
 import { MassCompleteStatus } from '../../interfaces.ts';
 import { afterPaint, afterReveal } from '../../reveal.ts';
 import { standInForPortalPage } from '../../standIn.ts';
-import { mountApp } from '../mount.ts';
 import ReservationSidebar from '../components/ReservationSidebar.vue';
 import {
 	COMPLETED_CONTAINER_SELECTOR, COMPLETED_HEADING_SELECTOR, COMPLETED_PROCEED_SELECTOR,
 	COMPLETED_STEP_DETAIL_SELECTOR, COMPLETED_STEP_ERROR_SELECTOR, COMPLETED_STEP_SELECTOR,
-	MAIN_CONTENT_SELECTOR, PACKING_PORTAL_URL, PARCELS_RETURN_HASH, VENDOR_BAND_LOGO_SELECTOR
+	COMPLETED_PARCEL_FIELD_SELECTOR, COMPLETED_PARCEL_SELECTOR, COMPLETED_PARCEL_TITLE_SELECTOR,
+	PACKING_PORTAL_URL, PARCELS_RETURN_HASH, VENDOR_BAND_LOGO_SELECTOR
 } from '../../constants.ts';
 
 // One step of the portal's own account of what it did with the reservation.
@@ -21,6 +21,24 @@ interface Failure {
 	// worth reading: it is the difference between a label that will come out on
 	// a retry and one that never will.
 	detail: string;
+}
+
+// A parcel as this screen lists it, read out of the portal's own card.
+interface Parcel {
+	// "349637 / SendCloud": the parcel's number and where it was sent.
+	title: string;
+	// Everything the portal writes as `Label: value` -- the carrier, the weight,
+	// the barcode once there is one. Kept as the portal's own labels: they are
+	// translated with the rest of the page, and this screen has no opinion about
+	// which of them matter.
+	fields: Array<{ label: string; value: string }>;
+	lines: ParcelLine[];
+}
+
+interface ParcelLine {
+	name: string;
+	barcode: string;
+	amount: string;
 }
 
 // The last screen of a reservation: it has been packed, its parcels have been
@@ -82,6 +100,9 @@ const heading = ref("");
 // only place a refused announcement can be put right.
 const parcelsUrl = ref("");
 
+// What is in the boxes, for the screen that is about to be looked into.
+const parcels = ref<Parcel[]>([]);
+
 // Whatever the portal calls it. This is its button being pressed, so it is its
 // word that goes on ours -- and a label read off the page cannot drift from what
 // the control actually does the way a copy of it here would.
@@ -109,27 +130,22 @@ onMounted(() => {
 	failures.value = readFailures(container);
 	heading.value = document.querySelector(COMPLETED_HEADING_SELECTOR)?.textContent?.trim() ?? "";
 	parcelsUrl.value = readParcelsUrl();
+	parcels.value = readParcels(container);
 
 	updateAutoComplete();
 
-	// A reservation that went out is finished with: the card says so, the button
-	// closes it, and nothing else on the page is going to be read. One that was
-	// refused is the opposite -- it is about to be looked into, and everything
-	// the screen knows about it is worth having. So the two cases hide different
-	// amounts of the portal's page.
-	if (failed.value) {
-		restorePortalPage = keepPortalDetail(container);
-		mountSidebar();
-		liftCardAboveDetail();
-	} else {
-		container.classList.add("pse-portal-replaced");
+	container.classList.add("pse-portal-replaced");
 
-		// And with it everything else the portal laid out in this cell -- the
-		// reservation sidebar above all, which otherwise stands there beside a
-		// card that has been pushed below the whole page it replaces.
-		if (root.value) {
-			restorePortalPage = standInForPortalPage(root.value);
-		}
+	// And with it everything else the portal laid out in this cell -- the
+	// reservation's own summary block above all, which otherwise stands there
+	// beside a card that has been pushed below the whole page it replaces.
+	//
+	// Both outcomes hide the same amount, which is all of it. A refused
+	// reservation needs more of this page than a finished one does, but it needs
+	// it in one design rather than in ours over the vendor's: everything worth
+	// keeping has been read out above and is rendered again below.
+	if (root.value) {
+		restorePortalPage = standInForPortalPage(root.value);
 	}
 
 	// This page is served without a header band, and carries the vendor's small
@@ -162,93 +178,68 @@ onMounted(() => {
 	afterReveal(() => afterPaint(finalize));
 });
 
-// What the portal's own block keeps on a refused reservation: the parcels, with
-// their carrier, their weight and what is in them. That is the part the operator
-// is coming back to look at, so it is left standing and given the chrome of a
-// card; what our own card already says is hidden.
-//
-// Hidden by what the rows hold rather than by their position: the failure adds
-// rows to this block, so counting from the top means counting differently on the
-// two pages this markup serves.
-function keepPortalDetail(container: Element): () => void {
-	const hidden: Element[] = [];
+// The parcels, read out of the portal's own cards so they can be rendered as
+// ours. Nothing is interpreted: the fields keep the portal's labels, in the
+// portal's language, and a field it stops writing simply stops appearing.
+function readParcels(container: Element): Parcel[] {
+	return [...container.querySelectorAll(COMPLETED_PARCEL_SELECTOR)].map(readParcel);
+}
 
-	const hide = (element: Element | null | undefined) => {
-		if (!element || element.classList.contains("pse-portal-replaced")) {
-			return;
+function readParcel(card: Element): Parcel {
+	const titles = [...card.querySelectorAll(COMPLETED_PARCEL_TITLE_SELECTOR)];
+
+	// The first title is the parcel itself -- "349637 / SendCloud". The others
+	// are `Label: value` in heading clothes, the barcode among them, so they are
+	// read as fields alongside the cells below.
+	const fields = [...titles.slice(1), ...card.querySelectorAll(COMPLETED_PARCEL_FIELD_SELECTOR)]
+		.map((cell) => splitField(text(cell)))
+		// A parcel that was refused has no barcode yet, and the portal writes
+		// the label anyway. An empty value is not a fact about the parcel.
+		.filter((field): field is { label: string; value: string } => Boolean(field?.value));
+
+	return { title: text(titles[0]), fields, lines: readParcelLines(card) };
+}
+
+// The portal's table of what is in the parcel: a header row of `th`, then one
+// row per product with its description and barcode run together in the first
+// cell and the amount in the last.
+function readParcelLines(card: Element): ParcelLine[] {
+	const lines: ParcelLine[] = [];
+
+	for (const row of card.querySelectorAll("table tr")) {
+		if (row.querySelector("th")) {
+			continue;
 		}
 
-		element.classList.add("pse-portal-replaced");
-		hidden.push(element);
-	};
+		const cells = [...row.children];
+		const first = text(cells[0]);
+		const last = cells[cells.length - 1];
+		const barcode = first.match(/\d{8,14}$/)?.[0] ?? "";
 
-	// The portal's heading and its finish button, both of which our card
-	// carries -- and the rule between them, which separates nothing once they
-	// are gone.
-	hide(container.querySelector(COMPLETED_HEADING_SELECTOR)?.closest(".row"));
-	hide(proceedButton()?.closest(".row"));
-
-	for (const rule of container.querySelectorAll(":scope > hr")) {
-		hide(rule);
+		lines.push({
+			name: barcode ? first.slice(0, -barcode.length).trim() : first,
+			barcode,
+			// Text on this screen, a field on the parcels page. Read both ways
+			// so the same reader serves either.
+			amount: text(last) || last.querySelector("input")?.value || "",
+		});
 	}
 
-	const detail = container.querySelector(".container");
-	const steps = detail?.querySelector(".list-group")?.closest(".row");
-
-	if (!detail || !steps) {
-		return () => undo(hidden);
-	}
-
-	detail.classList.add("pse-portal-detail");
-
-	// Everything down to and including the list of steps: that is the portal's
-	// version of the verdict, which our card has already given. What follows it
-	// is the reservation's own detail, and stays.
-	for (const row of detail.children) {
-		hide(row);
-
-		if (row == steps) {
-			break;
-		}
-	}
-
-	return () => {
-		detail.classList.remove("pse-portal-detail");
-		undo(hidden);
-	};
+	return lines;
 }
 
-function undo(hidden: Element[]) {
-	for (const element of hidden) {
-		element.classList.remove("pse-portal-replaced");
+function splitField(value: string): { label: string; value: string } | null {
+	const separator = value.indexOf(":");
+
+	if (separator < 0) {
+		return null;
 	}
+
+	return { label: value.slice(0, separator).trim(), value: value.slice(separator + 1).trim() };
 }
 
-// The same column of facts every other page with a reservation open carries --
-// who it is for, where it is going, and the webshop reference, which is the one
-// thing on this screen that gets looked up somewhere else and so is the one
-// thing with a copy button on it.
-//
-// The portal renders those facts on this page too; this reads them out of its
-// block and hides it, the way it does on the parcels page.
-function mountSidebar() {
-	const column = RVUtils.getReservationSidebarColumn();
-
-	if (!column) {
-		return;
-	}
-
-	mountApp(ReservationSidebar, (host) => column.insertAdjacentElement("afterbegin", host));
-}
-
-// Our card is appended past the end of the cell, which is behind the detail we
-// have just kept. It is the answer to what happened, so it goes first.
-function liftCardAboveDetail() {
-	const main = root.value?.closest(MAIN_CONTENT_SELECTOR);
-
-	if (main && root.value) {
-		main.prepend(root.value);
-	}
+function text(element: Element | null | undefined): string {
+	return (element?.textContent ?? "").replace(/\s+/g, " ").trim();
 }
 
 // The portal's account of what it did, filtered down to the steps it marked as
@@ -383,71 +374,110 @@ function updateAutoComplete() {
 	     anything to put in it. -->
 	<div ref="root">
 		<div class="pse-done" :class="{ 'is-failed': failed }" v-if="replaced">
-			<!-- Two cards, not one card with the failure written into it: the
-			     screens say opposite things and are acted on differently, and
-			     the operator has to be able to tell them apart from a step back
-			     without reading either. -->
-			<div class="pse-done-card" :class="{ 'is-failed': failed }">
-				<!-- The mark is the message: at a glance, from a step back, this
-				     screen says the reservation is off the bench -- or that it
-				     is not. -->
-				<span class="pse-done-mark" :class="{ 'is-working': finalizing, 'is-failed': failed }"
-					aria-hidden="true">
-					<svg v-if="failed" viewBox="0 0 24 24" width="30" height="30" fill="none"
-						stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-						<path d="M12 8v5" />
-						<path d="M12 16.6v.1" />
-						<path d="M10.3 3.9L2.6 17.2A2 2 0 004.3 20.2h15.4a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z" />
-					</svg>
-					<svg v-else-if="!finalizing" viewBox="0 0 24 24" width="30" height="30" fill="none"
-						stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-						<path d="M5 12.5l4.5 4.5L19 7.5" />
-					</svg>
-					<span v-else class="pse-done-spinner"></span>
-				</span>
+			<!-- A finished reservation is one card in the middle of the screen and
+			     nothing else. A refused one is a screen to work from: what went
+			     wrong on the left, and everything needed to judge it beside --
+			     who it is for, and what is in the boxes. -->
+			<div class="pse-done-layout">
+				<div class="pse-done-card" :class="{ 'is-failed': failed }">
+					<!-- The mark is the message: at a glance, from a step back,
+					     this screen says the reservation is off the bench -- or
+					     that it is not. -->
+					<span class="pse-done-mark" :class="{ 'is-working': finalizing, 'is-failed': failed }"
+						aria-hidden="true">
+						<svg v-if="failed" viewBox="0 0 24 24" width="30" height="30" fill="none"
+							stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M12 8v5" />
+							<path d="M12 16.6v.1" />
+							<path d="M10.3 3.9L2.6 17.2A2 2 0 004.3 20.2h15.4a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z" />
+						</svg>
+						<svg v-else-if="!finalizing" viewBox="0 0 24 24" width="30" height="30" fill="none"
+							stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+							<path d="M5 12.5l4.5 4.5L19 7.5" />
+						</svg>
+						<span v-else class="pse-done-spinner"></span>
+					</span>
 
-				<h1 class="pse-done-title">{{ failed ? (heading || "Reservering niet verzonden") : "Reservering afgerond" }}</h1>
+					<h1 class="pse-done-title">
+						{{ failed ? (heading || "Reservering niet verzonden") : "Reservering afgerond" }}
+					</h1>
 
-				<p class="pse-done-number" v-if="reservationNumber">{{ reservationNumber }}</p>
+					<p class="pse-done-number" v-if="reservationNumber">{{ reservationNumber }}</p>
 
-				<!-- The portal's own account of what was refused. It is the only
-				     thing on this screen that says what to do next, so it is set
-				     to be read rather than tucked under an icon. -->
-				<ul class="pse-done-failures" v-if="failed">
-					<li class="pse-done-failure" v-for="(failure, index) in failures" :key="index">
-						<span class="pse-done-failure-step" v-if="failure.step">{{ failure.step }}</span>
-						<span class="pse-done-failure-detail" v-if="failure.detail">{{ failure.detail }}</span>
-					</li>
-				</ul>
+					<!-- The portal's own account of what was refused. It is the
+					     only thing on this screen that says what to do next, so
+					     it is set to be read rather than tucked under an icon. -->
+					<ul class="pse-done-failures" v-if="failed">
+						<li class="pse-done-failure" v-for="(failure, index) in failures" :key="index">
+							<span class="pse-done-failure-step" v-if="failure.step">{{ failure.step }}</span>
+							<span class="pse-done-failure-detail" v-if="failure.detail">{{ failure.detail }}</span>
+						</li>
+					</ul>
 
-				<p class="pse-done-text" v-if="failed">
-					De pakketten zijn niet aangemeld. Ga terug naar de pakketten om het opnieuw te
-					proberen.
-				</p>
-				<p class="pse-done-text" v-else-if="finalizing">
-					Wordt afgesloten en gaat terug naar zoeken...
-				</p>
-				<p class="pse-done-text" v-else>
-					De pakketten zijn aangemeld. Sluit de reservering af om verder te gaan.
-				</p>
+					<p class="pse-done-text" v-if="failed">
+						De pakketten zijn niet aangemeld. Ga terug naar de pakketten om het opnieuw te
+						proberen.
+					</p>
+					<p class="pse-done-text" v-else-if="finalizing">
+						Wordt afgesloten en gaat terug naar zoeken...
+					</p>
+					<p class="pse-done-text" v-else>
+						De pakketten zijn aangemeld. Sluit de reservering af om verder te gaan.
+					</p>
 
-				<!-- On a failure the way back is the offer, and finishing anyway
-				     is kept as the quiet one beside it: it is a real thing to
-				     want -- the label may have come out regardless -- but it is
-				     not what this screen is recommending. -->
-				<div class="pse-done-actions" v-if="failed">
-					<button v-if="parcelsUrl" type="button" class="pse-done-button" @click="backToParcels()">
-						Terug naar pakketten
-					</button>
-					<button type="button" class="pse-done-button is-quiet" @click="finalize()">
+					<!-- On a failure the way back is the offer, and finishing
+					     anyway is kept as the quiet one beside it: it is a real
+					     thing to want -- the label may have come out regardless
+					     -- but it is not what this screen is recommending. -->
+					<div class="pse-done-actions" v-if="failed">
+						<button v-if="parcelsUrl" type="button" class="pse-done-button" @click="backToParcels()">
+							Terug naar pakketten
+						</button>
+						<button type="button" class="pse-done-button is-quiet" @click="finalize()">
+							{{ proceedLabel }}
+						</button>
+					</div>
+
+					<!-- One control, and only when it is the operator's to press. -->
+					<button v-else-if="!finalizing" type="button" class="pse-done-button" @click="finalize()">
 						{{ proceedLabel }}
 					</button>
 				</div>
 
-				<!-- One control, and only when it is the operator's to press. -->
-				<button v-else-if="!finalizing" type="button" class="pse-done-button" @click="finalize()">
-					{{ proceedLabel }}
-				</button>
+				<!-- The same column of facts every other page with a reservation
+				     open carries, and the boxes as they stand. Rendered rather
+				     than revealed: the portal's own version of both is hidden
+				     with the rest of its page. -->
+				<aside class="pse-done-aside" v-if="failed">
+					<ReservationSidebar />
+
+					<section class="pse-done-parcels" v-if="parcels.length">
+						<h2 class="pse-done-parcels-title">Pakketten</h2>
+
+						<article class="pse-done-parcel" v-for="(parcel, index) in parcels" :key="index">
+							<h3 class="pse-done-parcel-name">{{ parcel.title }}</h3>
+
+							<dl class="pse-done-parcel-fields" v-if="parcel.fields.length">
+								<template v-for="field in parcel.fields" :key="field.label">
+									<dt>{{ field.label }}</dt>
+									<dd>{{ field.value }}</dd>
+								</template>
+							</dl>
+
+							<ul class="pse-done-parcel-lines" v-if="parcel.lines.length">
+								<li v-for="(line, lineIndex) in parcel.lines" :key="lineIndex">
+									<span class="pse-done-parcel-amount">{{ line.amount }}×</span>
+									<span class="pse-done-parcel-product">
+										<span class="pse-done-parcel-product-name">{{ line.name }}</span>
+										<span class="pse-done-parcel-barcode" v-if="line.barcode">
+											{{ line.barcode }}
+										</span>
+									</span>
+								</li>
+							</ul>
+						</article>
+					</section>
+				</aside>
 			</div>
 		</div>
 	</div>
@@ -502,12 +532,137 @@ function updateAutoComplete() {
 	color: var(--pse-brand-ink);
 }
 
-/* On a failure the card is not the whole screen: the reservation's own detail is
-   kept underneath it, so the card takes the room it needs and hands the rest
-   over rather than centring itself in a window it no longer owns. */
+/* On a failure the card shares the screen with the reservation's own detail, so
+   it stops claiming the height of the window and lets the two sit side by side
+   from the top. */
 .pse-done.is-failed {
 	min-height: 0;
-	padding-bottom: 8px;
+	align-items: flex-start;
+	padding-top: 32px;
+}
+
+/* One card on the ordinary screen, two columns on the refused one -- the card
+   and everything needed to judge it. */
+.pse-done-layout {
+	display: flex;
+	align-items: flex-start;
+	justify-content: center;
+	gap: 20px;
+	width: 100%;
+}
+
+.pse-done-aside {
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	width: 100%;
+	max-width: 380px;
+	text-align: left;
+}
+
+/* The sidebar is written for the column it sits in on the parcels page, where
+   the page around it sets the width. Here it is one of two panels, so it is
+   given the same width as the other. */
+.pse-done-aside :deep(.pse-sidebar) {
+	width: 100%;
+}
+
+/* The boxes, in the same chrome as the card beside them. */
+.pse-done-parcels {
+	padding: 18px 20px 20px;
+	border: 1px solid var(--pse-line);
+	border-radius: 20px;
+	background-color: #ffffff;
+	box-shadow: 0 1px 2px rgba(20, 48, 33, 0.04), 0 18px 40px -28px rgba(20, 48, 33, 0.45);
+}
+
+.pse-done-parcels-title {
+	margin: 0 0 12px;
+	font-size: 12px;
+	font-weight: 700;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--pse-ink-soft);
+}
+
+.pse-done-parcel + .pse-done-parcel {
+	margin-top: 14px;
+	padding-top: 14px;
+	border-top: 1px solid var(--pse-line);
+}
+
+.pse-done-parcel-name {
+	margin: 0;
+	font-size: 14.5px;
+	font-weight: 700;
+	color: var(--pse-ink);
+}
+
+/* The carrier and the weight: reference, read once, so they are set as a
+   two-column list rather than as sentences. */
+.pse-done-parcel-fields {
+	display: grid;
+	grid-template-columns: auto minmax(0, 1fr);
+	gap: 2px 10px;
+	margin: 10px 0 0;
+	font-size: 12.5px;
+	line-height: 1.45;
+}
+
+.pse-done-parcel-fields dt {
+	color: var(--pse-ink-faint);
+}
+
+.pse-done-parcel-fields dd {
+	margin: 0;
+	color: var(--pse-ink);
+	overflow-wrap: anywhere;
+}
+
+.pse-done-parcel-lines {
+	margin: 12px 0 0;
+	padding: 0;
+	list-style: none;
+}
+
+.pse-done-parcel-lines li {
+	display: flex;
+	gap: 10px;
+	padding: 8px 10px;
+	border-radius: 10px;
+	background-color: var(--pse-well);
+	font-size: 12.5px;
+	line-height: 1.4;
+}
+
+.pse-done-parcel-lines li + li {
+	margin-top: 6px;
+}
+
+/* The count first and set apart: what is checked here is whether the box holds
+   what it should, and that is a question about the number. */
+.pse-done-parcel-amount {
+	flex: none;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	color: var(--pse-brand-ink);
+}
+
+.pse-done-parcel-product {
+	display: flex;
+	flex-direction: column;
+	min-width: 0;
+}
+
+.pse-done-parcel-product-name {
+	color: var(--pse-ink);
+	overflow-wrap: anywhere;
+}
+
+.pse-done-parcel-barcode {
+	font-variant-numeric: tabular-nums;
+	font-size: 12px;
+	color: var(--pse-ink-faint);
 }
 
 /* A refused reservation. The card is the same card -- same shape, same weight --
@@ -710,6 +865,17 @@ function updateAutoComplete() {
 	   read, so they stack -- the way back first. */
 	.pse-done-actions {
 		flex-direction: column;
+	}
+
+	/* And so do the columns, with the card -- which says what happened -- above
+	   the detail it is judged against. */
+	.pse-done-layout {
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.pse-done-aside {
+		max-width: 560px;
 	}
 
 	.pse-done-card {
