@@ -42,6 +42,16 @@
 	--pse-alert-soft: rgba(176, 58, 46, 0.12);
 	--pse-alert-wash: rgba(176, 58, 46, 0.05);
 
+	/* ---- Attention ---- *
+	 * A search the portal answered with something to read rather than with a
+	 * reservation: a number that is not processed yet, a run that has to be
+	 * finished first. Not a failure -- nothing went wrong and nothing has to be
+	 * repeated -- so it is kept off the red and given an amber of the same
+	 * muted weight, dark enough to be read on the white of a card.
+	 */
+	--pse-attention-ink: #8a5a12;
+	--pse-attention-soft: rgba(186, 130, 32, 0.16);
+
 	/* ---- Dialogs ---- *
 	 * Shared by every modal in the extension and by the portal's own two, which
 	 * `src/styles/portal.css` restyles to match. Declared here so a dialog of

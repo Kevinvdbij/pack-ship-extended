@@ -4,6 +4,7 @@ import { ReservationSearchResponseType, ReservationSelectionModalData } from "..
 import Modal from "../components/ReservationSelectionModal.vue";
 import SearchPanel from "../components/SearchPanel.vue";
 import SearchField from "../components/SearchField.vue";
+import SearchNotice from "../components/SearchNotice.vue";
 import ResumeButton from "../components/ResumeButton.vue";
 import * as RVUtils from "../../retailVistaUtils.ts";
 import { PACKING_PORTAL_URL } from "../../constants.ts";
@@ -33,6 +34,10 @@ const addParcelsNumber = ref("");
 const searching = ref(false);
 
 const messages = useTemplateRef<HTMLElement>("messages");
+
+// The portal's alert, read off its markup and said again in our own words. Null
+// on a page that has nothing to report, which is the ordinary load.
+const notice = ref<Notice>();
 
 // Nothing to go back to, or the last thing opened is the last thing finished --
 // in which case the other shortcut is the one that applies, and offering this
@@ -75,6 +80,84 @@ function keepScannerFocused() {
 	});
 }
 
+interface Notice {
+	title: string;
+	detail?: string;
+	tone: "notice" | "alert";
+}
+
+// The portal's own alerts, translated where we recognise them.
+//
+// Only the messages the operator actually meets are listed. Anything else is
+// shown as the portal wrote it -- English on a Dutch screen is worse than the
+// alternative only until the alternative is a message that has been dropped,
+// and a search can be answered with something we have not seen.
+const NOTICES: { pattern: RegExp; notice: (match: RegExpMatchArray) => Notice }[] = [
+	{
+		// "Reservation 395361 is not processed yet. Parcels can be added through
+		// the 'Search reservation' routine." -- the answer to a number typed into
+		// the add-parcels form that has not been packed yet. The way forward is
+		// the other form, named rather than pointed at: the card stacks on a
+		// narrow screen and "the one beside it" is then the one below it.
+		pattern: /reservation\s+(\d+)\s+is\s+not\s+processed\s+yet/i,
+		notice: (match) => ({
+			title: `Reservering ${match[1]} is nog niet ingepakt.`,
+			detail: "Pak de reservering eerst in via \"Zoek reservering\". Pakketten toevoegen kan pas als de reservering is afgerond.",
+			tone: "notice",
+		}),
+	},
+];
+
+// Reads whatever the portal left in `#messages` and renders it as ours.
+//
+// The element itself stays in the document and off the screen: the portal's
+// response handler and ours both write into it, so it has to keep existing and
+// keep being the thing that is written to. This turns it into something to look
+// at rather than replacing it.
+function readNotice() {
+	const alert = messages.value?.querySelector(".alert");
+
+	if (!alert) {
+		notice.value = undefined;
+
+		return;
+	}
+
+	// The dismiss button the portal renders inside the alert is not part of what
+	// it says.
+	const copy = alert.cloneNode(true) as Element;
+	copy.querySelectorAll("button").forEach((button) => button.remove());
+
+	const text = copy.textContent?.replace(/\s+/g, " ").trim();
+
+	if (!text) {
+		notice.value = undefined;
+
+		return;
+	}
+
+	const known = NOTICES.map((entry) => {
+		const match = text.match(entry.pattern);
+
+		return match ? entry.notice(match) : undefined;
+	}).find(Boolean);
+
+	notice.value = known ?? {
+		title: text,
+		// The portal marks its own severity, and the only distinction our card
+		// draws is between "read this" and "this went wrong".
+		tone: alert.classList.contains("alert-danger") ? "alert" : "notice",
+	};
+}
+
+// Dismissing takes the portal's alert with it, so a message that has been read
+// cannot come back when the next response leaves the element alone.
+function dismissNotice() {
+	messages.value?.querySelector(".alert")?.remove();
+
+	notice.value = undefined;
+}
+
 // Whatever the operator picked in the modal, the page underneath is a search
 // again the moment it closes -- so the cursor goes back where a scan can be
 // caught rather than being left on the dismissed dialog.
@@ -100,13 +183,25 @@ function replacePortalSearchBlock() {
 	}
 
 	// The portal renders its messages row inside the block on some responses and
-	// above it on others. Moved when it is inside, left where it is when it is
-	// not: either way an alert about the search ends up directly above the
-	// search, and the element the response handler writes into still exists.
-	const portalMessages = block.querySelector("#messages")?.parentElement;
+	// above it on others. Taken either way, so the row we read from and the row
+	// the response handler writes into are the same one wherever the portal put
+	// it -- and so a raw alert of theirs cannot be left standing above our card.
+	const portalMessages = (block.querySelector("#messages") ?? document.querySelector("#messages"))
+		?.parentElement;
 
 	if (portalMessages && messages.value) {
-		RVUtils.adoptElement(messages.value, portalMessages);
+		// Hidden as it is adopted: the row is kept for what writes into it, and
+		// what it says is rendered again above the card as ours.
+		RVUtils.adoptElement(messages.value, portalMessages, "pse-portal-replaced");
+	}
+
+	if (messages.value) {
+		// A search that comes back to this page rewrites the row rather than
+		// reloading, so our reading of it follows the element instead of being
+		// taken once.
+		new MutationObserver(readNotice).observe(messages.value, { childList: true, subtree: true });
+
+		readNotice();
 	}
 
 	block.classList.add("pse-portal-replaced");
@@ -218,6 +313,9 @@ function openReservation(url: string) {
 		     to nothing when it is. -->
 		<div class="pse-messages" ref="messages"></div>
 
+		<SearchNotice v-if="notice" :title="notice.title" :detail="notice.detail" :tone="notice.tone"
+			@dismiss="dismissNotice()" />
+
 		<div class="pse-card">
 			<SearchPanel title="Zoek reservering" subtitle="Scan een product of vul een reserveringsnummer in.">
 				<template #icon>
@@ -315,6 +413,12 @@ function openReservation(url: string) {
    the card on every ordinary load. */
 .pse-messages:empty {
 	display: none;
+}
+
+/* The gap the portal's own alert used to hold, now held by ours -- and only
+   when there is one, so an ordinary load still opens with the card. */
+.pse-search :deep(.pse-notice) {
+	margin-bottom: 18px;
 }
 
 /* One card holding both forms, rather than two panels side by side. They are

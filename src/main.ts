@@ -77,6 +77,24 @@ function mountIntoMainContent(host: HTMLDivElement) {
 	appendToBody(host);
 }
 
+// The search screen, named as well as listed: it is also what the add-parcels
+// route falls back to when the portal answers it with this page.
+const searchReservationsRoute: Route = {
+	pattern: /outdoor\/packship/,
+	component: SearchReservationsPage,
+	// Directly after the portal's search block, which the page then takes
+	// apart: it lifts the portal's own inputs into its own card and hides
+	// what is left, so this is the block's position rather than a position
+	// beside it.
+	//
+	// No anchor, unlike the routes above. An anchor exists as soon as its
+	// opening tag is parsed, and a block that is only half parsed has only
+	// half the inputs to lift -- so this one waits for a finished document.
+	// It costs nothing: the reveal is gated on DOM-ready regardless, so
+	// nothing of the portal's version is on screen either way.
+	attach: (host) => RVUtils.getSearchBlock()?.insertAdjacentElement("afterend", host),
+};
+
 // First match wins, so the catch-all search page has to come last.
 const routes: Route[] = [
 	{
@@ -127,21 +145,7 @@ const routes: Route[] = [
 	{
 		pattern: /outdoor\/packship\/AnnounceParcels/,
 	},
-	{
-		pattern: /outdoor\/packship/,
-		component: SearchReservationsPage,
-		// Directly after the portal's search block, which the page then takes
-		// apart: it lifts the portal's own inputs into its own card and hides
-		// what is left, so this is the block's position rather than a position
-		// beside it.
-		//
-		// No anchor, unlike the routes above. An anchor exists as soon as its
-		// opening tag is parsed, and a block that is only half parsed has only
-		// half the inputs to lift -- so this one waits for a finished document.
-		// It costs nothing: the reveal is gated on DOM-ready regardless, so
-		// nothing of the portal's version is on screen either way.
-		attach: (host) => RVUtils.getSearchBlock()?.insertAdjacentElement("afterend", host),
-	},
+	searchReservationsRoute,
 ];
 
 Settings.load();
@@ -358,6 +362,26 @@ async function moveVendorBuildLine() {
 	target.prepend(moved);
 }
 
+// The route as the portal answered it, rather than as the URL asked.
+//
+// AddParcels/Search is served as the search page again -- an alert and both
+// forms, no reservation -- when the number turns out not to be processed yet.
+// That page is the search screen, so it gets the search screen: our card, our
+// shortcuts, and the portal's alert rendered as one of our own notices. Without
+// this it came out as raw portal markup under our header band.
+//
+// Decided at DOM-ready, because "no reservation on this page" is a question only
+// a finished document answers.
+function servedRoute(current: Route | undefined): Route | undefined {
+	if (current?.component != AddParcelsPage) {
+		return current;
+	}
+
+	const isSearchPage = !document.querySelector("#ReservationOverview") && Boolean(RVUtils.getSearchBlock());
+
+	return isSearchPage ? searchReservationsRoute : current;
+}
+
 async function boot() {
 	try {
 		// A route that named an anchor mounts as soon as that anchor exists,
@@ -376,8 +400,10 @@ async function boot() {
 		// replacing anything, and nothing above them moves.
 		await domReady();
 
-		if (route?.component && route.attach && !route.anchor) {
-			mountApp(route.component, route.attach);
+		const served = servedRoute(route);
+
+		if (served?.component && served.attach && !served.anchor) {
+			mountApp(served.component, served.attach);
 		}
 
 		if (!route?.bareLayout) {
