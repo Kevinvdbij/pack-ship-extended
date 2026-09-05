@@ -75,7 +75,10 @@ export interface ModalReservationDetails {
 }
 
 export interface ModalProductDetails {
-	number: number,
+	// The article number as the portal prints it. A string, because it is only
+	// ever shown: parsing it gained nothing and turned an article number that is
+	// not all digits into "NaN" in the picker's table.
+	number: string,
 	description: string,
 	barcode: string,
 	amount: string

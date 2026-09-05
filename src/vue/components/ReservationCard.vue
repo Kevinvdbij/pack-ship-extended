@@ -92,7 +92,8 @@ function isShort(amount: string) {
 					</tr>
 				</thead>
 				<tbody>
-					<tr v-for="(product, index) in reservation.products" :key="index">
+					<tr v-for="(product, index) in reservation.products" :key="index"
+						:class="{ 'is-short': isShort(product.amount) }">
 						<td class="pse-cell-barcode">{{ product.number }}</td>
 						<td class="pse-cell-description">{{ product.description }}</td>
 						<td class="pse-cell-barcode">
@@ -102,9 +103,7 @@ function isShort(amount: string) {
 							</span>
 						</td>
 						<td class="pse-table-right">
-							<span class="pse-rescard-amount" :class="{ 'is-short': isShort(product.amount) }">
-								{{ product.amount }}
-							</span>
+							<span class="pse-rescard-amount">{{ product.amount }}</span>
 						</td>
 					</tr>
 				</tbody>
@@ -257,12 +256,28 @@ function isShort(amount: string) {
 	white-space: nowrap;
 }
 
-/* Why this reservation is in the group it is in. Amber and not red: nothing has
-   gone wrong, the picking is simply not finished -- the same distinction, and
-   the same colour, the parcels page draws for a count that is part way there. */
-.pse-rescard-amount.is-short {
-	background-color: rgba(226, 160, 46, 0.18);
-	color: #8a5a10;
+/* The line that is the reason, amber from edge to edge.
+ *
+ * Marking only the count in the last column was accurate and too quiet: it is
+ * two tinted digits at the far right of a wide table, and a colleague scanning
+ * the picker sees a card that looks like every other card. The row is what is
+ * short, so the row is what is coloured -- which is also how the portal's own
+ * table said it before this screen was ours.
+ *
+ * Amber and not red: nothing has gone wrong, the picking is simply not
+ * finished -- the same distinction, and the same colour, the parcels page draws
+ * for a count that is part way there.
+ */
+.pse-table tbody tr.is-short td {
+	background-color: var(--pse-attention-wash-strong);
+	border-top-color: var(--pse-attention-line-soft);
+}
+
+/* The count keeps the emphasis inside the row, since the row says which line is
+   short and this says by how much. */
+.pse-table tbody tr.is-short .pse-rescard-amount {
+	font-weight: 700;
+	color: var(--pse-attention-ink);
 }
 
 .pse-rescard-note {

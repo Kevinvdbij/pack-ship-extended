@@ -51,6 +51,13 @@
 	 */
 	--pse-attention-ink: #8a5a12;
 	--pse-attention-soft: rgba(186, 130, 32, 0.16);
+	/* The surface version of the above, for a whole line that is in this state
+	   rather than a value that is: the row of a picking table that is short is
+	   amber across its width, kept light enough that the text on it is still
+	   ordinary text, with a hairline that separates without ruling the table
+	   into stripes. */
+	--pse-attention-wash-strong: rgba(226, 160, 46, 0.18);
+	--pse-attention-line-soft: rgba(186, 130, 32, 0.22);
 
 	/* ---- Dialogs ---- *
 	 * Shared by every modal in the extension and by the portal's own two, which

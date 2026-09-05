@@ -475,7 +475,6 @@ function ensureBusyOverlay() {
 }
 
 export function retrieveModalData(modalElement:HTMLElement):ReservationSelectionModalData {
-	const amount = (<HTMLElement>modalElement.querySelector("#productReservationsModal > div > div > div.modal-header > h5")).innerText.trimStart()[0];
 	const barcode = (<HTMLElement>modalElement.querySelector("#productReservationsModal > div > div > div.modal-header > h5")).innerText.split("'")[1];
 	const name = (<HTMLElement>modalElement.querySelector("#productReservationsModal > div > div > div.modal-body > div > div > div.row.text-success > div:nth-child(1) > h3")).innerText.split("'")[1];
 	const imgUrl = (<HTMLImageElement>modalElement.querySelector("#productReservationsModal > div > div > div.modal-body > div > div > div.row.text-success > div:nth-child(2) > div > div.col-3.product-image > div > img")).src;
@@ -519,7 +518,20 @@ export function retrieveModalData(modalElement:HTMLElement):ReservationSelection
 	return {
 		searchProductName: name,
 		searchProductBarcode: barcode,
-		searchProductAmount: parseInt(amount!),
+		// Counted from what is actually listed below, rather than read off the
+		// portal's heading.
+		//
+		// The heading used to be taken apart by hand -- its first character,
+		// parsed as a number -- which is right only while the count is one digit
+		// and stands at the very front of the sentence. It is neither on a
+		// heading that opens with a word, which is what the portal serves once
+		// the session has been corrected to Dutch, and the screen then announced
+		// "NaN reserveringen met dit product" over three lists that plainly held
+		// some.
+		//
+		// The number on this screen names the lists under it, so it is those
+		// lists that are counted. It cannot disagree with what is on show.
+		searchProductAmount: singleReservations.length + validReservations.length + invalidReservations.length,
 		searchProductImageUrl: imgUrl,
 
 		singleLineReservations: singleReservations,
@@ -550,7 +562,7 @@ function iterateModalContainer(container:HTMLElement):ModalReservationDetails[] 
 				const amount = (<HTMLElement>product.querySelector("div > div:nth-child(4)")).innerText;
 
 				products.push({
-					number: parseInt(number),
+					number: number,
 					description: description,
 					barcode: barcode,
 					amount: amount
@@ -573,12 +585,27 @@ function iterateModalContainer(container:HTMLElement):ModalReservationDetails[] 
 	return reservations;
 }
 
+// "3 van 5" -- what was picked and what was asked for, as the portal writes it
+// in the picker's tables.
+//
+// The numbers are taken out of the string rather than the string being split on
+// the word between them: that word is "van" on a corrected page and "of" on one
+// still being served in English, and splitting on the Dutch one alone turned
+// every English row into a single number -- which then compared as short, and
+// marked rows that were fully picked.
 export function parseAmountString(amount:string):number[] {
-	return amount.split(" van ").map((x) => parseInt(x))
+	return (amount.match(/\d+/g) ?? []).map((x) => parseInt(x));
 }
 
 export function isAmountStringComplete(amount:string) {
 	const amounts:number[] = parseAmountString(amount);
+
+	// Nothing to compare against is not the same as being short. A value we
+	// cannot read is left unmarked rather than marked wrong -- the group it is
+	// in already says the reservation is not ready.
+	if (amounts.length < 2) {
+		return true;
+	}
 
 	return amounts[0] >= amounts[1];
 }
