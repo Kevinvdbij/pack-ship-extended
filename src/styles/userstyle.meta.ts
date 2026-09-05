@@ -8,7 +8,12 @@
 // would leave nothing to tell which pair a machine is running.
 
 export const USERSTYLE_NAME = "Pack & Ship Extended Style";
-export const USERSTYLE_ID = "555698";
+// The style's own Greasy Fork id. Not the script's, and not the id of the
+// style that came before this one -- "NedFox KHR Style", 555698, which is
+// still up there at 1.0.8 and is what these URLs used to point at. A style
+// that advertises another style's metadata as its update source is a style
+// Stylus will never update.
+export const USERSTYLE_ID = "594402";
 
 // The `@-moz-document url-prefix(...)` target. Stylus matches this itself; the
 // userscript's own `@match` is declared separately in `vite.config.ts`, so the

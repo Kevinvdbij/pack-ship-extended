@@ -167,6 +167,30 @@ export const VENDOR_BAND_LOGO_SELECTOR = "img.nfLogoSmall";
 // own means. What crosses between two apps on the same document is an event.
 export const SETTINGS_SAVED_EVENT = "pse:settings-saved";
 
+// The script on Greasy Fork, and the metadata block of its published version.
+//
+// Greasy Fork rather than the GitHub release, even though the release is the
+// earlier signal: this is the copy Tampermonkey installs from, so it is the one
+// that decides whether an update is actually available to a workplace. A chip
+// pointing at a version Greasy Fork has not synced yet is a chip nobody can
+// act on.
+//
+// The filename in the URL is decoration -- Greasy Fork answers on the id alone
+// -- but it is kept accurate so the URL is recognisable in a network log.
+export const GREASYFORK_SCRIPT_ID = "594401";
+export const GREASYFORK_META_URL =
+	`https://update.greasyfork.org/scripts/${GREASYFORK_SCRIPT_ID}/Pack%26Ship%20Extended.meta.js`;
+
+// Where a workplace is sent to fetch it: the release rather than the script,
+// because the Stylus style is the other half of this extension and is attached
+// to the same release. See `src/update.ts`.
+export const RELEASES_PAGE_URL = "https://github.com/Kevinvdbij/pack-ship-extended/releases/latest";
+
+// How long an update check stands before another is made. The metadata block is
+// a few hundred bytes and Greasy Fork does not meter it, so this is about not
+// asking on every page rather than about a quota.
+export const UPDATE_CHECK_INTERVAL = 60 * 60 * 1000;
+
 // Keys used with the GM value store.
 export const STORAGE_KEYS = {
 	settings: "PSE_Settings",
@@ -183,6 +207,8 @@ export const STORAGE_KEYS = {
 	// which is the same reason the run's own state is stored this way.
 	completedEntryPrefix: "PSE_Completed_",
 	currentUser: "PSE_Current_User",
+	// What the last update check found, shared by every tab on the machine.
+	updateCheck: "PSE_Update_Check",
 	swClientId: "PSE_Shopware_Client_Id",
 	swClientSecret: "PSE_Shopware_Client_Secret",
 	// Suffixed with a reservation number, one key per mass complete entry.

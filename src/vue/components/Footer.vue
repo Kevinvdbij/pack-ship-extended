@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, Teleport, Transition } from 'vue';
+import { computed, onMounted, ref, Teleport, Transition } from 'vue';
 import Modal from "../components/SettingsModal.vue";
 import CredentialsPrompt from "../components/CredentialsPrompt.vue";
 import pkg from "../../../package.json";
@@ -11,6 +11,7 @@ import { getCurrentUser, onCurrentUserChange } from '../../currentUser.ts';
 import { FOOTER_SLOT_SELECTOR } from '../../constants.ts';
 import { hasCredentials } from '../../shopware.ts';
 import { canInstall, installApp } from '../../pwa.ts';
+import { AvailableUpdate, checkForUpdate, getKnownUpdate } from '../../update.ts';
 
 // The same bar in two shapes. The full one is the control strip on the pages
 // behind the login; `minimal` drops everything that needs a session -- the
@@ -29,6 +30,24 @@ const props = withDefaults(defineProps<{
 	minimal: false,
 	to: FOOTER_SLOT_SELECTOR,
 });
+
+// The release that is out, when it is not the one running here.
+//
+// Seeded from what the last check stored so the bar draws itself in one pass,
+// then asked again -- without being waited for, because this is a line on a
+// footer and nothing on the page depends on the answer. Every page mounts this
+// bar, so every page checks; how often that actually reaches GitHub is the
+// interval's business, not this component's.
+const update = ref<AvailableUpdate | undefined>(getKnownUpdate());
+
+onMounted(() => {
+	checkForUpdate().then((available) => update.value = available);
+});
+
+const updateTitle = computed(() => update.value
+	? `Versie ${update.value.version} is beschikbaar, deze werkplek draait ${pkg.version}. `
+		+ "Klik om de release te openen -- werk het script en de stijl allebei bij."
+	: undefined);
 
 const showModal = ref(false);
 
@@ -118,6 +137,16 @@ function masterSwitchToggle() {
 			<span class="pse-version" title="Pack&Ship Extended">
 				<span class="pse-brand">P&amp;S Extended</span>
 				<span class="pse-version-number">v{{ pkg.version }}</span>
+
+				<!-- Only ever present when there is something to fetch, so the
+				     bar is unchanged on a workplace that is up to date. Inside
+				     the version item rather than beside it: it is about this
+				     build, and it reads as a remark on the number it follows. -->
+				<a v-if="update" class="pse-update" :href="update.url" target="_blank" rel="noopener"
+					:title="updateTitle">
+					<span class="pse-update-dot" aria-hidden="true"></span>
+					update {{ update.version }}
+				</a>
 			</span>
 
 			<!-- Present only while Chrome is actually willing to install: it
@@ -414,6 +443,52 @@ function masterSwitchToggle() {
 .pse-version-number {
 	font-variant-numeric: tabular-nums;
 	letter-spacing: 0.02em;
+}
+
+/* The one warm thing on the bar, and only ever on a workplace that is behind:
+   amber rather than green, because it is something to act on rather than a
+   state to read, and the same amber the toggle uses for "not automatic" so the
+   band still answers to two accents in total.
+
+   Centred against the baseline the rest of the item sits on -- it is a chip
+   with padding of its own, and baseline alignment would hang it low. */
+.pse-update {
+	display: inline-flex;
+	align-items: center;
+	align-self: center;
+	gap: 5px;
+	padding: 2px 8px;
+	border-radius: 999px;
+	background-color: rgba(245, 189, 116, 0.18);
+	font-size: 10px;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	color: var(--pse-off);
+	text-decoration: none;
+	white-space: nowrap;
+	transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.pse-update:hover {
+	background-color: rgba(245, 189, 116, 0.3);
+	color: #ffe1bb;
+}
+
+.pse-update:focus {
+	outline: none;
+}
+
+.pse-update:focus-visible {
+	outline: none;
+	box-shadow: 0 0 0 2px rgba(245, 189, 116, 0.6);
+}
+
+.pse-update-dot {
+	width: 5px;
+	height: 5px;
+	flex: none;
+	border-radius: 50%;
+	background-color: currentColor;
 }
 
 /* Narrow enough and the footer row runs out of width before anything else
