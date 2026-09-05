@@ -31,17 +31,26 @@ const fields = ref<Array<{ label: string; value: string }>>([]);
 const addressLabel = ref("");
 const address = ref<string[]>([]);
 
+// The address as it is set: one line per line, which is how it is written on a
+// label and therefore how it belongs on the clipboard.
+const addressText = computed(() => address.value.join("\n"));
+
 const chips = computed(() => fields.value.filter((field) => CHIP_LABELS.includes(field.label)));
 const rows = computed(() => fields.value.filter((field) => !CHIP_LABELS.includes(field.label)));
 
-// The fields that get copied out of here rather than read: the reservation
-// number and the webshop's order reference are what get pasted into a search
-// somewhere else -- a carrier's site, Shopware, an email to a customer -- and
-// they are long enough that reading them off the screen and typing them in is
-// where the digits get transposed.
-const COPYABLE_LABELS = ["Verkooporder referentiecode"];
-
-const isCopyable = (label: string) => COPYABLE_LABELS.includes(label);
+// Every row is copyable, and the address with them.
+//
+// It used to be a list of labels -- the order reference, and nothing else --
+// which failed twice. It failed by language: the portal serves this page in
+// English until our own correction has gone through, and "Saleorder
+// referencecode" is not the string the list held, so the add-parcels screen had
+// no copy control on the one field it is most often opened for. And it failed by
+// judgement: the customer number, the transport and the address are pasted
+// somewhere else just as often, and a control that is only on some rows is one
+// the operator has to look for.
+//
+// So there is no list. Anything the portal put in this column can be taken out
+// of it.
 
 // The heading reads "Reservering 395258"; what belongs on the clipboard is the
 // number on its own.
@@ -236,13 +245,21 @@ function onOpen() {
 					<dd class="pse-sidebar-value">
 						<span class="pse-sidebar-value-text">{{ row.value }}</span>
 
-						<CopyButton v-if="isCopyable(row.label)" :value="row.value" :label="row.label" />
+						<CopyButton :value="row.value" :label="row.label" />
 					</dd>
 				</template>
 			</dl>
 
 			<div v-if="address.length" class="pse-sidebar-address">
-				<span class="pse-sidebar-label">{{ addressLabel }}</span>
+				<span class="pse-sidebar-label pse-sidebar-address-label">
+					{{ addressLabel }}
+
+					<!-- The whole block, lines and all: an address is copied to be
+					     written somewhere as an address, so it goes onto the
+					     clipboard the way it is set here rather than as one run-on
+					     line. -->
+					<CopyButton :value="addressText" :label="addressLabel" />
+				</span>
 				<p class="pse-sidebar-address-body">
 					<span v-for="(line, index) in address" :key="index">{{ line }}</span>
 				</p>
@@ -365,6 +382,13 @@ function onOpen() {
 .pse-sidebar-value-text {
 	min-width: 0;
 	overflow-wrap: anywhere;
+}
+
+/* The label and its control on one line, the way the heading carries its own. */
+.pse-sidebar-address-label {
+	display: flex;
+	align-items: center;
+	gap: 4px;
 }
 
 .pse-sidebar-address {

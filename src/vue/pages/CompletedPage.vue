@@ -446,7 +446,13 @@ function updateAutoComplete() {
 							: announced ? "Pakket aangemeld" : "Reservering afgerond" }}
 					</h1>
 
-					<p class="pse-done-number" v-if="reservationNumber">{{ reservationNumber }}</p>
+					<!-- The comment above says this number is written on a note or
+					     typed into something else, which is the case for a copy
+					     control rather than an argument against one. -->
+					<p class="pse-done-number pse-copy-cell" v-if="reservationNumber">
+						{{ reservationNumber }}
+						<CopyButton :value="reservationNumber" :label="`Reserveringsnummer ${reservationNumber}`" />
+					</p>
 
 					<!-- The portal's own account of what was refused. It is the
 					     only thing on this screen that says what to do next, so
@@ -858,6 +864,9 @@ function updateAutoComplete() {
    written on a note or typed into something else -- so it is set in the tabular
    face and given room of its own. */
 .pse-done-number {
+	/* The card is centred, so the control has to be laid out as part of the
+	   line rather than left to sit after it. */
+	justify-content: center;
 	margin: 8px 0 0;
 	font-size: 26px;
 	font-weight: 700;
