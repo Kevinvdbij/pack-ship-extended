@@ -222,15 +222,15 @@ const state = computed(() => props.status == undefined
 }
 
 .pse-row-state.is-failed {
-	background-color: rgba(176, 58, 46, 0.12);
-	color: #a3372c;
+	background-color: var(--pse-alert-soft);
+	color: var(--pse-alert-ink);
 }
 
 /* A failure is the one thing on this list that has to be picked out without
    reading it, since the run carries on around it and the summary at the top
    only says how many there were. */
 .pse-row.is-failed {
-	background-color: rgba(176, 58, 46, 0.05);
+	background-color: var(--pse-alert-wash);
 }
 
 @media (prefers-reduced-motion: reduce) {

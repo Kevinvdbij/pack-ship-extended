@@ -30,6 +30,18 @@
 	--pse-line: #e2eae5;
 	--pse-well: #f6f9f7;
 
+	/* ---- Failure ---- *
+	 * The one colour in the extension that is not the green: a reservation whose
+	 * announcement was refused, and a row of a mass complete run that did not
+	 * finish. Kept as far from an alarm as the message allows -- this is a step
+	 * to repeat, not a fault -- but far enough from the green that it is picked
+	 * out without being read.
+	 */
+	--pse-alert: #b03a2e;
+	--pse-alert-ink: #a3372c;
+	--pse-alert-soft: rgba(176, 58, 46, 0.12);
+	--pse-alert-wash: rgba(176, 58, 46, 0.05);
+
 	/* ---- Dialogs ---- *
 	 * Shared by every modal in the extension and by the portal's own two, which
 	 * `src/styles/portal.css` restyles to match. Declared here so a dialog of

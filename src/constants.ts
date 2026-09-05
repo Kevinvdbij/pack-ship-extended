@@ -87,6 +87,24 @@ export const MAIN_CONTENT_SELECTOR = "div.col-12.mainContent";
 // vendor's screen, which they can finish by hand, rather than on ours with a
 // button that does nothing.
 export const COMPLETED_CONTAINER_SELECTOR = "#ReservationContainer";
+
+// The portal's own heading for this screen, which says whether the reservation
+// went out or was refused. Taken off the page rather than written here, the way
+// the finish button's label is: it is the portal's verdict, in the portal's
+// words, and a copy of it here would drift.
+export const COMPLETED_HEADING_SELECTOR = "#ReservationContainer h3";
+
+// What the portal did with the reservation, one list item per step -- announced
+// the parcels, sent the reservation -- each with an icon that carries the
+// verdict, the step's name, and a line of detail when there is one.
+//
+// The failed ones are marked by the icon's class rather than by their wording,
+// which is translated, and the detail is what actually says why. This is the
+// screen the operator is held on when a step fails, so both are read out and
+// shown rather than summarised: "it did not go out" is not enough to act on.
+export const COMPLETED_STEP_SELECTOR = "#ReservationContainer li.list-group-item";
+export const COMPLETED_STEP_ERROR_SELECTOR = ".material-icons.text-error";
+export const COMPLETED_STEP_DETAIL_SELECTOR = ".pl-2";
 export const COMPLETED_PROCEED_SELECTOR = "#ReservationContainer > div:nth-child(11) > div > button";
 
 // The vendor's small wordmark and the back control, which the pages without a
