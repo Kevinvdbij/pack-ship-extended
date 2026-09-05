@@ -99,12 +99,16 @@ function parcelLabel(count: number) {
 		<ol class="pse-history-list">
 			<li v-for="entry in entries" :key="entry.number">
 				<button type="button" class="pse-history-row" :class="{ 'pse-history-row-failed': entry.failed }"
-					:title="`Pakket toevoegen aan reservering ${entry.number}`"
+					:title="`Pakket toevoegen aan reservering ${entry.number}${entry.customer ? ` -- ${entry.customer}` : ''}`"
 					@click="$emit('open', entry.number)">
 					<span class="pse-history-marker" aria-hidden="true"></span>
 
 					<span class="pse-history-body">
 						<span class="pse-history-number">{{ entry.number }}</span>
+						<!-- The line the list is actually scanned for once the
+						     reservation is a day old. Absent on entries written
+						     before it was recorded, and the row simply closes up. -->
+						<span v-if="entry.customer" class="pse-history-customer">{{ entry.customer }}</span>
 						<span class="pse-history-meta">
 							<span v-if="entry.failed" class="pse-history-badge">Geweigerd</span>
 							<span v-else>{{ parcelLabel(entry.parcels) }}</span>
@@ -139,7 +143,7 @@ function parcelLabel(count: number) {
 	align-self: start;
 	/* Tall enough to be a list, short enough that the card beside it is still
 	   what the eye lands on. Past that it scrolls. */
-	max-height: 420px;
+	max-height: 460px;
 	padding: 18px 8px 8px 18px;
 	border: 1px solid var(--pse-line);
 	border-radius: 20px;
@@ -302,6 +306,19 @@ function parcelLabel(count: number) {
 	font-weight: 600;
 	line-height: 1.3;
 	font-variant-numeric: tabular-nums;
+}
+
+/* Named at the weight of the number rather than of the detail under it: the
+   number is what is checked, the name is what is recognised, and the two are
+   looked for by the same glance. Long names are cut rather than wrapped -- a
+   row that grows a line pushes the rest of the list out of view. */
+.pse-history-customer {
+	overflow: hidden;
+	font-size: 12.5px;
+	line-height: 1.35;
+	color: var(--pse-ink);
+	white-space: nowrap;
+	text-overflow: ellipsis;
 }
 
 .pse-history-meta {

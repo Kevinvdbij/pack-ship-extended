@@ -291,6 +291,36 @@ export function getCurrentReservationId() {
 	return getReservationId(document.body);
 }
 
+// The customer's name, out of the portal's own summary block.
+//
+// Matched on the label in either of the two languages the portal serves, for
+// the same reason `ReservationSidebar.vue` matches its rows that way: the
+// session is corrected to Dutch after the markup has been rendered, so a page
+// can be read here while its labels still say "Customer". "Debtor" is a
+// different row and deliberately does not match -- on a webshop order it holds
+// the collective debtor rather than the person the parcel is for.
+//
+// Empty when the block is not there or holds no such row, which the history
+// panel renders as a row without a name rather than as a row it cannot show.
+export function getCurrentCustomerName(): string {
+	const block = document.querySelector(RESERVATION_SUMMARY_SELECTOR);
+
+	for (const row of Array.from(block?.children ?? [])) {
+		const text = row.textContent?.replace(/\s+/g, " ").trim() ?? "";
+		const separator = text.indexOf(":");
+
+		if (separator < 0 || !/^(customer|klant)$/i.test(text.slice(0, separator).trim())) {
+			continue;
+		}
+
+		// "Batenburg, Floris (391588)" -- the number in the tail is the portal's
+		// own customer id, which is not what anyone is scanning this list for.
+		return text.slice(separator + 1).replace(/\(\d+\)\s*$/, "").trim();
+	}
+
+	return "";
+}
+
 export function getCurrentOrderNumber() {
 	return document.querySelector<HTMLElement>(`${RESERVATION_SUMMARY_SELECTOR} > div:nth-child(3)`)!.innerHTML.split(" ")[2];
 }

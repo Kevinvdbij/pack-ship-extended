@@ -93,6 +93,10 @@ export interface CompletedReservation extends ReservationDefinition {
 	// When it was finished, as epoch milliseconds. Stored rather than formatted
 	// so the list can say "zojuist" as well as a clock time.
 	completedAt: number,
+	// Who it is for, as the portal names them: "Batenburg, Floris". Absent on an
+	// entry written before this was recorded, and on a reservation whose summary
+	// block held no customer row.
+	customer?: string,
 	// How many parcels went out with it. Zero on a reservation whose
 	// announcement was refused before any parcel was made.
 	parcels: number,

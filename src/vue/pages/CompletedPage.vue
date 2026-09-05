@@ -193,6 +193,7 @@ onMounted(() => {
 	RVUtils.recordCompletedReservation({
 		...finished,
 		completedAt: Date.now(),
+		customer: RVUtils.getCurrentCustomerName(),
 		parcels: parcels.value.length,
 		failed: failed.value
 	});
