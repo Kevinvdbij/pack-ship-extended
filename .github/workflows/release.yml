@@ -47,3 +47,44 @@ jobs:
             dist/pack-ship-extended.user.js
             dist/pack-ship-extended.user.css
           generate_release_notes: true
+
+      # Greasy Fork re-fetches the sync URL when it is poked, and the poke has
+      # to come from here rather than from a GitHub webhook on the repository.
+      # A push webhook fires the instant the tag lands, which is ~25s before
+      # this job has finished building and publishing the release; Greasy Fork
+      # would fetch releases/latest while it still points at the previous one,
+      # see the version it already holds, and correctly do nothing. Sending it
+      # ourselves, last, means the release it goes looking for is there.
+      #
+      # The secret is the full webhook URL from the Greasy Fork account page.
+      # Greasy Fork wants a GitHub-shaped push payload: it reads the repository
+      # out of it and updates whichever of your scripts sync from a URL there.
+      - name: Tell Greasy Fork to sync
+        env:
+          WEBHOOK: ${{ secrets.GREASYFORK_WEBHOOK }}
+        run: |
+          # Greasy Fork reads the repository out of the payload and updates
+          # whichever of your scripts sync from a URL there. Built with jq so
+          # nothing here depends on the shell quoting of a URL or a tag name.
+          jq -n \
+            --arg ref "refs/tags/$GITHUB_REF_NAME" \
+            --arg url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" \
+            --arg name "$GITHUB_REPOSITORY" \
+            '{ref: $ref, repository: {html_url: $url, full_name: $name}}' > payload.json
+
+          code="$(curl -sS -o response.txt -w '%{http_code}' -X POST "$WEBHOOK" \
+            -H 'Content-Type: application/json' \
+            -H 'X-GitHub-Event: push' \
+            --data @payload.json)"
+
+          # The response body names the scripts it updated, or says why it
+          # updated none. That is the only report of whether this worked, so it
+          # goes into the log either way.
+          echo "Greasy Fork answered $code:"
+          cat response.txt
+          echo
+
+          # The release is already published by this point, so a failure here
+          # costs only the sync -- but a sync that quietly does nothing is the
+          # exact thing that went unnoticed before, so it is loud now.
+          test "$code" -lt 400
