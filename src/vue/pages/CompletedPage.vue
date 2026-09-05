@@ -10,7 +10,8 @@ import {
 	COMPLETED_CONTAINER_SELECTOR, COMPLETED_HEADING_SELECTOR, COMPLETED_PROCEED_SELECTOR,
 	COMPLETED_STEP_DETAIL_SELECTOR, COMPLETED_STEP_ERROR_SELECTOR, COMPLETED_STEP_SELECTOR,
 	COMPLETED_PARCEL_FIELD_SELECTOR, COMPLETED_PARCEL_SELECTOR, COMPLETED_PARCEL_TITLE_SELECTOR,
-	PACKING_PORTAL_URL, PARCELS_RETURN_HASH, VENDOR_BAND_LOGO_SELECTOR
+	COMPLETED_PROCEED_FALLBACK_SELECTOR, PACKING_PORTAL_URL, PARCELS_RETURN_HASH,
+	VENDOR_BAND_LOGO_SELECTOR
 } from '../../constants.ts';
 
 // One step of the portal's own account of what it did with the reservation.
@@ -71,6 +72,19 @@ interface ParcelLine {
 // anyway stays available, one deliberate press away, because the operator is the
 // one who knows whether the label came out of the printer.
 
+// The same screen is served at the end of the add-parcels flow, where a parcel
+// has been added to a reservation that was already finished: the portal renders
+// this page again, with "Parcels announced" for a heading and a button that
+// only goes back to the search. It is the same markup and the same three things
+// worth showing, so it is the same page in a second mode rather than a second
+// page -- what differs is what it is called, and that nothing here is pressed
+// for the operator. See `main.ts`.
+const props = defineProps<{
+	// The announcement of a parcel added afterwards, rather than the last step
+	// of packing a reservation.
+	announced?: boolean;
+}>();
+
 // Nothing of ours is shown until the portal's page has been recognised. If the
 // block this stands in for is not there, this is not the page we think it is,
 // and the operator is better off with the vendor's screen than with a card of
@@ -89,6 +103,13 @@ const reservationNumber = ref("");
 const failures = ref<Failure[]>([]);
 
 const failed = computed(() => failures.value.length > 0);
+
+// Whether this screen is a receipt or something to work from. A finished
+// reservation is one card and nothing else -- there is nothing left to decide.
+// A refused one and a parcel just added both are: the first because the
+// operator has to judge what to change, the second because the barcode that
+// came out of the printer is on this screen and nowhere else.
+const detailed = computed(() => failed.value || props.announced);
 
 // The portal's heading for this screen. It already says which of the two
 // outcomes this is, in the language the portal is running in, so it is read
@@ -164,7 +185,11 @@ onMounted(() => {
 	// A refused reservation is where the automatic run stops, switch or no
 	// switch. Everything after this screen assumes the parcels are on their way,
 	// and they are not.
-	if (failed.value || !Settings.autoMasterSwitch) {
+	//
+	// A parcel added afterwards is not pressed through either: nothing is waiting
+	// on this screen the way a packing run waits on the one before it, and the
+	// label that was just printed is checked against the barcode on this page.
+	if (failed.value || props.announced || !Settings.autoMasterSwitch) {
 		return;
 	}
 
@@ -325,7 +350,8 @@ function readReservationNumber(): string {
 }
 
 function proceedButton(): HTMLButtonElement | null {
-	return document.querySelector<HTMLButtonElement>(COMPLETED_PROCEED_SELECTOR);
+	return document.querySelector<HTMLButtonElement>(COMPLETED_PROCEED_SELECTOR)
+		?? document.querySelector<HTMLButtonElement>(COMPLETED_PROCEED_FALLBACK_SELECTOR);
 }
 
 // The portal's own button, pressed. Guarded rather than assumed: this is the
@@ -373,7 +399,7 @@ function updateAutoComplete() {
 	     the portal's page is hidden around, so it has to exist before there is
 	     anything to put in it. -->
 	<div ref="root">
-		<div class="pse-done" :class="{ 'is-failed': failed }" v-if="replaced">
+		<div class="pse-done" :class="{ 'is-failed': failed, 'is-detailed': detailed }" v-if="replaced">
 			<!-- A finished reservation is one card in the middle of the screen and
 			     nothing else. A refused one is a screen to work from: what went
 			     wrong on the left, and everything needed to judge it beside --
@@ -381,7 +407,7 @@ function updateAutoComplete() {
 			<div class="pse-done-layout">
 				<!-- The reservation's own column, in the place it holds on every
 				     other page with a reservation open: the left. -->
-				<aside class="pse-done-side" v-if="failed">
+				<aside class="pse-done-side" v-if="detailed">
 					<ReservationSidebar />
 				</aside>
 
@@ -405,7 +431,9 @@ function updateAutoComplete() {
 					</span>
 
 					<h1 class="pse-done-title">
-						{{ failed ? (heading || "Reservering niet verzonden") : "Reservering afgerond" }}
+						{{ failed
+							? (heading || "Reservering niet verzonden")
+							: announced ? "Pakket aangemeld" : "Reservering afgerond" }}
 					</h1>
 
 					<p class="pse-done-number" v-if="reservationNumber">{{ reservationNumber }}</p>
@@ -423,6 +451,10 @@ function updateAutoComplete() {
 					<p class="pse-done-text" v-if="failed">
 						De pakketten zijn niet aangemeld. Ga terug naar de pakketten om het opnieuw te
 						proberen.
+					</p>
+					<p class="pse-done-text" v-else-if="announced">
+						Het label is geprint en het pakket is aangemeld. De reservering was al
+						afgerond en blijft dat.
 					</p>
 					<p class="pse-done-text" v-else-if="finalizing">
 						Wordt afgesloten en gaat terug naar zoeken...
@@ -453,7 +485,7 @@ function updateAutoComplete() {
 				<!-- And the boxes as they stand, on the other side. Both
 				     columns are rendered rather than revealed: the portal's own
 				     version of each is hidden with the rest of its page. -->
-				<aside class="pse-done-parcels-column" v-if="failed">
+				<aside class="pse-done-parcels-column" v-if="detailed">
 					<section class="pse-done-parcels" v-if="parcels.length">
 						<h2 class="pse-done-parcels-title">Pakketten</h2>
 
@@ -535,17 +567,18 @@ function updateAutoComplete() {
 	color: var(--pse-brand-ink);
 }
 
-/* On a failure the card shares the screen with the reservation's own detail, so
-   it stops claiming the height of the window and lets the two sit side by side
+/* Wherever the card shares the screen with the reservation's own detail -- a
+   refusal, or a parcel added to a reservation that was already finished -- it
+   stops claiming the height of the window and lets the columns sit beside it
    from the top. */
-.pse-done.is-failed {
+.pse-done.is-detailed {
 	min-height: 0;
 	align-items: flex-start;
 	padding-top: 32px;
 }
 
-/* One card on the ordinary screen, two columns on the refused one -- the card
-   and everything needed to judge it. */
+/* One card on the ordinary screen, three columns on the ones that are worked
+   from: who it is for, the card, and what is in the boxes. */
 .pse-done-layout {
 	display: flex;
 	align-items: flex-start;

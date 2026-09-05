@@ -130,12 +130,30 @@ export const COMPLETED_STEP_SELECTOR = "#ReservationContainer li.list-group-item
 // reservation this is what the operator is looking at while deciding what to
 // change, and the vendor's version of it under a card of ours is the seam that
 // made this screen look like two pages stacked.
-export const COMPLETED_PARCEL_SELECTOR = "#ReservationContainer .parcels .card";
+//
+// Two shapes, because two pages render it. The completed screen wraps the cards
+// in `.parcels`; the announce screen the add-parcels flow ends on lays the same
+// cards out in a plain `.container` instead. Both are named rather than reduced
+// to `#ReservationContainer .card`, which would also take in any card the portal
+// adds to either page for something that is not a parcel.
+export const COMPLETED_PARCEL_SELECTOR =
+	"#ReservationContainer .parcels .card, #ReservationContainer .container .card";
 export const COMPLETED_PARCEL_TITLE_SELECTOR = ".card-title";
-export const COMPLETED_PARCEL_FIELD_SELECTOR = ".card-text > div";
+// The `Label: value` cells. Addressed as the divs that hold text rather than as
+// the direct children of `.card-text`, which on the announce screen are the two
+// Bootstrap columns the cells are laid out in -- reading those gave one field
+// per column with both of its lines run together.
+export const COMPLETED_PARCEL_FIELD_SELECTOR = ".card-text div:not(:has(div))";
 export const COMPLETED_STEP_ERROR_SELECTOR = ".material-icons.text-error";
 export const COMPLETED_STEP_DETAIL_SELECTOR = ".pl-2";
 export const COMPLETED_PROCEED_SELECTOR = "#ReservationContainer > div:nth-child(11) > div > button";
+
+// The same button on the announce screen, where the block above it is laid out
+// differently and the position does not hold. Tried after the position rather
+// than merged into one selector list: a comma list is answered in document
+// order, so a page with a second primary button somewhere above would hand back
+// the wrong one.
+export const COMPLETED_PROCEED_FALLBACK_SELECTOR = "#ReservationContainer button.btn-primary";
 
 // The vendor's small wordmark and the back control, which the pages without a
 // header band carry instead of one. Addressed by the image because the row

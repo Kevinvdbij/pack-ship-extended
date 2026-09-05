@@ -37,6 +37,8 @@ interface Route {
 	// A route with no component is one the portal handles by itself.
 	component?: Component;
 	attach?: (host: HTMLDivElement) => void;
+	// Root props for the component, where one component serves two routes.
+	props?: Record<string, unknown>;
 	// A specific portal element to hang the host off, rather than a position
 	// within one. Set it and the route mounts as soon as that element is
 	// parsed, which puts our UI in the portal's first paint -- but only an
@@ -143,7 +145,15 @@ const routes: Route[] = [
 		attach: appendToBody,
 	},
 	{
+		// The end of the add-parcels flow: a parcel added to a reservation that
+		// was already finished, announced and printed. The portal serves the
+		// completed screen's markup for it -- same container, same steps, same
+		// parcel cards -- so it gets the completed screen's page, told that it is
+		// announcing rather than finishing.
 		pattern: /outdoor\/packship\/AnnounceParcels/,
+		component: CompletedPage,
+		attach: (host) => mountIntoMainContent(host),
+		props: { announced: true },
 	},
 	searchReservationsRoute,
 ];
@@ -390,7 +400,7 @@ async function boot() {
 		if (route?.component && route.attach && route.anchor) {
 			await whenPresent(route.anchor);
 
-			mountApp(route.component, route.attach);
+			mountApp(route.component, route.attach, route.props);
 		}
 
 		// Everything below mounts into markup the portal serves, so it waits
@@ -403,7 +413,7 @@ async function boot() {
 		const served = servedRoute(route);
 
 		if (served?.component && served.attach && !served.anchor) {
-			mountApp(served.component, served.attach);
+			mountApp(served.component, served.attach, served.props);
 		}
 
 		if (!route?.bareLayout) {
