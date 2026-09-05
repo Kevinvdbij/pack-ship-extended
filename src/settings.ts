@@ -16,7 +16,12 @@ type SettingsData = {
 	// off its <option> list meant waiting for that list to be parsed, and the
 	// wait was long enough for the dropdown to be painted before we could
 	// replace it.
-	environmentName: string
+	environmentName: string,
+	// The audible cues, one switch each -- see `src/sounds.ts`. A scan that
+	// landed, a scan that landed wrong, and a step that failed.
+	soundSuccess: boolean,
+	soundWarning: boolean,
+	soundError: boolean
 }
 
 function defaults(): SettingsData {
@@ -26,7 +31,10 @@ function defaults(): SettingsData {
 		autoProceed: true,
 		autoSelect: true,
 		environmentId: -1,
-		environmentName: ""
+		environmentName: "",
+		soundSuccess: true,
+		soundWarning: true,
+		soundError: true
 	}
 }
 
@@ -48,7 +56,10 @@ const Settings = {
 			autoProceed: this.autoProceed,
 			autoSelect: this.autoSelect,
 			environmentId: this.environmentId,
-			environmentName: this.environmentName
+			environmentName: this.environmentName,
+			soundSuccess: this.soundSuccess,
+			soundWarning: this.soundWarning,
+			soundError: this.soundError
 		});
 	}
 };

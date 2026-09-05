@@ -17,6 +17,7 @@ import CopyButton from '../components/CopyButton.vue';
 import ImageModal from '../components/ImageModal.vue';
 import Settings from '../../settings.ts';
 import * as Shopware from "../../shopware.ts";
+import { playSound, warmUpAudio } from '../../sounds.ts';
 
 const showRows = ref(false);
 
@@ -71,6 +72,7 @@ onMounted(() => {
 		.then(() => {
 			updateVerifiedQuantities();
 			showRows.value = true;
+			armScanSounds();
 
 			// After the parcels have been cleared, not before: clearing runs
 			// the portal's own update through the page, and anything focused
@@ -121,11 +123,113 @@ function observeParcelContainer() {
 		const config = { attributes: true, childList: true, subtree: true };
 		const observer = new MutationObserver(() => {
 			updateVerifiedQuantities();
+			judgeScan();
 			restoreScannerFocus();
 			autoAnnounceParcels(parcelContainerElement);
 		});
 		observer.observe(parcelContainerElement, config);
 	}
+}
+
+// ---- Scan sounds ----
+//
+// The portal answers a scan by posting the whole form and replacing the parcel
+// container with what came back, and says nothing else -- so what the scan did
+// has to be read off the difference between the container before and after.
+// Three answers are told apart:
+//
+// - a product's count in the boxes went up and stayed within what was picked:
+//   the scan landed;
+// - a count went up past what was picked: the same product was scanned once too
+//   often, and the box now holds more than the order asks for;
+// - the portal wrote an alert into the container: the barcode matched nothing in
+//   this reservation ("Found no products with this barcode ..."), which is how a
+//   product from the wrong order announces itself.
+//
+// The counts are per product line rather than one total, so a line that was
+// already over does not turn every later scan of another product into a warning.
+// The alert is told by identity rather than by presence: the portal leaves it
+// standing until the next scan replaces the container, and the container is
+// rewritten for other reasons too.
+let scanSoundsArmed = false;
+let lastCounts = new Map<string, number>();
+let lastAlert: Element | null = null;
+
+// When the cue that is playing will have finished, as a `performance.now()`
+// time. The automatic announcement waits for it: the last scan of a reservation
+// is the one that completes it, and the click that follows navigates away --
+// which stops the audio with the page, so the chime that said "that was the
+// last one" was the one that got cut off.
+let soundPlayingUntil = 0;
+
+// The margin after the cue's own length. Covers the output latency between the
+// audio thread and the speakers, so the tail is heard rather than scheduled.
+const SOUND_TAIL_MS = 150;
+
+// Nothing plays until the page has settled: the parcels the page was opened
+// with are cleared on the way in, and that runs the portal's update through the
+// container as many times as there are items. A mass complete run is left
+// silent altogether -- it scans every line itself, in a tab nobody is standing
+// at, and a row of chimes from behind the page being worked on says nothing
+// about that page.
+function armScanSounds() {
+	lastCounts = countsByLine();
+	lastAlert = document.querySelector("#ParcelsContainer #alert");
+	scanSoundsArmed = !RVUtils.isMassCompleteReservation(RVUtils.getCurrentReservationNumber());
+
+	if (scanSoundsArmed) {
+		// Ahead of the first scan, so the first chime is not late by the time
+		// it takes the browser to bring an audio context up.
+		warmUpAudio();
+	}
+}
+
+function noteSound(durationMs: number) {
+	if (durationMs > 0) {
+		soundPlayingUntil = performance.now() + durationMs + SOUND_TAIL_MS;
+	}
+}
+
+// How long the automatic step has to wait before it may leave the page.
+function soundHoldMs(): number {
+	return Math.max(0, soundPlayingUntil - performance.now());
+}
+
+function countsByLine(): Map<string, number> {
+	return new Map(lines.value.map((line) => [line.key, line.verifiedQuantity]));
+}
+
+function judgeScan() {
+	const counts = countsByLine();
+	const alert = document.querySelector("#ParcelsContainer #alert");
+	const previousCounts = lastCounts;
+	const previousAlert = lastAlert;
+
+	lastCounts = counts;
+	lastAlert = alert;
+
+	if (!scanSoundsArmed) {
+		return;
+	}
+
+	if (alert && alert != previousAlert) {
+		// The portal's own severity: yellow for a barcode it could not place,
+		// red for something that went wrong on its side.
+		noteSound(playSound(alert.classList.contains("alert-danger") ? "error" : "warning"));
+
+		return;
+	}
+
+	const grown = lines.value.filter((line) => line.verifiedQuantity > (previousCounts.get(line.key) ?? 0));
+
+	if (grown.length == 0) {
+		return;
+	}
+
+	const over = grown.some((line) => line.verifiedQuantity > line.requiredQuantity);
+
+	debug(over ? "Scan went past the picked quantity" : "Scan landed", grown.map((line) => line.mainBarcode));
+	noteSound(playSound(over ? "warning" : "success"));
 }
 // The parcel area is the one region of this page that cannot be part of the
 // reveal. The portal serves `#tabs-parcels` and its panes empty and fills them
@@ -224,12 +328,31 @@ function setupSidebar() {
 	mountApp(ReservationSidebar, (host) => column.insertAdjacentElement("afterbegin", host));
 }
 
+let announceTimer: ReturnType<typeof setTimeout> | undefined;
+
 function autoAnnounceParcels(parcelContainerElement: Element) {
 	if (returning) {
 		return;
 	}
 
 	if (!Settings.autoMasterSwitch && !RVUtils.isMassCompleteReservation(RVUtils.getCurrentReservationNumber())) {
+		return;
+	}
+
+	// Let the cue for the scan that got us here finish first. Tried again from
+	// a timer rather than held in a loop, and only one timer at a time: the
+	// observer fires more than once per portal refresh, and each firing gets
+	// here.
+	const hold = soundHoldMs();
+
+	if (hold > 0) {
+		if (announceTimer === undefined) {
+			announceTimer = setTimeout(() => {
+				announceTimer = undefined;
+				autoAnnounceParcels(parcelContainerElement);
+			}, hold);
+		}
+
 		return;
 	}
 

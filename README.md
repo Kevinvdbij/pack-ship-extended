@@ -195,6 +195,7 @@ is installed by hand from the release asset and has to be updated alongside the 
 | `src/retailVistaUtils.ts` | DOM scraping and requests against the portal |
 | `src/shopware.ts` | Shopware Admin/Store API client |
 | `src/settings.ts` | Settings persisted through `GM_setValue`, edited in the footer's settings modal |
+| `src/sounds.ts` | The scan cues -- success, warning, error -- synthesised with Web Audio, each switched in the settings modal |
 | `src/style.css` | Global rules for our own markup, bundled into the userscript |
 | `src/styles/portal.css` | The vendor's own elements, restyled |
 | `src/styles/palette.css` | The brand colours, shared by every stylesheet above |

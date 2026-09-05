@@ -4,8 +4,37 @@ import Settings from "../../settings.ts";
 import { getCredentials, setCredentials } from "../../shopware.ts";
 import { applyConfiguredEnvironment, getEnvironmentOptions } from "../../environment.ts";
 import ModalShell from "./ModalShell.vue";
+import { previewSound, type SoundKind } from "../../sounds.ts";
 
 const emit = defineEmits<{ close: []; save: [] }>();
+
+// The three cues, in the order they are met: most scans land, some land wrong,
+// and now and then a step fails. Each has a switch and a button to hear it,
+// since which is which is exactly what a switch labelled "warning" cannot
+// tell you.
+const SOUNDS: { kind: SoundKind; title: string; hint: string }[] = [
+	{
+		kind: "success",
+		title: "Scan gelukt",
+		hint: "Twee korte tonen omhoog. Het product is aan het pakket toegevoegd.",
+	},
+	{
+		kind: "warning",
+		title: "Scan klopt niet",
+		hint: "Twee piepjes. De barcode hoort niet bij deze reservering, of het product is één keer te veel gescand.",
+	},
+	{
+		kind: "error",
+		title: "Fout in het proces",
+		hint: "Eén lage, dalende zoemer. De aanmelding bij de vervoerder is geweigerd of een stap is mislukt.",
+	},
+];
+
+const soundSwitches = ref<Record<SoundKind, boolean>>({
+	success: Settings.soundSuccess,
+	warning: Settings.soundWarning,
+	error: Settings.soundError,
+});
 
 // The picker lives in the portal footer, so the choices are whatever the
 // current page offers. An empty list means this page has no picker.
@@ -24,6 +53,9 @@ function save() {
 	// Stored with the id so the next page load can label the footer without
 	// waiting for the portal to render its dropdown.
 	Settings.environmentName = environmentOptions.find((option) => option.id == Number(environmentId.value))?.name ?? "";
+	Settings.soundSuccess = soundSwitches.value.success;
+	Settings.soundWarning = soundSwitches.value.warning;
+	Settings.soundError = soundSwitches.value.error;
 	Settings.save();
 
 	setCredentials({ clientId: clientId.value, clientSecret: clientSecret.value });
@@ -65,6 +97,27 @@ function save() {
 				Hoort bij deze computer en de printer erachter. Vastzetten verbergt de keuzelijst in de portal en
 				zet de omgeving bij elke pagina terug.
 			</small>
+		</div>
+
+		<div class="pse-settings-group">
+			<h3 class="pse-settings-group-title">Geluiden</h3>
+
+			<!-- The listen button sits beside the label rather than inside it, so
+			     hearing a sound and switching it are two different clicks. -->
+			<div v-for="sound in SOUNDS" :key="sound.kind" class="pse-settings-sound">
+				<label class="pse-settings-switch pse-settings-switch-compact">
+					<input type="checkbox" class="pse-settings-checkbox" v-model="soundSwitches[sound.kind]" />
+					<span class="pse-settings-switch-text">
+						<span class="pse-settings-switch-title">{{ sound.title }}</span>
+						<span class="pse-dialog-hint">{{ sound.hint }}</span>
+					</span>
+				</label>
+				<button type="button" class="pse-dialog-btn pse-dialog-btn-quiet pse-settings-listen"
+					:title="`${sound.title} afspelen`" @click="previewSound(sound.kind)">
+					<span class="material-icons pse-settings-listen-icon" aria-hidden="true">volume_up</span>
+					Luister
+				</button>
+			</div>
 		</div>
 
 		<div class="pse-settings-group">
@@ -146,6 +199,42 @@ function save() {
 	font-weight: 650;
 	line-height: 1.3;
 	color: var(--pse-ink);
+}
+
+/* One row per sound: the switch, then the button that plays it. The switch
+   keeps the master switch's shape so the list reads as more of the same kind of
+   thing, but stacked, so it loses the clear water the lone one needs above the
+   field under it. */
+.pse-settings-sound {
+	display: flex;
+	align-items: stretch;
+	gap: 8px;
+	margin-bottom: 8px;
+}
+
+.pse-settings-sound:last-child {
+	margin-bottom: 0;
+}
+
+.pse-settings-switch-compact {
+	flex: 1 1 auto;
+	min-width: 0;
+	margin: 0 !important;
+}
+
+.pse-settings-listen {
+	flex: none;
+	min-width: 0;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	height: auto;
+	padding: 0 14px;
+	border-radius: 13px;
+}
+
+.pse-settings-listen-icon {
+	font-size: 18px;
 }
 
 .pse-settings-field {

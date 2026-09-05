@@ -5,6 +5,7 @@ import Settings from '../../settings.ts';
 import { MassCompleteStatus } from '../../interfaces.ts';
 import { afterPaint, afterReveal } from '../../reveal.ts';
 import { standInForPortalPage } from '../../standIn.ts';
+import { playSound } from '../../sounds.ts';
 import ReservationSidebar from '../components/ReservationSidebar.vue';
 import CopyButton from '../components/CopyButton.vue';
 import {
@@ -190,6 +191,14 @@ onMounted(() => {
 	// A parcel added afterwards is not pressed through either: nothing is waiting
 	// on this screen the way a packing run waits on the one before it, and the
 	// label that was just printed is checked against the barcode on this page.
+	if (failed.value) {
+		// The one outcome on this screen that needs someone to come back to it.
+		// Whether this plays on a page that has not been touched yet is up to
+		// the browser's gesture rule -- see `src/sounds.ts` -- but a station
+		// that has been packing on has usually earned it by now.
+		playSound("error");
+	}
+
 	if (failed.value || props.announced || !Settings.autoMasterSwitch) {
 		return;
 	}

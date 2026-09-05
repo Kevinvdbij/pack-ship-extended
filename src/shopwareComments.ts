@@ -1,5 +1,6 @@
 import { toast } from "vue3-toastify";
 import { ShopwareOrderEntry, ShopwareToken, updateOrderComment } from "./shopware.ts";
+import { playSound } from "./sounds.ts";
 
 // Saves a customer comment and reports progress through a toast. Callers are
 // expected to disable their comment box for a moment afterwards so a double
@@ -13,6 +14,9 @@ export function saveOrderComment(token: ShopwareToken, orderData: ShopwareOrderE
 		error: `Er is een fout opgetreden bij het opslaan van de notitie van order ${orderNumber}.`
 	}).catch((error) => {
 		console.error("Failed to save order comment.", error);
+		// The toast says so on screen; this says so to whoever has already
+		// turned back to the box.
+		playSound("error");
 	});
 
 	return updatePromise;

@@ -8,6 +8,7 @@ import SearchNotice from "../components/SearchNotice.vue";
 import ResumeButton from "../components/ResumeButton.vue";
 import * as RVUtils from "../../retailVistaUtils.ts";
 import { PACKING_PORTAL_URL } from "../../constants.ts";
+import { playSound } from "../../sounds.ts";
 
 // The portal's own search form. It stays in the document -- hidden, emptied of
 // its inputs -- because it is still what carries the search: our fields are
@@ -148,6 +149,14 @@ function readNotice() {
 		// draws is between "read this" and "this went wrong".
 		tone: alert.classList.contains("alert-danger") ? "alert" : "notice",
 	};
+
+	// A search that came back with something to read is not a scan that landed
+	// wrong -- the scan was of the barcode field and the field is fine -- so a
+	// plain notice stays quiet. What the portal marks as an error is the process
+	// failing, and gets the sound for that.
+	if (notice.value.tone == "alert") {
+		playSound("error");
+	}
 }
 
 // Dismissing takes the portal's alert with it, so a message that has been read
