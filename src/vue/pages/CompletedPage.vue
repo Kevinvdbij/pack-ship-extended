@@ -1,9 +1,10 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue';
+import { onMounted, ref, useTemplateRef } from 'vue';
 import * as RVUtils from '../../retailVistaUtils.ts';
 import Settings from '../../settings.ts';
 import { MassCompleteStatus } from '../../interfaces.ts';
 import { afterPaint, afterReveal } from '../../reveal.ts';
+import { standInForPortalPage } from '../../standIn.ts';
 import { COMPLETED_CONTAINER_SELECTOR, COMPLETED_PROCEED_SELECTOR, VENDOR_BAND_LOGO_SELECTOR } from '../../constants.ts';
 
 // The last screen of a reservation: it has been packed, its parcels have been
@@ -41,6 +42,13 @@ const reservationNumber = ref("");
 // the control actually does the way a copy of it here would.
 const proceedLabel = ref("Afronden");
 
+// Our own block, once it is in the document: what the rest of the portal's page
+// is hidden around. See `standInForPortalPage`.
+const root = useTemplateRef<HTMLElement>("root");
+
+// Puts the portal's page back, for the one path that gives up on this screen.
+let restorePortalPage: (() => void) | null = null;
+
 onMounted(() => {
 	const container = document.querySelector(COMPLETED_CONTAINER_SELECTOR);
 
@@ -57,6 +65,13 @@ onMounted(() => {
 	updateAutoComplete();
 
 	container.classList.add("pse-portal-replaced");
+
+	// And with it everything else the portal laid out in this cell -- the
+	// reservation sidebar above all, which otherwise stands there beside a card
+	// that has been pushed below the whole page it replaces.
+	if (root.value) {
+		restorePortalPage = standInForPortalPage(root.value);
+	}
 
 	// This page is served without a header band, and carries the vendor's small
 	// wordmark in its place. Our own band is mounted above it by `main.ts`, so
@@ -111,6 +126,8 @@ function finalize() {
 		finalizing.value = false;
 		replaced.value = false;
 		document.querySelector(COMPLETED_CONTAINER_SELECTOR)?.classList.remove("pse-portal-replaced");
+		restorePortalPage?.();
+		restorePortalPage = null;
 
 		return;
 	}
@@ -128,33 +145,38 @@ function updateAutoComplete() {
 </script>
 
 <template>
-	<div class="pse-done" v-if="replaced">
-		<div class="pse-done-card">
-			<!-- The mark is the message: at a glance, from a step back, this
-			     screen says the reservation is off the bench. -->
-			<span class="pse-done-mark" :class="{ 'is-working': finalizing }" aria-hidden="true">
-				<svg v-if="!finalizing" viewBox="0 0 24 24" width="30" height="30" fill="none"
-					stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
-					<path d="M5 12.5l4.5 4.5L19 7.5" />
-				</svg>
-				<span v-else class="pse-done-spinner"></span>
-			</span>
+	<!-- Always rendered, even when nothing is shown in it: this is the element
+	     the portal's page is hidden around, so it has to exist before there is
+	     anything to put in it. -->
+	<div ref="root">
+		<div class="pse-done" v-if="replaced">
+			<div class="pse-done-card">
+				<!-- The mark is the message: at a glance, from a step back, this
+				     screen says the reservation is off the bench. -->
+				<span class="pse-done-mark" :class="{ 'is-working': finalizing }" aria-hidden="true">
+					<svg v-if="!finalizing" viewBox="0 0 24 24" width="30" height="30" fill="none"
+						stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round">
+						<path d="M5 12.5l4.5 4.5L19 7.5" />
+					</svg>
+					<span v-else class="pse-done-spinner"></span>
+				</span>
 
-			<h1 class="pse-done-title">Reservering afgerond</h1>
+				<h1 class="pse-done-title">Reservering afgerond</h1>
 
-			<p class="pse-done-number" v-if="reservationNumber">{{ reservationNumber }}</p>
+				<p class="pse-done-number" v-if="reservationNumber">{{ reservationNumber }}</p>
 
-			<p class="pse-done-text" v-if="finalizing">
-				Wordt afgesloten en gaat terug naar zoeken...
-			</p>
-			<p class="pse-done-text" v-else>
-				De pakketten zijn aangemeld. Sluit de reservering af om verder te gaan.
-			</p>
+				<p class="pse-done-text" v-if="finalizing">
+					Wordt afgesloten en gaat terug naar zoeken...
+				</p>
+				<p class="pse-done-text" v-else>
+					De pakketten zijn aangemeld. Sluit de reservering af om verder te gaan.
+				</p>
 
-			<!-- One control, and only when it is the operator's to press. -->
-			<button v-if="!finalizing" type="button" class="pse-done-button" @click="finalize()">
-				{{ proceedLabel }}
-			</button>
+				<!-- One control, and only when it is the operator's to press. -->
+				<button v-if="!finalizing" type="button" class="pse-done-button" @click="finalize()">
+					{{ proceedLabel }}
+				</button>
+			</div>
 		</div>
 	</div>
 </template>
