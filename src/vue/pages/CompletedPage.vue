@@ -379,6 +379,12 @@ function updateAutoComplete() {
 			     wrong on the left, and everything needed to judge it beside --
 			     who it is for, and what is in the boxes. -->
 			<div class="pse-done-layout">
+				<!-- The reservation's own column, in the place it holds on every
+				     other page with a reservation open: the left. -->
+				<aside class="pse-done-side" v-if="failed">
+					<ReservationSidebar />
+				</aside>
+
 				<div class="pse-done-card" :class="{ 'is-failed': failed }">
 					<!-- The mark is the message: at a glance, from a step back,
 					     this screen says the reservation is off the bench -- or
@@ -444,13 +450,10 @@ function updateAutoComplete() {
 					</button>
 				</div>
 
-				<!-- The same column of facts every other page with a reservation
-				     open carries, and the boxes as they stand. Rendered rather
-				     than revealed: the portal's own version of both is hidden
-				     with the rest of its page. -->
-				<aside class="pse-done-aside" v-if="failed">
-					<ReservationSidebar />
-
+				<!-- And the boxes as they stand, on the other side. Both
+				     columns are rendered rather than revealed: the portal's own
+				     version of each is hidden with the rest of its page. -->
+				<aside class="pse-done-parcels-column" v-if="failed">
 					<section class="pse-done-parcels" v-if="parcels.length">
 						<h2 class="pse-done-parcels-title">Pakketten</h2>
 
@@ -551,19 +554,27 @@ function updateAutoComplete() {
 	width: 100%;
 }
 
-.pse-done-aside {
+.pse-done-side,
+.pse-done-parcels-column {
 	display: flex;
 	flex-direction: column;
 	gap: 14px;
-	width: 100%;
-	max-width: 380px;
+	/* Each column keeps its width and gives the room it does not need to the
+	   card between them, which is the one thing here that is read as prose. */
+	flex: 0 1 340px;
+	min-width: 0;
 	text-align: left;
 }
 
+/* The card is what the screen is about, so it takes what the columns leave
+   rather than being squeezed between them. */
+.pse-done-layout > .pse-done-card {
+	flex: 1 1 460px;
+}
+
 /* The sidebar is written for the column it sits in on the parcels page, where
-   the page around it sets the width. Here it is one of two panels, so it is
-   given the same width as the other. */
-.pse-done-aside :deep(.pse-sidebar) {
+   the page around it sets the width. */
+.pse-done-side :deep(.pse-sidebar) {
 	width: 100%;
 }
 
@@ -856,6 +867,29 @@ function updateAutoComplete() {
 	}
 }
 
+/* Three columns need the width of a packing station's screen. Below that they
+   stack, with the card -- which says what happened -- above the detail it is
+   judged against, whichever side that detail was on. */
+@media (max-width: 1200px) {
+	.pse-done-layout {
+		flex-direction: column;
+		align-items: center;
+	}
+
+	.pse-done-layout > .pse-done-card {
+		order: -1;
+		flex: none;
+		width: 100%;
+	}
+
+	.pse-done-side,
+	.pse-done-parcels-column {
+		flex: none;
+		width: 100%;
+		max-width: 560px;
+	}
+}
+
 @media (max-width: 860px) {
 	.pse-done {
 		padding: 32px 16px;
@@ -867,16 +901,6 @@ function updateAutoComplete() {
 		flex-direction: column;
 	}
 
-	/* And so do the columns, with the card -- which says what happened -- above
-	   the detail it is judged against. */
-	.pse-done-layout {
-		flex-direction: column;
-		align-items: center;
-	}
-
-	.pse-done-aside {
-		max-width: 560px;
-	}
 
 	.pse-done-card {
 		padding: 28px 22px 24px;
