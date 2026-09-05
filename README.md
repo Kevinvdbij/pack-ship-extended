@@ -152,6 +152,33 @@ companion style:
 npm run build
 ```
 
+## Releasing
+
+A release is cut from a tag:
+
+```bash
+npm version patch   # bumps package.json, commits, tags v<version>
+git push --follow-tags
+```
+
+The tag starts `.github/workflows/release.yml`, which builds both artefacts and attaches them to a
+GitHub release. Bumping the version is not optional bookkeeping — Tampermonkey ignores a rebuild
+that reuses the version it already has, so a release that forgets the bump reaches nobody.
+
+Greasy Fork takes it from there. The script's page there is set to sync from
+
+```
+https://github.com/Kevinvdbij/pack-ship-extended/releases/latest/download/pack-ship-extended.user.js
+```
+
+which GitHub redirects to the newest release's asset, so the URL never has to change. Greasy Fork
+polls it and publishes a new version whenever the `@version` in the fetched file is higher than the
+one it holds — set that up once under *Script settings → Sync* ("Sync from URL", method: webhook or
+automatic). Installed copies then update through Greasy Fork, not from GitHub directly.
+
+The companion Stylus style is attached to the same release, but Greasy Fork does not host styles;
+it is installed by hand from the release asset and has to be updated alongside the script.
+
 ## Layout
 
 | Path | Contents |

@@ -1,0 +1,49 @@
+# Cutting a release
+#
+#   npm version patch   # bumps package.json and tags v<version>
+#   git push --follow-tags
+#
+# The tag is what starts this. It builds both halves of the extension and
+# attaches them to a GitHub release; Greasy Fork then pulls the userscript from
+# the release itself (see below).
+name: Release
+
+on:
+  push:
+    tags: ['v*']
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+      - run: npm run build
+
+      # The tag and package.json are the same version by construction when the
+      # tag comes from `npm version`, but a hand-made tag can disagree -- and a
+      # release whose asset carries a different @version than its tag is the
+      # kind of thing that is only noticed once Tampermonkey refuses the update.
+      - name: Check the tag matches package.json
+        run: |
+          tag="${GITHUB_REF_NAME#v}"
+          pkg="$(node -p "require('./package.json').version")"
+          test "$tag" = "$pkg" || {
+            echo "tag $tag != package.json $pkg"; exit 1;
+          }
+
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: |
+            dist/pack-ship-extended.user.js
+            dist/pack-ship-extended.user.css
+          generate_release_notes: true
