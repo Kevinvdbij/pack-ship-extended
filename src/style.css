@@ -15,18 +15,20 @@
 
 /* ---- One page width, scrollbar or no scrollbar ---- *
  * The band centres its contents on the viewport, and so does the search card
- * under it. A page that scrolls has a scrollbar and a page that does not has
- * none, which makes the viewport 15px narrower on one of them -- and everything
- * centred in it moves by half of that. Going from the search page to the
- * parcels page shifted the logo by 7.6px, measured, which is exactly the sort
- * of thing that reads as the page twitching rather than as a scrollbar
- * appearing.
+ * under it, so a page that scrolls centres them 7.6px off from a page that
+ * does not -- measured going from the search page to the parcels page.
  *
- * The gutter is reserved on every page instead, so it is there whether it is
- * used or not and nothing centred has to move when it fills.
+ * `scrollbar-gutter: stable` on `html` cured that by reserving the gutter on
+ * every page, but reserving it everywhere is worse than the twitch it fixed:
+ * a short page carries a permanently empty 15px strip. So the centring is
+ * pinned to the whole viewport instead. `100vw` counts the scrollbar and
+ * `100%` of the body does not, so the padding below is the scrollbar's own
+ * width on a page that scrolls and zero on one that does not. It sits on the
+ * left, where it gives back exactly the half-scrollbar the centring lost, and
+ * it reserves nothing on a page with no scrollbar to compensate for.
  */
-html {
-	scrollbar-gutter: stable;
+body {
+	padding-left: calc(100vw - 100%);
 }
 
 
