@@ -165,19 +165,25 @@ The tag starts `.github/workflows/release.yml`, which builds both artefacts and 
 GitHub release. Bumping the version is not optional bookkeeping — Tampermonkey ignores a rebuild
 that reuses the version it already has, so a release that forgets the bump reaches nobody.
 
-Greasy Fork takes it from there. The script's page there is set to sync from
+Greasy Fork takes it from there, and the way it does so is worth knowing, because it is not what
+the setup looks like. The sync URL,
 
 ```
 https://github.com/Kevinvdbij/pack-ship-extended/releases/latest/download/pack-ship-extended.user.js
 ```
 
-which GitHub redirects to the newest release's asset, so the URL never has to change. Greasy Fork
-polls it and publishes a new version whenever the `@version` in the fetched file is higher than the
-one it holds — set that up once under *Script settings → Sync* ("Sync from URL", method: webhook or
-automatic). Installed copies then update through Greasy Fork, not from GitHub directly.
+is only how Greasy Fork *identifies* which script a change belongs to. The code it publishes is not
+downloaded from there — it clones the repository and reads `git show <tag>:pack-ship-extended.user.js`.
+So both built artefacts are committed at the repository root, by npm's `version` hook, which runs
+after the bump and before the commit and therefore puts them in the version commit that gets tagged.
+That is why build output is in git here, and why it sits at the root rather than in `dist/`: for a
+`releases/latest/download/` URL, Greasy Fork strips the path down to the bare filename.
 
-The companion Stylus style is attached to the same release, but Greasy Fork does not host styles;
-it is installed by hand from the release asset and has to be updated alongside the script.
+The workflow's last step sends the sync request itself rather than leaving it to a webhook on the
+repository, which would fire when the tag lands — some twenty-five seconds before the release exists.
+
+The companion Stylus style is attached to the same release, but Greasy Fork does not host styles; it
+is installed by hand from the release asset and has to be updated alongside the script.
 
 ## Layout
 

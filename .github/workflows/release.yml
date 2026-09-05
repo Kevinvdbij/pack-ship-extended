@@ -41,6 +41,16 @@ jobs:
             echo "tag $tag != package.json $pkg"; exit 1;
           }
 
+      # The committed artefact and the build have to be the same file. They
+      # are produced together by npm's `version` hook, so they can only differ
+      # if someone edited one by hand or committed without rebuilding -- in
+      # which case Greasy Fork would publish the stale one, since it reads the
+      # committed file and not the release asset.
+      - name: Check the committed artefact matches the build
+        run: |
+          diff pack-ship-extended.user.js dist/pack-ship-extended.user.js
+          diff pack-ship-extended.user.css dist/pack-ship-extended.user.css
+
       - uses: softprops/action-gh-release@v2
         with:
           files: |
@@ -48,46 +58,48 @@ jobs:
             dist/pack-ship-extended.user.css
           generate_release_notes: true
 
-      # Greasy Fork re-fetches the sync URL when it is poked, and the poke has
-      # to come from here rather than from a GitHub webhook on the repository.
-      # A push webhook fires the instant the tag lands, some twenty-five seconds
-      # before this job has finished building and publishing the release. Greasy
-      # Fork would fetch releases/latest while it still pointed at the previous
-      # one, see the version it already held, and correctly do nothing. Sending
-      # it ourselves, last, means the release it goes looking for is there.
+      # Greasy Fork syncs when it receives a GitHub webhook delivery, and the
+      # delivery has to come from here rather than from a webhook on the
+      # repository: a push webhook fires when the tag lands, some twenty-five
+      # seconds before this job has published the release it would go looking
+      # for. Sending it last removes that race.
       #
-      # This is a GitHub webhook delivery, made by hand: Greasy Fork is given
-      # the same POST that GitHub would have sent, signed with the shared secret
-      # the way GitHub signs one. Hence two settings rather than one -- the
-      # endpoint (a repository variable; it is not sensitive) and the secret.
+      # Shaped against their source (app/controllers/concerns/webhooks.rb and
+      # lib/github.rb), because none of this is in their help pages:
+      #
+      #   - the signature is HMAC-SHA1 in X-Hub-Signature, not the SHA-256
+      #     header GitHub also sends -- a mismatch is an empty-bodied 403;
+      #   - a `releases/latest/download/...` sync URL is only recognised on a
+      #     release event, and only with action "published";
+      #   - the file it then reads is the bare filename at the repository root,
+      #     at the release's tag. Hence the committed artefacts above.
       - name: Tell Greasy Fork to sync
         env:
           WEBHOOK_URL: ${{ vars.GREASYFORK_WEBHOOK_URL }}
           WEBHOOK_SECRET: ${{ secrets.GREASYFORK_WEBHOOK }}
         run: |
-          # Greasy Fork reads the repository out of the payload and updates
-          # whichever of your scripts sync from a URL there. Built with jq so
-          # nothing here depends on the shell quoting of a URL or a tag name.
+          # The release name becomes the changelog entry on Greasy Fork.
           jq -n \
-            --arg ref "refs/tags/$GITHUB_REF_NAME" \
+            --arg tag "$GITHUB_REF_NAME" \
             --arg url "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY" \
-            --arg name "$GITHUB_REPOSITORY" \
-            '{ref: $ref, repository: {html_url: $url, full_name: $name}}' > payload.json
+            --arg clone "$GITHUB_SERVER_URL/$GITHUB_REPOSITORY.git" \
+            --arg branch "${{ github.event.repository.default_branch }}" \
+            '{action: "published", release: {name: $tag, tag_name: $tag}, repository: {html_url: $url, clone_url: $clone, default_branch: $branch}}' > payload.json
 
-          # The signature is over the exact bytes sent, so the file is what gets
-          # hashed and what gets posted -- never a re-rendered copy of it.
-          signature="$(openssl dgst -sha256 -hmac "$WEBHOOK_SECRET" -hex < payload.json | awk '{print $NF}')"
+          # Signed over the exact bytes sent, so the file is what gets hashed
+          # and the same file is what gets posted.
+          signature="$(openssl dgst -sha1 -hmac "$WEBHOOK_SECRET" -hex < payload.json | awk '{print $NF}')"
 
           code="$(curl -sS -o response.txt -w '%{http_code}' -X POST "$WEBHOOK_URL" \
             -H 'Content-Type: application/json' \
-            -H 'X-GitHub-Event: push' \
+            -H 'X-GitHub-Event: release' \
             -H "X-GitHub-Delivery: $GITHUB_RUN_ID-$GITHUB_RUN_ATTEMPT" \
-            -H "X-Hub-Signature-256: sha256=$signature" \
+            -H "X-Hub-Signature: sha1=$signature" \
             --data-binary @payload.json)"
 
-          # The response body names the scripts it updated, or says why it
-          # updated none. That is the only report of whether this worked, so it
-          # goes into the log either way.
+          # The body lists updated_scripts and update_failed_scripts, or says
+          # why it matched nothing. That is the only report of whether this
+          # worked, so it goes into the log either way.
           echo "Greasy Fork answered $code:"
           cat response.txt
           echo

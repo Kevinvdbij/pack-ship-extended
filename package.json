@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "vite",
     "build": "vue-tsc -b && vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "version": "npm run build && node build/stage-artefacts.mjs && git add pack-ship-extended.user.js pack-ship-extended.user.css"
   },
   "dependencies": {
     "@types/jquery": "^4.0.0",
