@@ -181,10 +181,12 @@ export const GREASYFORK_SCRIPT_ID = "594401";
 export const GREASYFORK_META_URL =
 	`https://update.greasyfork.org/scripts/${GREASYFORK_SCRIPT_ID}/Pack%26Ship%20Extended.meta.js`;
 
-// Where a workplace is sent to fetch it: the release rather than the script,
-// because the Stylus style is the other half of this extension and is attached
-// to the same release. See `src/update.ts`.
-export const RELEASES_PAGE_URL = "https://github.com/Kevinvdbij/pack-ship-extended/releases/latest";
+// Where a workplace is sent to fetch it: the script itself, not a page about
+// it. Tampermonkey claims `.user.js` and answers this URL with its own install
+// screen, so the chip is one click and one confirmation rather than a release
+// page to read and an asset to find. See `src/update.ts`.
+export const UPDATE_INSTALL_URL =
+	`https://update.greasyfork.org/scripts/${GREASYFORK_SCRIPT_ID}/Pack%26Ship%20Extended.user.js`;
 
 // How long an update check stands before another is made. The metadata block is
 // a few hundred bytes and Greasy Fork does not meter it, so this is about not

@@ -1,5 +1,5 @@
 import { GM_getValue, GM_setValue, GM_xmlhttpRequest } from "$";
-import { GREASYFORK_META_URL, RELEASES_PAGE_URL, STORAGE_KEYS, UPDATE_CHECK_INTERVAL } from "./constants.ts";
+import { GREASYFORK_META_URL, STORAGE_KEYS, UPDATE_CHECK_INTERVAL, UPDATE_INSTALL_URL } from "./constants.ts";
 import { debug } from "./logger.ts";
 import pkg from "../package.json";
 
@@ -22,10 +22,9 @@ import pkg from "../package.json";
 export interface AvailableUpdate {
 	// The version that is published, as its metadata block declares it.
 	version: string;
-	// Where to get it. The release page rather than the script itself: the
-	// Stylus style is the other half of this extension and is installed by hand
-	// from the same release, and a machine that takes only the script ends up
-	// with a mismatched pair.
+	// Where to get it: the published script itself, which Tampermonkey opens as
+	// its own install screen. A packing computer should not have to read a
+	// release page to take an update.
 	url: string;
 }
 
@@ -43,7 +42,7 @@ export function getKnownUpdate(): AvailableUpdate | undefined {
 	const cached = GM_getValue(STORAGE_KEYS.updateCheck) as CachedCheck | undefined;
 
 	return cached?.version && isNewer(cached.version, pkg.version)
-		? { version: cached.version, url: RELEASES_PAGE_URL }
+		? { version: cached.version, url: UPDATE_INSTALL_URL }
 		: undefined;
 }
 
@@ -58,10 +57,14 @@ export function getKnownUpdate(): AvailableUpdate | undefined {
 // Never rejects. A check that cannot reach Greasy Fork is not something to
 // report on a packing screen -- it leaves the last answer standing and tries
 // again on the next page after the interval.
-export async function checkForUpdate(): Promise<AvailableUpdate | undefined> {
+export async function checkForUpdate(force = false): Promise<AvailableUpdate | undefined> {
 	const cached = GM_getValue(STORAGE_KEYS.updateCheck) as CachedCheck | undefined;
 
-	if (cached && Date.now() - cached.checkedAt < UPDATE_CHECK_INTERVAL) {
+	// `force` is the settings dialog asking on someone's behalf. The interval
+	// exists so that every page load does not ask; a person who has opened the
+	// dialog and pressed the button has asked, and telling them the hour is not
+	// up yet would be answering a question they did not put.
+	if (!force && cached && Date.now() - cached.checkedAt < UPDATE_CHECK_INTERVAL) {
 		return getKnownUpdate();
 	}
 

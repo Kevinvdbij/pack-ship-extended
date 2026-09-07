@@ -5,7 +5,9 @@ import { getCredentials, setCredentials } from "../../shopware.ts";
 import { applyConfiguredEnvironment, getEnvironmentOptions } from "../../environment.ts";
 import ModalShell from "./ModalShell.vue";
 import { previewSound, type SoundKind } from "../../sounds.ts";
-import { SETTINGS_SAVED_EVENT } from "../../constants.ts";
+import { SETTINGS_SAVED_EVENT, UPDATE_INSTALL_URL } from "../../constants.ts";
+import { checkForUpdate } from "../../update.ts";
+import pkg from "../../../package.json";
 
 const emit = defineEmits<{ close: []; save: [] }>();
 
@@ -48,6 +50,34 @@ const environmentId = ref(Settings.environmentId);
 const credentials = getCredentials();
 const clientId = ref(credentials.clientId);
 const clientSecret = ref(credentials.clientSecret);
+
+// What the last press of the check button found. Empty until it is pressed --
+// the footer already carries the standing answer, and this line is here to
+// report on an asking that just happened.
+const updateStatus = ref("");
+const checking = ref(false);
+
+// Asked properly rather than from the cache: the hour the ordinary check waits
+// out is there to keep page loads quiet, and this is a person wanting to know
+// now -- most often the person who just published the version they are looking
+// for.
+//
+// The link is followed either way. Tampermonkey answers the script URL with its
+// own install screen even when the version has not moved, which is the way to
+// push a workplace that has fallen behind and will not pick it up on its own.
+// So the anchor navigates as anchors do, and this only fills in the line under
+// it.
+async function onCheckForUpdate() {
+	checking.value = true;
+	updateStatus.value = "";
+
+	const available = await checkForUpdate(true);
+
+	checking.value = false;
+	updateStatus.value = available
+		? `Versie ${available.version} is beschikbaar.`
+		: `Deze werkplek draait de nieuwste versie (${pkg.version}).`;
+}
 
 function save() {
 	Settings.autoMasterSwitch = masterSwitch.value;
@@ -167,6 +197,32 @@ function save() {
 			</div>
 		</div>
 
+		<div class="pse-settings-group">
+			<h3 class="pse-settings-group-title">Versie</h3>
+
+			<div class="pse-settings-field">
+				<!-- An anchor rather than a button, and the same URL the pill in
+				     the footer opens: this is the one way in to an update, so
+				     there is one address for it. Opened in its own tab so the
+				     dialog and whatever was on screen behind it survive an
+				     install that is thought better of. -->
+				<a class="pse-dialog-btn pse-settings-update" :href="UPDATE_INSTALL_URL" target="_blank"
+					rel="noopener" @click="onCheckForUpdate()">
+					<span class="material-icons pse-settings-update-icon" aria-hidden="true">system_update_alt</span>
+					{{ checking ? "Bezig met controleren" : "Controleer op updates" }}
+				</a>
+
+				<small class="pse-dialog-hint">
+					Deze werkplek draait {{ pkg.version }}. Opent het installatiescherm van Tampermonkey, ook als
+					er geen nieuwere versie is -- zo haal je een werkplek bij die achterloopt.
+				</small>
+
+				<small class="pse-dialog-hint pse-settings-update-status" v-if="updateStatus">
+					{{ updateStatus }}
+				</small>
+			</div>
+		</div>
+
 		<template #footer>
 			<button type="button" class="pse-dialog-btn pse-dialog-btn-quiet" @click="emit('close')">
 				Annuleren
@@ -179,6 +235,39 @@ function save() {
 </template>
 
 <style scoped>
+/* An anchor wearing the dialog's button: it has to be told to lay itself out
+   like one, since a button is a flex box here and an inline link is not.
+ 
+   And it has to be told its colour in every link state. `.pse-dialog-btn` sets
+   white text, but the portal styles links as links -- `a:hover` outranks a bare
+   class, so hovering the button turned the label Bootstrap blue and underlined
+   it. Stated once per state here, where the scope attribute puts us above that. */
+.pse-settings-update,
+.pse-settings-update:hover,
+.pse-settings-update:focus,
+.pse-settings-update:active,
+.pse-settings-update:visited {
+	display: inline-flex;
+	align-items: center;
+	gap: 8px;
+	margin-bottom: 9px;
+	color: #ffffff;
+	text-decoration: none;
+}
+
+.pse-settings-update-icon {
+	font-size: 18px;
+}
+
+/* The answer to a press, so it is set apart from the standing explanation above
+   it rather than reading as a third line of the same paragraph. */
+.pse-settings-update-status {
+	display: block;
+	margin-top: 7px;
+	font-weight: 600;
+	color: var(--pse-ink);
+}
+
 /* A filled box against a bare label reads as one crowding the other: the box
    has an edge and a tint, and the small uppercase label under it has neither,
    so the gap the fields use between themselves is not enough to separate them.

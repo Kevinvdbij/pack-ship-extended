@@ -36,7 +36,7 @@ const props = withDefaults(defineProps<{
 // Seeded from what the last check stored so the bar draws itself in one pass,
 // then asked again -- without being waited for, because this is a line on a
 // footer and nothing on the page depends on the answer. Every page mounts this
-// bar, so every page checks; how often that actually reaches GitHub is the
+// bar, so every page checks; how often that actually reaches Greasy Fork is the
 // interval's business, not this component's.
 const update = ref<AvailableUpdate | undefined>(getKnownUpdate());
 
@@ -46,7 +46,7 @@ onMounted(() => {
 
 const updateTitle = computed(() => update.value
 	? `Versie ${update.value.version} is beschikbaar, deze werkplek draait ${pkg.version}. `
-		+ "Klik om de release te openen -- werk het script en de stijl allebei bij."
+		+ "Klik om de nieuwe versie te installeren."
 	: undefined);
 
 const showModal = ref(false);
