@@ -85,7 +85,7 @@ onMounted(() => {
 
 	setupSidebar();
 	markParcelsLoading();
-	keepScannerFocused();
+	watchScannerFocus();
 
 	RVUtils.setLastOpenReservation({
 		id: RVUtils.getCurrentReservationId(),
@@ -270,36 +270,54 @@ function markParcelsLoading() {
 	new MutationObserver(sync).observe(container, { childList: true, subtree: true });
 }
 
-// The cursor belongs in the scan field for the whole of this step, whether or
-// not anything is handling itself: this is where the packer works, the scanner
-// types into whatever has the cursor, and a scan that lands anywhere else is
-// lost with nothing on screen to say so.
+// The scan field as it stood when the cursor was last in it.
 //
-// Two things take it away. The portal rewrites the whole parcel area after every
-// parcel change -- `refresh()` -- and the cursor goes with the markup it was in;
-// and a click on the page rather than on a control leaves focus on `body`.
-// Neither is someone going somewhere on purpose, so the field takes it back.
-function keepScannerFocused() {
-	document.addEventListener("focusout", (event) => {
-		if (event.target != document.querySelector(SCAN_INPUT)) {
-			return;
-		}
+// The cursor is placed there once, when the page opens, and after that it is
+// the packer's. It used to be taken back from anywhere it was not wanted --
+// every click on the page that was not a control put it straight back in the
+// scan field -- and on a screen people work on for a whole shift that reads as
+// the page arguing with them rather than as a help.
+//
+// One case still has to be answered, because nobody chose it: the portal
+// rewrites the entire parcel area after every parcel change -- `refresh()` --
+// and the field the packer was scanning into stops existing mid-scan. What
+// tells that apart from a cursor put down on purpose is the element itself. If
+// the field is a different one than the one that had focus, the portal replaced
+// it and the cursor goes back; if it is the same field and the cursor is
+// elsewhere, that is where the packer left it.
+let focusedScanInput: Element | null = null;
 
-		// Where focus went is not known until the browser has moved it, which
-		// happens after this event.
-		setTimeout(restoreScannerFocus);
+// Kept up to date wherever the cursor lands in the scan field -- by the packer,
+// by the scanner, or by the one placement this page makes itself.
+function watchScannerFocus() {
+	document.addEventListener("focusin", (event) => {
+		if (event.target == document.querySelector(SCAN_INPUT)) {
+			focusedScanInput = event.target as Element;
+		}
 	});
 }
 
-// Only from nowhere. Landing on another field, a button or a dialog is the
-// operator going there, and taking the cursor off them mid-edit would be worse
-// than a missed scan -- the parcel's weight is typed into one of those fields.
+// Called after the parcel area has been rewritten, and only then.
 function restoreScannerFocus() {
-	if (document.activeElement && document.activeElement != document.body) {
+	if (!focusedScanInput || showImageModal.value) {
 		return;
 	}
 
-	if (showImageModal.value) {
+	const current = document.querySelector(SCAN_INPUT);
+
+	// Still the same field: whatever the rewrite touched, it was not the one the
+	// cursor was in, and where the cursor is now is not this page's business.
+	if (current == focusedScanInput) {
+		return;
+	}
+
+	focusedScanInput = null;
+
+	// The cursor is only replaced if the rewrite is what took it. Landing on
+	// another field, a button or a dialog is the packer going there, and taking
+	// it off them mid-edit would be worse than a missed scan -- the parcel's
+	// weight is typed into one of those fields.
+	if (document.activeElement && document.activeElement != document.body) {
 		return;
 	}
 

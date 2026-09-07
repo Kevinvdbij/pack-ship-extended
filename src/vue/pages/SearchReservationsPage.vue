@@ -11,6 +11,7 @@ import * as RVUtils from "../../retailVistaUtils.ts";
 import { PACKING_PORTAL_URL, SETTINGS_SAVED_EVENT } from "../../constants.ts";
 import Settings from "../../settings.ts";
 import { playSound } from "../../sounds.ts";
+import { debug } from "../../logger.ts";
 
 // The portal's own search form. It stays in the document -- hidden, emptied of
 // its inputs -- because it is still what carries the search: our fields are
@@ -46,6 +47,16 @@ const hasHistory = computed(() => showHistory.value && completedHistory.value.le
 // element behind it.
 const addParcelsNumber = ref("");
 
+// What is typed or scanned into the search panel's reservation field.
+//
+// A field of ours rather than the portal's `#ReservationNumber` taken over. The
+// portal's element was adopted so the form would serialise it, and that is the
+// part that never held: whatever we were reading and wiring there, it was not
+// the input on screen -- the value never reached the portal and a return key in
+// it did nothing. The query is built by hand now, so the field has no reason to
+// be the portal's, and this way what is sent is what is shown.
+const searchNumber = ref("");
+
 // Set for as long as a search is in flight. Most searches end in a navigation,
 // so the button stays in this state until the next page takes over; the ones
 // that come back to us clear it themselves.
@@ -67,7 +78,6 @@ const canAddToCompleted = computed(() => Boolean(lastCompletedReservation.value?
 
 onMounted(() => {
 	replacePortalSearchBlock();
-	keepScannerFocused();
 
 	// The dialog that carries the switch is the footer's mount, not this one, so
 	// the change arrives as an event rather than as a value this page can watch.
@@ -75,34 +85,16 @@ onMounted(() => {
 	// which on this screen can be a whole shift away.
 	document.addEventListener(SETTINGS_SAVED_EVENT, () => showHistory.value = Settings.showCompletedHistory);
 
+	// Placed once, as the page opens, and after that the cursor is the
+	// operator's. It used to be taken back from anywhere it was not wanted --
+	// every click that was not on a control put it straight back here -- which
+	// on a screen people sit in front of all day argues with them rather than
+	// helping. Nothing rewrites this field out from under the cursor the way the
+	// parcel area does, so there is nothing else to answer: the other two
+	// placements below are a finished search and a dismissed dialog, which are
+	// both the operator's own action handing the screen back.
 	RVUtils.focusBarcodeInput();
 });
-
-// The scanner types into whatever has the cursor and presses return, so a
-// cursor that is not in the barcode field means the next scan is dropped with
-// nothing on screen to say so. Clicking anywhere that is not itself a control
-// -- the card, the page margin -- is enough to lose it.
-//
-// So focus leaving the field is allowed to settle, and taken back only if
-// nothing else claimed it. Moving to the other form's field, to a button or to
-// the modal is someone going somewhere on purpose; landing on `body` is not.
-function keepScannerFocused() {
-	document.addEventListener("focusout", (event) => {
-		if (event.target != document.querySelector(BARCODE_INPUT)) {
-			return;
-		}
-
-		// Where focus went is not known until the browser has moved it, which
-		// happens after this event.
-		setTimeout(() => {
-			if (showModal.value || document.activeElement != document.body) {
-				return;
-			}
-
-			RVUtils.focusBarcodeInput();
-		});
-	});
-}
 
 interface Notice {
 	title: string;
@@ -238,29 +230,137 @@ function replacePortalSearchBlock() {
 
 	block.classList.add("pse-portal-replaced");
 
-	// Out of the form and into our fields, then back into the form by id. A
+	// Out of the form and into our fields, then back into the form by id -- a
 	// control carries its form association in an attribute, so it does not have
 	// to be a descendant of the form to be submitted with it.
-	for (const selector of [RESERVATION_NUMBER_INPUT, BARCODE_INPUT]) {
-		document.querySelector(selector)?.setAttribute("form", RESERVATION_FORM_ID);
+	//
+	// Kept, because it is what lets the submit button reach the form from our
+	// card. Not relied on for anything else: when the association does not take,
+	// the form owns neither field, so it serialises to its hidden fields alone
+	// -- a search the portal answers with "no search criteria specified" -- and
+	// a return key in a field with no form owner does nothing at all. Both of
+	// those are handled here instead of being left to the browser.
+	for (const selector of [BARCODE_INPUT]) {
+		const input = document.querySelector(selector);
+
+		if (!input) {
+			continue;
+		}
+
+		input.setAttribute("form", RESERVATION_FORM_ID);
+
+		// The scanner ends every scan with a return, and this is the one thing
+		// on the page that has to answer it. `preventDefault` also stands in for
+		// the implicit submission it replaces, so a field that *is* associated
+		// does not search twice.
+		input.addEventListener("keydown", (event) => {
+			if ((event as KeyboardEvent).key != "Enter") {
+				return;
+			}
+
+			event.preventDefault();
+			onSearchReservation();
+		});
 	}
 
-	// Both our submit button and a return key pressed in either field go through
-	// the form's submit event, so there is one way in and one handler on it.
+	// The submit button still goes through the form, so there is one handler for
+	// it whether it is clicked or reached with the keyboard.
 	document.querySelector("#" + RESERVATION_FORM_ID)?.addEventListener("submit", (e) => {
 		e.preventDefault();
 		onSearchReservation();
-		RVUtils.focusBarcodeInput();
 	});
 }
 
+// The search as a query string, built rather than serialised.
+//
+// The form's own fields first -- the anti-forgery token and whatever else it
+// carries -- and then our two on top of them by name, read straight off the
+// elements. `set` rather than `append`, so a field the form does own is written
+// once and with the value that is on screen.
+//
+// This is the part that used to be `$(form).serialize()` alone. That answer is
+// only right while the form owns the two inputs, and they sit in our card now.
+function buildSearchQuery(): string {
+	const form = document.querySelector<HTMLFormElement>("#" + RESERVATION_FORM_ID);
+	const params = new URLSearchParams();
+
+	if (form) {
+		for (const [key, value] of new FormData(form)) {
+			if (typeof value == "string") {
+				params.append(key, value);
+			}
+		}
+	}
+
+	// The barcode is still the portal's own element -- it is what the scanner is
+	// aimed at and what `focusBarcodeInput` puts the cursor in -- so it is read
+	// where it stands. The reservation number is ours and is read from the model.
+	//
+	// The names: the element's own where there is an element, since that is what
+	// it would have been submitted under, and the id the portal derives its
+	// names from otherwise.
+	const barcode = document.querySelector<HTMLInputElement>(BARCODE_INPUT);
+
+	params.set(barcode?.name || BARCODE_INPUT.slice(1), barcode?.value ?? "");
+
+	params.set(
+		document.querySelector<HTMLInputElement>(RESERVATION_NUMBER_INPUT)?.name
+			|| RESERVATION_NUMBER_INPUT.slice(1),
+		searchNumber.value,
+	);
+
+	return params.toString();
+}
+
 async function onSearchReservation() {
+	// A scanner that fires twice, or a return held down, is one search. The
+	// button is disabled while one is in flight; the return key is not.
+	if (searching.value) {
+		return;
+	}
+
 	searching.value = true;
 
-	const formData = $("#" + RESERVATION_FORM_ID).serialize();
-	const response = await RVUtils.reservationSearchRequest(formData);
+	// Serialised before the fields are emptied, and both of them are emptied:
+	// they are two ways of asking the same form one question, and whichever was
+	// just used, the other has to be blank when the next scan lands. A number
+	// left standing in the reservation field is sent along with the next barcode
+	// and answered first, so the scan appears to be ignored.
+	const formData = buildSearchQuery();
 
-	handleResponse(response)
+	clearSearchFields();
+	RVUtils.focusBarcodeInput();
+
+	try {
+		handleResponse(await RVUtils.reservationSearchRequest(formData));
+	} catch (error) {
+		// Whatever went wrong, the button cannot be left spinning: it is
+		// disabled while a search is in flight, so a search that ends in a throw
+		// takes the form with it and the screen reads as one that ignores scans.
+		debug("The reservation search failed:", error);
+
+		notice.value = {
+			title: "De zoekopdracht kon niet worden afgerond.",
+			detail: "Probeer het opnieuw. Blijft het misgaan, ververs dan de pagina.",
+			tone: "alert",
+		};
+
+		playSound("error");
+		searching.value = false;
+		RVUtils.setBusy(false);
+	}
+}
+
+// Both search fields emptied. `focusBarcodeInput` already clears the one it
+// puts the cursor in; this is the other one, which nothing else touches.
+function clearSearchFields() {
+	searchNumber.value = "";
+
+	const barcode = document.querySelector<HTMLInputElement>(BARCODE_INPUT);
+
+	if (barcode) {
+		barcode.value = "";
+	}
 }
 
 async function handleResponse(response: string) {
@@ -287,8 +387,29 @@ async function handleResponse(response: string) {
 			break;
 
 		case ReservationSearchResponseType.RefreshMain:
-			document.querySelector("#messages")!.parentElement!.innerHTML =
-				responseElement.querySelector("#alert")!.parentElement!.parentElement!.innerHTML;
+			// The portal's answer is a message rather than a reservation. It is
+			// written into the row we adopted -- the row itself is kept, since it
+			// is what the observer above watches and what `readNotice` reads --
+			// and rendered as our own card from there.
+			//
+			// Addressed by class as well as by id, and guarded: the id is what
+			// this page has always seen, but a response without either used to
+			// throw here, and a throw during a search leaves the button disabled
+			// with nothing on screen -- a scan that does nothing at all.
+			const alert = responseElement.querySelector("#alert") ?? responseElement.querySelector(".alert");
+			const portalMessages = document.querySelector("#messages");
+
+			if (portalMessages) {
+				portalMessages.innerHTML = alert?.outerHTML ?? "";
+			}
+
+			if (!alert) {
+				notice.value = {
+					title: "Geen reservering gevonden.",
+					detail: "Controleer het reserveringsnummer of scan de barcode opnieuw.",
+					tone: "notice",
+				};
+			}
 
 			searching.value = false;
 			RVUtils.setBusy(false);
@@ -369,7 +490,11 @@ function openReservation(url: string) {
 							</svg>
 						</template>
 
-						<SearchField label="Reservering nr" :adopt="RESERVATION_NUMBER_INPUT" />
+						<!-- Ours, so a return key here is a return key we can hear. The
+						     keydown is caught on the field's root and reaches it by
+						     bubbling out of the input inside. -->
+						<SearchField label="Reservering nr" placeholder="Bijv. 1234567" v-model="searchNumber"
+							@keydown.enter.prevent="onSearchReservation()" />
 						<SearchField label="Product barcode" :adopt="BARCODE_INPUT" />
 
 						<button type="submit" class="pse-submit pse-submit-end" :form="RESERVATION_FORM_ID"
