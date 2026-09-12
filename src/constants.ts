@@ -26,16 +26,59 @@ export const ERP_LOGIN_FIELDS = {
 	submit: "ctl00$MasterContent$cmdLogin",
 } as const;
 
-// The ERP's application page. `RetailVista.aspx` is only a launcher -- it
-// redirects to `Index.aspx`, which pops the application into a window of its
-// own -- so the page that actually holds the application is this one, addressed
-// by the id of the screen wanted.
+// The ERP's application page, addressed by the id of the screen wanted. This is
+// what holds a screen's own markup, and what everything keyed by an id is driven
+// through.
 //
 // 374 is reservation maintenance. The ids are the ERP's own, read off the menu
 // markup `Default.aspx` serves; they are stable for a given release and are
 // worth checking after a RetailVista update.
 export const ERP_PAGE_PATH = "/Default.aspx";
 export const ERP_RESERVATION_PAGE_ID = 374;
+
+// ---- The launcher, and the one word that decides whether it behaves ----
+//
+// `RetailVista.aspx` is the application's real top window: it loads
+// `pagemanager.js`, frames `Default.aspx?pageId=<n>` as `DefaultFrame`, and owns
+// the modal dialog machinery every screen reaches for through
+// `window.top.getMainWindow()`. A screen loaded bare has none of that, which is
+// why the search dialog is missing from one.
+//
+// It looks like it only redirects, and it does -- but conditionally.
+// `pagemanager.js` opens with
+//
+//     if (window.name.substring(0, 3) == 'pop') { } else { top.location.href = "Index.aspx" }
+//
+// because the application is meant to live in a window `Index.aspx` popped and
+// named. A frame whose name starts with `pop` is taken for that window and the
+// application runs in it; a frame with any other name navigates *our* tab to
+// `Index.aspx` -- which is what it did on the first attempt, packing screen and
+// all. So the name is not cosmetic and must not be tidied away.
+export const ERP_LAUNCHER_PATH = "/RetailVista.aspx";
+export const ERP_LAUNCHER_FRAME_NAME = "pop-pack-ship-extended";
+export const ERP_LAUNCHER_INNER_FRAME = "DefaultFrame";
+
+// ---- Finding a reservation by its number ----
+//
+// The maintenance screen loads a record by internal id and has no way to look
+// one up by number. The application's own answer is the search dialog: the
+// screen publishes the page id of its search form in
+// `navigationIconsSearchPageId`, and the launcher opens it with
+// `OpenSearchDialog(pageId, width, height)`.
+//
+// The form is the one an operator sees under the magnifier on the reservation
+// screen -- store, reservation number, parcel barcode and the rest -- and its
+// Search posts back into the screen behind it.
+export const ERP_SEARCH_OPEN_FUNCTION = "OpenSearchDialog";
+export const ERP_SEARCH_PAGE_ID_VARIABLE = "navigationIconsSearchPageId";
+export const ERP_SEARCH_NUMBER_SELECTOR = "[id$='rvcReservationNumber_TextBox']";
+export const ERP_SEARCH_SUBMIT_SELECTOR = "[id$='ctl00_cmdSearch']";
+
+// The element the screen keeps the displayed record's id in. Its id is not
+// hard-coded here: the screen holds it in a variable of its own -- `hdnItemId`,
+// the same one `SetDisplayItemId` writes into -- so it is read from there rather
+// than guessed at from a selector.
+export const ERP_ITEM_ID_VARIABLE = "hdnItemId";
 
 // How a record is opened on that page.
 //

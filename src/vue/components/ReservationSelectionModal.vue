@@ -4,6 +4,7 @@ import * as Shopware from "../../shopware.ts";
 import { saveOrderComment } from "../../shopwareComments.ts";
 import * as RVUtils from "../../retailVistaUtils.ts";
 import { ErpSignedOutError, readReservationNotes } from "../../reservationNote.ts";
+import { findReservationId } from "../../reservationLookup.ts";
 import { createSlotHandle, SlotHandle } from "../slotHandle.ts";
 import { erpStore } from "../erpStore.ts";
 import { MassCompleteEntry, MassCompleteStatus, ModalReservationDetails, ReservationSelectionModalData } from "../../interfaces.ts";
@@ -35,36 +36,23 @@ const massCompleteStatus = ref<MassCompleteEntry[]>();
 
 // ---- The rack bays on the cards ----
 //
-// On the reservations that are ready to pack: an order of several lines, or of
-// several of one product, is the order that waits in the rack while the rest of
-// it comes in -- and the packer deciding which of these to carry on with wants
-// to know which of them is already standing somewhere, and to park what is in
-// their hands before opening anything.
+// On every card, which is both groups that get one: an order of several lines,
+// or of several of one product, is the order that waits in the rack while the
+// rest of it comes in -- and the packer deciding which of these to carry on with
+// wants to know which of them is already standing somewhere, and to park what is
+// in their hands before opening anything.
 //
-// ---- Why not on the ones that are not fully picked ----
-//
-// They should have a bay, and arguably need one more than the ready ones do: a
-// half-picked order is exactly what has to stand somewhere until the rest turns
-// up. What is missing is the reservation's internal id, which is what the ERP
-// record -- and so the note the bays live on -- is keyed by.
-//
-// Checked on the live portal rather than assumed. A ready card carries an Open
-// link, and the page behind it holds `#ReservationId`; an incomplete card
-// carries no link, no hidden input and no id in any attribute, and the portal
-// answers a direct search for such a reservation by number with "is nog niet
-// volledig geraapt" and nothing else -- on both the search and the add-parcels
-// route. The only place left that knows the mapping is the ERP's own
-// reservation search screen (`pageId=376`), whose results arrive in an async
-// grid that is a job of its own to drive.
-//
-// So the panel is left off those cards rather than shown saying "not available"
-// on every one of them, which is a broken control rather than an honest one.
+// The reservations that are not fully picked are included, and they are the ones
+// this is most useful for: a half-picked order is exactly what has to stand
+// somewhere until the rest turns up. They cost an extra step to identify, which
+// is what `findReservationId()` is for -- the portal tells us nothing at all
+// about them, not even an id.
 //
 // A handle per card, made here and now rather than when its note arrives: the
 // list is known before the first render, and a card that grows a control a
 // second later is worse than one that shows it waiting. Each starts out
 // unsettled, so every panel is turning until it has an answer.
-const slotReservations = props.modalData.validReservations;
+const slotReservations = props.modalData.validReservations.concat(props.modalData.invalidReservations);
 
 const slotHandles = new Map<number, SlotHandle>(
 	slotReservations.map((reservation) => [reservation.reservationNumber, createSlotHandle()])
@@ -108,14 +96,42 @@ function onSaveButtonClick(orderData: Shopware.ShopwareOrderEntry, orderNumber: 
 	}, 250);
 }
 
+// Which record a card is about.
+//
+// A reservation that is ready to pack carries a link to itself, and the page
+// behind it holds `#ReservationId` -- a plain portal request, and the cheap case.
+// One that is not fully picked carries no link at all, and the portal will not
+// discuss it: those are looked up by number through the ERP's own search form,
+// which is one job with the application per card.
+//
+// Ordered cheap-first on purpose. The ERP lookups queue behind each other
+// anyway, and the ready cards -- the ones the packer is actually choosing
+// between -- should not wait on them.
+function identify(reservation: ModalReservationDetails): Promise<string> {
+	if (reservation.url) {
+		return RVUtils.fetchReservationId(reservation.url);
+	}
+
+	return findReservationId(String(reservation.reservationNumber))
+		.catch((error) => {
+			if (error instanceof ErpSignedOutError) {
+				throw error;
+			}
+
+			// One card we could not place is one panel that says so, not a
+			// dialog-wide failure.
+			console.error("Pack&Ship Extended could not find reservation "
+				+ reservation.reservationNumber + " in RetailVista.", error);
+
+			return "";
+		});
+}
+
 // The bays of every card, in two passes.
 //
-// The portal's search response names a reservation by its number and its link,
-// and the note lives on the ERP record, which is keyed by the internal id. So
-// the ids are fetched first -- in parallel, they are plain portal requests --
-// and the notes then read in one ERP job rather than one job each: see
-// `readReservationNotes()`, which opens the ERP screen once and changes only
-// which record it is showing.
+// The ids come first -- see `identify()` -- and the notes are then read in one
+// ERP job rather than one job each: see `readReservationNotes()`, which opens the
+// ERP screen once and changes only which record it is showing.
 //
 // A reservation whose id or note cannot be read is settled with nothing, which
 // is what its panel then renders as "not available". That is deliberate: an
@@ -129,7 +145,7 @@ function loadSlots() {
 		return;
 	}
 
-	Promise.all(reservations.map((reservation) => RVUtils.fetchReservationId(reservation.url)))
+	Promise.all(reservations.map(identify))
 		.then(async (ids) => {
 			const notes = await readReservationNotes(ids.filter(Boolean));
 
@@ -419,6 +435,7 @@ function countStatus(status: MassCompleteStatus): number {
 			<ReservationCard v-for="reservation in modalData.invalidReservations"
 				:key="reservation.reservationNumber" :reservation="reservation" show-products
 				highlight-incomplete show-note :note-enabled="swCommentBoxesEnabled"
+				:slot-handle="slotsFor(reservation.reservationNumber)"
 				@save-note="onSaveButtonClick(reservation.swOrderData, reservation.saleOrderReference)" />
 		</section>
 
