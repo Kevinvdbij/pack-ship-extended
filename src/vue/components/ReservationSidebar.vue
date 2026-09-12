@@ -2,11 +2,13 @@
 import { computed, onMounted, ref } from "vue";
 import * as Shopware from "../../shopware.ts";
 import { saveOrderComment } from "../../shopwareComments.ts";
-import { getCurrentOrderNumber, matchShopwareOrderNumber } from "../../retailVistaUtils.ts";
+import { getCurrentOrderNumber, getCurrentReservationId, matchShopwareOrderNumber } from "../../retailVistaUtils.ts";
 import { debug } from "../../logger.ts";
 import { RESERVATION_SUMMARY_SELECTOR, SHOPWARE_URL } from "../../constants.ts";
 import ShopwareNote from "./ShopwareNote.vue";
+import SlotCard from "./SlotCard.vue";
 import CopyButton from "./CopyButton.vue";
+import { slotStore } from "../slotStore.ts";
 
 // The column beside the work: which reservation this is, who it is for, where
 // it is going, and the customer's note. The same on every page that has a
@@ -85,6 +87,31 @@ let saveTimeoutId: number;
 // what works in both states -- and it is the only way to get the line breaks
 // out of the address, which the portal writes with `<br>`.
 readPortalSummary();
+
+// The rack bays, off the reservation's own note.
+//
+// Independent of Shopware, and that is the point of where they are kept: this
+// runs for every reservation the sidebar is mounted on, not only for the ones
+// that came from the webshop. This is the only read of the note on the page, so
+// everything that shows or sets a bay -- here and in the product table, which is
+// its own mount -- is served from what it loads.
+//
+// The internal id, not the number on the heading: the ERP screen loads a record
+// by the first and ignores the second. Guarded the same way the order number is,
+// because the pages this component is mounted on each lay the portal's summary
+// block out their own way, and a reservation we cannot identify is bays we
+// cannot show rather than a reason to take the sidebar down.
+slotStore.attachReservation(readReservationId(), reservationNumber.value);
+
+function readReservationId(): string {
+	try {
+		return getCurrentReservationId();
+	} catch (error) {
+		debug("No reservation id in the portal's summary block.", error);
+
+		return "";
+	}
+}
 
 onMounted(() => {
 	document.querySelector(RESERVATION_SUMMARY_SELECTOR)?.classList.add("pse-portal-replaced");
@@ -227,6 +254,15 @@ function onOpen() {
 		     read cannot be. -->
 		<ShopwareNote v-if="hasShopwareOrder" :order-data="orderEntry" :enabled="noteEnabled" show-open
 			show-alert @save="onSave" @open="onOpen" />
+
+		<!-- Under the note and above the reservation's own details. A bay is not
+		     an instruction the way a note is, but it is acted on -- walked to --
+		     while the details below are only ever looked up. -->
+		<!-- Not gated on the webshop order any more. The bays live on the
+		     reservation, so every reservation can have one -- and a reservation
+		     that did not come from the shop is exactly the case the move was
+		     made for. -->
+		<SlotCard v-if="slotStore.showSlots.value" />
 
 		<div class="pse-sidebar-card">
 			<header class="pse-sidebar-head">

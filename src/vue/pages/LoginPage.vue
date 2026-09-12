@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import { onMounted, useTemplateRef } from "vue";
 import { clearCurrentUser, setCurrentUser } from "../../currentUser.ts";
+import { erpLogin } from "../../erpSession.ts";
+import { debug } from "../../logger.ts";
 import { adoptElement, setBusy } from "../../retailVistaUtils.ts";
 import { afterReveal } from "../../reveal.ts";
 import { LOGIN_FOOTER_CONTAINER_SELECTOR } from "../../constants.ts";
@@ -22,6 +24,25 @@ const PASSWORD_INPUT = "#Input_Password";
 // rejected login (the portal re-renders this page) or an expiry redirect. Drop
 // whatever name was stored so nothing stale can outlive the session.
 clearCurrentUser();
+
+// How long the ERP sign-in may hold up the portal's own. Long enough for a slow
+// answer on a shop connection, short enough that an ERP which is simply not
+// there is a pause rather than a wait.
+const ERP_SIGN_IN_BUDGET = 6000;
+
+// Whether the portal's post has already been let go, so a second press does not
+// start a second one.
+let signingIn = false;
+
+// Resolves to false rather than hanging when the budget runs out. The sign-in
+// itself is left running -- there is nothing to cancel a fetch usefully here,
+// and if it lands late it lands into the session that is about to exist anyway.
+function withTimeout(work: Promise<boolean>, budget: number): Promise<boolean> {
+	return Promise.race([
+		work,
+		new Promise<boolean>((resolve) => setTimeout(() => resolve(false), budget)),
+	]);
+}
 
 // Where the minimal footer bar mounts. Built here rather than in `main.ts`
 // because this page owns its whole layout: the portal serves it with a bare
@@ -72,11 +93,13 @@ function replacePortalLoginBlock() {
 	// submit button left inside it is what a return key in a field still finds.
 	document.querySelector(".mainContainer")?.classList.add("pse-portal-replaced");
 
-	// Store the submitted name. If the login is rejected the page reloads and
-	// the clear above runs again, so only a successful login leaves a name
-	// behind. Nothing here prevents the default: the portal's own post is what
-	// logs in, this only listens in on it.
-	document.querySelector(`#${LOGIN_FORM_ID}`)?.addEventListener("submit", () => {
+	// Store the submitted name, and sign into the ERP with the same credentials.
+	//
+	// If the login is rejected the page reloads and the clear above runs again,
+	// so only a successful login leaves a name behind.
+	const form = document.querySelector<HTMLFormElement>(`#${LOGIN_FORM_ID}`);
+
+	form?.addEventListener("submit", (event) => {
 		// The portal's post takes a moment and the browser keeps this page up
 		// until it answers, so the overlay is what says the sign-in was taken.
 		// This page is served without one of the portal's, so `setBusy` supplies
@@ -85,12 +108,46 @@ function replacePortalLoginBlock() {
 
 		const userName = document.querySelector<HTMLInputElement>(USER_NAME_INPUT)?.value.trim();
 		const companyNumber = document.querySelector<HTMLInputElement>(COMPANY_INPUT)?.value.trim() ?? "";
+		const password = document.querySelector<HTMLInputElement>(PASSWORD_INPUT)?.value ?? "";
 
 		if (userName) {
 			setCurrentUser({ userName, companyNumber, loggedInAt: Date.now() });
 		} else {
 			clearCurrentUser();
 		}
+
+		event.preventDefault();
+
+		// A second press while the first is still in flight. Dropped rather than
+		// queued: the post it would start is the same one already on its way.
+		if (signingIn) {
+			return;
+		}
+
+		signingIn = true;
+
+		// The ERP is a second session with a second sign-in, and this is the one
+		// moment the password exists on this machine -- so it is used here and
+		// nowhere else. Nothing about it is stored; when the ERP session later
+		// lapses on its own clock the operator is asked again. See
+		// `src/erpSession.ts`.
+		//
+		// Raced against a timer, and the portal's post goes ahead whatever the
+		// race returns. Signing into the ERP is what makes the rack bays work;
+		// it is not what makes packing work, and an ERP that is slow or down must
+		// not be able to hold somebody out of the portal.
+		withTimeout(erpLogin(companyNumber, userName ?? "", password), ERP_SIGN_IN_BUDGET)
+			.catch(() => false)
+			.then((signedIn) => {
+				if (!signedIn) {
+					// Not shown to the operator: they are on their way into the
+					// portal and the bays will ask for themselves when one is
+					// pressed.
+					debug("Signed into the portal without an ERP session.");
+				}
+
+				form.submit();
+			});
 	});
 }
 

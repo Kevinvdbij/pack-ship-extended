@@ -22,6 +22,22 @@ type SettingsData = {
 	// off hides what is there rather than stopping it being kept -- and turning
 	// it back on shows the reservations packed while it was off.
 	showCompletedHistory: boolean,
+	// Whether a rack bay is picked for the whole order or one per product line.
+	// See `src/slots.ts`. Per order is the ordinary way an order is parked --
+	// everything of it goes in one bay -- and per line is for the orders whose
+	// items arrive far enough apart to be shelved separately.
+	slotScope: "order" | "line",
+	// How many seconds the workplace may stand untouched before it is signed out
+	// of the portal, or 0 for never. See `src/idleLogout.ts`.
+	//
+	// Seconds rather than minutes, which is not the unit it is picked in -- the
+	// dialog offers minutes. Stored this way so a time shorter than a minute can
+	// be set at all, which is what it took to watch this work end to end without
+	// standing at a counter for a quarter of an hour.
+	//
+	// Per machine, like the environment: what counts as "nobody is here" is a
+	// fact about where the station stands rather than about the portal.
+	idleLogoutSeconds: number,
 	// The audible cues, one switch each -- see `src/sounds.ts`. A scan that
 	// landed, a scan that landed wrong, and a step that failed.
 	soundSuccess: boolean,
@@ -38,6 +54,12 @@ function defaults(): SettingsData {
 		environmentId: -1,
 		environmentName: "",
 		showCompletedHistory: true,
+		slotScope: "order",
+		// A quarter of an hour: long enough to walk a reservation to the counter
+		// and back without being signed out mid-pack, short enough that a station
+		// left at the end of a shift is not still somebody's session an hour
+		// later.
+		idleLogoutSeconds: 15 * 60,
 		soundSuccess: true,
 		soundWarning: true,
 		soundError: true
@@ -64,6 +86,8 @@ const Settings = {
 			environmentId: this.environmentId,
 			environmentName: this.environmentName,
 			showCompletedHistory: this.showCompletedHistory,
+			slotScope: this.slotScope,
+			idleLogoutSeconds: this.idleLogoutSeconds,
 			soundSuccess: this.soundSuccess,
 			soundWarning: this.soundWarning,
 			soundError: this.soundError

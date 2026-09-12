@@ -1,7 +1,8 @@
 <script setup lang="ts">
-import { computed } from "vue";
+import { computed, ref, watch } from "vue";
 import ShopwareLogoIconUrl from "../../assets/shopware.svg";
 import { ShopwareOrderEntry } from "../../shopware.ts";
+import { parseComment, stripMarkers } from "../../slots.ts";
 
 // The customer's note on the webshop order, shown wherever a reservation is.
 // One component for both places it appears -- the reservation sidebar and every
@@ -30,13 +31,67 @@ const props = defineProps<{
 
 defineEmits<{ save: []; open: [] }>();
 
-// Whitespace is not a note. The field is edited elsewhere in Shopware too, so
-// an order can come back holding nothing but a stray newline.
-const hasNote = computed(() => Boolean(props.orderData?.customerComment?.trim()));
+// The customer's note, with any rack bays left on it taken off.
+//
+// The bays are kept on the reservation now, not here -- see `src/vue/slotStore.ts`
+// for why they moved. But this field carried them until that change, so orders
+// packed before it still have a `[PSE-VAK] ... [/PSE-VAK]` block on the end of
+// their comment, and a packer should no more see that block today than they did
+// when it was live. So it is still stripped on the way in.
+//
+// It is not written back. A note saved from here is the customer's text alone,
+// which drops whatever stale block the order was carrying -- correct, since the
+// bays it named are no longer read from here, and leaving it would mean orders
+// quietly keeping a second, older answer to where they are parked.
+const note = computed({
+	get: () => (props.orderData ? parseComment(props.orderData.customerComment).text : ""),
+	set: (value: string) => {
+		if (props.orderData) {
+			props.orderData.customerComment = stripMarkers(value);
+		}
+	},
+});
+
+// Whitespace is not a note, and neither is a bare bay marker on an order nobody
+// wrote anything on. The field is edited elsewhere in Shopware too, so an order
+// can come back holding nothing but a stray newline.
+const hasNote = computed(() => Boolean(note.value.trim()));
 
 // The controls are dead until there is an order to act on, whatever the caller
 // says about a save being in flight.
 const ready = computed(() => props.enabled && Boolean(props.orderData));
+
+// Still on its way. Both places this card is used render it only for orders that
+// came from the webshop and then fetch them, so no order yet always means the
+// request is out -- the sidebar's for the one order it is about, the selection
+// modal's for the card it belongs to.
+//
+// Worth saying on the bar rather than only behind it. Folded shut, the card is
+// one line, and a line that says "Shopware notitie" with nothing beside it looks
+// like an answer: no note. The spinner is the difference between that and "we do
+// not know yet", which on a screen where a note is an instruction about the
+// parcel is a difference the packer should not have to open the card to find.
+const loading = computed(() => !props.orderData);
+
+// ---- Folded away when there is nothing in it ----
+//
+// Most orders carry no note, and on those this card was a box of empty grey
+// taking the top of the column -- the most valuable space on the screen spent
+// saying "nothing here". Folded, it is a line, and what is under it moves up.
+//
+// The order decides which way it opens, not the packer: a note is an instruction
+// about the parcel being packed, so an order that has one arrives open. It is
+// still a control, so anybody can fold it shut or open an empty one to write in.
+const open = ref(false);
+
+// Opened when the order lands rather than at setup, because at setup there is no
+// order yet -- the sidebar is still asking Shopware for it. This is the moment
+// the answer arrives, and it is the one unfolding anybody sees.
+watch(() => props.orderData, (order) => {
+	if (order) {
+		open.value = hasNote.value;
+	}
+}, { immediate: true });
 </script>
 
 <template>
@@ -52,15 +107,31 @@ const ready = computed(() => props.enabled && Boolean(props.orderData));
 		</Transition>
 
 		<div class="pse-note-card">
-			<header class="pse-note-head">
+			<button type="button" class="pse-note-head" :aria-expanded="open"
+				:title="open ? 'Notitie inklappen' : 'Notitie uitklappen'" @click="open = !open">
 				<img class="pse-note-logo" :src="ShopwareLogoIconUrl" alt="" />
 				<h3 class="pse-note-title">Shopware notitie</h3>
-			</header>
 
+				<!-- What is being folded away, said on the line that folds it. An
+				     order with a note never shows this -- it arrives open. -->
+				<span v-if="loading" class="pse-note-spinner" role="status" aria-label="Notitie wordt opgehaald"></span>
+				<span v-else-if="!open && !hasNote" class="pse-note-empty">Geen notitie</span>
+
+				<span class="material-icons pse-note-chevron" :class="{ 'is-open': open }"
+					aria-hidden="true">expand_more</span>
+			</button>
+
+			<!-- The fold. A grid row from 0fr to 1fr rather than a height, so the
+			     box opens to exactly what is in it without anything having to
+			     measure it first -- which for a note box is the whole problem, since
+			     `field-sizing: content` means its height is the length of what the
+			     customer wrote. -->
+			<div class="pse-note-collapse" :class="{ 'is-open': open }">
+			<div class="pse-note-collapse-inner">
 			<div class="pse-note-body">
 				<!-- Same box either way, so the order arriving does not resize the
 				     card. Disabled and empty while it is still on its way. -->
-				<textarea v-if="orderData" class="pse-note-field" v-model="orderData.customerComment"
+				<textarea v-if="orderData" class="pse-note-field" v-model="note"
 					:disabled="!ready" :placeholder="ready ? 'Nog geen notitie...' : ''"></textarea>
 				<div v-else class="pse-note-field pse-note-field-waiting" aria-hidden="true">
 					<span class="pse-note-shimmer"></span>
@@ -76,6 +147,8 @@ const ready = computed(() => props.enabled && Boolean(props.orderData));
 						Opslaan
 					</button>
 				</div>
+			</div>
+			</div>
 			</div>
 		</div>
 	</section>
@@ -144,13 +217,114 @@ const ready = computed(() => props.enabled && Boolean(props.orderData));
 	box-shadow: 0 1px 2px rgba(20, 48, 33, 0.04);
 }
 
+/* The header is the control that folds the card, so it is a button -- full
+   width, and wearing the same tinted strip it did when it was a caption. The
+   border under it goes when the card is shut: a rule under nothing reads as a
+   box that failed to render. */
 .pse-note-head {
 	display: flex;
 	align-items: center;
 	gap: 9px;
+	width: 100%;
 	padding: 10px 14px;
+	border: 0;
 	border-bottom: 1px solid var(--pse-line);
 	background-color: var(--pse-well);
+	font: inherit;
+	text-align: left;
+	cursor: pointer;
+	transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+/* Shut, there is nothing under the rule for it to separate. */
+.pse-note-head[aria-expanded="false"] {
+	border-bottom-color: transparent;
+}
+
+.pse-note-head:hover {
+	background-color: var(--pse-brand-soft);
+}
+
+.pse-note-head:focus {
+	outline: none;
+}
+
+.pse-note-head:focus-visible {
+	outline: none;
+	box-shadow: inset 0 0 0 2px var(--pse-brand-ring);
+}
+
+/* Takes the space so the chevron sits at the far edge. */
+.pse-note-title {
+	flex: 1;
+	min-width: 0;
+}
+
+.pse-note-empty {
+	flex: none;
+	font-size: 11.5px;
+	font-weight: 550;
+	color: var(--pse-ink-faint);
+}
+
+/* ---- Waiting for Shopware ---- *
+ * A ring with one quarter of it in the brand green, turning. Sized to the text
+ * beside it rather than to the chevron, so the bar does not change height when
+ * it appears and again when it goes.
+ */
+.pse-note-spinner {
+	flex: none;
+	width: 13px;
+	height: 13px;
+	border: 2px solid var(--pse-line);
+	border-top-color: var(--pse-brand);
+	border-radius: 50%;
+	animation: pse-note-spin 0.7s linear infinite;
+}
+
+@keyframes pse-note-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+.pse-note-chevron {
+	flex: none;
+	font-size: 19px;
+	color: var(--pse-ink-faint);
+	transition: transform 0.28s ease;
+}
+
+.pse-note-chevron.is-open {
+	transform: rotate(180deg);
+}
+
+/* ---- The fold ---- *
+ * `grid-template-rows: 0fr -> 1fr` animates to the content's own height with
+ * nothing having to measure it, which is what a box that sizes itself to the
+ * text in it needs. The contents fade slightly behind the opening so the note
+ * arrives rather than being dragged out.
+ */
+.pse-note-collapse {
+	display: grid;
+	grid-template-rows: 0fr;
+	transition: grid-template-rows 0.28s cubic-bezier(0.33, 1, 0.68, 1);
+}
+
+.pse-note-collapse.is-open {
+	grid-template-rows: 1fr;
+}
+
+.pse-note-collapse-inner {
+	min-height: 0;
+	overflow: hidden;
+	opacity: 0;
+	transition: opacity 0.2s ease;
+}
+
+.pse-note-collapse.is-open .pse-note-collapse-inner {
+	opacity: 1;
+	transition-delay: 0.06s;
 }
 
 /* Desaturated to sit with the label beside it. In Shopware's own blue on the
@@ -322,6 +496,17 @@ const ready = computed(() => props.enabled && Boolean(props.orderData));
 }
 
 @media (prefers-reduced-motion: reduce) {
+	.pse-note-collapse,
+	.pse-note-collapse-inner,
+	.pse-note-chevron {
+		transition: none;
+	}
+
+	/* Still has to say it is working, so it breathes instead of turning. */
+	.pse-note-spinner {
+		animation: pse-note-pulse 1.4s ease-in-out infinite;
+	}
+
 	.pse-note-alert {
 		animation: none;
 		border-color: rgba(180, 118, 20, 0.75);

@@ -762,3 +762,129 @@ select.pse-dialog-input {
 .pse-back-icon {
 	font-size: 19px;
 }
+
+/* ---- Rack bays ---- *
+ * The control that says where an order, or one line of it, is standing. Shared
+ * because it appears in two places that are not one component tree: the card in
+ * the sidebar and the "Vak" column of the product table on the parcels page.
+ *
+ * Always the same object -- a bay's name on a pill -- so a bay is recognised as
+ * a bay wherever it is met, and an empty one reads as somewhere to put something
+ * rather than as a missing value.
+ */
+.pse-slot-chip {
+	display: inline-flex;
+	align-items: center;
+	justify-content: center;
+	gap: 5px;
+	min-width: 58px;
+	height: 32px;
+	padding: 0 12px;
+	border: 1px solid var(--pse-brand-ring);
+	border-radius: 10px;
+	background-color: var(--pse-brand-soft);
+	font: inherit;
+	font-size: 13px;
+	font-weight: 700;
+	font-variant-numeric: tabular-nums;
+	color: var(--pse-brand-ink);
+	white-space: nowrap;
+	cursor: pointer;
+	transition: border-color 0.15s ease, background-color 0.15s ease, color 0.15s ease,
+		box-shadow 0.15s ease;
+}
+
+.pse-slot-chip:hover:not(:disabled):not(.is-static) {
+	border-color: var(--pse-brand-ink);
+	background-color: var(--pse-brand-ink);
+	color: #ffffff;
+}
+
+.pse-slot-chip:focus {
+	outline: none;
+}
+
+.pse-slot-chip:focus-visible {
+	outline: none;
+	box-shadow: 0 0 0 3px var(--pse-brand-ring);
+}
+
+/* Nothing in it yet. Dashed and faint: an outline of a place rather than a
+   filled one, which is the difference the packer is scanning the column for. */
+.pse-slot-chip.is-empty {
+	border-style: dashed;
+	border-color: var(--pse-line);
+	background-color: transparent;
+	font-weight: 600;
+	color: var(--pse-ink-faint);
+}
+
+.pse-slot-chip.is-empty:hover:not(:disabled) {
+	border-style: solid;
+	border-color: var(--pse-brand);
+	background-color: var(--pse-brand-soft);
+	color: var(--pse-brand-ink);
+}
+
+/* An empty bay on a screen that is not the one that fills it: the parcels table
+   on a workplace set to one bay per order, where the column is only shown
+   because somebody else parked this order per line. It keeps the outline of a
+   place -- there is still nothing standing there -- but faded, so it reads as
+   not-for-you here rather than as a control that is loading. */
+.pse-slot-chip.is-empty:disabled {
+	border-style: dashed;
+	border-color: var(--pse-line);
+	background-color: transparent;
+	color: var(--pse-ink-faint);
+	opacity: 0.55;
+}
+
+.pse-slot-chip:disabled {
+	border-color: var(--pse-line);
+	background-color: var(--pse-well);
+	color: var(--pse-ink-faint);
+	cursor: not-allowed;
+}
+
+/* The one in the sidebar, which is walked to from across the room. */
+.pse-slot-chip.is-large {
+	width: 100%;
+	height: 46px;
+	font-size: 20px;
+	letter-spacing: 0.02em;
+}
+
+/* A bay being reported rather than set. */
+.pse-slot-chip.is-static {
+	cursor: default;
+}
+
+.pse-slot-chip-empty {
+	display: inline-flex;
+	align-items: center;
+	gap: 4px;
+	font-size: 13px;
+}
+
+.pse-slot-chip-empty-icon {
+	font-size: 17px;
+}
+
+/* The frame the reservation note is read and written through -- see
+   `src/reservationNote.ts`. It holds a full ERP page, which is only ever acted
+   on by script, so it is taken out of the layout entirely rather than merely
+   made small: off screen so it cannot be reached by tab or by touch, and with no
+   size of its own so nothing it renders can push the page about. Not
+   `display: none`, and not `visibility: hidden` either -- neither is a reliable
+   way to keep a document laying itself out, and the page inside this one has to
+   run its own scripts and measure its own controls. Off screen is the one form
+   of hiding that changes nothing about how it behaves. */
+.pse-erp-frame {
+	position: fixed;
+	left: -10000px;
+	top: 0;
+	width: 1280px;
+	height: 900px;
+	border: 0;
+	pointer-events: none;
+}

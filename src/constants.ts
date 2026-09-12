@@ -4,6 +4,82 @@ export const PACKING_PORTAL_URL = "https://retailvista.net/outdoor/packship";
 
 export const SHOPWARE_URL = "https://www.kampeerhalroden.nl";
 
+// The ERP the packing portal is a front for, and which owns the reservation
+// itself. The same origin as the portal -- `/outdoor/packship` is a sub
+// application of `/outdoor` -- which is the whole reason the rack bays can be
+// kept on the reservation at all: a page of ours can load an ERP page in a
+// frame and read it, with no CORS to negotiate and no credentials of its own.
+//
+// It is not, however, the same session. Signing into the portal does not sign
+// anyone into the ERP, so `src/erpSession.ts` signs in a second time with the
+// credentials the login form was given. See `LoginPage.vue`.
+export const ERP_URL = "https://retailvista.net/outdoor";
+
+// The ERP's WebForms login, and the three fields on it. Named in full because
+// they are posted by name: the sign-in is a form post rather than a call to an
+// interface meant for one.
+export const ERP_LOGIN_PATH = "/Login.aspx";
+export const ERP_LOGIN_FIELDS = {
+	companyNumber: "ctl00$MasterContent$txtCompanyNumber$TextBox",
+	userName: "ctl00$MasterContent$txtUsername$TextBox",
+	password: "ctl00$MasterContent$txtPassword$TextBox",
+	submit: "ctl00$MasterContent$cmdLogin",
+} as const;
+
+// The ERP's application page. `RetailVista.aspx` is only a launcher -- it
+// redirects to `Index.aspx`, which pops the application into a window of its
+// own -- so the page that actually holds the application is this one, addressed
+// by the id of the screen wanted.
+//
+// 374 is reservation maintenance. The ids are the ERP's own, read off the menu
+// markup `Default.aspx` serves; they are stable for a given release and are
+// worth checking after a RetailVista update.
+export const ERP_PAGE_PATH = "/Default.aspx";
+export const ERP_RESERVATION_PAGE_ID = 374;
+
+// How a record is opened on that page.
+//
+// Not by query string: `itemId=` is ignored, and the page comes up empty with
+// it. The page loads its own record through a function of its own, which is
+// called on the frame's window -- and being the page's own function it does the
+// postback, carries the view state and leaves us nothing to reimplement.
+//
+// The argument is the reservation's internal id -- `#ReservationId` on the
+// portal's pages -- and not the reservation number the operator reads.
+export const ERP_SET_ITEM_FUNCTION = "SetDisplayItemId";
+
+// The note field on that screen, and the two controls that make it writable and
+// then save it. The note is `readOnly` until the record is put into edit mode.
+//
+// Matched on the tail of the name rather than written out in full: the control
+// is nested several naming containers deep and the prefix is a fact about where
+// the page puts its content, which is exactly the part most likely to shift.
+export const ERP_NOTE_SELECTOR = '[name$="rvcNote$TextBox"]';
+export const ERP_EDIT_BUTTON_ID = "ctl00_ctl00_MasterContent_NavigationIcons_ctl00_cmdEdit";
+
+// The save is the navigation bar's, beside the edit it undoes -- not the one on
+// the tab control. There are three controls on this page whose id contains
+// `cmdSave` and only this one is ever visible; the other two belong to the tab
+// strip and are rendered whether or not anything can be saved. Picking by name
+// alone found one of those, and pressing it did nothing that reached the record.
+export const ERP_SAVE_BUTTON_ID = "ctl00_ctl00_MasterContent_NavigationIcons_ctl00_cmdSave";
+
+// What a page served to a signed-out browser has on it. The ERP answers an
+// unauthenticated request with its login form rather than with a status, so
+// "is there a session" starts by looking for the company number box.
+export const ERP_LOGIN_MARKER = "txtCompanyNumber";
+
+// ...and is not finished by it. There is a third thing the ERP can serve: a
+// short page with an empty title that is neither the login form nor the
+// application -- what comes back when the session exists but the application
+// could not start, which is what a sign-in that lost the culture produces. It
+// has no company number box on it, so "not the login form" reads as signed in
+// and everything downstream then fails for reasons that make no sense.
+//
+// So the question is asked the other way round, of something only the working
+// application has: the quick navigation box, which is on every page of it.
+export const ERP_APP_MARKER = "QuickNavigation";
+
 // The environment ("Omgeving") picker the portal renders in its footer. Note
 // the portal's own spelling of "Enviroment" — matching it is not a typo here.
 export const ENVIRONMENT_FORM_SELECTOR = "form#selectEnviroment";
@@ -211,6 +287,13 @@ export const STORAGE_KEYS = {
 	currentUser: "PSE_Current_User",
 	// What the last update check found, shared by every tab on the machine.
 	updateCheck: "PSE_Update_Check",
+	// When this machine was last touched by somebody, and whether a sign-out is
+	// owed. Both are shared by every tab in the profile: the tabs are one
+	// workplace, so a packer working in one of them keeps all of them signed in,
+	// and a sign-out that could not be carried out on one page is carried out on
+	// the next. See `src/idleLogout.ts`.
+	idleActivity: "PSE_Idle_Activity",
+	pendingLogout: "PSE_Pending_Logout",
 	swClientId: "PSE_Shopware_Client_Id",
 	swClientSecret: "PSE_Shopware_Client_Secret",
 	// Suffixed with a reservation number, one key per mass complete entry.

@@ -2,6 +2,8 @@
 import { computed, onMounted, ref, Teleport, Transition } from 'vue';
 import Modal from "../components/SettingsModal.vue";
 import CredentialsPrompt from "../components/CredentialsPrompt.vue";
+import ErpLoginPrompt from "../components/ErpLoginPrompt.vue";
+import { erpStore } from "../erpStore.ts";
 import pkg from "../../../package.json";
 import installIconUrl from "../../assets/install.svg";
 import powerIconUrl from "../../assets/power.svg";
@@ -185,6 +187,16 @@ function masterSwitchToggle() {
 		<Transition name="modal">
 			<CredentialsPrompt v-if="showCredentialsPrompt && !showModal"
 				@saved="showCredentialsPrompt = false" @dismiss="showCredentialsPrompt = false" />
+		</Transition>
+
+		<!-- The ERP session, which expires on its own clock rather than with the
+		     portal's. Raised by whatever press was refused, from here because the
+		     footer is the one mount on every page -- the bays are shown in two
+		     others, and a dialog per mount would mean two of them. Not on the
+		     minimal bar: that is the login page, where there is no session of
+		     either kind yet. -->
+		<Transition name="modal">
+			<ErpLoginPrompt v-if="!minimal && erpStore.signedOut.value && !showModal" @done="() => undefined" />
 		</Transition>
 	</Teleport>
 </template>
