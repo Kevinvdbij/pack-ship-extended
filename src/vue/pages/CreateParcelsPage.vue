@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, onMounted, ref, Transition } from 'vue';
+import { computed, onMounted, ref, Transition, watchEffect } from 'vue';
 import * as RVUtils from '../../retailVistaUtils.ts';
 import { domReady, mountApp } from '../mount.ts';
 import {
@@ -15,6 +15,8 @@ import { MassCompleteStatus, ParcelItem, VerificationRow } from '../../interface
 import ReservationSidebar from '../components/ReservationSidebar.vue';
 import CopyButton from '../components/CopyButton.vue';
 import ImageModal from '../components/ImageModal.vue';
+import SlotPicker from '../components/SlotPicker.vue';
+import { slotStore } from '../slotStore.ts';
 import Settings from '../../settings.ts';
 import * as Shopware from "../../shopware.ts";
 import { playSound, warmUpAudio } from '../../sounds.ts';
@@ -59,6 +61,82 @@ const parcelItems = ref<ParcelItem[]>(RVUtils.getParcelItems());
 const lines = computed(() => RVUtils.groupVerificationRows(rows.value, parcelItems.value));
 const showImageModal = ref(false);
 const imageModalUrl = ref("");
+
+// ---- Rack bays ----
+//
+// A multi-line order is rarely packed in one visit: what is here goes in a bay
+// of the rack and waits for the rest. With the bay set per product line this
+// column is where it is picked, and the line the picker is open for is held
+// here -- the dialog is one dialog, opened from whichever row was pressed.
+//
+// The bays themselves are in `slotStore`, which the sidebar fills in once
+// Shopware has answered for this order. Until it has, the column renders its
+// resting state and the chips are dead: a bay written against no order is a bay
+// that is not written down anywhere.
+const slotLine = ref<{ barcode: string; description: string }>();
+const showSlotPicker = computed(() => Boolean(slotLine.value));
+
+// The column is shown when this workplace picks bays per line, and also when
+// this order already has one -- whoever set it, on whatever workplace, with
+// whatever setting. An order parked per line and then opened on a screen set to
+// per order would otherwise have its bays on it and nothing showing them, which
+// is the one state this must not produce: the items are standing in the rack.
+//
+// It follows that the column can appear once Shopware has answered rather than
+// with the table. That is a shift on the screen, and it is the right one: the
+// alternative is holding the whole table on a request, and the bays are not
+// what the first seconds of this page are for.
+// One line, one unit: nothing about this order waits in the rack, so no bay is
+// offered anywhere on the page. Watched rather than read once -- on a page that
+// mounts mid-parse the rows can arrive a moment after this runs -- and told to
+// the store, which is what the sidebar's own mount reads it from.
+watchEffect(() => {
+	slotStore.setSingleUnit(lines.value.length == 1 && lines.value[0].requiredQuantity == 1);
+});
+
+const perLineSlots = computed(() => slotStore.showSlots.value
+	&& (slotStore.scope.value == "line" || slotStore.hasLineSlots.value));
+
+// Whether a line that has no bay yet may be given one here. Only while this
+// workplace picks bays per line: on a workplace set to one bay per order the
+// column is being shown because somebody else parked this order that way, and
+// what it is there for is reading and correcting their bays -- not quietly
+// starting to park the rest of the order by a rule this screen is not set to.
+//
+// So the bays that exist stay live and the empty ones are dead. A packer who
+// wants to add one changes the setting, which is a decision about how this
+// workplace works rather than something to fall into one row at a time.
+const canAssignLines = computed(() => slotStore.scope.value == "line");
+
+function lineChipDisabled(barcode: string): boolean {
+	return !slotStore.ready.value
+		|| slotStore.saving.value
+		|| (!slotStore.lineSlot(barcode) && !canAssignLines.value);
+}
+
+function lineChipTitle(barcode: string): string {
+	const current = slotStore.lineSlot(barcode);
+
+	if (current) {
+		return `Staat in vak ${current}`;
+	}
+
+	return canAssignLines.value
+		? "Kies een vak voor dit product"
+		: "Deze werkplek zet één vak per order. Zet de instelling op 'een vak per productregel' om losse regels weg te zetten.";
+}
+// The table's own width, which the skeleton has to match cell for cell.
+const columnCount = computed(() => (perLineSlots.value ? 6 : 5));
+
+function onPickSlot(slot: string) {
+	const line = slotLine.value;
+
+	slotLine.value = undefined;
+
+	if (line) {
+		slotStore.setLineSlot(line.barcode, slot);
+	}
+}
 
 onMounted(() => {
 	domReady()
@@ -299,7 +377,7 @@ function watchScannerFocus() {
 
 // Called after the parcel area has been rewritten, and only then.
 function restoreScannerFocus() {
-	if (!focusedScanInput || showImageModal.value) {
+	if (!focusedScanInput || showImageModal.value || showSlotPicker.value) {
 		return;
 	}
 
@@ -462,6 +540,15 @@ async function removeParcelItems(): Promise<void> {
 		</Transition>
 	</Teleport>
 
+	<Teleport to="body">
+		<Transition name="modal">
+			<SlotPicker v-if="slotLine" :subject="slotLine.description"
+				:current="slotStore.lineSlot(slotLine.barcode)"
+				:taken="slotStore.takenBy(slotLine.barcode)" @pick="onPickSlot"
+				@close="slotLine = undefined" />
+		</Transition>
+	</Teleport>
+
 	<section class="pse-products">
 		<header class="pse-products-head">
 			<h2 class="pse-products-title">Producten</h2>
@@ -479,6 +566,7 @@ async function removeParcelItems(): Promise<void> {
 						<th>Hoofd barcode</th>
 						<th>Gescand</th>
 						<th class="pse-table-centre">Verzameld</th>
+						<th v-if="perLineSlots" class="pse-table-centre">Vak</th>
 						<th class="pse-table-right">Actie</th>
 					</tr>
 				</thead>
@@ -502,6 +590,25 @@ async function removeParcelItems(): Promise<void> {
 								class="material-icons pse-mark pse-mark-done">check_circle</span>
 							<span v-else class="material-icons pse-mark pse-mark-open">radio_button_unchecked</span>
 						</td>
+						<!-- Where this line is standing. Its own column rather than a
+						     third button in the action group: it carries a value that is
+						     read off the screen, and the actions beside it are things you
+						     press. -->
+						<td v-if="perLineSlots" class="pse-table-centre">
+							<button type="button" class="pse-slot-chip"
+								:class="{ 'is-empty': !slotStore.lineSlot(product.mainBarcode) }"
+								:disabled="lineChipDisabled(product.mainBarcode)"
+								:title="lineChipTitle(product.mainBarcode)"
+								@click="slotLine = { barcode: product.mainBarcode, description: product.description }">
+								<span v-if="slotStore.lineSlot(product.mainBarcode)" class="pse-slot-chip-label">
+									{{ slotStore.lineSlot(product.mainBarcode) }}
+								</span>
+								<span v-else class="pse-slot-chip-empty">
+									<span class="material-icons pse-slot-chip-empty-icon" aria-hidden="true">add</span>
+									Vak
+								</span>
+							</button>
+						</td>
 						<td class="pse-table-right">
 							<div class="pse-actions">
 								<button type="button" class="pse-action" title="Product toevoegen"
@@ -524,7 +631,7 @@ async function removeParcelItems(): Promise<void> {
 				     changing under it; a reservation opened clean never renders it. -->
 				<tbody v-else aria-hidden="true">
 					<tr v-for="line in lines" :key="line.key" class="pse-skeleton-row">
-						<td v-for="cell in 5" :key="cell"><span class="pse-skeleton-cell"></span></td>
+						<td v-for="cell in columnCount" :key="cell"><span class="pse-skeleton-cell"></span></td>
 					</tr>
 				</tbody>
 			</table>

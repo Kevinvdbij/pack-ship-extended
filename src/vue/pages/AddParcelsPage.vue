@@ -4,16 +4,22 @@ import ReservationProducts from '../components/ReservationProducts.vue';
 import BackLink from '../components/BackLink.vue';
 import { mountApp } from '../mount.ts';
 import {
-	getCurrentReservationNumber,
+	getCachedProducts,
 	getParcelContainerParent,
 	getReservationSidebarColumn,
-	retrieveCachedReservationDetails,
+	isSingleUnitOrder,
 } from '../../retailVistaUtils.ts';
+import { slotStore } from '../slotStore.ts';
 import { debug } from '../../logger.ts';
 
 // Adding a parcel to a reservation that has already been packed. The portal
 // owns the work on this page; what we add is the column beside it and, when we
 // can, the list of what the order was for.
+// Before the sidebar, which is what shows the rack bay: a single-line order of
+// one never waits in the rack, and a card that appears and then takes itself
+// away is worse than one that was never there.
+slotStore.setSingleUnit(isSingleUnitOrder(cachedProducts()));
+
 mountSidebar();
 mountProducts();
 mountBackLink();
@@ -84,21 +90,10 @@ function mountBackLink() {
 	mountApp(BackLink, (host) => column.insertAdjacentElement("afterbegin", host));
 }
 
+// The portal serves this route as a plain search form when the reservation turns
+// out not to be processed yet, which the shared reader answers with nothing.
 function cachedProducts() {
-	try {
-		const reservationNumber = getCurrentReservationNumber();
-
-		return retrieveCachedReservationDetails()
-			.find((reservation) => reservation.id == reservationNumber)
-			?.products;
-	} catch (error) {
-		// The portal serves this route as a plain search form when the
-		// reservation turns out not to be processed yet, and that page has no
-		// reservation on it to be about.
-		debug("No reservation on this page.", error);
-
-		return undefined;
-	}
+	return getCachedProducts();
 }
 </script>
 

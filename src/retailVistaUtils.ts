@@ -654,6 +654,34 @@ export async function handleUnfinishedRun(target:HTMLElement): Promise<string> {
 	});
 }
 
+// What the reservation on this page was for, as far as this workstation still
+// remembers. Filled while packing, keyed by reservation number, and therefore
+// present exactly when this workstation is the one that packed it.
+//
+// Guarded, because the pages that ask are served as a plain search form when the
+// reservation turns out not to be on them: no reservation is not an error here,
+// it is an answer.
+export function getCachedProducts(): ProductDetails[] | undefined {
+	try {
+		const reservationNumber = getCurrentReservationNumber();
+
+		return retrieveCachedReservationDetails()
+			.find((reservation) => reservation.id == reservationNumber)
+			?.products;
+	} catch (error) {
+		debug("No reservation on this page.", error);
+
+		return undefined;
+	}
+}
+
+// One product, one of it -- the order that is packed in a single visit and never
+// waits in the rack. Unknown counts as no: a reservation we cannot see the rows
+// of is one to offer the bay for rather than one to withhold it from.
+export function isSingleUnitOrder(products: ProductDetails[] | undefined): boolean {
+	return products?.length == 1 && products[0].requiredQuantity == 1;
+}
+
 export function matchShopwareOrderNumber(value: string):boolean {
 	return /^[0-9]{6,6}$/.test(value);
 }

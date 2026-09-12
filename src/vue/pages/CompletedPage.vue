@@ -7,6 +7,7 @@ import { afterPaint, afterReveal } from '../../reveal.ts';
 import { standInForPortalPage } from '../../standIn.ts';
 import { playSound } from '../../sounds.ts';
 import ReservationSidebar from '../components/ReservationSidebar.vue';
+import { slotStore } from '../slotStore.ts';
 import CopyButton from '../components/CopyButton.vue';
 import {
 	COMPLETED_CONTAINER_SELECTOR, COMPLETED_HEADING_SELECTOR, COMPLETED_PROCEED_SELECTOR,
@@ -15,6 +16,12 @@ import {
 	COMPLETED_PROCEED_FALLBACK_SELECTOR, PACKING_PORTAL_URL, PARCELS_RETURN_HASH,
 	VENDOR_BAND_LOGO_SELECTOR
 } from '../../constants.ts';
+
+// Whether the rack bay is a question for this reservation, settled before the
+// sidebar renders. The rows are gone from this page -- they are all in a carrier
+// by now -- so this is what the workstation cached while packing, which is
+// absent rather than wrong when somebody else packed it.
+slotStore.setSingleUnit(RVUtils.isSingleUnitOrder(RVUtils.getCachedProducts()));
 
 // One step of the portal's own account of what it did with the reservation.
 interface Failure {

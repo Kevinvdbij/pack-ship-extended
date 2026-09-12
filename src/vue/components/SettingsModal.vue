@@ -7,6 +7,7 @@ import ModalShell from "./ModalShell.vue";
 import { previewSound, type SoundKind } from "../../sounds.ts";
 import { SETTINGS_SAVED_EVENT, UPDATE_INSTALL_URL } from "../../constants.ts";
 import { checkForUpdate } from "../../update.ts";
+import { restartIdleLogout } from "../../idleLogout.ts";
 import pkg from "../../../package.json";
 
 const emit = defineEmits<{ close: []; save: [] }>();
@@ -46,6 +47,21 @@ const environmentOptions = getEnvironmentOptions();
 const masterSwitch = ref(Settings.autoMasterSwitch);
 const showCompletedHistory = ref(Settings.showCompletedHistory);
 const environmentId = ref(Settings.environmentId);
+const slotScope = ref(Settings.slotScope);
+const idleLogoutSeconds = ref(Settings.idleLogoutSeconds);
+
+// The times worth offering rather than a box to type a number into. Every one of
+// these is a decision about how long a counter stands empty between reservations,
+// and picking from a list is what stops a workplace being signed out every thirty
+// seconds by a typo.
+const IDLE_TIMES = [
+	{ seconds: 0, label: "Uit -- nooit automatisch uitloggen" },
+	{ seconds: 5 * 60, label: "Na 5 minuten" },
+	{ seconds: 10 * 60, label: "Na 10 minuten" },
+	{ seconds: 15 * 60, label: "Na 15 minuten" },
+	{ seconds: 30 * 60, label: "Na 30 minuten" },
+	{ seconds: 60 * 60, label: "Na een uur" },
+];
 
 const credentials = getCredentials();
 const clientId = ref(credentials.clientId);
@@ -89,6 +105,8 @@ function save() {
 	Settings.soundWarning = soundSwitches.value.warning;
 	Settings.soundError = soundSwitches.value.error;
 	Settings.showCompletedHistory = showCompletedHistory.value;
+	Settings.slotScope = slotScope.value;
+	Settings.idleLogoutSeconds = Number(idleLogoutSeconds.value);
 	Settings.save();
 
 	// The pages are mounted separately from this footer, so anything of theirs
@@ -96,6 +114,12 @@ function save() {
 	document.dispatchEvent(new CustomEvent(SETTINGS_SAVED_EVENT));
 
 	setCredentials({ clientId: clientId.value, clientSecret: clientSecret.value });
+
+	// The timer is running in this page already, so a time that was just changed
+	// has to replace the one that was armed on load rather than wait for the next
+	// navigation -- which on a workplace that just turned the timer on could be
+	// the sign-out it was configured to prevent being late for.
+	restartIdleLogout();
 
 	// Relabels the footer and, when the environment changed, corrects the
 	// portal session.
@@ -144,6 +168,33 @@ function save() {
 			<small class="pse-dialog-hint">
 				Hoort bij deze computer en de printer erachter. Vastzetten verbergt de keuzelijst in de portal en
 				zet de omgeving bij elke pagina terug.
+			</small>
+		</div>
+
+		<div class="pse-settings-field">
+			<label class="pse-dialog-label" for="pseSlotScope">Vakken in het rek</label>
+			<select id="pseSlotScope" class="pse-dialog-input" v-model="slotScope">
+				<option value="order">Eén vak per order</option>
+				<option value="line">Een vak per productregel</option>
+			</select>
+			<small class="pse-dialog-hint">
+				Waar een order blijft staan tot de rest binnen is. Per order staat het vak naast de reservering;
+				per regel kies je het in de productlijst, voor orders waarvan de artikelen los binnenkomen. Het
+				vak wordt bij de order in Shopware bewaard, apart van de notitie van de klant.
+			</small>
+		</div>
+
+		<div class="pse-settings-field">
+			<label class="pse-dialog-label" for="pseIdleLogout">Automatisch uitloggen</label>
+			<select id="pseIdleLogout" class="pse-dialog-input" v-model.number="idleLogoutSeconds">
+				<option v-for="time in IDLE_TIMES" :key="time.seconds" :value="time.seconds">
+					{{ time.label }}
+				</option>
+			</select>
+			<small class="pse-dialog-hint">
+				Logt deze werkplek uit als er zo lang niets is aangeraakt, zodat de volgende packer niet onder
+				de naam van de vorige werkt. Een minuut van tevoren verschijnt er een waarschuwing; een toets,
+				een scan of een klik zet de teller terug. Tijdens het massaal afronden gebeurt er niets.
 			</small>
 		</div>
 
