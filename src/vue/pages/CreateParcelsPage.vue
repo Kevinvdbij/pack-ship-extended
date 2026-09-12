@@ -69,10 +69,10 @@ const imageModalUrl = ref("");
 // column is where it is picked, and the line the picker is open for is held
 // here -- the dialog is one dialog, opened from whichever row was pressed.
 //
-// The bays themselves are in `slotStore`, which the sidebar fills in once
-// Shopware has answered for this order. Until it has, the column renders its
-// resting state and the chips are dead: a bay written against no order is a bay
-// that is not written down anywhere.
+// The bays themselves are in `slotStore`, which the sidebar fills in once the
+// reservation's note has been read. Until it has, the column renders its
+// resting state and the chips are dead: a bay written against a note we have
+// not managed to read is a bay that is not written down anywhere.
 const slotLine = ref<{ barcode: string; description: string }>();
 const showSlotPicker = computed(() => Boolean(slotLine.value));
 
@@ -82,7 +82,7 @@ const showSlotPicker = computed(() => Boolean(slotLine.value));
 // per order would otherwise have its bays on it and nothing showing them, which
 // is the one state this must not produce: the items are standing in the rack.
 //
-// It follows that the column can appear once Shopware has answered rather than
+// It follows that the column can appear once the note has been read rather than
 // with the table. That is a shift on the screen, and it is the right one: the
 // alternative is holding the whole table on a request, and the bays are not
 // what the first seconds of this page are for.
