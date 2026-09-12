@@ -23,6 +23,10 @@ const props = defineProps<{
 	// and a second way in from here would land the operator in a reservation
 	// that is already being finished behind their back.
 	showOpen?: boolean;
+	// A collection order: it is in this list like any other, but a mass complete
+	// will not take it -- see the selection modal. Marked so that a row sitting
+	// out a run reads as left out on purpose rather than as forgotten.
+	pickup?: boolean;
 }>();
 
 defineEmits<{ open: [url: string] }>();
@@ -54,7 +58,11 @@ const state = computed(() => props.status == undefined
 
 		<span class="pse-row-customer">{{ reservation.customer }}</span>
 
-		<span class="pse-row-reference">{{ reservation.saleOrderReference }}</span>
+		<span class="pse-row-reference">
+			<span class="pse-row-reference-text">{{ reservation.saleOrderReference }}</span>
+
+			<span class="pse-row-tag" v-if="pickup">Afhalen in de winkel</span>
+		</span>
 
 		<!-- The status takes the place the Open button had rather than appearing
 		     beside it, so a row is the same width whether it is being picked from
@@ -110,7 +118,7 @@ const state = computed(() => props.status == undefined
 }
 
 .pse-row-customer,
-.pse-row-reference {
+.pse-row-reference-text {
 	overflow: hidden;
 	white-space: nowrap;
 	text-overflow: ellipsis;
@@ -121,9 +129,26 @@ const state = computed(() => props.status == undefined
 }
 
 .pse-row-reference {
+	display: flex;
+	align-items: center;
+	gap: 8px;
 	font-variant-numeric: tabular-nums;
 	font-size: 13px;
 	color: var(--pse-ink-soft);
+}
+
+/* The one thing on a row that is about where the box goes rather than about
+   which reservation it is, so it is the one thing on the row that is tinted. */
+.pse-row-tag {
+	flex: none;
+	padding: 2px 8px;
+	border-radius: 999px;
+	background-color: var(--pse-attention-soft);
+	font-size: 11.5px;
+	font-weight: 650;
+	font-variant-numeric: normal;
+	white-space: nowrap;
+	color: var(--pse-attention-ink);
 }
 
 /* ---- Open ---- *

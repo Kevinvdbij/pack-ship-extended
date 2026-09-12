@@ -34,6 +34,38 @@ const massCompleteMax = 50;
 const massCompleteThreshold = 2;
 const massCompleteStatus = ref<MassCompleteEntry[]>();
 
+// ---- Which singleline reservations a run may take ----
+//
+// Not the collection orders. Everything a mass complete does assumes the box
+// leaves on the round: it opens the reservation in a background tab, lets it
+// announce its parcels and close itself, and the operator never sees the
+// screen. An "afhalen in de winkel" reservation put through that is a box that
+// has been shipped to a customer who is on their way to the counter for it.
+//
+// So they are taken out before the run is offered rather than stopped inside
+// it: the count on the panel is the count that will actually be opened, and the
+// rows say which ones were left behind and why. They are still packed by hand
+// from the same list -- the Open button on their row is untouched.
+//
+// The transport is not in the picker's markup, so each candidate's own page is
+// fetched for it. Until those answer the run cannot be offered honestly, which
+// is what `transportsKnown` holds the Start button for.
+//
+// A reservation whose transport cannot be read is left out too. The two ways of
+// being wrong are not equal: one costs a reservation that has to be opened by
+// hand, the other ships a collection order.
+const pickupNumbers = ref(new Set<number>());
+const unknownTransportNumbers = ref(new Set<number>());
+const transportsKnown = ref(false);
+
+const massCompleteCandidates = computed(() => props.modalData.singleLineReservations
+	.filter((reservation) => !isExcluded(reservation.reservationNumber)));
+
+const isPickup = (reservationNumber: number) => pickupNumbers.value.has(reservationNumber);
+
+const isExcluded = (reservationNumber: number) => isPickup(reservationNumber)
+	|| unknownTransportNumbers.value.has(reservationNumber);
+
 // ---- The rack bays on the cards ----
 //
 // On every card, which is both groups that get one: an order of several lines,
@@ -76,6 +108,7 @@ initMassComplete();
 
 onMounted(() => {
 	loadSlots();
+	loadTransports();
 
 	Shopware.shopwareInitialize().then((token) => {
 		swToken.value = token;
@@ -235,21 +268,57 @@ function initMassComplete() {
 	}
 }
 
+// The transport of every singleline reservation, in one pass, before the run
+// can be started. One request each, run together: they are plain portal page
+// loads and the list is at most a few dozen.
+//
+// A reservation with no link of its own cannot be fetched, and is treated the
+// same as one that answered with nothing: kept out of the run.
+async function loadTransports() {
+	const reservations = props.modalData.singleLineReservations;
+
+	const transports = await Promise.all(reservations.map((reservation) => reservation.url
+		? RVUtils.fetchReservationTransport(reservation.url)
+		: Promise.resolve("")));
+
+	const pickups = new Set<number>();
+	const unknown = new Set<number>();
+
+	reservations.forEach((reservation, index) => {
+		if (!transports[index]) {
+			unknown.add(reservation.reservationNumber);
+		} else if (RVUtils.isStorePickup(transports[index])) {
+			pickups.add(reservation.reservationNumber);
+		}
+	});
+
+	pickupNumbers.value = pickups;
+	unknownTransportNumbers.value = unknown;
+	transportsKnown.value = true;
+
+	// The list the count was offered from has shrunk under it.
+	setMassCompleteAmount(massCompleteAmount.value);
+}
+
 function setMassCompleteAmount(value: number) {
-	const totalReservations = props.modalData.singleLineReservations.length;
+	const totalReservations = massCompleteCandidates.value.length;
 	const clampedVal = Math.min(Math.min(Math.max(2, value), massCompleteMax), totalReservations);
 
 	massCompleteAmount.value = clampedVal;
 }
 
 async function startMassComplete() {
+	if (!transportsKnown.value) {
+		return;
+	}
+
 	setMassCompleteAmount(massCompleteAmount.value);
 	massCompleteStarted.value = true;
 
 	let startedReservations: MassCompleteEntry[] = [];
 
 	for(let i = 0; i < massCompleteAmount.value; i++) {
-		const reservation = props.modalData.singleLineReservations[i];
+		const reservation = massCompleteCandidates.value[i];
 
 		let tab = await GM.openInTab(reservation.url, { active: false });
 
@@ -386,16 +455,18 @@ function countStatus(status: MassCompleteStatus): number {
 			</header>
 
 			<MassCompletePanel v-if="massCompleteShowDialog"
-				:total="modalData.singleLineReservations.length" :max="massCompleteMax"
+				:total="massCompleteCandidates.length" :max="massCompleteMax"
 				:amount="massCompleteAmount" :started="massCompleteStarted"
 				:finished="massCompleteFinished" :failed="massCompleteFailed"
-				:stopped="massCompleteStopped"
+				:stopped="massCompleteStopped" :ready="transportsKnown"
+				:pickups="pickupNumbers.size" :unknown="unknownTransportNumbers.size"
 				@update:amount="setMassCompleteAmount" @start="startMassComplete()" />
 
 			<div class="pse-rows">
 				<ReservationRow v-for="reservation in modalData.singleLineReservations"
 					:key="reservation.reservationNumber" :reservation="reservation"
 					:status="statusFor(reservation.reservationNumber)"
+					:pickup="isPickup(reservation.reservationNumber)"
 					:show-open="!massCompleteStarted"
 					@open="(url) => emit('open', url)" />
 			</div>

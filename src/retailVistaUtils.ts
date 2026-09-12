@@ -406,6 +406,63 @@ export function getCurrentCustomerName(): string {
 	return "";
 }
 
+// How the reservation is going out, out of the portal's own summary block:
+// "PostNL Standaard", "Bezorgen via pakketdienst (D)", "Afhalen in de winkel".
+//
+// Read the way the customer's name above it is, and for the same reasons: the
+// label is matched in either of the two languages the portal serves, since the
+// correction to Dutch lands after the markup does. Empty when the block is not
+// there or carries no such row, which every caller reads as "not known" rather
+// than as a transport of its own.
+export function getCurrentTransport(): string {
+	return readTransport(document);
+}
+
+// The same row, out of a reservation page fetched rather than stood on. The
+// mass complete reads it this way: what it has before it opens anything is a
+// list of numbers and links, and which of those may be sent has to be settled
+// before the first tab is opened rather than inside it.
+export async function fetchReservationTransport(url: string): Promise<string> {
+	try {
+		const holder = document.createElement("div");
+
+		holder.innerHTML = await fetchReservation(url);
+
+		return readTransport(holder);
+	} catch (error) {
+		console.error("Pack&Ship Extended could not read the reservation's transport.", error);
+
+		return "";
+	}
+}
+
+function readTransport(root: ParentNode): string {
+	const block = root.querySelector(RESERVATION_SUMMARY_SELECTOR);
+
+	for (const row of Array.from(block?.children ?? [])) {
+		const text = row.textContent?.replace(/\s+/g, " ").trim() ?? "";
+		const separator = text.indexOf(":");
+
+		if (separator < 0 || !/^transport/i.test(text.slice(0, separator).trim())) {
+			continue;
+		}
+
+		return text.slice(separator + 1).trim();
+	}
+
+	return "";
+}
+
+// Whether the customer is coming to collect this one at the counter.
+//
+// Matched on the whole phrase rather than on "afhalen", because the transports
+// that ship to a carrier's service point are spelled "PostNL Afhaalpunt
+// Nederland" and are the opposite case: those boxes go out with the round, and
+// a collection notice over them would be wrong on every one of them.
+export function isStorePickup(transport = getCurrentTransport()): boolean {
+	return /afhalen in de winkel/i.test(transport);
+}
+
 export function getCurrentOrderNumber() {
 	return document.querySelector<HTMLElement>(`${RESERVATION_SUMMARY_SELECTOR} > div:nth-child(3)`)!.innerHTML.split(" ")[2];
 }

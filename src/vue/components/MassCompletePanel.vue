@@ -29,6 +29,18 @@ const props = defineProps<{
 	// that had not finished were closed. What is not counted above is not on its
 	// way any more.
 	stopped: boolean;
+	// Whether it is yet known which of the reservations may be sent. Each one's
+	// transport is read before the run is offered -- see the selection modal --
+	// and until they have all answered the count above is not the count that
+	// would be opened, so there is nothing honest to press.
+	ready: boolean;
+	// Left out of the run, counted apart because they are two different things
+	// to know: a collection order is staying in the shop on purpose, and a
+	// reservation whose transport could not be read is one nobody has checked.
+	// Said rather than silently subtracted -- a count that is two short of the
+	// list above it is a count nobody trusts.
+	pickups: number;
+	unknown: number;
 }>();
 
 const emit = defineEmits<{ "update:amount": [value: number]; start: [] }>();
@@ -36,6 +48,21 @@ const emit = defineEmits<{ "update:amount": [value: number]; start: [] }>();
 const settled = computed(() => props.finished + props.failed);
 
 const done = computed(() => props.started && (props.stopped || settled.value >= props.amount));
+
+// Below the threshold the run stands on there is nothing to start: one
+// reservation is opened by hand from the row under this panel.
+const tooFew = computed(() => props.ready && props.total < 2);
+
+const canStart = computed(() => props.ready && !tooFew.value);
+
+const excluded = computed(() => props.pickups + props.unknown);
+
+// "2 afhalen in de winkel", "1 onbekend transport", or both. Built rather than
+// written out, because either half can be nought.
+const excludedLabel = computed(() => [
+	props.pickups > 0 ? `${props.pickups}× afhalen in de winkel` : "",
+	props.unknown > 0 ? `${props.unknown}× transport onbekend` : "",
+].filter(Boolean).join(", "));
 
 // Nought until the run starts, so the bar is not drawn part-full before anything
 // has happened.
@@ -68,7 +95,20 @@ function step(by: number) {
 				<!-- One line that says what will happen, what is happening, or
 				     what happened. It is the same sentence slot throughout, so
 				     the panel does not change height between states. -->
-				<p class="pse-mc-subtitle" v-if="!started">
+				<p class="pse-mc-subtitle" v-if="!started && !ready">
+					Transport wordt gecontroleerd...
+				</p>
+				<!-- What was taken out, before what is left: the number beside it
+				     is smaller than the list above for a reason, and this is the
+				     only place that says what the reason is. -->
+				<p class="pse-mc-subtitle" v-else-if="!started && tooFew">
+					Overgeslagen: {{ excludedLabel }}. Er blijft niets over om massaal af te ronden.
+				</p>
+				<p class="pse-mc-subtitle" v-else-if="!started && excluded > 0">
+					Opent {{ amount }} van de {{ total }} reserveringen in de achtergrond en rondt ze af.
+					Overgeslagen: {{ excludedLabel }}.
+				</p>
+				<p class="pse-mc-subtitle" v-else-if="!started">
 					Opent {{ amount }} van de {{ total }} reserveringen in de achtergrond en rondt ze af.
 				</p>
 				<p class="pse-mc-subtitle" v-else-if="!done">
@@ -90,10 +130,10 @@ function step(by: number) {
 			</div>
 
 			<!-- Before the run: how many, and the one button that starts it. -->
-			<div class="pse-mc-controls" v-if="!started">
+			<div class="pse-mc-controls" v-if="!started && !tooFew">
 				<div class="pse-mc-stepper">
 					<button type="button" class="pse-mc-step" aria-label="Eén minder"
-						:disabled="amount <= 2" @click="step(-1)">−</button>
+						:disabled="!canStart || amount <= 2" @click="step(-1)">−</button>
 
 					<input type="number" class="pse-mc-amount" :value="amount" inputmode="numeric"
 						aria-label="Aantal reserveringen"
@@ -101,17 +141,18 @@ function step(by: number) {
 						@focusout="emit('update:amount', amount)" />
 
 					<button type="button" class="pse-mc-step" aria-label="Eén meer"
-						:disabled="amount >= Math.min(max, total)" @click="step(1)">+</button>
+						:disabled="!canStart || amount >= Math.min(max, total)" @click="step(1)">+</button>
 				</div>
 
-				<button type="button" class="pse-dialog-btn pse-mc-start" @click="emit('start')">
+				<button type="button" class="pse-dialog-btn pse-mc-start" :disabled="!canStart"
+					@click="emit('start')">
 					Start voltooien
 				</button>
 			</div>
 
 			<!-- During and after: the same corner, holding the count instead of
 			     the controls that produced it. -->
-			<div class="pse-mc-tally" v-else>
+			<div class="pse-mc-tally" v-else-if="started">
 				<span class="pse-mc-tally-count">{{ settled }}<span class="pse-mc-tally-of">/{{ amount }}</span></span>
 				<span class="pse-mc-tally-label">{{ stopped ? "gestopt" : done ? "klaar" : "afgerond" }}</span>
 			</div>

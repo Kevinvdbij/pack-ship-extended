@@ -9,6 +9,7 @@ import { playSound } from '../../sounds.ts';
 import ReservationSidebar from '../components/ReservationSidebar.vue';
 import { slotStore } from '../slotStore.ts';
 import CopyButton from '../components/CopyButton.vue';
+import PickupNotice from '../components/PickupNotice.vue';
 import {
 	COMPLETED_CONTAINER_SELECTOR, COMPLETED_HEADING_SELECTOR, COMPLETED_PROCEED_SELECTOR,
 	COMPLETED_STEP_DETAIL_SELECTOR, COMPLETED_STEP_ERROR_SELECTOR, COMPLETED_STEP_SELECTOR,
@@ -107,6 +108,21 @@ const finalizing = ref(false);
 
 const reservationNumber = ref("");
 
+// A collection order stopped on this screen: the boxes are finished but they
+// are not going on the round, and the screen after this one says nothing about
+// that. See `PickupNotice.vue` for why it is a dialog and why it blocks.
+//
+// Not raised on a mass complete, where it would be a dialog in a background tab
+// that the run closes as soon as it reports in: nobody could press it, and the
+// run would stop in the middle. A run cannot contain one anyway -- the picker
+// takes collection orders out of the list before it opens the first tab, and
+// leaves out any reservation whose transport it could not read; see
+// `ReservationSelectionModal.vue`. This is the case that is not supposed to
+// happen, handled by not making it worse.
+const pickup = ref(false);
+const pickupTransport = ref("");
+const pickupCustomer = ref("");
+
 // The steps the portal refused, read off its own list. Empty is the ordinary
 // case: the reservation went out and this screen is a receipt.
 const failures = ref<Failure[]>([]);
@@ -161,6 +177,11 @@ onMounted(() => {
 	heading.value = document.querySelector(COMPLETED_HEADING_SELECTOR)?.textContent?.trim() ?? "";
 	parcelsUrl.value = readParcelsUrl();
 	parcels.value = readParcels(container);
+
+	// Read here with the rest: the portal's summary block stays in the document,
+	// but everything else on this page is about to be hidden around ours.
+	pickupTransport.value = RVUtils.getCurrentTransport();
+	pickupCustomer.value = RVUtils.getCurrentCustomerName();
 
 	const finished = {
 		id: RVUtils.getCurrentReservationId(),
@@ -226,7 +247,20 @@ onMounted(() => {
 		playSound("error");
 	}
 
-	if (failed.value || props.announced || !Settings.autoMasterSwitch) {
+	// A reservation the customer is coming to collect. Not on a refused one --
+	// that screen already has something to do and its own cue -- and not on a
+	// parcel announced afterwards, where nothing is about to move on.
+	pickup.value = !failed.value
+		&& !props.announced
+		&& RVUtils.isStorePickup(pickupTransport.value)
+		&& !RVUtils.isMassCompleteReservation(reservationNumber.value);
+
+	if (pickup.value) {
+		// The cue for "this landed, but it is not the ordinary case".
+		playSound("warning");
+	}
+
+	if (failed.value || props.announced || pickup.value || !Settings.autoMasterSwitch) {
 		return;
 	}
 
@@ -423,6 +457,20 @@ function finalize() {
 	button.click();
 }
 
+// The dialog pressed: the boxes are on the collection shelf, and the screen can
+// go on doing what it would have done without it -- pressing the portal's own
+// button where automatic handling is on, and offering it where it is not.
+function confirmPickup() {
+	pickup.value = false;
+
+	if (!Settings.autoMasterSwitch) {
+		return;
+	}
+
+	finalizing.value = true;
+	afterPaint(finalize);
+}
+
 function updateAutoComplete() {
 	const orderNumber = RVUtils.getCurrentReservationNumber();
 
@@ -445,6 +493,9 @@ function updateAutoComplete() {
 	     the portal's page is hidden around, so it has to exist before there is
 	     anything to put in it. -->
 	<div ref="root">
+		<PickupNotice v-if="pickup" :reservation-number="reservationNumber" :customer="pickupCustomer"
+			:transport="pickupTransport" @confirm="confirmPickup()" />
+
 		<div class="pse-done" :class="{ 'is-failed': failed, 'is-detailed': detailed }" v-if="replaced">
 			<!-- A finished reservation is one card in the middle of the screen and
 			     nothing else. A refused one is a screen to work from: what went
