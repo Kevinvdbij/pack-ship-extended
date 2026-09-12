@@ -81,9 +81,25 @@ record by the number an operator reads. Two further facts about it, learned the 
   the application. Pointing that frame at `Default.aspx` afterwards does not help: by then the
   session is gone.
 
-So a reservation that the portal will not identify — one that is not fully picked has no id anywhere
-in the portal's markup — currently cannot have a rack bay. Anything attempting that again needs a
-route that never loads those two pages.
+### Finding a reservation by number without the launcher
+
+A reservation that is not fully picked has no id anywhere in the portal's markup, so `src/reservationLookup.ts`
+asks the ERP — through the search form as an **ordinary screen** (`Default.aspx?pageId=<the id the
+reservation screen publishes in `navigationIconsSearchPageId`>`), never as a dialog. Two things make
+that work, and both look optional until you remove them:
+
+- **Our page has to answer as the launcher.** Every screen reaches for `window.top.getMainWindow()`;
+  most only when a dialog opens, which is why the note screen needs nothing. The search form calls it
+  *as it loads*, and unanswered it throws and renders an empty criteria form — which reads exactly
+  like "the search does not work here". `standInForLauncher()` in `erpFrame.ts` provides the little
+  it actually touches.
+- **The answer arrives after the postback's load event.** The grid builds itself from the page's own
+  start-up scripts, and it is that build which calls `window.top.SetMainItemId(source, itemId, …)`
+  (`Scripts/search.js`) with the record it settled on. Read at the moment `press()` resolves, there is
+  no grid and no handoff yet — so the lookup waits for one of them.
+
+The id is then confirmed by loading the record and checking its reservation number. Keep that: it
+feeds the note writer, and a wrong id parks a bay on somebody else's reservation.
 
 ## Three traps that have already cost time
 

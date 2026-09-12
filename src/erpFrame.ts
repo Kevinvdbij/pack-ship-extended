@@ -1,4 +1,6 @@
-import { ERP_LOGIN_MARKER, ERP_URL } from "./constants.ts";
+import {
+	ERP_LOGIN_MARKER, ERP_MAIN_ITEM_FUNCTION, ERP_MAIN_WINDOW_FUNCTION, ERP_URL
+} from "./constants.ts";
 
 // The one ERP page this workstation keeps open, and the queue that keeps it to
 // one thing at a time.
@@ -56,6 +58,10 @@ export interface ErpPage {
 	press(elementId: string, what: string): Promise<Document>;
 	// First match in the frame's current document.
 	find<T extends Element>(selector: string): T | null;
+	// The frame's own window, for a screen's variables and for the client-side
+	// objects its controls keep their data in -- a grid holds its rows there, not
+	// in the markup.
+	window: Window & Record<string, unknown>;
 }
 
 // Runs one job with the frame to itself.
@@ -152,6 +158,12 @@ async function ensurePage(): Promise<ErpPage> {
 			requireSession(frame);
 
 			return frame.contentDocument!.querySelector<T>(selector);
+		},
+
+		get window() {
+			requireSession(frame);
+
+			return frame.contentWindow as Window & Record<string, unknown>;
 		},
 	};
 
@@ -283,7 +295,76 @@ function releaseFocus() {
 	}, FOCUS_WATCH_TAIL);
 }
 
+// The job waiting for a record to be handed back, if any. One at a time, which
+// is what the queue already guarantees.
+let mainItemListener: ((itemId: string) => void) | undefined;
+
+// Listens for the next record an ERP screen hands to the window above it, for
+// the length of one job. The returned function stops listening, and must be
+// called: a listener left behind would take the next job's answer.
+export function whenErpHandsBackItem(listener: (itemId: string) => void): () => void {
+	mainItemListener = listener;
+
+	return () => {
+		if (mainItemListener == listener) {
+			mainItemListener = undefined;
+		}
+	};
+}
+
+// ---- Standing in for the application launcher ----
+//
+// An ERP screen is normally framed by `RetailVista.aspx`, and its scripts reach
+// for that window as `window.top.getMainWindow()`. A screen in a frame of ours
+// finds our page there instead, so anything it asks the launcher for is asked of
+// us.
+//
+// Most screens only ask when something opens a dialog, which is why the note
+// screen drives perfectly well without this. The reservation search form asks as
+// it loads -- and, unanswered, throws and renders nothing, which is what made it
+// look as though a bare search could not work at all.
+//
+// What is provided is the little the form actually touches, found by recording
+// every call it made against a stand-in. Not a permissive catch-all: a stub that
+// answers everything would have the page believe in features this frame does not
+// have, and the failure would be somewhere less obvious than here.
+//
+// Never `RetailVista.aspx` itself. It frames `Login.aspx`, and loading that signs
+// the workplace out of the ERP mid-shift -- see CLAUDE.md.
+function standInForLauncher() {
+	const host = window as unknown as Record<string, unknown>;
+
+	// Somebody else's, and not ours to replace.
+	if (typeof host[ERP_MAIN_WINDOW_FUNCTION] == "function") {
+		return;
+	}
+
+	// Where a screen hands a record back to the window above it. What calls this
+	// is the search form, with the record it settled on -- see
+	// `ERP_MAIN_ITEM_FUNCTION`. Handed straight to whichever job is listening,
+	// and dropped when none is: the ERP calling us is only meaningful inside the
+	// job that asked it something.
+	host[ERP_MAIN_ITEM_FUNCTION] = (_source: unknown, itemId: unknown) => {
+		mainItemListener?.(String(itemId ?? "").trim());
+	};
+
+	const nothing = () => undefined;
+	const launcher = {
+		// The dialog stack, which the form counts before deciding it is not in one.
+		ModalDialogs: [] as unknown[],
+		CloseButtonUrl: "",
+		RetailVistaPage: {
+			DisplayLoadingMessage: nothing,
+			HideLoadingMessage: nothing,
+		},
+	};
+
+	host[ERP_MAIN_WINDOW_FUNCTION] = () => launcher;
+}
+
 async function createFrame(): Promise<HTMLIFrameElement> {
+	standInForLauncher();
+
 	const frame = document.createElement("iframe");
 
 	frame.className = "pse-erp-frame";

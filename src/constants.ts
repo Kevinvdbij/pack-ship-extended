@@ -37,6 +37,50 @@ export const ERP_LOGIN_FIELDS = {
 export const ERP_PAGE_PATH = "/Default.aspx";
 export const ERP_RESERVATION_PAGE_ID = 374;
 
+// ---- Finding a reservation by the number an operator reads ----
+//
+// The maintenance screen loads a record by internal id and cannot look one up by
+// number. The ERP's own answer is the search form behind the magnifier on that
+// screen -- an ordinary page of its own, which is how it is used here: opened
+// bare like any other screen, filled in, and its results read off the grid it
+// renders.
+//
+// Deliberately *not* through the application launcher that would normally open
+// it as a dialog. See the warning in CLAUDE.md: loading `RetailVista.aspx` frames
+// `Login.aspx`, and that signs the workplace out.
+//
+// The screen publishes the page id of its own search form, so the form is not
+// named here -- it is asked for.
+export const ERP_SEARCH_PAGE_ID_VARIABLE = "navigationIconsSearchPageId";
+export const ERP_SEARCH_NUMBER_SELECTOR = "[id$='rvcReservationNumber_TextBox']";
+export const ERP_SEARCH_SUBMIT_SELECTOR = "[id$='ctl00_cmdSearch']";
+
+// What the search form expects to find on the window above it.
+//
+// Every ERP screen reaches for `window.top.getMainWindow()` -- the application
+// launcher, which is what a screen is normally framed by. Most screens only do
+// so when something asks for a dialog, which is why the note screen works in a
+// bare frame; the search form does it as it loads, and without an answer it
+// throws and comes back empty. It was that, rather than anything about the
+// search, that made this look impossible at first.
+//
+// So the page above it -- ours -- answers. The stub is the small part of the
+// launcher the form actually touches, and nothing else: see `erpFrame.ts`.
+export const ERP_MAIN_WINDOW_FUNCTION = "getMainWindow";
+
+// How the search hands its answer back.
+//
+// Not by us reading its results: the search form calls the window above it when
+// a record is settled on, which for a search on one reservation number is the
+// single row it found. From `Scripts/search.js`:
+//
+//     window.top.SetMainItemId(source, itemId, destinationField, modus)
+//
+// So the id arrives as the second argument, from the ERP's own statement of
+// which record the search means -- rather than from a column counted off a grid.
+// The grid is still read if this never fires; see `reservationLookup.ts`.
+export const ERP_MAIN_ITEM_FUNCTION = "SetMainItemId";
+
 // How a record is opened on that page.
 //
 // Not by query string: `itemId=` is ignored, and the page comes up empty with
