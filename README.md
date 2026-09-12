@@ -120,6 +120,41 @@ has actually offered (`beforeinstallprompt`), and disappears once a copy is inst
 menu offers the same thing under *Casten, opslaan en delen -> Pagina installeren als app*, and both
 routes use the manifest above.
 
+## The second session: the ERP
+
+The rack bays and the label reprint are not portal features. They drive the RetailVista ERP itself,
+which is served from the same origin (`/outdoor`, of which `/outdoor/packship` is a sub application)
+but **behind a separate login**. Signing into the portal signs nobody into the ERP, and the two
+sessions expire on their own clocks. `src/erpFrame.ts` loads ERP screens in a hidden same-origin
+iframe and calls the page's own functions, so a RetailVista update that changes its postback
+protocol changes nothing here.
+
+How the two sessions are kept in step:
+
+- **Created together.** The login page (`LoginPage.vue`) posts the ERP's own WebForms login with the
+  same three values the operator just typed, then lets the portal's post go. The password is used
+  for that one request and never stored. An ERP that is slow or down cannot hold anybody out of the
+  portal: the sign-in is raced against a short budget and packing does not depend on it.
+- **Kept alive together.** The ERP only hears from the frame when a bay is read or a label printed,
+  so a quiet hour of ordinary packing would let it time out while the portal stayed signed in.
+  `src/erpKeepAlive.ts` touches the application page every five minutes for as long as a portal
+  page is open — once per machine, through a stamp in the value store, not once per tab. The ERP
+  has no cheaper endpoint for this: the obvious keep-alive page names all answer with an error page.
+- **Ended together.** The ERP's logout is a postback on its own application page, and it is fired
+  from the logout page, the login page and ahead of the idle sign-out. Otherwise the ERP session
+  outlives the portal's in the browser profile and the next person on the station inherits it. The
+  login waits for a sign-out still in flight, so a password manager cannot race it.
+- **Asked for when it is gone anyway.** A server restart, an absolute expiry or a sign-out made
+  elsewhere leaves the ERP refusing the frame. The first thing that needs it raises one dialog
+  (`ErpLoginPrompt.vue`) with the company number and user name already filled in; "Later" leaves
+  the bays unavailable and nothing else. The keep-alive never raises it on its own, so nothing
+  appears mid-scan.
+
+Two consequences worth knowing. The ERP session is the browser profile's, so on a machine where the
+RetailVista GUI is also used, signing out of the portal signs the GUI out too. And each station
+holds an ERP session for the length of its portal session, which may count against RetailVista's
+concurrent-user seats — the idle sign-out is what releases it when a station is left.
+
 ## Stack
 
 Vue 3 (`<script setup>` SFCs) + TypeScript, bundled into a single userscript by
@@ -205,6 +240,11 @@ is installed by hand from the release asset and has to be updated alongside the 
 | `src/environment.ts` | Pins the portal's environment ("Omgeving") to the machine |
 | `src/pwa.ts` | The web app manifest, so the portal installs as an app |
 | `src/currentUser.ts` | Name of the logged-in employee, captured on the Login page and shown in the footer |
+| `src/erpFrame.ts` | The hidden same-origin frame the ERP screens are driven in, one job at a time |
+| `src/erpSession.ts` | The ERP's sign-in, sign-out and session probe, all as whole-form WebForms posts |
+| `src/erpKeepAlive.ts` | Touches the ERP on a schedule so its session lasts as long as the portal's |
+| `src/reservationNote.ts`, `src/parcelLabel.ts` | The two ERP screens actually driven: the reservation note and the label reprint |
+| `src/idleLogout.ts` | Signs the workplace out after a configured stretch of nobody touching it |
 
 ## Editor setup
 
