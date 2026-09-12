@@ -117,16 +117,15 @@ function isShort(amount: string) {
 			</table>
 		</div>
 
-		<!-- The note and the rack bays, in the order the sidebar puts them in on
-		     the reservation's own page: the note is an instruction from the
-		     customer, the bay is where the items are standing. Both fold shut when
-		     they are empty, which on a dialog that is a column of cards is most of
-		     them. -->
+		<!-- Where it is standing, then what the customer wrote. The bay is the one
+		     line of this card that is read while choosing between reservations --
+		     an order already in the rack is the one to carry on with -- and the
+		     note is what gets read once one has been chosen. -->
 		<div class="pse-rescard-aside" v-if="(showNote && hasShopwareNote()) || slotHandle">
+			<ReservationSlotPanel v-if="slotHandle" :handle="slotHandle" :products="reservation.products" />
+
 			<ShopwareNote v-if="showNote && hasShopwareNote()" :order-data="reservation.swOrderData"
 				:enabled="!!noteEnabled" @save="$emit('saveNote')" />
-
-			<ReservationSlotPanel v-if="slotHandle" :handle="slotHandle" :products="reservation.products" />
 		</div>
 	</article>
 </template>

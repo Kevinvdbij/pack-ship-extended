@@ -34,7 +34,6 @@ const orderSlot = computed(() => props.handle.slots.order);
 
 const showOrderSlot = computed(() => slotScope.value == "order" || props.handle.hasOrderSlot.value);
 const showLineSlots = computed(() => slotScope.value == "line" || props.handle.hasLineSlots.value);
-const showBoth = computed(() => showOrderSlot.value && showLineSlots.value);
 
 // Every bay this reservation is using, each once, in rack order. What is on the
 // folded bar: the whole point of the panel is being able to read that without
@@ -82,19 +81,25 @@ function onPick(slot: string) {
 	}
 }
 
-// ---- Folded away when there is nothing in it ----
+// ---- Folded, but only when there is something to fold ----
 //
-// The same rule the Shopware note follows, and for the same reason: this dialog
-// is a column of cards being compared, and a block of empty grey on each of them
-// spends the screen saying "nothing here". Most reservations are not in the rack,
-// so folded shut is the ordinary state -- and the bar still says which it is.
+// One bay for the whole reservation is one control, and a fold around a single
+// chip is a second press to reach something that already fits on the bar -- with
+// the bay then printed twice, once as the summary and once as the control. So
+// that version is just the bar, with the chip on it.
 //
+// A reservation with bays per line does have a list, and that folds: this dialog
+// is a column of cards being compared, and a block of rows on each of them
+// spends the screen on something only one card is being read for.
+const foldable = computed(() => showLineSlots.value);
+
+const open = ref(false);
+
 // The reservation decides which way it opens, not the packer: bays that exist
 // are what the card is for. It is still a control, so an empty one can be opened
 // to park something in.
-const open = ref(false);
-
-// Opened when the note lands rather than at setup, because at setup it has not
+//
+// Settled when the note lands rather than at setup, because at setup it has not
 // been read yet -- the dialog is still asking the ERP for it. This is the moment
 // the answer arrives, and it is the one unfolding anybody sees.
 watch(() => props.handle.loading.value, (loading) => {
@@ -115,40 +120,25 @@ watch(() => props.handle.loading.value, (loading) => {
 	</Teleport>
 
 	<section class="pse-slotpanel">
-		<button type="button" class="pse-slotpanel-head" :aria-expanded="open"
-			:title="open ? 'Vakken inklappen' : 'Vakken uitklappen'" @click="open = !open">
-			<span class="material-icons pse-slotpanel-icon" aria-hidden="true">inventory_2</span>
-			<h4 class="pse-slotpanel-title">{{ showLineSlots ? "Vakken" : "Vak" }}</h4>
+		<div class="pse-slotpanel-card">
+			<!-- The bar. A button only when there is a fold behind it: a bar that
+			     carries the bay control itself must not also be a control, and a
+			     button inside a button is not one either. -->
+			<component :is="foldable ? 'button' : 'div'" class="pse-slotpanel-head"
+				:class="{ 'is-plain': !foldable }" :type="foldable ? 'button' : undefined"
+				:aria-expanded="foldable ? open : undefined"
+				:title="foldable ? (open ? 'Vakken inklappen' : 'Vakken uitklappen') : undefined"
+				@click="foldable && (open = !open)">
+				<span class="material-icons pse-slotpanel-icon" aria-hidden="true">inventory_2</span>
+				<h4 class="pse-slotpanel-title">{{ foldable ? "Vakken" : "Vak" }}</h4>
 
-			<!-- What is being folded away, said on the line that folds it. The bays
-			     themselves rather than a count: this bar is read to find out where
-			     the reservation is standing, and a number would mean opening the
-			     card to answer the only question being asked. -->
-			<span v-if="handle.loading.value" class="pse-slotpanel-spinner" role="status"
-				aria-label="Vak wordt opgehaald"></span>
-			<span v-else-if="usedSlots.length" class="pse-slotpanel-summary">
-				<span v-for="used in usedSlots" :key="used" class="pse-slot-chip is-static">
-					<span class="pse-slot-chip-label">{{ used }}</span>
-				</span>
-			</span>
-			<span v-else-if="unavailable" class="pse-slotpanel-empty">Niet beschikbaar</span>
-			<span v-else class="pse-slotpanel-empty">Geen vak</span>
+				<span v-if="handle.loading.value" class="pse-slotpanel-spinner" role="status"
+					aria-label="Vak wordt opgehaald"></span>
 
-			<span class="material-icons pse-slotpanel-chevron" :class="{ 'is-open': open }"
-				aria-hidden="true">expand_more</span>
-		</button>
-
-		<!-- The fold, as the note card does it: a grid row from 0fr to 1fr, so the
-		     panel opens to exactly what is in it without anything having to measure
-		     it first. -->
-		<div class="pse-slotpanel-collapse" :class="{ 'is-open': open }">
-		<div class="pse-slotpanel-collapse-inner">
-		<div class="pse-slotpanel-body">
-			<!-- One bay for the whole reservation. -->
-			<div v-if="showOrderSlot" class="pse-slotpanel-block">
-				<span v-if="showBoth" class="pse-slotpanel-caption">Hele order</span>
-
-				<button type="button" class="pse-slot-chip" :class="{ 'is-empty': !orderSlot }"
+				<!-- One bay for the whole reservation: the control lives on the bar,
+				     because there is nothing else for the card to hold. -->
+				<button v-else-if="!foldable" type="button" class="pse-slot-chip"
+					:class="{ 'is-empty': !orderSlot }"
 					:disabled="!handle.ready.value || handle.saving.value"
 					:title="orderSlot
 						? `Deze order staat in vak ${orderSlot}`
@@ -161,56 +151,103 @@ watch(() => props.handle.loading.value, (loading) => {
 						Vak kiezen
 					</span>
 				</button>
-			</div>
 
-			<!-- A bay per line, for the order whose items come in far enough apart to
-			     be shelved separately. The same control the parcels page puts in its
-			     product table, so a line parked from here reads back there unchanged. -->
-			<div v-if="showLineSlots" class="pse-slotpanel-block">
-				<span v-if="showBoth" class="pse-slotpanel-caption">Losse regels</span>
+				<!-- Folded shut, the bar says what is behind it. Open, it does not:
+				     the bays are on show underneath, and saying them twice is one
+				     answer too many. -->
+				<span v-else-if="!open && usedSlots.length" class="pse-slotpanel-summary">
+					<span v-for="used in usedSlots" :key="used" class="pse-slot-chip is-static">
+						<span class="pse-slot-chip-label">{{ used }}</span>
+					</span>
+				</span>
+				<span v-else-if="!open && unavailable" class="pse-slotpanel-empty">Niet beschikbaar</span>
+				<span v-else-if="!open" class="pse-slotpanel-empty">Geen vak</span>
 
-				<ul class="pse-slotpanel-lines">
-					<li v-for="product in products" :key="product.barcode" class="pse-slotpanel-line">
-						<span class="pse-slotpanel-line-name" :title="product.description">
-							{{ product.description }}
+				<span v-if="foldable" class="material-icons pse-slotpanel-chevron"
+					:class="{ 'is-open': open }" aria-hidden="true">expand_more</span>
+			</component>
+
+			<!-- The fold, as the note card does it: a grid row from 0fr to 1fr, so
+			     the card opens to exactly what is in it without anything having to
+			     measure it first. -->
+			<div v-if="foldable" class="pse-slotpanel-collapse" :class="{ 'is-open': open }">
+			<div class="pse-slotpanel-collapse-inner">
+			<div class="pse-slotpanel-body">
+				<!-- The whole reservation's own bay, when it has one as well. -->
+				<div v-if="showOrderSlot" class="pse-slotpanel-block">
+					<span class="pse-slotpanel-caption">Hele order</span>
+
+					<button type="button" class="pse-slot-chip" :class="{ 'is-empty': !orderSlot }"
+						:disabled="!handle.ready.value || handle.saving.value"
+						:title="orderSlot
+							? `Deze order staat in vak ${orderSlot}`
+							: 'Kies een vak voor deze order'"
+						@click="picking = { subject: `Reservering ${handle.reservationNumber.value}` }">
+						<span v-if="orderSlot" class="pse-slot-chip-label">{{ orderSlot }}</span>
+						<span v-else class="pse-slot-chip-empty">
+							<span class="material-icons pse-slot-chip-empty-icon" aria-hidden="true">add</span>
+							Vak kiezen
 						</span>
+					</button>
+				</div>
 
-						<button type="button" class="pse-slot-chip"
-							:class="{ 'is-empty': !handle.lineSlot(product.barcode) }"
-							:disabled="lineChipDisabled(product.barcode)"
-							:title="handle.lineSlot(product.barcode)
-								? `Staat in vak ${handle.lineSlot(product.barcode)}`
-								: canAssignLines
-									? 'Kies een vak voor dit product'
-									: `Deze werkplek zet één vak per order. Zet de instelling op 'een vak per productregel' om losse regels weg te zetten.`"
-							@click="picking = { barcode: product.barcode, subject: product.description }">
-							<span v-if="handle.lineSlot(product.barcode)" class="pse-slot-chip-label">
-								{{ handle.lineSlot(product.barcode) }}
+				<!-- A bay per line, for the order whose items come in far enough apart
+				     to be shelved separately. The same control the parcels page puts in
+				     its product table, so a line parked from here reads back there
+				     unchanged. -->
+				<div class="pse-slotpanel-block">
+					<span v-if="showOrderSlot" class="pse-slotpanel-caption">Losse regels</span>
+
+					<ul class="pse-slotpanel-lines">
+						<li v-for="product in products" :key="product.barcode" class="pse-slotpanel-line">
+							<span class="pse-slotpanel-line-name" :title="product.description">
+								{{ product.description }}
 							</span>
-							<span v-else class="pse-slot-chip-empty">
-								<span class="material-icons pse-slot-chip-empty-icon" aria-hidden="true">add</span>
-								Vak
-							</span>
-						</button>
-					</li>
-				</ul>
+
+							<button type="button" class="pse-slot-chip"
+								:class="{ 'is-empty': !handle.lineSlot(product.barcode) }"
+								:disabled="lineChipDisabled(product.barcode)"
+								:title="handle.lineSlot(product.barcode)
+									? `Staat in vak ${handle.lineSlot(product.barcode)}`
+									: canAssignLines
+										? 'Kies een vak voor dit product'
+										: `Deze werkplek zet één vak per order. Zet de instelling op 'een vak per productregel' om losse regels weg te zetten.`"
+								@click="picking = { barcode: product.barcode, subject: product.description }">
+								<span v-if="handle.lineSlot(product.barcode)" class="pse-slot-chip-label">
+									{{ handle.lineSlot(product.barcode) }}
+								</span>
+								<span v-else class="pse-slot-chip-empty">
+									<span class="material-icons pse-slot-chip-empty-icon" aria-hidden="true">add</span>
+									Vak
+								</span>
+							</button>
+						</li>
+					</ul>
+				</div>
+
+				<p v-if="unavailable" class="pse-slotpanel-hint">
+					Geen verbinding met RetailVista, dus het vak van deze order is niet bekend.
+				</p>
 			</div>
-
-			<p v-if="unavailable" class="pse-slotpanel-hint">
-				Geen verbinding met RetailVista, dus het vak van deze order is niet bekend.
-			</p>
-		</div>
-		</div>
+			</div>
+			</div>
 		</div>
 	</section>
 </template>
 
 <style scoped>
-/* Not a card of its own: it sits inside one, under the note, so it is a bar and
-   a fold rather than a third bordered box on a screen that is already a column
-   of them. */
 .pse-slotpanel {
 	text-align: left;
+}
+
+/* The same surface as the note card beside it, so the two read as one pair of
+   fields on the reservation rather than as a card and a strip. */
+.pse-slotpanel-card {
+	overflow: hidden;
+	border: 1px solid var(--pse-line);
+	border-radius: 14px;
+	background-color: #ffffff;
+	box-shadow: 0 1px 2px rgba(20, 48, 33, 0.04);
 }
 
 .pse-slotpanel-head {
@@ -218,9 +255,10 @@ watch(() => props.handle.loading.value, (loading) => {
 	align-items: center;
 	gap: 9px;
 	width: 100%;
-	padding: 8px 11px;
-	border: 1px solid var(--pse-line);
-	border-radius: 11px;
+	min-height: 42px;
+	padding: 7px 14px;
+	border: 0;
+	border-bottom: 1px solid var(--pse-line);
 	background-color: var(--pse-well);
 	font: inherit;
 	text-align: left;
@@ -228,8 +266,20 @@ watch(() => props.handle.loading.value, (loading) => {
 	transition: background-color 0.15s ease, border-color 0.15s ease;
 }
 
-.pse-slotpanel-head:hover {
-	border-color: var(--pse-brand);
+/* Shut, there is nothing under the rule for it to separate -- and the bar that
+   carries its own bay control has nothing under it at all. */
+.pse-slotpanel-head[aria-expanded="false"],
+.pse-slotpanel-head.is-plain {
+	border-bottom-color: transparent;
+}
+
+/* The bar-only version is not a control, so it does not answer the pointer like
+   one. What is on it does. */
+.pse-slotpanel-head.is-plain {
+	cursor: default;
+}
+
+.pse-slotpanel-head:not(.is-plain):hover {
 	background-color: var(--pse-brand-soft);
 }
 
@@ -239,7 +289,7 @@ watch(() => props.handle.loading.value, (loading) => {
 
 .pse-slotpanel-head:focus-visible {
 	outline: none;
-	box-shadow: 0 0 0 3px var(--pse-brand-ring);
+	box-shadow: inset 0 0 0 2px var(--pse-brand-ring);
 }
 
 .pse-slotpanel-icon {
@@ -333,7 +383,7 @@ watch(() => props.handle.loading.value, (loading) => {
 	display: flex;
 	flex-direction: column;
 	gap: 12px;
-	padding: 11px 2px 2px;
+	padding: 12px 14px 14px;
 }
 
 .pse-slotpanel-block {
