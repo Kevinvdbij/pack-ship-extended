@@ -1,7 +1,8 @@
 <script setup lang="ts">
 import { onMounted, useTemplateRef } from "vue";
 import { clearCurrentUser, setCurrentUser } from "../../currentUser.ts";
-import { erpLogin } from "../../erpSession.ts";
+import { erpLogin, erpLogout } from "../../erpSession.ts";
+import { clearPendingLogout } from "../../idleLogout.ts";
 import { debug } from "../../logger.ts";
 import { adoptElement, setBusy } from "../../retailVistaUtils.ts";
 import { afterReveal } from "../../reveal.ts";
@@ -24,6 +25,14 @@ const PASSWORD_INPUT = "#Input_Password";
 // rejected login (the portal re-renders this page) or an expiry redirect. Drop
 // whatever name was stored so nothing stale can outlive the session.
 clearCurrentUser();
+clearPendingLogout();
+
+// Whatever ERP session the profile still holds belongs to a portal session that
+// is over -- this page is the boundary between one and the next. It is ended
+// here so the sign-in below starts from nothing, and so a sign-in that fails or
+// times out leaves the bays unavailable rather than working under the previous
+// name. `erpLogin` waits for this to land before it posts.
+erpLogout();
 
 // How long the ERP sign-in may hold up the portal's own. Long enough for a slow
 // answer on a shop connection, short enough that an ERP which is simply not

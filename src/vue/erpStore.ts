@@ -1,5 +1,6 @@
 import { computed, ref } from "vue";
-import { erpLogin, hasErpSession } from "../erpSession.ts";
+import { erpLogin, probeErpSession } from "../erpSession.ts";
+import { pauseErpKeepAlive, resumeErpKeepAlive } from "../erpKeepAlive.ts";
 import { resetReservationNoteFrame } from "../reservationNote.ts";
 import { getCurrentUser } from "../currentUser.ts";
 
@@ -64,20 +65,26 @@ export const erpStore = {
 			resetReservationNoteFrame();
 		}
 
+		// Nothing left to keep alive until somebody signs in again.
+		pauseErpKeepAlive();
 		signedOut.value = true;
 	},
 
 	// Checks quietly, without raising the dialog on a session that is fine. Used
 	// where something is about to depend on the ERP and would rather ask first
 	// than fail in front of the operator.
+	//
+	// Only a session the ERP has actually ended raises the prompt. An ERP that
+	// cannot be reached is a different failure with a different remedy, and a
+	// password would not fix it.
 	async verify(): Promise<boolean> {
-		const alive = await hasErpSession();
+		const state = await probeErpSession();
 
-		if (!alive) {
+		if (state == "signed-out") {
 			this.reportSignedOut();
 		}
 
-		return alive;
+		return state == "alive";
 	},
 
 	// Signs in again from the dialog. Resolves to whether it worked, so the
@@ -94,6 +101,7 @@ export const erpStore = {
 			// Whatever the frame was showing belongs to the session that ended.
 			resetReservationNoteFrame();
 			signedOut.value = false;
+			resumeErpKeepAlive();
 
 			// Pick up whatever was dropped when the session went. Guarded one by
 			// one: this is a list of other people's work, and one handler that

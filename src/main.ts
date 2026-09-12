@@ -9,6 +9,7 @@ import AddParcelsPage from './vue/pages/AddParcelsPage.vue';
 import LoginPage from './vue/pages/LoginPage.vue';
 import LogoutPage from './vue/pages/LogoutPage.vue';
 import FooterExtension from './vue/components/Footer.vue';
+import IdleLogoutWarning from './vue/components/IdleLogoutWarning.vue';
 import HeaderExtension from './vue/components/Header.vue';
 import Settings from "./settings.ts"
 import { applyConfiguredEnvironment, getEnvironmentSelect, hideEnvironmentPicker, lockEnvironmentPicker } from './environment.ts';
@@ -17,6 +18,8 @@ import { ENVIRONMENT_FORM_SELECTOR, FOOTER_SLOT_SELECTOR, MAIN_CONTENT_SELECTOR,
 import { armReveal, reveal } from './reveal.ts';
 import { installManifest } from './pwa.ts';
 import { pinFooter } from './stickyFooter.ts';
+import { completePendingLogout, startIdleLogout } from './idleLogout.ts';
+import { startErpKeepAlive } from './erpKeepAlive.ts';
 // The portal's own elements first, ours second, so a tie between the two is
 // settled the way it reads: our markup wins on the page it is on. Both go up at
 // document-start, which is behind the cloak -- see `src/styles/cloak.css`.
@@ -392,6 +395,30 @@ function servedRoute(current: Route | undefined): Route | undefined {
 	return isSearchPage ? searchReservationsRoute : current;
 }
 
+// The sign-out timer, and the minute of warning before it fires.
+//
+// Not on the login and logout pages: there is no session on either, and a page
+// that signs you out of nothing would only ever be in the way. Not in the group
+// the reveal waits on either -- the dialog is a thing that happens minutes from
+// now, and nothing on screen is waiting for it.
+//
+// A sign-out owed from a page that had no form to do it with is carried out
+// first, and mounts nothing: this page is not one to stay on.
+function armIdleLogout() {
+	if (completePendingLogout()) {
+		return;
+	}
+
+	startIdleLogout();
+
+	// The ERP session is kept for as long as this one is: the pages this runs on
+	// are the ones with a portal session, and the timer above is what takes them
+	// away. See `src/erpKeepAlive.ts`.
+	startErpKeepAlive();
+
+	mountApp(IdleLogoutWarning, (host) => document.body.append(host));
+}
+
 async function boot() {
 	try {
 		// A route that named an anchor mounts as soon as that anchor exists,
@@ -422,6 +449,8 @@ async function boot() {
 			// own jQuery change handler.
 			applyConfiguredEnvironment();
 			applyDutchLanguage();
+
+			armIdleLogout();
 		}
 
 		await nextTick();

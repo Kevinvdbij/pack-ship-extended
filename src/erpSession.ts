@@ -1,5 +1,5 @@
 import {
-	ERP_APP_MARKER, ERP_LOGIN_FIELDS, ERP_LOGIN_MARKER, ERP_LOGIN_PATH, ERP_PAGE_PATH, ERP_URL
+	ERP_APP_MARKER, ERP_LOGIN_FIELDS, ERP_LOGIN_MARKER, ERP_LOGIN_PATH, ERP_LOGOUT_TARGET, ERP_PAGE_PATH, ERP_URL
 } from "./constants.ts";
 import { debug } from "./logger.ts";
 
@@ -17,31 +17,54 @@ import { debug } from "./logger.ts";
 // -- there is nothing here to sign in with again, and the operator is asked.
 // That is deliberate, and it is the reason a stored password is not needed.
 
-// Whether `/outdoor` currently has a session in this browser profile.
+// What `/outdoor` answers for this browser profile right now.
 //
 // Asked of the application page rather than of anything cheaper: the ERP has no
 // endpoint that answers this, so what we can do is fetch a page that requires a
 // session and recognise what came back.
 //
-// Both ways round, and deliberately. Asking only whether the login form is
-// absent says yes to the error page a half-started session produces -- see
-// `ERP_APP_MARKER` -- so what settles it is the application's own furniture
-// being there. A page that is neither is not a session.
-export async function hasErpSession(): Promise<boolean> {
+// Three answers, not two, and the third is the one that matters for anything
+// that runs on its own: an ERP that cannot be reached is not an ERP that has
+// signed us out, and treating it as one would raise a sign-in prompt for a
+// network blip -- on a station whose packing does not depend on the ERP at all.
+//
+// "alive" is settled both ways round, and deliberately. Asking only whether the
+// login form is absent says yes to the error page a half-started session
+// produces -- see `ERP_APP_MARKER` -- so what settles it is the application's
+// own furniture being there. A page that is neither is not a session.
+export type ErpSessionState = "alive" | "signed-out" | "unreachable";
+
+export async function probeErpSession(): Promise<ErpSessionState> {
 	try {
-		const response = await fetch(`${ERP_URL}${ERP_PAGE_PATH}`, { credentials: "include" });
+		const response = await fetch(`${ERP_URL}${ERP_PAGE_PATH}`, { credentials: "include", cache: "no-store" });
 		const body = await response.text();
 
-		return response.ok && !body.includes(ERP_LOGIN_MARKER) && body.includes(ERP_APP_MARKER);
+		if (response.ok && !body.includes(ERP_LOGIN_MARKER) && body.includes(ERP_APP_MARKER)) {
+			return "alive";
+		}
+
+		return body.includes(ERP_LOGIN_MARKER) ? "signed-out" : "unreachable";
 	} catch (error) {
-		// Unreachable is not signed out, but there is nothing useful to tell
-		// apart here: either way the note cannot be read, and the caller's answer
-		// to both is the same.
 		debug("Could not determine the ERP session state.", error);
 
-		return false;
+		return "unreachable";
 	}
 }
+
+// Whether `/outdoor` currently has a session in this browser profile. The
+// yes-or-no form of the question above, for the callers whose answer to
+// "signed out" and "unreachable" is the same: either way the note cannot be read.
+export async function hasErpSession(): Promise<boolean> {
+	return (await probeErpSession()) == "alive";
+}
+
+// A sign-out that is still on its way, so a sign-in started behind it waits.
+//
+// Both run from the login page: the sign-out when it loads, the sign-in when the
+// form is submitted. Fast typing -- or a password manager -- can put the second
+// on the wire before the first has posted, and a sign-out that lands after the
+// sign-in it was meant to precede takes the new session down with it.
+let signingOut: Promise<void> = Promise.resolve();
 
 // Signs into the ERP with the credentials the portal was given.
 //
@@ -56,6 +79,8 @@ export async function hasErpSession(): Promise<boolean> {
 // says nothing -- what settles it is asking the question this module opens with.
 export async function erpLogin(companyNumber: string, userName: string, password: string): Promise<boolean> {
 	try {
+		await signingOut;
+
 		const form = await fetch(`${ERP_URL}${ERP_LOGIN_PATH}`, { credentials: "include" });
 		const body = await form.text();
 
@@ -87,6 +112,59 @@ export async function erpLogin(companyNumber: string, userName: string, password
 
 		return false;
 	}
+}
+
+// Ends the ERP session, so it goes when the portal's does.
+//
+// The two sessions are created together at sign-in -- see `LoginPage.vue` -- but
+// nothing ends them together: the portal's sign-out is a form post to its own
+// identity pages and the ERP knows nothing of it. Left alone, the ERP session
+// outlives the portal's in the browser profile, and the next person to sign into
+// the portal on this station inherits it. Their bays and reprints would then be
+// written under the previous name whenever the sign-in that should replace it
+// is slow, refused or times out -- which is precisely when nobody is looking.
+//
+// The ERP's own logout is a WebForms postback, `cmdLogout` on the application
+// page, so it is driven the way the sign-in is: the page is fetched, the whole
+// form is carried across, and the event target is set to that control.
+//
+// Never throws, and never worth waiting long for: a sign-out is not something
+// to hold a page on. Resolves once it is done either way, so a sign-in can
+// order itself behind it.
+export function erpLogout(): Promise<void> {
+	const work = (async () => {
+		try {
+			const response = await fetch(`${ERP_URL}${ERP_PAGE_PATH}`, { credentials: "include", cache: "no-store" });
+			const body = await response.text();
+
+			if (body.includes(ERP_LOGIN_MARKER) || !body.includes(ERP_APP_MARKER)) {
+				// No session to end, or no application to end it through.
+				return;
+			}
+
+			const payload = serializeForm(body);
+
+			payload.set("__EVENTTARGET", ERP_LOGOUT_TARGET);
+			payload.set("__EVENTARGUMENT", "");
+
+			await fetch(`${ERP_URL}${ERP_PAGE_PATH}`, {
+				method: "POST",
+				credentials: "include",
+				// Survives the navigation a sign-out is usually followed by.
+				keepalive: true,
+				headers: { "Content-Type": "application/x-www-form-urlencoded" },
+				body: payload.toString(),
+			});
+
+			debug("Signed out of the ERP.");
+		} catch (error) {
+			debug("Could not sign out of the ERP.", error);
+		}
+	})();
+
+	signingOut = work;
+
+	return work;
 }
 
 // The whole login form, exactly as the browser would have posted it.

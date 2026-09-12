@@ -69,6 +69,10 @@ export const ERP_SAVE_BUTTON_ID = "ctl00_ctl00_MasterContent_NavigationIcons_ctl
 // "is there a session" starts by looking for the company number box.
 export const ERP_LOGIN_MARKER = "txtCompanyNumber";
 
+// The application page's own logout control, which posts back by name. Ending
+// the ERP session is a `__doPostBack` on this -- see `erpLogout()`.
+export const ERP_LOGOUT_TARGET = "ctl00$ctl00$MasterContent$CurrentUser$ctl00$cmdLogout";
+
 // ---- Reprinting a parcel service label ----
 //
 // The ERP's own "print parcel service label" task. It is a dialog on the
@@ -370,6 +374,10 @@ export const STORAGE_KEYS = {
 	// the next. See `src/idleLogout.ts`.
 	idleActivity: "PSE_Idle_Activity",
 	pendingLogout: "PSE_Pending_Logout",
+	// When the ERP session was last touched on purpose, shared so that every tab
+	// on the machine counts as one keep-alive rather than one each. See
+	// `src/erpKeepAlive.ts`.
+	erpKeepAlive: "PSE_Erp_KeepAlive",
 	swClientId: "PSE_Shopware_Client_Id",
 	swClientSecret: "PSE_Shopware_Client_Secret",
 	// Suffixed with a reservation number, one key per mass complete entry.
