@@ -1,12 +1,7 @@
-import { computed, reactive, ref } from "vue";
-import { toast } from "vue3-toastify";
-import { composeComment, emptyAssignment, parseComment, SlotAssignment } from "../slots.ts";
-import { ErpSignedOutError, readReservationNote, writeReservationNote } from "../reservationNote.ts";
+import { computed, ref } from "vue";
+import { createSlotHandle } from "./slotHandle.ts";
+import { slotScope } from "./slotScope.ts";
 import { erpStore } from "./erpStore.ts";
-import { playSound } from "../sounds.ts";
-import Settings from "../settings.ts";
-import { SETTINGS_SAVED_EVENT } from "../constants.ts";
-import { debug } from "../logger.ts";
 
 // The rack bays of the reservation that is open, shared by everything on the
 // page that shows or changes one.
@@ -22,6 +17,12 @@ import { debug } from "../logger.ts";
 // One reservation at a time, which is what a page is. Nothing here survives a
 // navigation, and nothing needs to: the bays live on the reservation itself.
 //
+// The reading, writing and saving are `src/vue/slotHandle.ts`, which the cards
+// in the reservation selection dialog hold one of each. This module is that
+// handle for the page's own reservation, plus the two things only a page can say
+// -- whether the reservation is one that is ever parked at all, and what the
+// workplace setting asks for.
+//
 // ---- Why the reservation and not the webshop order ----
 //
 // These used to be kept on the Shopware order's customer comment, which worked
@@ -35,28 +36,7 @@ import { debug } from "../logger.ts";
 // which never knew which field it was writing into -- and what changed is only
 // where it is read from and written to.
 
-const slots = reactive<SlotAssignment>(emptyAssignment());
-
-// The reservation the bays belong to. The internal id is what the ERP screen
-// loads a record by; the number is what the operator reads and what a toast
-// names. They are not interchangeable and both are needed.
-const reservationId = ref("");
-const reservationNumber = ref("");
-
-// Whether the note has been read yet. Everything that shows a bay renders its
-// resting state until it has, the way the note box does.
-const loaded = ref(false);
-const saving = ref(false);
-
-// Whether the attempt to read it has finished, however it finished.
-//
-// Not the same question as `loaded`, and the difference is a spinner that never
-// stops. A read that fails -- an ERP that is signed out or unreachable -- leaves
-// `loaded` false for good, so anything that treats "not loaded" as "still
-// loading" turns forever on a card that is never going to fill in. This says the
-// attempt is over, so a card can stop claiming to be busy and say it has nothing
-// instead.
-const settled = ref(false);
+const handle = createSlotHandle();
 
 // One product, one of it. Such an order is not parked in the rack -- it is
 // scanned, boxed and gone, and there is never a second visit for the rest of it
@@ -66,125 +46,14 @@ const settled = ref(false);
 // control rather than quietly withholding it.
 const singleUnit = ref(false);
 
-// Whether a bay is picked for the whole order or one per product line. A setting
-// because the two ways of working are both real: one bay for the order is what
-// the floor does when an order is parked whole, and per line is for the orders
-// whose items come in far enough apart to be shelved separately.
-//
-// Read through a computed rather than copied into a ref, and that is not a
-// style choice: this module is evaluated with every other import, which is
-// before `main.ts` calls `Settings.load()`. A value taken at import time is the
-// default whatever the workplace has configured -- so it is read when something
-// first asks for it, by which time the store has been loaded.
-//
-// The counter is what re-reads it. The settings dialog lives in the footer's
-// mount, which is a third app again, so the change arrives as an event on the
-// document; bumping the counter is what tells the computed its answer is stale.
-const settingsVersion = ref(0);
+// The id the page attached with, kept because a re-read after a sign-in needs
+// it and the handle does not hand its own back.
+let lastReservationId = "";
 
-const scope = computed<"order" | "line">(() => {
-	settingsVersion.value;
+function attachReservation(id: string, number: string): Promise<void> {
+	lastReservationId = id;
 
-	return Settings.slotScope;
-});
-
-document.addEventListener(SETTINGS_SAVED_EVENT, () => {
-	Settings.load();
-	settingsVersion.value++;
-});
-
-// Registered by the sidebar, which is the one mount that knows what the page is
-// about. The bays are read off the reservation's note, which is where they live.
-//
-// Two kinds of failure, told apart on purpose.
-//
-// An ERP that is merely unreachable or slow leaves the controls at rest and says
-// nothing: a rack bay is an aside on a page whose job is packing, and one bad
-// request is not worth a dialog. A sign-out is different -- it will not come
-// back on its own, and every bay on the page is dead until somebody answers for
-// it -- so it raises the prompt here, on the way in, rather than waiting for a
-// packer to press a bay and be refused.
-async function attachReservation(id: string, number: string) {
-	reservationId.value = id;
-	reservationNumber.value = number;
-	loaded.value = false;
-	settled.value = false;
-
-	slots.order = "";
-	slots.lines = {};
-
-	// Nothing to read against, and nothing on its way: settled before it began.
-	if (!id) {
-		settled.value = true;
-
-		return;
-	}
-
-	try {
-		const parsed = parseComment(await readReservationNote(id));
-
-		slots.order = parsed.slots.order;
-		slots.lines = parsed.slots.lines;
-		loaded.value = true;
-
-		debug("Rack bays read off the reservation note", JSON.stringify(slots));
-	} catch (error) {
-		if (error instanceof ErpSignedOutError) {
-			erpStore.reportSignedOut();
-		}
-
-		console.error("Pack&Ship Extended could not read the reservation note.", error);
-	} finally {
-		settled.value = true;
-	}
-}
-
-// One writer, so a bay that is shown is a bay that reached RetailVista -- or a
-// toast saying it did not.
-//
-// The note is read again rather than composed from what was loaded with the
-// page. The field is shared: it is the reservation's own note, which somebody in
-// the office may have typed into since this page was opened, and recomposing
-// from a copy taken minutes ago would quietly drop what they wrote. Reading it
-// immediately before writing it back is what keeps the two from overwriting each
-// other, and the frame is already on the record so it costs almost nothing.
-function save(): Promise<unknown> {
-	if (!reservationId.value) {
-		return Promise.resolve();
-	}
-
-	saving.value = true;
-
-	const promise = (async () => {
-		const current = parseComment(await readReservationNote(reservationId.value));
-
-		await writeReservationNote(reservationId.value, composeComment(current.text, slots));
-	})();
-
-	toast.promise(promise, {
-		pending: `Reservering ${reservationNumber.value} vak wordt opgeslagen...`,
-		success: `Reservering ${reservationNumber.value} vak succesvol opgeslagen.`,
-		error: `Er is een fout opgetreden bij het opslaan van het vak van reservering ${reservationNumber.value}.`,
-	}).catch(() => undefined);
-
-	promise.catch((error) => {
-		if (error instanceof ErpSignedOutError) {
-			// The session went while the packer was working. This is the press
-			// that needs it, so this is where it is worth interrupting for.
-			erpStore.reportSignedOut();
-		}
-
-		console.error("Failed to save the reservation note.", error);
-		// The toast says so on screen; this says so to whoever has already turned
-		// back to the rack.
-		playSound("error");
-	});
-
-	// Settled either way: the toast reports the failure, and a control left
-	// disabled after one would mean the bay could not be corrected.
-	promise.catch(() => undefined).then(() => (saving.value = false));
-
-	return promise;
+	return handle.attach(id, number);
 }
 
 // Read the bays again once a lapsed ERP session has been signed back in.
@@ -193,47 +62,27 @@ function save(): Promise<unknown> {
 // anybody types a password, so without this the bays stay missing on a screen
 // whose dialog just said it had fixed them.
 erpStore.onRestored(() => {
-	if (reservationId.value) {
-		attachReservation(reservationId.value, reservationNumber.value);
+	if (lastReservationId) {
+		attachReservation(lastReservationId, handle.reservationNumber.value);
 	}
 });
 
-// Picking the bay a control already shows means clearing it -- the same press
-// that set it, which is how a mis-set bay gets taken off without a second
-// control for it.
 export const slotStore = {
-	slots,
-	scope,
-	saving,
+	slots: handle.slots,
+	scope: slotScope,
+	saving: handle.saving,
 	// Kept under its old name: every caller asks this to put a reservation number
 	// on screen, and which of the two ids it is has never been their business.
-	orderNumber: reservationNumber,
+	orderNumber: handle.reservationNumber,
 
 	// Whether there is a reservation to write a bay onto at all. False until the
 	// note has been read, which is what keeps a control from offering to save
 	// into a field nobody has managed to open yet.
-	ready: computed(() => loaded.value),
+	ready: handle.ready,
+	loading: handle.loading,
 
-	// Still on its way. False both before the note arrives and after the attempt
-	// has failed -- see `settled` -- so a card can spin while there is something
-	// to wait for and stop when there is not.
-	loading: computed(() => !settled.value),
-
-	// ---- What this reservation was actually written with ----
-	//
-	// The setting says how a bay is picked here; these say how it was picked
-	// wherever this reservation was last handled. They are not the same question,
-	// and answering the first one for both is how a reservation parked per line
-	// by another workstation would arrive on a screen set to per order with its
-	// bays nowhere on it -- the items standing in the rack and nothing saying
-	// where.
-	//
-	// So each control is shown when its own setting asks for it *or* when the
-	// reservation already carries that kind of bay. A bay that exists is always
-	// shown and always changeable; the setting only decides what is offered on a
-	// reservation that has none yet.
-	hasOrderSlot: computed(() => Boolean(slots.order)),
-	hasLineSlots: computed(() => Object.values(slots.lines).some(Boolean)),
+	hasOrderSlot: handle.hasOrderSlot,
+	hasLineSlots: handle.hasLineSlots,
 
 	// Whether to offer a bay on this reservation at all.
 	//
@@ -242,7 +91,7 @@ export const slotStore = {
 	// do not know -- a repair, a customer collecting later -- and hiding where
 	// they put it would leave the item in the rack with nothing pointing at it.
 	showSlots: computed(() =>
-		!singleUnit.value || Boolean(slots.order) || Object.values(slots.lines).some(Boolean)),
+		!singleUnit.value || handle.hasOrderSlot.value || handle.hasLineSlots.value),
 
 	attachReservation,
 
@@ -252,41 +101,8 @@ export const slotStore = {
 		singleUnit.value = value;
 	},
 
-	setOrderSlot(slot: string) {
-		slots.order = slots.order == slot ? "" : slot;
-
-		return save();
-	},
-
-	setLineSlot(barcode: string, slot: string) {
-		if (slots.lines[barcode] == slot) {
-			delete slots.lines[barcode];
-		} else {
-			slots.lines[barcode] = slot;
-		}
-
-		return save();
-	},
-
-	lineSlot(barcode: string): string {
-		return slots.lines[barcode] ?? "";
-	},
-
-	// The bays this reservation already has something in, so the picker can say
-	// which of them are taken and by what. Only the other lines of this
-	// reservation: what another reservation is using is not on this one's note,
-	// and guessing at it would be worse than saying nothing.
-	takenBy(exceptBarcode?: string): Map<string, string[]> {
-		const taken = new Map<string, string[]>();
-
-		for (const [barcode, slot] of Object.entries(slots.lines)) {
-			if (!slot || barcode == exceptBarcode) {
-				continue;
-			}
-
-			taken.set(slot, [...(taken.get(slot) ?? []), barcode]);
-		}
-
-		return taken;
-	},
+	setOrderSlot: handle.setOrderSlot,
+	setLineSlot: handle.setLineSlot,
+	lineSlot: handle.lineSlot,
+	takenBy: handle.takenBy,
 };

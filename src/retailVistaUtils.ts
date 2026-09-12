@@ -433,6 +433,30 @@ export async function fetchReservationDetails(reservationId: string):Promise<Res
 	}
 }
 
+// The internal id of a reservation we are not on, off its own page.
+//
+// The reservation selection dialog is built from the portal's search response,
+// and what that carries per reservation is the number the operator reads and the
+// link to open it -- not `#ReservationId`, which is what anything reaching the
+// ERP for that record needs. So the page behind the link is fetched and the id
+// read out of it, rather than guessing at the shape of the link.
+//
+// Empty when the page does not carry one, which is an answer rather than an
+// error: a card whose id we cannot find is a card without rack bays on it.
+export async function fetchReservationId(url: string): Promise<string> {
+	try {
+		const holder = document.createElement("div");
+
+		holder.innerHTML = await fetchReservation(url);
+
+		return holder.querySelector<HTMLInputElement>("#ReservationId")?.value ?? "";
+	} catch (error) {
+		console.error("Pack&Ship Extended could not read the reservation id.", error);
+
+		return "";
+	}
+}
+
 export async function fetchReservation(url:string): Promise<string> {
 		return new Promise((resolve) => {
 		$.ajax({

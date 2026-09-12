@@ -2,7 +2,9 @@
 import { ModalReservationDetails } from "../../interfaces.ts";
 import { isAmountStringComplete, matchShopwareOrderNumber } from "../../retailVistaUtils.ts";
 import ShopwareNote from "./ShopwareNote.vue";
+import ReservationSlotPanel from "./ReservationSlotPanel.vue";
 import CopyButton from "./CopyButton.vue";
+import { SlotHandle } from "../slotHandle.ts";
 
 // One reservation in the picker, for the two groups that have something to look
 // at: the ones that hold several of the scanned product, and the ones that hold
@@ -25,6 +27,11 @@ const props = defineProps<{
 	// fetched.
 	showNote?: boolean;
 	noteEnabled?: boolean;
+	// The reservation's rack bays, when the dialog has a handle for it. Absent
+	// on a card whose reservation we could not identify -- see
+	// `fetchReservationId()` -- which is a card without bays rather than a
+	// reason to hold the rest of it back.
+	slotHandle?: SlotHandle;
 }>();
 
 defineEmits<{
@@ -110,9 +117,16 @@ function isShort(amount: string) {
 			</table>
 		</div>
 
-		<div class="pse-rescard-note" v-if="showNote && hasShopwareNote()">
-			<ShopwareNote :order-data="reservation.swOrderData" :enabled="!!noteEnabled"
-				@save="$emit('saveNote')" />
+		<!-- The note and the rack bays, in the order the sidebar puts them in on
+		     the reservation's own page: the note is an instruction from the
+		     customer, the bay is where the items are standing. Both fold shut when
+		     they are empty, which on a dialog that is a column of cards is most of
+		     them. -->
+		<div class="pse-rescard-aside" v-if="(showNote && hasShopwareNote()) || slotHandle">
+			<ShopwareNote v-if="showNote && hasShopwareNote()" :order-data="reservation.swOrderData"
+				:enabled="!!noteEnabled" @save="$emit('saveNote')" />
+
+			<ReservationSlotPanel v-if="slotHandle" :handle="slotHandle" :products="reservation.products" />
 		</div>
 	</article>
 </template>
@@ -280,7 +294,10 @@ function isShort(amount: string) {
 	color: var(--pse-attention-ink);
 }
 
-.pse-rescard-note {
+.pse-rescard-aside {
+	display: flex;
+	flex-direction: column;
+	gap: 10px;
 	padding: 14px 16px;
 	border-top: 1px solid var(--pse-line);
 }

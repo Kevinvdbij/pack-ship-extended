@@ -17,6 +17,7 @@ import CopyButton from '../components/CopyButton.vue';
 import ImageModal from '../components/ImageModal.vue';
 import SlotPicker from '../components/SlotPicker.vue';
 import { slotStore } from '../slotStore.ts';
+import { canAssignLines } from '../slotScope.ts';
 import Settings from '../../settings.ts';
 import * as Shopware from "../../shopware.ts";
 import { playSound, warmUpAudio } from '../../sounds.ts';
@@ -97,17 +98,12 @@ watchEffect(() => {
 const perLineSlots = computed(() => slotStore.showSlots.value
 	&& (slotStore.scope.value == "line" || slotStore.hasLineSlots.value));
 
-// Whether a line that has no bay yet may be given one here. Only while this
-// workplace picks bays per line: on a workplace set to one bay per order the
-// column is being shown because somebody else parked this order that way, and
-// what it is there for is reading and correcting their bays -- not quietly
-// starting to park the rest of the order by a rule this screen is not set to.
-//
-// So the bays that exist stay live and the empty ones are dead. A packer who
+// Whether a row's chip can be pressed. `canAssignLines` is the shared answer to
+// whether a bay that does not exist yet may be set from a per-line control at
+// all -- see `src/vue/slotScope.ts`. So the bays that exist stay live and the
+// empty ones are dead on a workplace set to one bay per order: a packer who
 // wants to add one changes the setting, which is a decision about how this
 // workplace works rather than something to fall into one row at a time.
-const canAssignLines = computed(() => slotStore.scope.value == "line");
-
 function lineChipDisabled(barcode: string): boolean {
 	return !slotStore.ready.value
 		|| slotStore.saving.value
@@ -125,6 +121,7 @@ function lineChipTitle(barcode: string): string {
 		? "Kies een vak voor dit product"
 		: "Deze werkplek zet één vak per order. Zet de instelling op 'een vak per productregel' om losse regels weg te zetten.";
 }
+
 // The table's own width, which the skeleton has to match cell for cell.
 const columnCount = computed(() => (perLineSlots.value ? 6 : 5));
 

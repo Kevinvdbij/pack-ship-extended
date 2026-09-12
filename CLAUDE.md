@@ -62,12 +62,18 @@ longer than the reveal failsafe, so waiting for a band that never comes cost thr
 screen on every trip into a reservation. `mountHeader()` races that lookup against `domReady()` and
 mounts our band at the top of `PAGE_COLUMN_SELECTOR` when the portal serves none.
 
-## Two traps that have already cost time
+## Three traps that have already cost time
 
 - **The cloak blocks focus.** The Stylus style hides the page with `visibility: hidden` until
   `pse-ready`, and a hidden element cannot be focused — `focus()` is dropped silently and does *not*
   take effect when the cloak lifts. Anything that places the cursor must go through
   `afterReveal()` in `src/reveal.ts`.
+- **The ERP frame steals the focus.** Opening an ERP screen in the frame is harmless, but the
+  postback that loads a record into it — `SetDisplayItemId`, which every read and write goes
+  through — moves `document.activeElement` to the frame element, roughly 250ms *before* the frame's
+  load event and without firing a single focus event out here. `src/erpFrame.ts` watches
+  `document.activeElement` on a timer for the length of every `erpTask` and hands the cursor back.
+  Anything that adds a new way of driving the ERP should go through `erpTask` so it is covered.
 - **Load timing cannot be judged in `npm run dev`** (see README). Build and install before believing
   anything about paint order.
 

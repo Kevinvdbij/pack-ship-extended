@@ -3,6 +3,9 @@ import { computed, onMounted, ref } from "vue";
 import * as Shopware from "../../shopware.ts";
 import { saveOrderComment } from "../../shopwareComments.ts";
 import * as RVUtils from "../../retailVistaUtils.ts";
+import { ErpSignedOutError, readReservationNotes } from "../../reservationNote.ts";
+import { createSlotHandle, SlotHandle } from "../slotHandle.ts";
+import { erpStore } from "../erpStore.ts";
 import { MassCompleteEntry, MassCompleteStatus, ModalReservationDetails, ReservationSelectionModalData } from "../../interfaces.ts";
 import Settings from "../../settings.ts";
 import ModalShell from "./ModalShell.vue";
@@ -30,6 +33,47 @@ const massCompleteMax = 50;
 const massCompleteThreshold = 2;
 const massCompleteStatus = ref<MassCompleteEntry[]>();
 
+// ---- The rack bays on the cards ----
+//
+// On the reservations that are ready to pack: an order of several lines, or of
+// several of one product, is the order that waits in the rack while the rest of
+// it comes in -- and the packer deciding which of these to carry on with wants
+// to know which of them is already standing somewhere, and to park what is in
+// their hands before opening anything.
+//
+// ---- Why not on the ones that are not fully picked ----
+//
+// They should have a bay, and arguably need one more than the ready ones do: a
+// half-picked order is exactly what has to stand somewhere until the rest turns
+// up. What is missing is the reservation's internal id, which is what the ERP
+// record -- and so the note the bays live on -- is keyed by.
+//
+// Checked on the live portal rather than assumed. A ready card carries an Open
+// link, and the page behind it holds `#ReservationId`; an incomplete card
+// carries no link, no hidden input and no id in any attribute, and the portal
+// answers a direct search for such a reservation by number with "is nog niet
+// volledig geraapt" and nothing else -- on both the search and the add-parcels
+// route. The only place left that knows the mapping is the ERP's own
+// reservation search screen (`pageId=376`), whose results arrive in an async
+// grid that is a job of its own to drive.
+//
+// So the panel is left off those cards rather than shown saying "not available"
+// on every one of them, which is a broken control rather than an honest one.
+//
+// A handle per card, made here and now rather than when its note arrives: the
+// list is known before the first render, and a card that grows a control a
+// second later is worse than one that shows it waiting. Each starts out
+// unsettled, so every panel is turning until it has an answer.
+const slotReservations = props.modalData.validReservations;
+
+const slotHandles = new Map<number, SlotHandle>(
+	slotReservations.map((reservation) => [reservation.reservationNumber, createSlotHandle()])
+);
+
+function slotsFor(reservationNumber: number): SlotHandle | undefined {
+	return slotHandles.get(reservationNumber);
+}
+
 // A run that was cut short by a reservation the carrier refused. The rest of
 // the run is not attempted: whatever stopped the one is likely to stop the next
 // -- a carrier that is down, an account that is out of labels -- and a run that
@@ -43,6 +87,8 @@ const massCompleteStopped = ref(false);
 initMassComplete();
 
 onMounted(() => {
+	loadSlots();
+
 	Shopware.shopwareInitialize().then((token) => {
 		swToken.value = token;
 		retrieveCommentData();
@@ -60,6 +106,53 @@ function onSaveButtonClick(orderData: Shopware.ShopwareOrderEntry, orderNumber: 
 	saveTimeoutId = setTimeout(() => {
 		swCommentBoxesEnabled.value = true;
 	}, 250);
+}
+
+// The bays of every card, in two passes.
+//
+// The portal's search response names a reservation by its number and its link,
+// and the note lives on the ERP record, which is keyed by the internal id. So
+// the ids are fetched first -- in parallel, they are plain portal requests --
+// and the notes then read in one ERP job rather than one job each: see
+// `readReservationNotes()`, which opens the ERP screen once and changes only
+// which record it is showing.
+//
+// A reservation whose id or note cannot be read is settled with nothing, which
+// is what its panel then renders as "not available". That is deliberate: an
+// empty bay and a bay we failed to read look identical, and the more dangerous
+// of the two to get wrong is the one that reads as "this order is not in the
+// rack".
+function loadSlots() {
+	const reservations = slotReservations;
+
+	if (reservations.length == 0) {
+		return;
+	}
+
+	Promise.all(reservations.map((reservation) => RVUtils.fetchReservationId(reservation.url)))
+		.then(async (ids) => {
+			const notes = await readReservationNotes(ids.filter(Boolean));
+
+			reservations.forEach((reservation, index) => {
+				slotHandles.get(reservation.reservationNumber)
+					?.adopt(ids[index], String(reservation.reservationNumber), notes.get(ids[index]));
+			});
+		})
+		.catch((error) => {
+			// Nothing was read, so every panel has to stop claiming to be busy. A
+			// sign-out is worth the prompt: it will not come back on its own, and
+			// every bay on the dialog is dead until somebody answers for it.
+			if (error instanceof ErpSignedOutError) {
+				erpStore.reportSignedOut();
+			}
+
+			console.error("Pack&Ship Extended could not read the rack bays of the listed reservations.", error);
+
+			reservations.forEach((reservation) => {
+				slotHandles.get(reservation.reservationNumber)
+					?.adopt("", String(reservation.reservationNumber), undefined);
+			});
+		});
 }
 
 function retrieveCommentData() {
@@ -306,6 +399,7 @@ function countStatus(status: MassCompleteStatus): number {
 			<ReservationCard v-for="reservation in modalData.validReservations"
 				:key="reservation.reservationNumber" :reservation="reservation" show-products
 				:show-open-button="!massCompleteStarted" show-note :note-enabled="swCommentBoxesEnabled"
+				:slot-handle="slotsFor(reservation.reservationNumber)"
 				@open="(url) => emit('open', url)"
 				@save-note="onSaveButtonClick(reservation.swOrderData, reservation.saleOrderReference)" />
 		</section>

@@ -60,7 +60,17 @@ export interface ErpPage {
 
 // Runs one job with the frame to itself.
 export function erpTask<T>(work: (page: ErpPage) => Promise<T>): Promise<T> {
-	const run = async () => work(await ensurePage());
+	const run = async () => {
+		// The focus is the frame's for the length of the job to take, so it is
+		// ours to watch for exactly that long. See `watchFocus()`.
+		watchFocus();
+
+		try {
+			return await work(await ensurePage());
+		} finally {
+			releaseFocus();
+		}
+	};
 	const result = queue.then(run, run);
 
 	// The chain must not stop at the first failure, or one unreachable ERP would
@@ -154,6 +164,125 @@ function ensureFrame(): Promise<HTMLIFrameElement> {
 	return framePromise;
 }
 
+// ---- Keeping the cursor out of the frame ----
+//
+// Loading an ERP record takes the focus. Measured on the live portal rather than
+// reasoned about: opening `Default.aspx?pageId=374` in a frame leaves the focus
+// alone, but the postback that loads a record into it -- `SetDisplayItemId`,
+// which every read and write here goes through -- moves `document.activeElement`
+// to the frame element, about 250ms before the frame's own load event and
+// without the outer document hearing a single focus event for it.
+//
+// On the parcels page that costs a scan. The first thing the sidebar does on the
+// way in is read the reservation's note, so the cursor this page had just put in
+// the scan field was pulled into a hidden document a second later, and the scan
+// that followed went nowhere.
+//
+// The frame is `aria-hidden` and `tabindex="-1"`: nothing out here ever wants the
+// cursor in there. So for as long as a job is running, the focus is watched and
+// handed straight back to the element that had it.
+//
+// Watched on a timer rather than hung off an event, because there is no event:
+// what changes is only `document.activeElement`. A timer for the length of a job
+// is what covers a theft that lands anywhere in a postback -- before the load,
+// after it, or on the second of the two loads a read is made of.
+
+// The frame, once there is one, so the focus watch can tell "in the frame" from
+// anywhere else without being handed it.
+let frameElement: HTMLIFrameElement | undefined;
+
+// The element that had the focus before the frame took it.
+//
+// Sampled on the watch's own tick rather than tracked from focus events, and
+// that is not belt-and-braces: a `focus()` call in a background tab moves
+// `document.activeElement` without firing `focusin` at all -- measured in the
+// live tab -- and the one page that most needs this places the cursor from a
+// script. Events are listened to as well because they are free and finer
+// grained, but nothing depends on them.
+let lastFocusOutsideFrame: Element | null = null;
+
+// How often the focus is looked at while a job runs, and how long the watch
+// stays on after the last one finishes -- enough to cover a theft that lands a
+// moment after the step that caused it was awaited.
+const FOCUS_WATCH_INTERVAL = 100;
+const FOCUS_WATCH_TAIL = 1000;
+
+let focusWatchJobs = 0;
+let focusWatchTimer: number | undefined;
+let focusWatchStopTimer: number | undefined;
+
+document.addEventListener("focusin", (event) => {
+	lastFocusOutsideFrame = outsideFocusCandidate(event.target as Element | null)
+		?? lastFocusOutsideFrame;
+}, true);
+
+function handFocusBack() {
+	const frame = frameElement;
+
+	if (!frame) {
+		return;
+	}
+
+	// `activeElement` is the frame element itself whenever the focus is anywhere
+	// inside it, whichever of its own controls has it. Anything else is where the
+	// packer is, and worth remembering for when the frame takes it.
+	if (document.activeElement != frame) {
+		lastFocusOutsideFrame = outsideFocusCandidate(document.activeElement) ?? lastFocusOutsideFrame;
+
+		return;
+	}
+
+	const previous = lastFocusOutsideFrame;
+
+	// Out of the frame either way. A frame that keeps the focus keeps every
+	// keystroke after it, and handing the cursor back to nothing is still better
+	// than leaving it in a document nobody can see.
+	frame.blur();
+
+	if (previous instanceof HTMLElement && previous.isConnected) {
+		previous.focus({ preventScroll: true });
+	}
+}
+
+// Somewhere the cursor could sensibly be put back. Not the body, which is where
+// the focus sits when nothing holds it, and not the frame -- putting it back
+// there is the whole thing being prevented.
+function outsideFocusCandidate(element: Element | null): Element | null {
+	return element && element != document.body && element != frameElement ? element : null;
+}
+
+// Counted rather than switched, so a job that starts while another is finishing
+// does not turn the watch off behind it.
+function watchFocus() {
+	focusWatchJobs++;
+
+	// Where the packer is right now, which is where they will want to be when
+	// this job is over. Sampled again on every tick from here on.
+	lastFocusOutsideFrame = outsideFocusCandidate(document.activeElement) ?? lastFocusOutsideFrame;
+
+	window.clearTimeout(focusWatchStopTimer);
+	focusWatchStopTimer = undefined;
+
+	focusWatchTimer ??= window.setInterval(handFocusBack, FOCUS_WATCH_INTERVAL);
+}
+
+function releaseFocus() {
+	focusWatchJobs = Math.max(0, focusWatchJobs - 1);
+
+	if (focusWatchJobs > 0 || focusWatchStopTimer !== undefined) {
+		return;
+	}
+
+	focusWatchStopTimer = window.setTimeout(() => {
+		focusWatchStopTimer = undefined;
+
+		if (focusWatchJobs == 0) {
+			window.clearInterval(focusWatchTimer);
+			focusWatchTimer = undefined;
+		}
+	}, FOCUS_WATCH_TAIL);
+}
+
 async function createFrame(): Promise<HTMLIFrameElement> {
 	const frame = document.createElement("iframe");
 
@@ -166,6 +295,11 @@ async function createFrame(): Promise<HTMLIFrameElement> {
 	frame.src = "about:blank";
 
 	const loaded = whenLoaded(frame, "the ERP frame");
+
+	// Known to the focus watch before it is in the document, so the first job is
+	// covered -- that is the one that lands while the packer is being given the
+	// scan field.
+	frameElement = frame;
 
 	document.body.append(frame);
 
@@ -214,5 +348,6 @@ function requireSession(frame: HTMLIFrameElement) {
 export function resetErpFrame() {
 	framePromise?.then((frame) => frame.remove()).catch(() => undefined);
 	framePromise = undefined;
+	frameElement = undefined;
 	currentPage = "";
 }

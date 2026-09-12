@@ -2,7 +2,7 @@ import {
 	ERP_EDIT_BUTTON_ID, ERP_NOTE_SELECTOR, ERP_PAGE_PATH, ERP_RESERVATION_PAGE_ID,
 	ERP_SAVE_BUTTON_ID, ERP_SET_ITEM_FUNCTION
 } from "./constants.ts";
-import { ErpPage, erpTask } from "./erpFrame.ts";
+import { ErpPage, ErpSignedOutError, erpTask } from "./erpFrame.ts";
 import { debug } from "./logger.ts";
 
 // Reading and writing the reservation's own note field.
@@ -20,6 +20,48 @@ export function readReservationNote(reservationId: string): Promise<string> {
 		await showReservation(page, reservationId);
 
 		return noteField(page).value;
+	});
+}
+
+// The notes of several reservations, as one job with the frame.
+//
+// The reservation selection screen shows a card per reservation and a rack bay
+// on each of them, so it needs every note at once. Read one at a time through
+// `readReservationNote` that is two full page loads each -- the screen, then the
+// record -- because loading a record navigates the frame and the next read has
+// to open the screen again. Held in one job the screen is opened once and only
+// the record changes, which halves the loads and, more to the point, keeps the
+// whole batch to a single turn in the queue rather than interleaving with
+// whatever else the page wants the ERP for.
+//
+// A reservation whose note cannot be read is left out of the map rather than
+// failing the batch: the cards each speak for themselves, and one bad record
+// should not take the bays off all of them. A signed-out session is the
+// exception -- nothing after it can succeed either, so it is thrown for the
+// caller to raise the prompt over.
+export function readReservationNotes(reservationIds: string[]): Promise<Map<string, string>> {
+	return erpTask(async (page) => {
+		const notes = new Map<string, string>();
+
+		for (const id of reservationIds) {
+			if (!id || notes.has(id)) {
+				continue;
+			}
+
+			try {
+				await showReservation(page, id);
+
+				notes.set(id, noteField(page).value);
+			} catch (error) {
+				if (error instanceof ErpSignedOutError) {
+					throw error;
+				}
+
+				debug("Could not read the note of reservation", id, error);
+			}
+		}
+
+		return notes;
 	});
 }
 
