@@ -143,6 +143,30 @@ export const ERP_LABEL_PARCEL_SELECTOR = '[id$="rvcReservationParcel_ListBox"]';
 export const ERP_LABEL_PRINTER_SELECTOR = '[id$="rvcPrinter_ListBox"]';
 export const ERP_LABEL_PRINT_SELECTOR = '[id$="btnPrint"]';
 
+// ---- The raaplijst ----
+//
+// The reservation screen's report dialog: the printer icon in its navigation
+// icons opens `pageId=335` with `reportPageId` naming the screen the reports
+// belong to and `itemId` the record they are about. Both are on the query
+// string, so the dialog can be loaded straight rather than raised from the
+// screen behind it -- which is the whole reason this is a page and not a
+// sequence of presses through reservation maintenance.
+//
+// The report itself is picked by its caption, which is the one place in this
+// flow where a caption is unavoidable: the list's option values are internal
+// ids that differ per installation, and "110.1" is how the report is known to
+// everybody who asks for it. Matched on the number at the front rather than on
+// the whole caption, so the vendor renaming "Raaplijst" changes nothing.
+export const ERP_REPORT_PAGE_ID = 335;
+export const ERP_RAAPLIJST_REPORT_PREFIX = "110.1";
+export const ERP_REPORT_SELECTOR = '[id$="rvcReport_ListBox"]';
+export const ERP_REPORT_OK_SELECTOR = '[id$="cmdOk"]';
+
+// Where the rendered report lands: the viewer's content frame, which holds the
+// report as positioned HTML rather than as a PDF. That is what makes it
+// printable from our side at all -- see `src/raaplijst.ts`.
+export const ERP_REPORT_CONTENT_FRAME_SELECTOR = '[id$="ReportViewer1_ContentFrame"]';
+
 // ---- Which printer ----
 //
 // The environment maintenance screen, which is where the workplace's printers

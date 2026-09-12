@@ -418,7 +418,8 @@ function setupSidebar() {
 		return;
 	}
 
-	mountApp(ReservationSidebar, (host) => column.insertAdjacentElement("afterbegin", host));
+	mountApp(ReservationSidebar, (host) => column.insertAdjacentElement("afterbegin", host),
+		{ showRaaplijst: true });
 }
 
 let announceTimer: ReturnType<typeof setTimeout> | undefined;

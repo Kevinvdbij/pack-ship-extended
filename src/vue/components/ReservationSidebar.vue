@@ -8,6 +8,7 @@ import { RESERVATION_SUMMARY_SELECTOR, SHOPWARE_URL } from "../../constants.ts";
 import ShopwareNote from "./ShopwareNote.vue";
 import SlotCard from "./SlotCard.vue";
 import CopyButton from "./CopyButton.vue";
+import RaaplijstButton from "./RaaplijstButton.vue";
 import { slotStore } from "../slotStore.ts";
 
 // The column beside the work: which reservation this is, who it is for, where
@@ -101,7 +102,17 @@ readPortalSummary();
 // because the pages this component is mounted on each lay the portal's summary
 // block out their own way, and a reservation we cannot identify is bays we
 // cannot show rather than a reason to take the sidebar down.
-slotStore.attachReservation(readReservationId(), reservationNumber.value);
+// Which page this sidebar is standing on, as far as it is allowed to matter.
+//
+// Only the parcel creation screen offers the raaplijst: that is the screen a
+// packer starts a reservation on, which is when the list of what to fetch off
+// the rack is worth having. On the screens after it the work it describes is
+// already done.
+const props = defineProps<{ showRaaplijst?: boolean }>();
+
+const reservationId = readReservationId();
+
+slotStore.attachReservation(reservationId, reservationNumber.value);
 
 function readReservationId(): string {
 	try {
@@ -298,6 +309,9 @@ function onOpen() {
 					<span v-for="(line, index) in address" :key="index">{{ line }}</span>
 				</p>
 			</div>
+
+			<!-- Last on the card, under everything it is about. -->
+			<RaaplijstButton v-if="props.showRaaplijst && reservationId" :reservation-id="reservationId" />
 		</div>
 
 		<!-- Anything the page wants under the reservation's own details. -->
