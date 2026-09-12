@@ -62,6 +62,29 @@ longer than the reveal failsafe, so waiting for a band that never comes cost thr
 screen on every trip into a reservation. `mountHeader()` races that lookup against `domReady()` and
 mounts our band at the top of `PAGE_COLUMN_SELECTOR` when the portal serves none.
 
+## Never load the ERP's launcher or its login page
+
+`src/erpFrame.ts` drives the ERP by loading `Default.aspx?pageId=<n>` bare in a frame. Keep it that
+way. **Loading `/outdoor/RetailVista.aspx` destroys the ERP session** — it frames `Login.aspx`, and
+that page abandons whatever session the browser had. Measured: a session that answered
+`Default.aspx` with the application answered with the login form seconds after the launcher was
+loaded, and the packer is then prompted to sign in again on their next bay.
+
+That is what the launcher is for, so the temptation is real. `RetailVista.aspx` is the application's
+true top window — it owns the modal dialog machinery every screen reaches for through
+`window.top.getMainWindow()`, which is why a bare screen has no search dialog and no way to find a
+record by the number an operator reads. Two further facts about it, learned the expensive way:
+
+- Its frame's `name` must start with `pop` (`pagemanager.js`: anything else sends `top.location` to
+  `Index.aspx`, taking our own tab with it).
+- Its inner frame goes to `Login.aspx` **whether or not a session exists**, and never redirects on to
+  the application. Pointing that frame at `Default.aspx` afterwards does not help: by then the
+  session is gone.
+
+So a reservation that the portal will not identify — one that is not fully picked has no id anywhere
+in the portal's markup — currently cannot have a rack bay. Anything attempting that again needs a
+route that never loads those two pages.
+
 ## Three traps that have already cost time
 
 - **The cloak blocks focus.** The Stylus style hides the page with `visibility: hidden` until
