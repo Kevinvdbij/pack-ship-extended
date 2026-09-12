@@ -48,6 +48,16 @@ const reservationNumber = ref("");
 const loaded = ref(false);
 const saving = ref(false);
 
+// Whether the attempt to read it has finished, however it finished.
+//
+// Not the same question as `loaded`, and the difference is a spinner that never
+// stops. A read that fails -- an ERP that is signed out or unreachable -- leaves
+// `loaded` false for good, so anything that treats "not loaded" as "still
+// loading" turns forever on a card that is never going to fill in. This says the
+// attempt is over, so a card can stop claiming to be busy and say it has nothing
+// instead.
+const settled = ref(false);
+
 // One product, one of it. Such an order is not parked in the rack -- it is
 // scanned, boxed and gone, and there is never a second visit for the rest of it
 // to wait through -- so asking where it is standing is asking about something
@@ -98,11 +108,15 @@ async function attachReservation(id: string, number: string) {
 	reservationId.value = id;
 	reservationNumber.value = number;
 	loaded.value = false;
+	settled.value = false;
 
 	slots.order = "";
 	slots.lines = {};
 
+	// Nothing to read against, and nothing on its way: settled before it began.
 	if (!id) {
+		settled.value = true;
+
 		return;
 	}
 
@@ -120,6 +134,8 @@ async function attachReservation(id: string, number: string) {
 		}
 
 		console.error("Pack&Ship Extended could not read the reservation note.", error);
+	} finally {
+		settled.value = true;
 	}
 }
 
@@ -197,6 +213,11 @@ export const slotStore = {
 	// note has been read, which is what keeps a control from offering to save
 	// into a field nobody has managed to open yet.
 	ready: computed(() => loaded.value),
+
+	// Still on its way. False both before the note arrives and after the attempt
+	// has failed -- see `settled` -- so a card can spin while there is something
+	// to wait for and stop when there is not.
+	loading: computed(() => !settled.value),
 
 	// ---- What this reservation was actually written with ----
 	//

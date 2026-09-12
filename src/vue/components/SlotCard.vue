@@ -20,6 +20,29 @@ const showPicker = ref(false);
 
 const slot = computed(() => slotStore.slots.order);
 
+// The reservation's note has not come back yet.
+//
+// Worth saying out loud rather than leaving the card at rest. Empty and
+// "not known yet" look identical here -- both are a card with no bay on it --
+// and the resting state reads as an answer: this order is not in the rack. It is
+// the more dangerous of the two to get wrong, because acting on it means putting
+// the items somewhere the order already has a place for.
+//
+// So while the note is on its way the card says so, and none of the copy that
+// asserts an empty rack is rendered. The chip stays disabled either way; what
+// changes is what it claims.
+//
+// From the store's own `loading` rather than from `!ready`: a read that failed
+// leaves `ready` false for good, and a spinner hung off that would turn until
+// the page was navigated away from.
+const loading = computed(() => slotStore.loading.value);
+
+// The read is over and there is still nothing. The ERP was signed out or did not
+// answer -- the prompt and the console say which -- and what matters here is
+// only that this card cannot speak for the rack. It says so rather than showing
+// an empty bay, which would be a claim it has no business making.
+const unavailable = computed(() => !loading.value && !slotStore.ready.value);
+
 // The bays the lines are using, each once, in rack order. What is in them is the
 // product table's business; this is the list of places to walk to.
 const lineSlots = computed(() => {
@@ -67,6 +90,8 @@ function onPick(picked: string) {
 		<header class="pse-slotcard-head">
 			<span class="material-icons pse-slotcard-icon" aria-hidden="true">inventory_2</span>
 			<h3 class="pse-slotcard-title">{{ showLineSlots ? "Vakken" : "Vak" }}</h3>
+			<span v-if="loading" class="pse-slotcard-spinner" role="status"
+				aria-label="Vak wordt opgehaald"></span>
 		</header>
 
 		<div class="pse-slotcard-body">
@@ -82,16 +107,23 @@ function onPick(picked: string) {
 					:title="slot ? `Deze order staat in vak ${slot}` : 'Kies een vak voor deze order'"
 					@click="showPicker = true">
 					<span v-if="slot" class="pse-slot-chip-label">{{ slot }}</span>
+					<!-- Not "Vak kiezen" while the note is still coming: that is an
+					     instruction, and it is the wrong one on an order that turns
+					     out to have a bay already. -->
+					<span v-else-if="loading" class="pse-slot-chip-empty">Ophalen...</span>
+					<span v-else-if="unavailable" class="pse-slot-chip-empty">Niet beschikbaar</span>
 					<span v-else class="pse-slot-chip-empty">
 						<span class="material-icons pse-slot-chip-empty-icon" aria-hidden="true">add</span>
 						Vak kiezen
 					</span>
 				</button>
 
-				<p v-if="!showBoth" class="pse-slotcard-hint">
-					{{ slot
-						? "Alles van deze order staat hier tot de rest binnen is."
-						: "Kies een vak zodra je deze order wegzet." }}
+				<p v-if="!showBoth && !loading" class="pse-slotcard-hint">
+					{{ unavailable
+						? "Geen verbinding met RetailVista, dus het vak van deze order is niet bekend."
+						: slot
+							? "Alles van deze order staat hier tot de rest binnen is."
+							: "Kies een vak zodra je deze order wegzet." }}
 				</p>
 			</template>
 
@@ -107,7 +139,9 @@ function onPick(picked: string) {
 					</span>
 				</div>
 
-				<p class="pse-slotcard-hint">
+				<!-- Same reason as the hint above: every one of these sentences
+				     describes a rack we have not read, or could not read. -->
+				<p v-if="!loading && !unavailable" class="pse-slotcard-hint">
 					{{ canAssignLines
 						? (lineSlots.length
 							? "Vakken waar losse producten van deze order staan. Kies ze per regel in de productlijst."
@@ -138,6 +172,37 @@ function onPick(picked: string) {
 	padding: 10px 14px;
 	border-bottom: 1px solid var(--pse-line);
 	background-color: var(--pse-well);
+}
+
+/* At the far end of the bar, where the note card above puts its own. The two
+   cards load independently -- one asks Shopware, the other the reservation's
+   note -- so on a slow page both spinners can be turning at once, and they had
+   better look like the same thing happening twice.
+
+   Pushed over rather than sitting against the title: the heading is one short
+   word and a spinner beside it reads as part of the word. */
+.pse-slotcard-spinner {
+	flex: none;
+	margin-left: auto;
+	width: 13px;
+	height: 13px;
+	border: 2px solid var(--pse-line);
+	border-top-color: var(--pse-brand);
+	border-radius: 50%;
+	animation: pse-slotcard-spin 0.7s linear infinite;
+}
+
+@keyframes pse-slotcard-spin {
+	to {
+		transform: rotate(360deg);
+	}
+}
+
+/* The chip while the note is on its way. It carries a word rather than the add
+   icon and its instruction, so it is plainly a state and not a control -- the
+   button is disabled underneath either way. */
+.pse-slot-chip .pse-slot-chip-empty:only-child {
+	opacity: 0.75;
 }
 
 .pse-slotcard-icon {
