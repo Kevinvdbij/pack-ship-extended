@@ -1,7 +1,4 @@
-import {
-	ERP_LAUNCHER_FRAME_NAME, ERP_LAUNCHER_INNER_FRAME, ERP_LAUNCHER_PATH, ERP_LOGIN_MARKER,
-	ERP_PAGE_PATH, ERP_SEARCH_OPEN_FUNCTION, ERP_URL
-} from "./constants.ts";
+import { ERP_LOGIN_MARKER, ERP_URL } from "./constants.ts";
 
 // The one ERP page this workstation keeps open, and the queue that keeps it to
 // one thing at a time.
@@ -190,10 +187,9 @@ function ensureFrame(): Promise<HTMLIFrameElement> {
 // is what covers a theft that lands anywhere in a postback -- before the load,
 // after it, or on the second of the two loads a read is made of.
 
-// Every frame of ours that is in the document, so the focus watch can tell "in
-// one of our frames" from anywhere else without being handed one. There are two
-// kinds -- the bare screen and the launcher -- and either can take the cursor.
-const ourFrames = new Set<HTMLIFrameElement>();
+// The frame, once there is one, so the focus watch can tell "in the frame" from
+// anywhere else without being handed it.
+let frameElement: HTMLIFrameElement | undefined;
 
 // The element that had the focus before the frame took it.
 //
@@ -221,18 +217,20 @@ document.addEventListener("focusin", (event) => {
 }, true);
 
 function handFocusBack() {
-	const active = document.activeElement;
+	const frame = frameElement;
 
-	// `activeElement` is the frame element itself whenever the focus is anywhere
-	// inside it, whichever of its own controls has it. Anything else is where the
-	// packer is, and worth remembering for when a frame takes it.
-	if (!(active instanceof HTMLIFrameElement) || !ourFrames.has(active)) {
-		lastFocusOutsideFrame = outsideFocusCandidate(active) ?? lastFocusOutsideFrame;
-
+	if (!frame) {
 		return;
 	}
 
-	const frame = active;
+	// `activeElement` is the frame element itself whenever the focus is anywhere
+	// inside it, whichever of its own controls has it. Anything else is where the
+	// packer is, and worth remembering for when the frame takes it.
+	if (document.activeElement != frame) {
+		lastFocusOutsideFrame = outsideFocusCandidate(document.activeElement) ?? lastFocusOutsideFrame;
+
+		return;
+	}
 
 	const previous = lastFocusOutsideFrame;
 
@@ -250,11 +248,7 @@ function handFocusBack() {
 // the focus sits when nothing holds it, and not the frame -- putting it back
 // there is the whole thing being prevented.
 function outsideFocusCandidate(element: Element | null): Element | null {
-	if (!element || element == document.body) {
-		return null;
-	}
-
-	return element instanceof HTMLIFrameElement && ourFrames.has(element) ? null : element;
+	return element && element != document.body && element != frameElement ? element : null;
 }
 
 // Counted rather than switched, so a job that starts while another is finishing
@@ -305,7 +299,7 @@ async function createFrame(): Promise<HTMLIFrameElement> {
 	// Known to the focus watch before it is in the document, so the first job is
 	// covered -- that is the one that lands while the packer is being given the
 	// scan field.
-	ourFrames.add(frame);
+	frameElement = frame;
 
 	document.body.append(frame);
 
@@ -349,279 +343,11 @@ function requireSession(frame: HTMLIFrameElement) {
 	}
 }
 
-// ---- The application, rather than one of its screens ----
-//
-// Everything above drives a screen on its own, which is all that is needed for
-// anything addressed by an internal id. Finding a record by the number an
-// operator reads is not: the lookup is the application's search dialog, and the
-// dialog machinery lives in the launcher window -- `window.top.getMainWindow()`,
-// which a bare screen has no answer for.
-//
-// So there is a second frame that holds the application proper: the launcher,
-// with the screen inside it as `DefaultFrame`. It is created only when something
-// asks for it, because it costs two page loads rather than one, and it is kept
-// once created.
-//
-// Named, and the name matters -- see `ERP_LAUNCHER_FRAME_NAME`. A frame whose
-// name does not begin with `pop` sends our own tab to `Index.aspx`.
-
-// The launcher, for the length of one job.
-export interface ErpApplication {
-	// The launcher's own window, which owns the dialog machinery.
-	launcher: Window & Record<string, unknown>;
-	// The screen inside it. Re-read after every postback, which replaces the
-	// document.
-	screen(): Document;
-	// And its window, for the screen's own functions and variables.
-	screenWindow(): Window & Record<string, unknown>;
-	// Opens one of the application's dialogs the way the screen's own controls do,
-	// and hands back its document once `marker` is in it. The dialog is found by
-	// what it is showing rather than by a handle: the launcher hands none back.
-	openDialog(pageId: number, marker: string, what: string): Promise<Document>;
-	// Polls until `probe` answers with something, or gives up. The application
-	// answers callbacks and async postbacks with no event out here to wait on, so
-	// the waiting is done by looking.
-	until<T>(probe: () => T | undefined | null | false, what: string): Promise<T>;
-}
-
-let launcherPromise: Promise<HTMLIFrameElement> | undefined;
-
-// Which screen the launcher is holding, so a second job on the same one does not
-// pay for the load again.
-let launcherPage = 0;
-
-// How often the application is looked at while waiting for it.
-const POLL_INTERVAL = 150;
-
-export function erpApplicationTask<T>(
-	pageId: number,
-	work: (application: ErpApplication) => Promise<T>
-): Promise<T> {
-	const run = async () => {
-		watchFocus();
-
-		try {
-			return await work(await ensureApplication(pageId));
-		} finally {
-			releaseFocus();
-		}
-	};
-	const result = queue.then(run, run);
-
-	queue = result.catch(() => undefined);
-
-	return result;
-}
-
-async function ensureApplication(pageId: number): Promise<ErpApplication> {
-	const frame = await ensureLauncher(pageId);
-
-	const launcher = () => {
-		const window_ = frame.contentWindow as (Window & Record<string, unknown>) | null;
-
-		if (!window_) {
-			throw new Error("The ERP launcher has no window.");
-		}
-
-		return window_;
-	};
-
-	const screenWindow = () => {
-		const inner = launcher()[ERP_LAUNCHER_INNER_FRAME] as (Window & Record<string, unknown>) | undefined;
-
-		if (!inner?.document?.body) {
-			throw new Error("The ERP launcher is not holding a screen.");
-		}
-
-		requireInnerSession(inner.document);
-
-		return inner;
-	};
-
-	await openScreen(frame, pageId);
-
-	return {
-		get launcher() {
-			return launcher();
-		},
-
-		screen: () => screenWindow().document,
-		screenWindow,
-		until: pollFor,
-
-		async openDialog(dialogPageId: number, marker: string, what: string) {
-			const open = launcher()[ERP_SEARCH_OPEN_FUNCTION];
-
-			if (typeof open != "function") {
-				throw new Error(`The ERP launcher cannot open ${what}.`);
-			}
-
-			(open as (...rest: unknown[]) => void).call(launcher(), dialogPageId, 950, 600);
-
-			return pollFor(() => findFrameShowing(launcher(), marker), what);
-		},
-	};
-}
-
-// The dialog's own frame, told from the launcher's others by what is in it.
-//
-// The screen is skipped by name rather than left to the marker to exclude. A
-// search form is a form over the same record the screen behind it displays, so
-// its fields carry the same names -- ask for a reservation number box and the
-// screen answers first, with the box holding whatever record it is on. That
-// mistake is not visible in the answer: it is a document with the right control
-// in it, and everything after would read the wrong one.
-function findFrameShowing(launcher: Window, marker: string): Document | undefined {
-	for (const candidate of Array.from(launcher.frames as unknown as Window[])) {
-		try {
-			if (candidate.name == ERP_LAUNCHER_INNER_FRAME) {
-				continue;
-			}
-
-			const document_ = candidate.document;
-
-			if (document_?.querySelector(marker)) {
-				return document_;
-			}
-		} catch {
-			// A frame we cannot read is not one of the application's.
-		}
-	}
-
-	return undefined;
-}
-
-async function ensureLauncher(pageId: number): Promise<HTMLIFrameElement> {
-	launcherPromise ??= createLauncher(pageId);
-
-	return launcherPromise;
-}
-
-async function createLauncher(pageId: number): Promise<HTMLIFrameElement> {
-	const frame = document.createElement("iframe");
-
-	frame.className = "pse-erp-frame";
-	frame.setAttribute("aria-hidden", "true");
-	frame.setAttribute("tabindex", "-1");
-	frame.title = "RetailVista";
-	// Load-bearing. See `ERP_LAUNCHER_FRAME_NAME`.
-	frame.name = ERP_LAUNCHER_FRAME_NAME;
-
-	const loaded = whenLoaded(frame, "the ERP application");
-
-	ourFrames.add(frame);
-	launcherPage = pageId;
-
-	frame.src = `${ERP_URL}${ERP_LAUNCHER_PATH}?pageId=${pageId}`;
-	document.body.append(frame);
-
-	await loaded;
-	await whenScreenReady(frame);
-
-	return frame;
-}
-
-// Puts the launcher's inner frame on the screen wanted. A launcher already
-// showing it is left alone: the frame is kept between jobs, and reloading the
-// screen we are on would cost a page load and lose the record displayed.
-async function openScreen(frame: HTMLIFrameElement, pageId: number) {
-	if (launcherPage == pageId) {
-		return;
-	}
-
-	const inner = (frame.contentWindow as unknown as Record<string, Window | undefined>)
-		?.[ERP_LAUNCHER_INNER_FRAME];
-
-	if (!inner) {
-		throw new Error("The ERP launcher is not holding a screen.");
-	}
-
-	inner.location.replace(`${ERP_URL}${ERP_PAGE_PATH}?pageId=${pageId}`);
-	launcherPage = pageId;
-
-	await whenScreenReady(frame);
-}
-
-// The launcher frames its screen itself, from a load of its own that does not
-// finish with the launcher's -- and a postback inside it replaces the document
-// again. Waited for by looking, since those loads belong to a frame we did not
-// create and cannot listen to before it exists.
-function whenScreenReady(frame: HTMLIFrameElement): Promise<Document> {
-	return pollFor(() => {
-		const inner = (frame.contentWindow as unknown as Record<string, Window | undefined>)
-			?.[ERP_LAUNCHER_INNER_FRAME];
-		const document_ = inner?.document;
-
-		if (!document_?.body || document_.readyState == "loading") {
-			return undefined;
-		}
-
-		requireInnerSession(document_);
-
-		return document_;
-	}, "the ERP application's screen");
-}
-
-// The screen inside the launcher, checked the way a bare one is: the ERP answers
-// a request without a session by serving its login form.
-function requireInnerSession(document_: Document) {
-	if (document_.body?.innerHTML.includes(ERP_LOGIN_MARKER)) {
-		throw new ErpSignedOutError();
-	}
-}
-
-function pollFor<T>(probe: () => T | undefined | null | false, what: string): Promise<T> {
-	return new Promise<T>((resolve, reject) => {
-		const deadline = performance.now() + STEP_TIMEOUT;
-
-		const look = () => {
-			let answer: T | undefined | null | false;
-
-			try {
-				answer = probe();
-			} catch (error) {
-				// A signed-out session will not come good by waiting; anything else
-				// is usually a document mid-navigation, which is what the waiting is
-				// for.
-				if (error instanceof ErpSignedOutError) {
-					reject(error);
-
-					return;
-				}
-
-				answer = undefined;
-			}
-
-			if (answer) {
-				resolve(answer);
-
-				return;
-			}
-
-			if (performance.now() > deadline) {
-				reject(new Error(`Timed out waiting for ${what}.`));
-
-				return;
-			}
-
-			window.setTimeout(look, POLL_INTERVAL);
-		};
-
-		look();
-	});
-}
-
 // Takes the frame off the page, so the next job starts from a fresh load rather
 // than from a frame parked on a login form.
 export function resetErpFrame() {
-	for (const promise of [framePromise, launcherPromise]) {
-		promise?.then((frame) => {
-			ourFrames.delete(frame);
-			frame.remove();
-		}).catch(() => undefined);
-	}
-
+	framePromise?.then((frame) => frame.remove()).catch(() => undefined);
 	framePromise = undefined;
-	launcherPromise = undefined;
+	frameElement = undefined;
 	currentPage = "";
 }

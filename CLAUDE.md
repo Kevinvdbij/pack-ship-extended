@@ -62,32 +62,6 @@ longer than the reveal failsafe, so waiting for a band that never comes cost thr
 screen on every trip into a reservation. `mountHeader()` races that lookup against `domReady()` and
 mounts our band at the top of `PAGE_COLUMN_SELECTOR` when the portal serves none.
 
-## Driving the ERP
-
-`src/erpFrame.ts` offers two ways in, and which one a job needs depends on how it addresses a
-record.
-
-- **A bare screen** (`erpTask`) — `Default.aspx?pageId=<n>` in a frame. Enough for anything keyed by
-  the internal id, which is what `SetDisplayItemId` takes.
-- **The application** (`erpApplicationTask`) — `RetailVista.aspx?pageId=<n>`, which frames the screen
-  as `DefaultFrame` and brings the dialog machinery with it. Needed for anything that goes through a
-  dialog, such as finding a reservation by the number an operator reads.
-
-Two things about the launcher that are easy to undo by tidying:
-
-- **The frame's `name` must start with `pop`.** `pagemanager.js` opens with
-  `if (window.name.substring(0, 3) == 'pop') { } else { top.location.href = "Index.aspx" }` — the
-  application expects to live in a window `Index.aspx` popped. A frame named anything else navigates
-  **our own tab** to `Index.aspx`, packing screen and all. See `ERP_LAUNCHER_FRAME_NAME`.
-- **A search form's fields have the same names as the screen's.** The form is a form over the same
-  record, so asking the launcher's frames for "a reservation number box" is answered by the screen
-  first, holding whatever record it is on — a wrong answer that looks entirely right. `findFrameShowing`
-  skips `DefaultFrame` by name, and the lookup recognises the dialog by its Search button.
-
-A record found by search is only accepted when the screen's own reservation number matches the one
-asked for. Don't relax that: the id feeds the note writer, and a wrong id writes a bay onto somebody
-else's reservation.
-
 ## Three traps that have already cost time
 
 - **The cloak blocks focus.** The Stylus style hides the page with `visibility: hidden` until
