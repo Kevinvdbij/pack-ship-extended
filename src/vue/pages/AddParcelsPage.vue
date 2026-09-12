@@ -2,10 +2,13 @@
 import ReservationSidebar from '../components/ReservationSidebar.vue';
 import ReservationProducts from '../components/ReservationProducts.vue';
 import BackLink from '../components/BackLink.vue';
+import ParcelLabels from '../components/ParcelLabels.vue';
 import { mountApp } from '../mount.ts';
 import {
 	getCachedProducts,
+	getCurrentReservationId,
 	getParcelContainerParent,
+	getReservationParcels,
 	getReservationSidebarColumn,
 	isSingleUnitOrder,
 } from '../../retailVistaUtils.ts';
@@ -22,7 +25,52 @@ slotStore.setSingleUnit(isSingleUnitOrder(cachedProducts()));
 
 mountSidebar();
 mountProducts();
+mountParcelLabels();
 mountBackLink();
+
+// The reprint control, one row per parcel that has a carrier label.
+//
+// This page is where a reprint is actually wanted: it is what the operator opens
+// when a parcel comes back to the bench, and the reservation's parcels are
+// already on it. The ids come out of the portal's own form -- `Items[n].ItemId`
+// is the same id the ERP's label dialog lists its parcels by -- so nothing has
+// to be fetched to know which box is which.
+//
+// Into the column rather than into `#ParcelsContainer`: the portal re-renders
+// that wholesale after every parcel change, and anything of ours inside it would
+// be swept away with the first edit.
+function mountParcelLabels() {
+	const parcels = getReservationParcels();
+	const reservationId = readReservationId();
+
+	if (!reservationId || parcels.length == 0) {
+		debug("No parcels on this page to offer a reprint for.");
+
+		return;
+	}
+
+	const column = getParcelContainerParent();
+
+	if (!column) {
+		return;
+	}
+
+	mountApp(ParcelLabels, (host) => column.insertAdjacentElement("afterbegin", host),
+		{ reservationId, parcels });
+}
+
+// Guarded like the order number is: the pages this runs on each lay the portal's
+// summary block out their own way, and a reservation we cannot identify is a
+// reprint we cannot offer rather than a reason to take the page down.
+function readReservationId(): string {
+	try {
+		return getCurrentReservationId();
+	} catch (error) {
+		debug("No reservation id on the add-parcels page.", error);
+
+		return "";
+	}
+}
 
 function mountSidebar() {
 	const column = getReservationSidebarColumn();

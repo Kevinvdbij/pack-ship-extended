@@ -126,3 +126,24 @@ export enum MassCompleteStatus {
 	// anywhere. It is untouched and can be packed normally.
 	stopped = 4
 }
+
+// One parcel of a reservation, as the portal's own parcels form carries it.
+//
+// The id is the parcel's own -- the same id the ERP's label dialog lists its
+// parcels by -- which is what lets a reprint name the box it means rather than
+// picking one by position.
+export interface ReservationParcel {
+	id: string;
+	// The parcel's number within the reservation, as the portal shows it.
+	number: string;
+	// The carrier's tracking barcode, empty on a parcel that never got one.
+	// Whether this is filled in is what decides that a label exists to reprint:
+	// a collection order or a parcel taken by a local driver has no carrier label
+	// however its transport type happens to be spelled, and in whichever of the
+	// two languages the portal is serving that day.
+	barcode: string;
+	// "SendCloud", "PostNL" -- what the portal calls the service and carrier.
+	// Shown, never matched on.
+	service: string;
+	carrier: string;
+}

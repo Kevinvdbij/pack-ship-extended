@@ -1,5 +1,5 @@
 import { GM_deleteValues, GM_getValue, GM_listValues, GM_setValue } from "$";
-import { CompletedReservation, MassCompleteEntry, ModalProductDetails, ModalReservationDetails, ParcelItem, ProductDetails, ProductLine, ReservationDefinition, ReservationDetails, ReservationSearchResponseType, ReservationSelectionModalData, VerificationRow } from "./interfaces";
+import { CompletedReservation, MassCompleteEntry, ReservationParcel, ModalProductDetails, ModalReservationDetails, ParcelItem, ProductDetails, ProductLine, ReservationDefinition, ReservationDetails, ReservationSearchResponseType, ReservationSelectionModalData, VerificationRow } from "./interfaces";
 import { COMPLETED_HISTORY_LIMIT, completedEntryKey, CONTAINER_SELECTOR, massCompleteEntryKey, HEADER_SELECTOR, SEARCH_BLOCK_SELECTOR, PACKING_PORTAL_URL, PARCEL_CONTAINER_PARENT_SELECTOR, RESERVATION_SIDEBAR_SELECTOR, RESERVATION_SUMMARY_SELECTOR, STORAGE_KEYS } from "./constants.ts";
 import { debug } from "./logger.ts";
 import { afterReveal } from "./reveal.ts";
@@ -155,6 +155,56 @@ export function getParcelItems(target: ParentNode = document): ParcelItem[] {
 			};
 		})
 		.filter((item) => item.amount > 0);
+}
+
+// The reservation's parcels, as the add-parcels page serves them: one hidden
+// input group per parcel under `Items[n]`.
+//
+// Note the shape this has to tell apart. On the parcels page the same prefix
+// holds the *products* in each parcel, nested as `Items[p].Items[i]` -- so a
+// pattern that merely starts with `Items[` finds those too, and would hand back
+// a list of scanned products dressed as parcels. Only the singly-indexed names
+// are parcels, which is what the exactness here is for.
+export function getReservationParcels(target: ParentNode = document): ReservationParcel[] {
+	return Array
+		.from(target.querySelectorAll<HTMLInputElement>("input[name^='Items['][name$='].ItemId']"))
+		.filter((input) => /^Items\[\d+\]\.ItemId$/.test(input.name))
+		.map((input) => {
+			const prefix = input.name.slice(0, -"ItemId".length);
+			const field = (name: string) =>
+				target.querySelector<HTMLInputElement>(`input[name='${prefix}${name}']`)?.value ?? "";
+
+			return {
+				id: input.value,
+				number: field("Number"),
+				barcode: field("Barcode").trim(),
+				service: field("ParcelServiceDescription"),
+				carrier: field("ParcelServiceCarrierDescription"),
+			};
+		});
+}
+
+// The parcels of a reservation this page is not on.
+//
+// The completed log knows a reservation's number and nothing else about it -- it
+// is written when a reservation finishes and kept small deliberately -- so a
+// reprint from there has to go and look. The add-parcels route is what answers
+// with a processed reservation's parcels, which is the same markup the
+// add-parcels page is built from, so the same reader works on it.
+//
+// Empty when the reservation is not in a state that route serves, which is an
+// answer rather than an error: a reservation with no parcels has no label.
+export async function fetchReservationParcels(reservationNumber: string):
+	Promise<{ reservationId: string; parcels: ReservationParcel[] }> {
+	const response = await fetch(`${PACKING_PORTAL_URL}/AddParcels/Search?ReservationNumber=${reservationNumber}`);
+	const holder = document.createElement("div");
+
+	holder.innerHTML = await response.text();
+
+	return {
+		reservationId: holder.querySelector<HTMLInputElement>("#ReservationId")?.value ?? "",
+		parcels: getReservationParcels(holder),
+	};
 }
 
 // Folds the rows of one product into one line, in the order the products first

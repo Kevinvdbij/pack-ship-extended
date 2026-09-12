@@ -1,6 +1,13 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { toast } from "vue3-toastify";
 import { CompletedReservation } from "../../interfaces.ts";
+import { fetchReservationParcels } from "../../retailVistaUtils.ts";
+import { printParcelLabel } from "../../parcelLabel.ts";
+import { ErpSignedOutError } from "../../erpFrame.ts";
+import { erpStore } from "../erpStore.ts";
+import { playSound } from "../../sounds.ts";
+import Settings from "../../settings.ts";
 
 // The reservations this workplace has finished, listed beside the search.
 //
@@ -17,10 +24,77 @@ const props = defineProps<{
 	entries: CompletedReservation[];
 }>();
 
-defineEmits<{
+const emit = defineEmits<{
 	open: [reservationNumber: string];
 	clear: [];
 }>();
+
+// The reservation whose label is being fetched or printed.
+const printing = ref("");
+
+// Reprints the carrier label of a reservation in the log.
+//
+// The log holds a number and nothing else, so the parcels have to be looked up
+// first. What happens next depends on how many come back, and the split is
+// deliberate: one parcel is the overwhelmingly common case and is printed on the
+// spot, while a reservation of several boxes is a choice -- which label do you
+// want? -- and that choice already has a screen. Sending the operator there
+// beats inventing a second picker on a panel that is meant to be a log.
+async function reprint(entry: CompletedReservation) {
+	if (printing.value) {
+		return;
+	}
+
+	printing.value = entry.number;
+
+	try {
+		const { reservationId, parcels } = await fetchReservationParcels(entry.number);
+		const printable = parcels.filter((parcel) => parcel.barcode);
+
+		if (!reservationId || printable.length == 0) {
+			// No carrier label on this reservation: a collection order, a local
+			// driver, or a reservation the add-parcels route will not serve.
+			toast.info(`Reservering ${entry.number} heeft geen pakketdienst-etiket.`);
+
+			return;
+		}
+
+		if (printable.length > 1) {
+			toast.info(`Reservering ${entry.number} heeft ${printable.length} etiketten. Kies er een.`);
+			emit("open", entry.number);
+
+			return;
+		}
+
+		if (Settings.environmentId <= 0) {
+			toast.error("Stel eerst de omgeving van deze werkplek in bij Instellingen.");
+
+			return;
+		}
+
+		const parcel = printable[0];
+		const work = printParcelLabel(reservationId, parcel.id, Settings.environmentId);
+
+		toast.promise(work, {
+			pending: `Etiket ${parcel.barcode} wordt opnieuw geprint...`,
+			success: {
+				render: ({ data }) => `Etiket ${parcel.barcode} geprint op ${(data as { printer: string }).printer}.`,
+			},
+			error: `Etiket ${parcel.barcode} kon niet opnieuw geprint worden.`,
+		}).catch(() => undefined);
+
+		await work;
+	} catch (error) {
+		if (error instanceof ErpSignedOutError) {
+			erpStore.reportSignedOut();
+		}
+
+		console.error("Pack&Ship Extended could not reprint from the completed log.", error);
+		playSound("error");
+	} finally {
+		printing.value = "";
+	}
+}
 
 // "Zojuist" has to stop being true on its own. The panel is looked at on a page
 // that can sit open for a whole shift, so the times are re-read on a timer
@@ -97,7 +171,7 @@ function parcelLabel(count: number) {
 		</header>
 
 		<ol class="pse-history-list">
-			<li v-for="entry in entries" :key="entry.number">
+			<li v-for="entry in entries" :key="entry.number" class="pse-history-item">
 				<button type="button" class="pse-history-row" :class="{ 'pse-history-row-failed': entry.failed }"
 					:title="`Pakket toevoegen aan reservering ${entry.number}${entry.customer ? ` -- ${entry.customer}` : ''}`"
 					@click="$emit('open', entry.number)">
@@ -124,6 +198,18 @@ function parcelLabel(count: number) {
 						<path d="M4 7.5l8 4.5 8-4.5" />
 						<path d="M12 12v9" />
 					</svg>
+				</button>
+
+				<!-- Reprinting the carrier label, from the one screen that lists
+				     the reservations somebody might come back to. A parcel that
+				     comes back to the bench an hour later is exactly what this log
+				     is scanned for, and until now the answer was to open the
+				     reservation first. -->
+				<button v-if="!entry.failed && entry.parcels > 0" type="button" class="pse-history-print"
+					:disabled="Boolean(printing)" :title="`Print het etiket van reservering ${entry.number} opnieuw`"
+					@click="reprint(entry)">
+					<span v-if="printing == entry.number" class="pse-history-spinner" aria-hidden="true"></span>
+					<span v-else class="material-icons pse-history-print-icon" aria-hidden="true">print</span>
 				</button>
 			</li>
 		</ol>
@@ -241,6 +327,67 @@ function parcelLabel(count: number) {
 	mask-image: linear-gradient(to bottom, #000 calc(100% - 18px), transparent);
 	scrollbar-width: thin;
 	scrollbar-color: var(--pse-line) transparent;
+}
+
+/* The row and its reprint control sit side by side. They are two buttons, not
+   one with something clickable inside it: a button inside a button is invalid
+   markup, and more to the point a press of the printer must not also open the
+   reservation. */
+.pse-history-item {
+	display: flex;
+	align-items: stretch;
+	gap: 6px;
+}
+
+/* Quiet until wanted. The list is read far more often than it is printed from,
+   and a row of printer icons at full strength would compete with the numbers
+   that are actually being scanned for. */
+.pse-history-print {
+	display: flex;
+	flex: none;
+	align-items: center;
+	justify-content: center;
+	width: 38px;
+	border: 1px solid transparent;
+	border-radius: 12px;
+	background-color: #ffffff;
+	color: var(--pse-ink-faint);
+	cursor: pointer;
+	opacity: 0.7;
+	transition: border-color 0.15s ease, color 0.15s ease, opacity 0.15s ease;
+}
+
+.pse-history-item:hover .pse-history-print {
+	opacity: 1;
+}
+
+.pse-history-print:hover:not(:disabled) {
+	border-color: var(--pse-brand);
+	color: var(--pse-brand-ink);
+}
+
+.pse-history-print:disabled {
+	opacity: 0.4;
+	cursor: default;
+}
+
+.pse-history-print-icon {
+	font-size: 17px;
+}
+
+.pse-history-spinner {
+	width: 13px;
+	height: 13px;
+	border: 2px solid var(--pse-line);
+	border-top-color: var(--pse-brand);
+	border-radius: 50%;
+	animation: pse-history-spin 0.7s linear infinite;
+}
+
+@keyframes pse-history-spin {
+	to {
+		transform: rotate(360deg);
+	}
 }
 
 .pse-history-row {

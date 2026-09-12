@@ -69,6 +69,47 @@ export const ERP_SAVE_BUTTON_ID = "ctl00_ctl00_MasterContent_NavigationIcons_ctl
 // "is there a session" starts by looking for the company number box.
 export const ERP_LOGIN_MARKER = "txtCompanyNumber";
 
+// ---- Reprinting a parcel service label ----
+//
+// The ERP's own "print parcel service label" task. It is a dialog on the
+// reservation screen, but it is also an ordinary page: the link that opens it
+// only calls `ShowModalDialog('default.aspx?pageId=708&itemId=<reservation>')`,
+// so it can be loaded directly and driven without any of the modal machinery.
+//
+// Unlike the reservation screen, this one *does* take its record from the query
+// string -- `itemId` is the reservation's internal id -- and comes up with the
+// reservation filled in and its parcel selected when there is only one.
+//
+// A note on why every id here is a number rather than a caption. The ERP serves
+// this installation's page chrome in Dutch and these same task links in English,
+// in one session, and which language a given string comes back in is not ours to
+// predict. Nothing in this flow reads a label: the task's own link id encodes its
+// page id (`lnk708`), the controls are named, and the printer is matched on a
+// description that is RetailVista's own data rather than its user interface.
+export const ERP_PARCEL_LABEL_PAGE_ID = 708;
+
+// The dialog's controls. Matched on the tail of the id: they sit several naming
+// containers deep, and the prefix is a fact about where the page puts its
+// content -- the part most likely to move.
+export const ERP_LABEL_PARCEL_SELECTOR = '[id$="rvcReservationParcel_ListBox"]';
+export const ERP_LABEL_PRINTER_SELECTOR = '[id$="rvcPrinter_ListBox"]';
+export const ERP_LABEL_PRINT_SELECTOR = '[id$="btnPrint"]';
+
+// ---- Which printer ----
+//
+// The environment maintenance screen, which is where the workplace's printers
+// are configured: 1992 is the search grid, 1993 the record itself. `itemId` is
+// the environment id -- the same id the packing portal's own "Omgeving" picker
+// uses, which is worth saying plainly because it is not obvious and it is what
+// makes this join possible at all.
+//
+// Of the ten printer fields on that record, the parcel service label goes to
+// this one. Not the default printer and not the default label printer: those are
+// a colour laser at the service desk on the workplace this was read from, and a
+// shipping label sent there is a label nobody at the bench will see.
+export const ERP_ENVIRONMENT_PAGE_ID = 1993;
+export const ERP_ENVIRONMENT_PARCEL_PRINTER_SELECTOR = '[id$="rvcParcelServicePrinterId_Textbox"]';
+
 // ...and is not finished by it. There is a third thing the ERP can serve: a
 // short page with an empty title that is neither the login form nor the
 // application -- what comes back when the session exists but the application
