@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
+import { Teleport, Transition } from "vue";
 import { toast } from "vue3-toastify";
-import { CompletedReservation } from "../../interfaces.ts";
+import { CompletedReservation, ReservationParcel } from "../../interfaces.ts";
 import { fetchReservationParcels } from "../../retailVistaUtils.ts";
-import { printParcelLabel } from "../../parcelLabel.ts";
 import { ErpSignedOutError } from "../../erpFrame.ts";
 import { erpStore } from "../erpStore.ts";
+import { reprintParcel } from "../reprint.ts";
 import { playSound } from "../../sounds.ts";
-import Settings from "../../settings.ts";
+import ParcelPicker from "./ParcelPicker.vue";
 
 // The reservations this workplace has finished, listed beside the search.
 //
@@ -29,17 +30,20 @@ const emit = defineEmits<{
 	clear: [];
 }>();
 
-// The reservation whose label is being fetched or printed.
+// The reservation whose parcels are being fetched, or whose label is printing.
 const printing = ref("");
+
+// The choice, when there is one. Undefined the rest of the time, which is most
+// of the time: a reservation with one label never asks.
+const choice = ref<{ reservationNumber: string; reservationId: string; parcels: ReservationParcel[] }>();
 
 // Reprints the carrier label of a reservation in the log.
 //
-// The log holds a number and nothing else, so the parcels have to be looked up
-// first. What happens next depends on how many come back, and the split is
-// deliberate: one parcel is the overwhelmingly common case and is printed on the
-// spot, while a reservation of several boxes is a choice -- which label do you
-// want? -- and that choice already has a screen. Sending the operator there
-// beats inventing a second picker on a panel that is meant to be a log.
+// The log holds a number and nothing else -- it is written when a reservation
+// finishes and kept deliberately small -- so the parcels have to be looked up
+// before anything can be printed. What happens next depends on how many come
+// back, and only the plural case is a question worth asking: one label prints
+// where it was pressed, several open the picker.
 async function reprint(entry: CompletedReservation) {
 	if (printing.value) {
 		return;
@@ -53,37 +57,19 @@ async function reprint(entry: CompletedReservation) {
 
 		if (!reservationId || printable.length == 0) {
 			// No carrier label on this reservation: a collection order, a local
-			// driver, or a reservation the add-parcels route will not serve.
+			// driver, or one the add-parcels route will not serve.
 			toast.info(`Reservering ${entry.number} heeft geen pakketdienst-etiket.`);
 
 			return;
 		}
 
 		if (printable.length > 1) {
-			toast.info(`Reservering ${entry.number} heeft ${printable.length} etiketten. Kies er een.`);
-			emit("open", entry.number);
+			choice.value = { reservationNumber: entry.number, reservationId, parcels: printable };
 
 			return;
 		}
 
-		if (Settings.environmentId <= 0) {
-			toast.error("Stel eerst de omgeving van deze werkplek in bij Instellingen.");
-
-			return;
-		}
-
-		const parcel = printable[0];
-		const work = printParcelLabel(reservationId, parcel.id, Settings.environmentId);
-
-		toast.promise(work, {
-			pending: `Etiket ${parcel.barcode} wordt opnieuw geprint...`,
-			success: {
-				render: ({ data }) => `Etiket ${parcel.barcode} geprint op ${(data as { printer: string }).printer}.`,
-			},
-			error: `Etiket ${parcel.barcode} kon niet opnieuw geprint worden.`,
-		}).catch(() => undefined);
-
-		await work;
+		await reprintParcel(reservationId, printable[0]);
 	} catch (error) {
 		if (error instanceof ErpSignedOutError) {
 			erpStore.reportSignedOut();
@@ -213,6 +199,17 @@ function parcelLabel(count: number) {
 				</button>
 			</li>
 		</ol>
+
+		<!-- Teleported to the body, like every other dialog of ours: this panel
+		     sits inside the search page's own column, and a modal rendered there
+		     would be positioned against that column rather than the window. -->
+		<Teleport to="body">
+			<Transition name="modal">
+				<ParcelPicker v-if="choice" :reservation-number="choice.reservationNumber"
+					:reservation-id="choice.reservationId" :parcels="choice.parcels"
+					@close="choice = undefined" />
+			</Transition>
+		</Teleport>
 	</aside>
 </template>
 

@@ -10,6 +10,7 @@ import {
 	getCurrentReservationId,
 	getParcelContainer,
 	getParcelContainerParent,
+	getReservationParcels,
 	getReservationSidebarColumn,
 	isSingleUnitOrder,
 } from '../../retailVistaUtils.ts';
@@ -103,6 +104,11 @@ function mountParcelLabels() {
 				return false;
 			});
 
+			// Read once per pass and matched by id below. The pane's own hidden
+			// inputs hold the same fields, but this is the reader the rest of the
+			// extension uses and there is no reason for a second one here.
+			const parcels = getReservationParcels(container);
+
 			for (const pane of Array.from(container.querySelectorAll<HTMLElement>(PARCEL_PANE_SELECTOR))) {
 				// Already carries one. This is what keeps a render from becoming a
 				// remount, and a remount from becoming another render.
@@ -114,7 +120,7 @@ function mountParcelLabels() {
 				// the pane's id, which is the same id the ERP's label dialog lists
 				// its parcels by.
 				const parcelId = pane.id.slice(PARCEL_PANE_PREFIX.length);
-				const barcode = pane.querySelector<HTMLInputElement>("input[id$='__Barcode']")?.value.trim() ?? "";
+				const parcel = parcels.find((candidate) => candidate.id == parcelId);
 
 				// No carrier barcode, no carrier label to reprint. This is the whole
 				// gate: a collection order or a parcel taken by a local driver has
@@ -122,7 +128,7 @@ function mountParcelLabels() {
 				// which wants announcing, not reprinting. Deliberately not the
 				// transport type, which is a translated phrase on a portal that has
 				// been seen serving Dutch chrome and English task names at once.
-				if (!barcode) {
+				if (!parcel?.barcode) {
 					continue;
 				}
 
@@ -137,7 +143,7 @@ function mountParcelLabels() {
 				heading.classList.add(PARCEL_BARCODE_HEADING_CLASS);
 
 				mounted.push(mountApp(ParcelLabelButton, (host) => heading.append(host),
-					{ reservationId, parcelId, barcode }));
+					{ reservationId, parcel }));
 			}
 		} finally {
 			observer.observe(container, { childList: true, subtree: true });
