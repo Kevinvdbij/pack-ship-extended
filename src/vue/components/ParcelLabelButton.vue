@@ -86,15 +86,15 @@ async function reprint() {
 </template>
 
 <style scoped>
-/* Sized and coloured to sit under the portal's barcode heading as one more line
-   of that card, rather than as something bolted on. It is the only control in
-   there, so it does not have to compete for attention -- it only has to be
-   plainly a button. */
+/* Sized and coloured to sit beside the portal's barcode heading without
+   competing with it. The barcode is what that line is for and what gets read
+   off it; this only has to be plainly a button. Its own spacing is the
+   heading's business -- see `src/styles/portal.css` -- so there is no margin
+   here to fight with it. */
 .pse-reprint {
 	display: inline-flex;
 	align-items: center;
 	gap: 6px;
-	margin-top: 6px;
 	padding: 5px 11px;
 	border: 1px solid var(--pse-line);
 	border-radius: 9px;

@@ -1027,3 +1027,30 @@
 	text-transform: uppercase;
 	color: var(--pse-ink-soft);
 }
+
+/* ---- The parcel card's barcode heading, while a reprint sits in it ----
+ *
+ * The portal's heading is a block with one string in it. The reprint goes
+ * beside that string rather than under it -- the two lines under this heading
+ * are when the parcel was announced and printed, and a button dropped between
+ * the barcode and those belongs to neither.
+ *
+ * Only while there are two things to lay out, which is why this hangs off a
+ * class our own mount adds rather than off the heading itself: on a parcel with
+ * no carrier label there is no button, and the heading should be exactly what
+ * the portal wrote.
+ *
+ * Wrapping, because the barcode is long and the column is half a card wide:
+ * where they do not fit side by side the button drops under the barcode, which
+ * is where it was before and is still better than either of them truncating.
+ */
+:root .card-header .pse-has-reprint {
+	display: flex;
+	align-items: center;
+	gap: 12px;
+	flex-wrap: wrap;
+	/* The heading's own bottom margin would otherwise fall between the wrapped
+	   button and the lines below it, which reads as the button belonging to
+	   them. */
+	margin-bottom: 0;
+}

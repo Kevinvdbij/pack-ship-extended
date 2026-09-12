@@ -15,7 +15,9 @@ import {
 } from '../../retailVistaUtils.ts';
 import { slotStore } from '../slotStore.ts';
 import { debug } from '../../logger.ts';
-import { PARCEL_BARCODE_CELL_SELECTOR, PARCEL_PANE_PREFIX, PARCEL_PANE_SELECTOR } from '../../constants.ts';
+import {
+	PARCEL_BARCODE_HEADING_CLASS, PARCEL_BARCODE_HEADING_SELECTOR, PARCEL_PANE_PREFIX, PARCEL_PANE_SELECTOR
+} from '../../constants.ts';
 
 // Adding a parcel to a reservation that has already been packed. The portal
 // owns the work on this page; what we add is the column beside it and, when we
@@ -79,15 +81,17 @@ function mountParcelLabels() {
 				continue;
 			}
 
-			// Under the heading that shows the barcode, which is the second of the
-			// two columns the portal lays its card header out in.
-			const anchor = pane.querySelector(PARCEL_BARCODE_CELL_SELECTOR);
+			// Beside the barcode, in the heading itself, so the two read as one
+			// line: this label, and the way to print it again.
+			const heading = pane.querySelector(PARCEL_BARCODE_HEADING_SELECTOR);
 
-			if (!anchor) {
+			if (!heading) {
 				continue;
 			}
 
-			mounted.push(mountApp(ParcelLabelButton, (host) => anchor.append(host),
+			heading.classList.add(PARCEL_BARCODE_HEADING_CLASS);
+
+			mounted.push(mountApp(ParcelLabelButton, (host) => heading.append(host),
 				{ reservationId, parcelId, barcode }));
 		}
 	};

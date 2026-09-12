@@ -193,11 +193,22 @@ export const PARCEL_CONTAINER_SELECTOR = "#ParcelsContainer";
 export const PARCEL_PANE_PREFIX = "parcels-content-";
 export const PARCEL_PANE_SELECTOR = `[id^='${PARCEL_PANE_PREFIX}']`;
 
-// The right-hand cell of the portal's parcel card header -- the one carrying
-// "Barcode: 3SGESK0090473". Addressed by position because there is nothing else
-// to name it by, and by position within the card rather than the pane so a
-// change to what surrounds the card does not move it.
-export const PARCEL_BARCODE_CELL_SELECTOR = ".card .card-header .row > div:nth-child(2)";
+// The heading in the right-hand cell of the portal's parcel card header -- the
+// one reading "Barcode: 3SGESK0090473". The reprint goes beside it rather than
+// under it: the cell's next two lines are when the parcel was announced and
+// printed, and a button dropped between the barcode and those read as belonging
+// to neither.
+//
+// Addressed by position because there is nothing else to name the cell by, and
+// by position within the card rather than within the pane, so a change to what
+// surrounds the card does not move it.
+export const PARCEL_BARCODE_HEADING_SELECTOR = ".card .card-header .row > div:nth-child(2) .card-title";
+
+// Put on that heading while a reprint is sitting in it, which is what
+// `src/styles/portal.css` hangs the row layout off. The portal's own heading is
+// a block with one string in it; two things side by side is ours to arrange, and
+// only while there are two.
+export const PARCEL_BARCODE_HEADING_CLASS = "pse-has-reprint";
 
 export const PARCEL_GROUP_SELECTOR = "#parcelsGroup";
 export const PARCEL_TABS_SELECTOR = "#tabs-parcels";
