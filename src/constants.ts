@@ -181,6 +181,24 @@ export const RESERVATION_SIDEBAR_SELECTOR = "#ReservationOverview > div:nth-chil
 // portal's own `init()`, which fetches the carriers over AJAX -- so this is the
 // one region of that page that cannot be part of the reveal, and gets a
 // skeleton instead. See `CreateParcelsPage.vue`.
+// The portal's pane per parcel, and the parcel's own id inside the pane's id:
+// `parcels-content-876733`. That id is the same one the ERP's label dialog lists
+// its parcels by, so the box a reprint means is named rather than counted.
+// The portal's parcel region. Served empty and filled in by its own init over
+// AJAX, then replaced wholesale after every parcel change -- which is why
+// nothing of ours may be moved into it, and why anything of ours added to it has
+// to be put back afterwards.
+export const PARCEL_CONTAINER_SELECTOR = "#ParcelsContainer";
+
+export const PARCEL_PANE_PREFIX = "parcels-content-";
+export const PARCEL_PANE_SELECTOR = `[id^='${PARCEL_PANE_PREFIX}']`;
+
+// The right-hand cell of the portal's parcel card header -- the one carrying
+// "Barcode: 3SGESK0090473". Addressed by position because there is nothing else
+// to name it by, and by position within the card rather than the pane so a
+// change to what surrounds the card does not move it.
+export const PARCEL_BARCODE_CELL_SELECTOR = ".card .card-header .row > div:nth-child(2)";
+
 export const PARCEL_GROUP_SELECTOR = "#parcelsGroup";
 export const PARCEL_TABS_SELECTOR = "#tabs-parcels";
 

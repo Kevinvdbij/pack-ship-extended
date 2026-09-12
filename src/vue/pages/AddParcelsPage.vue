@@ -2,18 +2,20 @@
 import ReservationSidebar from '../components/ReservationSidebar.vue';
 import ReservationProducts from '../components/ReservationProducts.vue';
 import BackLink from '../components/BackLink.vue';
-import ParcelLabels from '../components/ParcelLabels.vue';
+import ParcelLabelButton from '../components/ParcelLabelButton.vue';
+import { App } from 'vue';
 import { mountApp } from '../mount.ts';
 import {
 	getCachedProducts,
 	getCurrentReservationId,
+	getParcelContainer,
 	getParcelContainerParent,
-	getReservationParcels,
 	getReservationSidebarColumn,
 	isSingleUnitOrder,
 } from '../../retailVistaUtils.ts';
 import { slotStore } from '../slotStore.ts';
 import { debug } from '../../logger.ts';
+import { PARCEL_BARCODE_CELL_SELECTOR, PARCEL_PANE_PREFIX, PARCEL_PANE_SELECTOR } from '../../constants.ts';
 
 // Adding a parcel to a reservation that has already been packed. The portal
 // owns the work on this page; what we add is the column beside it and, when we
@@ -28,35 +30,71 @@ mountProducts();
 mountParcelLabels();
 mountBackLink();
 
-// The reprint control, one row per parcel that has a carrier label.
+// The reprint control, one per parcel that has a carrier label.
 //
-// This page is where a reprint is actually wanted: it is what the operator opens
-// when a parcel comes back to the bench, and the reservation's parcels are
-// already on it. The ids come out of the portal's own form -- `Items[n].ItemId`
-// is the same id the ERP's label dialog lists its parcels by -- so nothing has
-// to be fetched to know which box is which.
+// Into the portal's own parcel card, beside the barcode it reprints. Everything
+// a card of ours could say about a parcel is already on that card, so what is
+// added is the button alone.
 //
-// Into the column rather than into `#ParcelsContainer`: the portal re-renders
-// that wholesale after every parcel change, and anything of ours inside it would
-// be swept away with the first edit.
+// That means mounting inside `#ParcelsContainer`, which the portal refreshes
+// wholesale after every parcel change -- adding a parcel, removing one, changing
+// a weight. Nothing of ours is *moved* in there, which is the rule that matters;
+// what is put in is put back when the portal replaces it. The observer is what
+// does that, and it is also what handles the first fill: the panes are not in
+// the served markup at all, but fetched by the portal's own init after
+// DOMContentLoaded.
 function mountParcelLabels() {
-	const parcels = getReservationParcels();
 	const reservationId = readReservationId();
+	const container = getParcelContainer();
 
-	if (!reservationId || parcels.length == 0) {
-		debug("No parcels on this page to offer a reprint for.");
+	if (!reservationId || !container) {
+		debug("No parcel container on this page to offer a reprint from.");
 
 		return;
 	}
 
-	const column = getParcelContainerParent();
+	// One app per parcel, discarded together whenever the region is rebuilt. An
+	// app whose host has been thrown away is an app still watching a document
+	// nobody can see.
+	let mounted: Array<{ app: App }> = [];
 
-	if (!column) {
-		return;
-	}
+	const place = () => {
+		mounted.forEach((entry) => entry.app.unmount());
+		mounted = [];
 
-	mountApp(ParcelLabels, (host) => column.insertAdjacentElement("afterbegin", host),
-		{ reservationId, parcels });
+		for (const pane of Array.from(container.querySelectorAll<HTMLElement>(PARCEL_PANE_SELECTOR))) {
+			// `parcels-content-876733` -- the portal puts the parcel's own id in
+			// the pane's id, which is the same id the ERP's label dialog lists its
+			// parcels by.
+			const parcelId = pane.id.slice(PARCEL_PANE_PREFIX.length);
+			const barcode = pane.querySelector<HTMLInputElement>("input[id$='__Barcode']")?.value.trim() ?? "";
+
+			// No carrier barcode, no carrier label to reprint. This is the whole
+			// gate: a collection order or a parcel taken by a local driver has
+			// none, and so does a parcel whose announcement never succeeded --
+			// which wants announcing, not reprinting. Deliberately not the
+			// transport type, which is a translated phrase on a portal that has
+			// been seen serving Dutch chrome and English task names at once.
+			if (!barcode) {
+				continue;
+			}
+
+			// Under the heading that shows the barcode, which is the second of the
+			// two columns the portal lays its card header out in.
+			const anchor = pane.querySelector(PARCEL_BARCODE_CELL_SELECTOR);
+
+			if (!anchor) {
+				continue;
+			}
+
+			mounted.push(mountApp(ParcelLabelButton, (host) => anchor.append(host),
+				{ reservationId, parcelId, barcode }));
+		}
+	};
+
+	place();
+
+	new MutationObserver(place).observe(container, { childList: true, subtree: true });
 }
 
 // Guarded like the order number is: the pages this runs on each lay the portal's

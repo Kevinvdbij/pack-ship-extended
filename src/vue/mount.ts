@@ -14,7 +14,16 @@ export function mountApp(
 
 	attach(host);
 
-	createApp(component, props).mount(host);
+	const app = createApp(component, props);
+
+	app.mount(host);
+
+	// Handed back for the few mounts that do not last as long as the page. Most
+	// of ours do -- they go into markup the portal serves once -- but anything
+	// mounted inside `#ParcelsContainer` is thrown away with it every time the
+	// portal refreshes that region, and an app whose host has been removed is an
+	// app still watching a document nobody is looking at.
+	return { app, host };
 }
 
 // Resolves once the portal's markup is complete.

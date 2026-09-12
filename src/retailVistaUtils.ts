@@ -1,6 +1,6 @@
 import { GM_deleteValues, GM_getValue, GM_listValues, GM_setValue } from "$";
 import { CompletedReservation, MassCompleteEntry, ReservationParcel, ModalProductDetails, ModalReservationDetails, ParcelItem, ProductDetails, ProductLine, ReservationDefinition, ReservationDetails, ReservationSearchResponseType, ReservationSelectionModalData, VerificationRow } from "./interfaces";
-import { COMPLETED_HISTORY_LIMIT, completedEntryKey, CONTAINER_SELECTOR, massCompleteEntryKey, HEADER_SELECTOR, SEARCH_BLOCK_SELECTOR, PACKING_PORTAL_URL, PARCEL_CONTAINER_PARENT_SELECTOR, RESERVATION_SIDEBAR_SELECTOR, RESERVATION_SUMMARY_SELECTOR, STORAGE_KEYS } from "./constants.ts";
+import { COMPLETED_HISTORY_LIMIT, completedEntryKey, CONTAINER_SELECTOR, massCompleteEntryKey, HEADER_SELECTOR, SEARCH_BLOCK_SELECTOR, PACKING_PORTAL_URL, PARCEL_CONTAINER_PARENT_SELECTOR, PARCEL_CONTAINER_SELECTOR, RESERVATION_SIDEBAR_SELECTOR, RESERVATION_SUMMARY_SELECTOR, STORAGE_KEYS } from "./constants.ts";
 import { debug } from "./logger.ts";
 import { afterReveal } from "./reveal.ts";
 
@@ -36,6 +36,12 @@ export function adoptElement(host: Element, target: Element | null, className?: 
 
 export function getPortalHeader():Element | null {
 	return document.querySelector(HEADER_SELECTOR);
+}
+
+// The portal's parcel region itself, which it rebuilds after every parcel
+// change. Anything of ours in there is put back by whoever put it in.
+export function getParcelContainer():Element | null {
+	return document.querySelector(PARCEL_CONTAINER_SELECTOR);
 }
 
 export function getParcelContainerParent():Element | null {

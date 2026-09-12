@@ -318,7 +318,11 @@ function parcelLabel(count: number) {
 	gap: 6px;
 	min-height: 0;
 	margin: 0;
-	padding: 0 8px 10px 0;
+	/* The top padding is not spacing, it is clearance. A hovered row lifts a
+	   pixel and casts a shadow above itself, and this list scrolls -- so with the
+	   first row flush against the top edge, the lift was being clipped off by the
+	   overflow the moment anyone pointed at it. */
+	padding: 4px 8px 10px 0;
 	list-style: none;
 	overflow-y: auto;
 	/* The list runs to the bottom edge of the panel and would otherwise end on a
