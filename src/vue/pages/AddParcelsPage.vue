@@ -16,7 +16,8 @@ import {
 import { slotStore } from '../slotStore.ts';
 import { debug } from '../../logger.ts';
 import {
-	PARCEL_BARCODE_HEADING_CLASS, PARCEL_BARCODE_HEADING_SELECTOR, PARCEL_PANE_PREFIX, PARCEL_PANE_SELECTOR
+	PARCEL_BARCODE_HEADING_CLASS, PARCEL_BARCODE_HEADING_SELECTOR, PARCEL_BUTTON_CLASS,
+	PARCEL_PANE_PREFIX, PARCEL_PANE_SELECTOR
 } from '../../constants.ts';
 
 // Adding a parcel to a reservation that has already been packed. The portal
@@ -47,58 +48,104 @@ mountBackLink();
 // DOMContentLoaded.
 function mountParcelLabels() {
 	const reservationId = readReservationId();
-	const container = getParcelContainer();
+	const found = getParcelContainer();
 
-	if (!reservationId || !container) {
+	if (!reservationId || !found) {
 		debug("No parcel container on this page to offer a reprint from.");
 
 		return;
 	}
 
-	// One app per parcel, discarded together whenever the region is rebuilt. An
-	// app whose host has been thrown away is an app still watching a document
-	// nobody can see.
-	let mounted: Array<{ app: App }> = [];
+	// Bound after the guard. `place` below is hoisted past it, and a check that
+	// has not run yet narrows nothing.
+	const container: Element = found;
 
-	const place = () => {
-		mounted.forEach((entry) => entry.app.unmount());
-		mounted = [];
+	// One app per parcel. Kept so the ones the portal throws away can be shut
+	// down: an app whose host has been removed is an app still watching a
+	// document nobody can see.
+	let mounted: Array<{ app: App; host: HTMLElement }> = [];
 
-		for (const pane of Array.from(container.querySelectorAll<HTMLElement>(PARCEL_PANE_SELECTOR))) {
-			// `parcels-content-876733` -- the portal puts the parcel's own id in
-			// the pane's id, which is the same id the ERP's label dialog lists its
-			// parcels by.
-			const parcelId = pane.id.slice(PARCEL_PANE_PREFIX.length);
-			const barcode = pane.querySelector<HTMLInputElement>("input[id$='__Barcode']")?.value.trim() ?? "";
+	// Re-entrancy guard and, with the disconnect below, the reason this does not
+	// feed itself.
+	//
+	// The first version of this unmounted everything and mounted it again on
+	// every mutation, and the hosts it mounted are *inside* the region it was
+	// watching -- so placing a button was itself a mutation, which placed the
+	// buttons again, for as long as the page could stand it. Clicking one made it
+	// worse: the spinner is a render, a render is a mutation, and the component
+	// handling the click was torn down in the middle of its own handler.
+	//
+	// So placing is now idempotent -- a pane that already has a button is left
+	// alone -- and the observer is disconnected while this runs, which also
+	// discards the mutations it makes. What remains for the observer is the only
+	// thing it was ever for: the portal rebuilding the region from scratch.
+	let placing = false;
 
-			// No carrier barcode, no carrier label to reprint. This is the whole
-			// gate: a collection order or a parcel taken by a local driver has
-			// none, and so does a parcel whose announcement never succeeded --
-			// which wants announcing, not reprinting. Deliberately not the
-			// transport type, which is a translated phrase on a portal that has
-			// been seen serving Dutch chrome and English task names at once.
-			if (!barcode) {
-				continue;
-			}
+	const observer = new MutationObserver(() => place());
 
-			// Beside the barcode, in the heading itself, so the two read as one
-			// line: this label, and the way to print it again.
-			const heading = pane.querySelector(PARCEL_BARCODE_HEADING_SELECTOR);
-
-			if (!heading) {
-				continue;
-			}
-
-			heading.classList.add(PARCEL_BARCODE_HEADING_CLASS);
-
-			mounted.push(mountApp(ParcelLabelButton, (host) => heading.append(host),
-				{ reservationId, parcelId, barcode }));
+	function place() {
+		if (placing) {
+			return;
 		}
-	};
+
+		placing = true;
+		observer.disconnect();
+
+		try {
+			// Anything the portal has thrown away since last time.
+			mounted = mounted.filter((entry) => {
+				if (entry.host.isConnected) {
+					return true;
+				}
+
+				entry.app.unmount();
+
+				return false;
+			});
+
+			for (const pane of Array.from(container.querySelectorAll<HTMLElement>(PARCEL_PANE_SELECTOR))) {
+				// Already carries one. This is what keeps a render from becoming a
+				// remount, and a remount from becoming another render.
+				if (pane.querySelector(`.${PARCEL_BUTTON_CLASS}`)) {
+					continue;
+				}
+
+				// `parcels-content-876733` -- the portal puts the parcel's own id in
+				// the pane's id, which is the same id the ERP's label dialog lists
+				// its parcels by.
+				const parcelId = pane.id.slice(PARCEL_PANE_PREFIX.length);
+				const barcode = pane.querySelector<HTMLInputElement>("input[id$='__Barcode']")?.value.trim() ?? "";
+
+				// No carrier barcode, no carrier label to reprint. This is the whole
+				// gate: a collection order or a parcel taken by a local driver has
+				// none, and so does a parcel whose announcement never succeeded --
+				// which wants announcing, not reprinting. Deliberately not the
+				// transport type, which is a translated phrase on a portal that has
+				// been seen serving Dutch chrome and English task names at once.
+				if (!barcode) {
+					continue;
+				}
+
+				// Beside the barcode, in the heading itself, so the two read as one
+				// line: this label, and the way to print it again.
+				const heading = pane.querySelector(PARCEL_BARCODE_HEADING_SELECTOR);
+
+				if (!heading) {
+					continue;
+				}
+
+				heading.classList.add(PARCEL_BARCODE_HEADING_CLASS);
+
+				mounted.push(mountApp(ParcelLabelButton, (host) => heading.append(host),
+					{ reservationId, parcelId, barcode }));
+			}
+		} finally {
+			observer.observe(container, { childList: true, subtree: true });
+			placing = false;
+		}
+	}
 
 	place();
-
-	new MutationObserver(place).observe(container, { childList: true, subtree: true });
 }
 
 // Guarded like the order number is: the pages this runs on each lay the portal's

@@ -210,6 +210,12 @@ export const PARCEL_BARCODE_HEADING_SELECTOR = ".card .card-header .row > div:nt
 // only while there are two.
 export const PARCEL_BARCODE_HEADING_CLASS = "pse-has-reprint";
 
+// The reprint button's own class. Named here rather than only in the component
+// because the mount tests for it: a pane that already carries one is left alone,
+// which is what stops a render inside the parcel region from being answered with
+// a remount.
+export const PARCEL_BUTTON_CLASS = "pse-reprint";
+
 export const PARCEL_GROUP_SELECTOR = "#parcelsGroup";
 export const PARCEL_TABS_SELECTOR = "#tabs-parcels";
 
