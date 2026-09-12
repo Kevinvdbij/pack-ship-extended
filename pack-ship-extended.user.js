@@ -1,7 +1,7 @@
 // ==UserScript==
 // @name         Pack&Ship Extended
 // @namespace    npm/vite-plugin-monkey
-// @version      1.1.0
+// @version      1.1.1
 // @description  Extension for the RetailVista Pack&Ship application with plenty of QOL improvements.
 // @license      MIT
 // @icon         https://www.kampeerhalroden.nl/media/e9/9d/08/1703346720/favicon.ico
@@ -30,7 +30,7 @@
 			else (document.head || document.documentElement).appendChild(document.createElement("style")).append(c);
 		})(t);
 	};
-	_css(" .pse-modal[data-v-66d77727]{z-index:100;background-color:var(--pse-scrim);-webkit-backdrop-filter:blur(3px);text-align:left;color:var(--pse-ink);justify-content:center;align-items:center;padding:28px 20px;display:flex;position:fixed;inset:0}.pse-modal[data-v-66d77727] *{box-sizing:border-box}.is-elevated[data-v-66d77727]{z-index:200}.pse-modal-panel[data-v-66d77727]{box-sizing:border-box;border-radius:var(--pse-dialog-radius);width:100%;max-height:100%;box-shadow:var(--pse-dialog-shadow);background-color:#fff;flex-direction:column;display:flex}.is-sm[data-v-66d77727]{max-width:420px}.is-md[data-v-66d77727]{max-width:560px}.is-lg[data-v-66d77727]{max-width:780px}.is-xl[data-v-66d77727]{max-width:1000px}.pse-modal-head[data-v-66d77727]{border-bottom:1px solid var(--pse-line);flex:none;align-items:center;gap:16px;padding:17px 20px;display:flex}.pse-modal-title[data-v-66d77727]{min-width:0;color:var(--pse-ink);flex:1;margin:0;font-size:16px;font-weight:650;line-height:1.3}.pse-modal-close[data-v-66d77727]{width:32px;height:32px;color:var(--pse-ink-faint);cursor:pointer;background-color:#0000;border:0;border-radius:9px;flex:none;justify-content:center;align-items:center;padding:0;transition:background-color .15s,color .15s;display:flex}.pse-modal-close[data-v-66d77727]:hover{background-color:var(--pse-well);color:var(--pse-ink)}.pse-modal-close[data-v-66d77727]:focus{outline:none}.pse-modal-close[data-v-66d77727]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-modal-body[data-v-66d77727]{flex:1;min-height:0;padding:20px;font-size:14px;line-height:1.5;overflow-y:auto}.pse-modal-foot[data-v-66d77727]{border-top:1px solid var(--pse-line);flex:none;justify-content:flex-end;align-items:center;gap:9px;padding:15px 20px;display:flex}@media (width<=640px){.pse-modal[data-v-66d77727]{padding:16px 12px}.pse-modal-head[data-v-66d77727],.pse-modal-body[data-v-66d77727],.pse-modal-foot[data-v-66d77727]{padding-left:16px;padding-right:16px}}.pse-note[data-v-ab3fbaa7]{text-align:left}.pse-note-alert[data-v-ab3fbaa7]{color:#8a5a10;background-color:#e2a02e1c;border:1px solid #b4761452;border-left-width:3px;border-radius:12px;align-items:flex-start;gap:9px;margin:0 0 12px;padding:11px 13px;font-size:13px;font-weight:600;line-height:1.4;animation:2.4s ease-in-out infinite pse-note-breathe-ab3fbaa7;display:flex}.pse-note-alert-icon[data-v-ab3fbaa7]{flex:none;font-size:18px;line-height:1.2}@keyframes pse-note-breathe-ab3fbaa7{50%{background-color:#e2a02e3d;border-color:#b47614bf}}.pse-note-card[data-v-ab3fbaa7]{border:1px solid var(--pse-line);background-color:#fff;border-radius:14px;overflow:hidden;box-shadow:0 1px 2px #1430210a}.pse-note-head[data-v-ab3fbaa7]{border:0;border-bottom:1px solid var(--pse-line);background-color:var(--pse-well);width:100%;font:inherit;text-align:left;cursor:pointer;align-items:center;gap:9px;padding:10px 14px;transition:background-color .15s,border-color .15s;display:flex}.pse-note-head[aria-expanded=false][data-v-ab3fbaa7]{border-bottom-color:#0000}.pse-note-head[data-v-ab3fbaa7]:hover{background-color:var(--pse-brand-soft)}.pse-note-head[data-v-ab3fbaa7]:focus{outline:none}.pse-note-head[data-v-ab3fbaa7]:focus-visible{box-shadow:inset 0 0 0 2px var(--pse-brand-ring);outline:none}.pse-note-title[data-v-ab3fbaa7]{flex:1;min-width:0}.pse-note-empty[data-v-ab3fbaa7]{color:var(--pse-ink-faint);flex:none;font-size:11.5px;font-weight:550}.pse-note-spinner[data-v-ab3fbaa7]{border:2px solid var(--pse-line);border-top-color:var(--pse-brand);border-radius:50%;flex:none;width:13px;height:13px;animation:.7s linear infinite pse-note-spin-ab3fbaa7}@keyframes pse-note-spin-ab3fbaa7{to{transform:rotate(360deg)}}.pse-note-chevron[data-v-ab3fbaa7]{color:var(--pse-ink-faint);flex:none;font-size:19px;transition:transform .28s}.pse-note-chevron.is-open[data-v-ab3fbaa7]{transform:rotate(180deg)}.pse-note-collapse[data-v-ab3fbaa7]{grid-template-rows:0fr;transition:grid-template-rows .28s cubic-bezier(.33,1,.68,1);display:grid}.pse-note-collapse.is-open[data-v-ab3fbaa7]{grid-template-rows:1fr}.pse-note-collapse-inner[data-v-ab3fbaa7]{opacity:0;min-height:0;transition:opacity .2s;overflow:hidden}.pse-note-collapse.is-open .pse-note-collapse-inner[data-v-ab3fbaa7]{opacity:1;transition-delay:60ms}.pse-note-logo[data-v-ab3fbaa7]{filter:grayscale()brightness(.72);flex:none;width:18px;height:18px}.pse-note-title[data-v-ab3fbaa7]{letter-spacing:.06em;text-transform:uppercase;color:var(--pse-ink-faint);margin:0;font-size:10.5px;font-weight:650;line-height:1.6}.pse-note-body[data-v-ab3fbaa7]{padding:12px 14px 14px}.pse-note-field[data-v-ab3fbaa7]{box-sizing:border-box;border:1px solid var(--pse-line);background-color:var(--pse-well);field-sizing:content;width:100%;min-height:76px;max-height:260px;font:inherit;color:var(--pse-ink);resize:vertical;border-radius:10px;margin:0;padding:9px 11px;font-size:14px;line-height:1.45;transition:border-color .15s,background-color .15s,box-shadow .15s;display:block}.pse-note-field[data-v-ab3fbaa7]::placeholder{color:var(--pse-ink-faint)}.pse-note-field[data-v-ab3fbaa7]:focus{border-color:var(--pse-brand);box-shadow:0 0 0 3px var(--pse-brand-ring);background-color:#fff;outline:none}.pse-note-field[data-v-ab3fbaa7]:disabled{color:var(--pse-ink-soft);cursor:default}.pse-note-field-waiting[data-v-ab3fbaa7]{resize:none;flex-direction:column;justify-content:center;gap:9px;display:flex}.pse-note-shimmer[data-v-ab3fbaa7]{background-color:var(--pse-line);border-radius:5px;height:10px;animation:1.4s ease-in-out infinite pse-note-pulse-ab3fbaa7}.pse-note-shimmer-short[data-v-ab3fbaa7]{width:62%;animation-delay:.2s}@keyframes pse-note-pulse-ab3fbaa7{50%{opacity:.45}}.pse-note-actions[data-v-ab3fbaa7]{gap:8px;margin-top:10px;display:flex}.pse-note-btn[data-v-ab3fbaa7]{background-color:var(--pse-brand-ink);min-width:0;height:36px;font:inherit;color:#fff;white-space:nowrap;text-overflow:ellipsis;cursor:pointer;border:1px solid #0000;border-radius:10px;flex:1;padding:0 12px;font-size:13px;font-weight:650;transition:background-color .15s,border-color .15s,color .15s;overflow:hidden}.pse-note-btn[data-v-ab3fbaa7]:hover:not(:disabled){background-color:var(--pse-brand-ink-strong)}.pse-note-btn[data-v-ab3fbaa7]:focus{outline:none}.pse-note-btn[data-v-ab3fbaa7]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-note-btn[data-v-ab3fbaa7]:disabled{color:#fff;cursor:not-allowed;background-color:#dfe6e2}.pse-note-btn-quiet[data-v-ab3fbaa7]{border-color:var(--pse-line);color:var(--pse-ink-soft);background-color:#fff}.pse-note-btn-quiet[data-v-ab3fbaa7]:hover:not(:disabled){border-color:var(--pse-brand);background-color:var(--pse-brand-soft);color:var(--pse-brand-ink)}.pse-note-btn-quiet[data-v-ab3fbaa7]:disabled{border-color:var(--pse-line);color:var(--pse-ink-faint);background-color:#fff}@media (prefers-reduced-motion:reduce){.pse-note-collapse[data-v-ab3fbaa7],.pse-note-collapse-inner[data-v-ab3fbaa7],.pse-note-chevron[data-v-ab3fbaa7]{transition:none}.pse-note-spinner[data-v-ab3fbaa7]{animation:1.4s ease-in-out infinite pse-note-pulse-ab3fbaa7}.pse-note-alert[data-v-ab3fbaa7]{background-color:#e2a02e3d;border-color:#b47614bf;animation:none}.pse-note-shimmer[data-v-ab3fbaa7]{animation:none}}.pse-rescard[data-v-99ff8266]{border:1px solid var(--pse-line);background-color:#fff;border-radius:16px;transition:border-color .15s,box-shadow .15s;overflow:hidden}.pse-rescard+.pse-rescard[data-v-99ff8266]{margin-top:10px}.pse-rescard[data-v-99ff8266]:not(.is-incomplete):hover{border-color:var(--pse-brand);box-shadow:0 1px 2px #1430210a,0 14px 30px -24px #14302180}.pse-rescard-head[data-v-99ff8266]{background-color:var(--pse-well);border-bottom:1px solid var(--pse-line);align-items:center;gap:20px;padding:13px 16px;display:flex}.pse-rescard-id[data-v-99ff8266]{flex:none;min-width:108px}.pse-rescard-number[data-v-99ff8266]{font-variant-numeric:tabular-nums;color:var(--pse-ink);font-size:17px;font-weight:700;line-height:1.2;display:block}.pse-rescard-reference[data-v-99ff8266]{font-variant-numeric:tabular-nums;color:var(--pse-ink-soft);margin-top:1px;font-size:12px;display:block}.pse-rescard-facts[data-v-99ff8266]{flex:1;gap:26px;min-width:0;margin:0;display:flex}.pse-rescard-fact[data-v-99ff8266]{min-width:0}.pse-rescard-fact dt[data-v-99ff8266]{letter-spacing:.06em;text-transform:uppercase;color:var(--pse-ink-faint);margin:0;font-size:10.5px;font-weight:650}.pse-rescard-fact dd[data-v-99ff8266]{white-space:nowrap;text-overflow:ellipsis;color:var(--pse-ink);margin:2px 0 0;font-size:13.5px;font-weight:600;overflow:hidden}.pse-rescard-open[data-v-99ff8266]{background-color:var(--pse-brand-ink);height:36px;font:inherit;color:#fff;cursor:pointer;border:0;border-radius:10px;flex:none;align-items:center;gap:2px;padding:0 10px 0 15px;font-size:13.5px;font-weight:650;transition:background-color .15s;display:inline-flex}.pse-rescard-open[data-v-99ff8266]:hover{background-color:var(--pse-brand-ink-strong)}.pse-rescard-open[data-v-99ff8266]:focus{outline:none}.pse-rescard-open[data-v-99ff8266]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-rescard-open-icon[data-v-99ff8266]{font-size:18px}.pse-rescard-products[data-v-99ff8266]{overflow-x:auto}.pse-rescard-amount[data-v-99ff8266]{font-variant-numeric:tabular-nums;white-space:nowrap;border-radius:8px;padding:2px 9px;font-size:13px;font-weight:600;display:inline-block}.pse-table tbody tr.is-short td[data-v-99ff8266]{background-color:var(--pse-attention-wash-strong);border-top-color:var(--pse-attention-line-soft)}.pse-table tbody tr.is-short .pse-rescard-amount[data-v-99ff8266]{color:var(--pse-attention-ink);font-weight:700}.pse-rescard-note[data-v-99ff8266]{border-top:1px solid var(--pse-line);padding:14px 16px}@media (width<=720px){.pse-rescard-head[data-v-99ff8266]{flex-wrap:wrap;gap:12px 20px}.pse-rescard-facts[data-v-99ff8266]{flex-basis:100%;order:1;gap:18px}.pse-rescard-open[data-v-99ff8266]{margin-left:auto}}.pse-row[data-v-51c20dba]{border-top:1px solid var(--pse-line);grid-template-columns:auto minmax(0,1.4fr) minmax(0,1fr) auto;align-items:center;gap:16px;padding:11px 16px;font-size:14px;transition:background-color .15s;display:grid}.pse-row[data-v-51c20dba]:first-child{border-top:0}.pse-row[data-v-51c20dba]:hover{background-color:var(--pse-well)}.pse-row-number[data-v-51c20dba]{font-variant-numeric:tabular-nums;color:var(--pse-ink);font-weight:650}.pse-row-customer[data-v-51c20dba],.pse-row-reference[data-v-51c20dba]{white-space:nowrap;text-overflow:ellipsis;overflow:hidden}.pse-row-customer[data-v-51c20dba]{color:var(--pse-ink)}.pse-row-reference[data-v-51c20dba]{font-variant-numeric:tabular-nums;color:var(--pse-ink-soft);font-size:13px}.pse-row-open[data-v-51c20dba]{border:1px solid var(--pse-line);height:32px;font:inherit;color:var(--pse-ink-soft);cursor:pointer;background-color:#fff;border-radius:9px;align-items:center;gap:2px;padding:0 8px 0 12px;font-size:13px;font-weight:650;transition:border-color .15s,background-color .15s,color .15s;display:inline-flex}.pse-row:hover .pse-row-open[data-v-51c20dba]{border-color:var(--pse-brand);background-color:var(--pse-brand-soft);color:var(--pse-brand-ink)}.pse-row-open[data-v-51c20dba]:focus{outline:none}.pse-row-open[data-v-51c20dba]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-row-open-icon[data-v-51c20dba]{font-size:18px}.pse-row-state[data-v-51c20dba]{white-space:nowrap;border-radius:999px;align-items:center;gap:7px;padding:4px 11px;font-size:12.5px;font-weight:650;display:inline-flex}.pse-row-mark[data-v-51c20dba]{background-color:currentColor;border-radius:50%;flex:none;width:7px;height:7px}.pse-row-state.is-queued[data-v-51c20dba]{background-color:var(--pse-well);color:var(--pse-ink-faint)}.pse-row-state.is-stopped[data-v-51c20dba]{background-color:var(--pse-well);color:var(--pse-ink-soft)}.pse-row-state.is-busy[data-v-51c20dba]{color:#8a5a10;background-color:#e2a02e29}.pse-row-state.is-busy .pse-row-mark[data-v-51c20dba]{animation:1.6s ease-in-out infinite pse-row-pulse-51c20dba}@keyframes pse-row-pulse-51c20dba{50%{opacity:.3}}.pse-row-state.is-done[data-v-51c20dba]{background-color:var(--pse-brand-soft);color:var(--pse-brand-ink)}.pse-row-state.is-failed[data-v-51c20dba]{background-color:var(--pse-alert-soft);color:var(--pse-alert-ink)}.pse-row.is-failed[data-v-51c20dba]{background-color:var(--pse-alert-wash)}@media (prefers-reduced-motion:reduce){.pse-row-state.is-busy .pse-row-mark[data-v-51c20dba]{animation:none}}@media (width<=720px){.pse-row[data-v-51c20dba]{grid-template-columns:auto minmax(0,1fr) auto;gap:12px}.pse-row-reference[data-v-51c20dba]{display:none}}.pse-mc[data-v-5c92f516]{border:1px solid var(--pse-line);background-color:var(--pse-well);border-radius:14px;margin-bottom:12px;padding:15px 17px;transition:border-color .2s,background-color .2s}.pse-mc.is-running[data-v-5c92f516]{background-color:#e2a02e12;border-color:#e2a02e66}.pse-mc.is-done[data-v-5c92f516]{border-color:var(--pse-brand);background-color:var(--pse-brand-soft)}.pse-mc.is-stopped[data-v-5c92f516]{border-color:var(--pse-alert-soft);background-color:var(--pse-alert-wash)}.pse-mc.is-stopped .pse-mc-icon[data-v-5c92f516]{border-color:var(--pse-alert-soft);color:var(--pse-alert-ink)}.pse-mc.is-stopped .pse-mc-progress-fill[data-v-5c92f516]{background-color:var(--pse-alert)}.pse-mc-head[data-v-5c92f516]{align-items:center;gap:13px;display:flex}.pse-mc-icon[data-v-5c92f516]{border:1px solid var(--pse-line);width:36px;height:36px;color:var(--pse-brand-ink);background-color:#fff;border-radius:11px;flex:none;justify-content:center;align-items:center;display:flex}.pse-mc.is-running .pse-mc-icon[data-v-5c92f516]{color:#8a5a10;border-color:#e2a02e66}.pse-mc-titles[data-v-5c92f516]{flex:1;min-width:0}.pse-mc-title[data-v-5c92f516]{color:var(--pse-ink);margin:0;font-size:14.5px;font-weight:650;line-height:1.3}.pse-mc-subtitle[data-v-5c92f516]{color:var(--pse-ink-soft);margin:3px 0 0;font-size:12.5px;line-height:1.4}.pse-mc-controls[data-v-5c92f516]{flex:none;align-items:center;gap:10px;display:flex}.pse-mc-stepper[data-v-5c92f516]{border:1px solid var(--pse-line);background-color:#fff;border-radius:11px;align-items:center;height:40px;display:flex;overflow:hidden}.pse-mc-step[data-v-5c92f516]{width:34px;height:100%;font:inherit;color:var(--pse-ink-soft);cursor:pointer;background-color:#0000;border:0;padding:0;font-size:17px;line-height:1;transition:background-color .15s,color .15s}.pse-mc-step[data-v-5c92f516]:hover:not(:disabled){background-color:var(--pse-brand-soft);color:var(--pse-brand-ink)}.pse-mc-step[data-v-5c92f516]:disabled{color:var(--pse-line);cursor:not-allowed}.pse-mc-step[data-v-5c92f516]:focus{outline:none}.pse-mc-step[data-v-5c92f516]:focus-visible{box-shadow:inset 0 0 0 2px var(--pse-brand-ring);outline:none}.pse-mc-amount[data-v-5c92f516]{border:0;border-left:1px solid var(--pse-line);border-right:1px solid var(--pse-line);width:46px;height:100%;font:inherit;font-variant-numeric:tabular-nums;text-align:center;color:var(--pse-ink);background-color:#0000;padding:0;font-size:15px;font-weight:650}.pse-mc-amount[data-v-5c92f516]:focus{background-color:var(--pse-brand-soft);outline:none}.pse-mc-amount[data-v-5c92f516]::-webkit-inner-spin-button{appearance:none;margin:0}.pse-mc-amount[data-v-5c92f516]::-webkit-outer-spin-button{appearance:none;margin:0}.pse-mc-start[data-v-5c92f516]{flex:none}.pse-mc-tally[data-v-5c92f516]{flex:none;align-items:baseline;gap:6px;display:flex}.pse-mc-tally-count[data-v-5c92f516]{font-variant-numeric:tabular-nums;color:var(--pse-ink);font-size:20px;font-weight:700;line-height:1}.pse-mc-tally-of[data-v-5c92f516]{color:var(--pse-ink-faint);font-size:14px;font-weight:650}.pse-mc-tally-label[data-v-5c92f516]{color:var(--pse-ink-soft);font-size:12px}.pse-mc-progress[data-v-5c92f516]{background-color:#142b2214;border-radius:999px;height:6px;margin-top:13px;overflow:hidden}.pse-mc-progress-fill[data-v-5c92f516]{background-color:var(--pse-brand);border-radius:999px;height:100%;transition:width .4s cubic-bezier(.2,.9,.3,1)}@media (width<=720px){.pse-mc.is-stopped[data-v-5c92f516]{border-color:var(--pse-alert-soft);background-color:var(--pse-alert-wash)}.pse-mc.is-stopped .pse-mc-icon[data-v-5c92f516]{border-color:var(--pse-alert-soft);color:var(--pse-alert-ink)}.pse-mc.is-stopped .pse-mc-progress-fill[data-v-5c92f516]{background-color:var(--pse-alert)}.pse-mc-head[data-v-5c92f516]{flex-wrap:wrap}.pse-mc-titles[data-v-5c92f516]{flex-basis:100%;order:-1}.pse-mc-controls[data-v-5c92f516],.pse-mc-tally[data-v-5c92f516]{margin-left:auto}}.pse-found[data-v-d0ff4a59]{border:1px solid var(--pse-line);background-color:var(--pse-well);border-radius:14px;align-items:center;gap:16px;margin-bottom:20px;padding:14px 16px;display:flex}.pse-found-image[data-v-d0ff4a59]{border:1px solid var(--pse-line);background-color:#fff;border-radius:11px;flex:none;justify-content:center;align-items:center;width:58px;height:58px;display:flex;overflow:hidden}.pse-found-image img[data-v-d0ff4a59]{object-fit:contain;max-width:100%;max-height:100%}.pse-found-text[data-v-d0ff4a59]{flex:1;min-width:0}.pse-found-name[data-v-d0ff4a59]{color:var(--pse-ink);margin:0;font-size:15.5px;font-weight:650;line-height:1.3}.pse-found-barcode[data-v-d0ff4a59]{font-variant-numeric:tabular-nums;color:var(--pse-ink-soft);margin:3px 0 0;font-size:13px}.pse-found-count[data-v-d0ff4a59]{flex:none;align-items:baseline;gap:6px;display:flex}.pse-found-count-number[data-v-d0ff4a59]{font-variant-numeric:tabular-nums;color:var(--pse-brand-ink);font-size:22px;font-weight:700;line-height:1}.pse-found-count-label[data-v-d0ff4a59]{color:var(--pse-ink-soft);font-size:12.5px}.pse-countdown[data-v-d0ff4a59]{border:1px solid var(--pse-brand);background-color:var(--pse-brand-soft);color:var(--pse-brand-ink);border-radius:12px;align-items:center;gap:9px;margin:0 0 20px;padding:11px 14px;font-size:13.5px;font-weight:600;display:flex}.pse-countdown-mark[data-v-d0ff4a59]{background-color:var(--pse-brand);border-radius:50%;flex:none;width:8px;height:8px;animation:1s ease-in-out infinite pse-countdown-tick-d0ff4a59}@keyframes pse-countdown-tick-d0ff4a59{50%{opacity:.25}}@media (prefers-reduced-motion:reduce){.pse-countdown-mark[data-v-d0ff4a59]{animation:none}}.pse-group+.pse-group[data-v-d0ff4a59]{margin-top:26px}.pse-group-head[data-v-d0ff4a59]{margin-bottom:10px}.pse-group-title[data-v-d0ff4a59]{letter-spacing:.02em;color:var(--pse-ink);align-items:center;gap:8px;margin:0;font-size:14px;font-weight:650;display:flex}.pse-group-count[data-v-d0ff4a59]{background-color:var(--pse-brand-soft);font-variant-numeric:tabular-nums;min-width:22px;height:20px;color:var(--pse-brand-ink);border-radius:999px;justify-content:center;align-items:center;padding:0 7px;font-size:12px;font-weight:700;display:inline-flex}.pse-group-note[data-v-d0ff4a59]{color:var(--pse-ink-soft);margin:4px 0 0;font-size:12.5px;line-height:1.45}.pse-rows[data-v-d0ff4a59]{border:1px solid var(--pse-line);background-color:#fff;border-radius:14px;overflow:hidden}.pse-panel[data-v-2ad9890a]{flex-direction:column;gap:18px;min-width:0;display:flex}.pse-panel-head[data-v-2ad9890a]{align-items:center;gap:12px;display:flex}.pse-panel-icon[data-v-2ad9890a]{background-color:var(--pse-brand-soft);width:38px;height:38px;color:var(--pse-brand-ink);border-radius:11px;flex:none;justify-content:center;align-items:center;display:flex}.pse-panel-text[data-v-2ad9890a]{min-width:0}.pse-panel-title[data-v-2ad9890a]{color:var(--pse-ink);margin:0;font-size:16px;font-weight:650;line-height:1.3}.pse-panel-subtitle[data-v-2ad9890a]{color:var(--pse-ink-soft);margin:2px 0 0;font-size:12.5px;line-height:1.4}.pse-field[data-v-e35ea7a8]{cursor:text;margin:0;display:block}.pse-field-label[data-v-e35ea7a8]{letter-spacing:.07em;text-transform:uppercase;color:var(--pse-ink-soft);margin-bottom:7px;font-size:11px;font-weight:650;display:block}.pse-field-shell[data-v-e35ea7a8]{display:block}.pse-field-shell[data-v-e35ea7a8] .pse-input{box-sizing:border-box;border:1px solid var(--pse-line);background-color:var(--pse-well);width:100%;height:48px;font:inherit;color:var(--pse-ink);border-radius:12px;margin:0;padding:0 15px;font-size:15px;transition:border-color .15s,background-color .15s,box-shadow .15s;display:block}.pse-field-shell[data-v-e35ea7a8] .pse-input::placeholder{color:var(--pse-ink-faint)}.pse-field-shell[data-v-e35ea7a8] .pse-input:-webkit-autofill{-webkit-text-fill-color:var(--pse-ink);box-shadow:0 0 0 100px var(--pse-well) inset}.pse-field-shell[data-v-e35ea7a8] .pse-input:-webkit-autofill:hover{-webkit-text-fill-color:var(--pse-ink);box-shadow:0 0 0 100px var(--pse-well) inset}.pse-field-shell[data-v-e35ea7a8] .pse-input:focus{border-color:var(--pse-brand);box-shadow:0 0 0 3px var(--pse-brand-ring);background-color:#fff;outline:none}.pse-field-shell[data-v-e35ea7a8] .pse-input:-webkit-autofill:focus{box-shadow:0 0 0 100px #fff inset, 0 0 0 3px var(--pse-brand-ring)}.pse-notice[data-v-0438713d]{border:1px solid var(--pse-line);text-align:left;background-color:#fff;border-radius:14px;align-items:flex-start;gap:12px;padding:14px 16px;display:flex;box-shadow:0 1px 2px #1430210a,0 14px 30px -26px #14302173}.pse-notice-icon[data-v-0438713d]{border-radius:10px;flex:none;justify-content:center;align-items:center;width:32px;height:32px;display:flex}.pse-notice.is-notice .pse-notice-icon[data-v-0438713d]{background-color:var(--pse-attention-soft);color:var(--pse-attention-ink)}.pse-notice.is-alert .pse-notice-icon[data-v-0438713d]{background-color:var(--pse-alert-soft);color:var(--pse-alert-ink)}.pse-notice-text[data-v-0438713d]{min-width:0;padding-top:4px;display:block}.pse-notice-title[data-v-0438713d]{color:var(--pse-ink);font-size:14px;font-weight:650;line-height:1.35;display:block}.pse-notice-detail[data-v-0438713d]{color:var(--pse-ink-soft);margin-top:2px;font-size:12.5px;line-height:1.45;display:block}.pse-notice-close[data-v-0438713d]{width:28px;height:28px;color:var(--pse-ink-faint);cursor:pointer;background:0 0;border:0;border-radius:8px;flex:none;justify-content:center;align-items:center;margin-left:auto;padding:0;transition:background-color .15s,color .15s;display:flex}.pse-notice-close[data-v-0438713d]:hover{background-color:var(--pse-well);color:var(--pse-ink)}.pse-notice-close[data-v-0438713d]:focus{outline:none}.pse-notice-close[data-v-0438713d]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-resume[data-v-ead5c402]{border:1px solid var(--pse-line);width:100%;font:inherit;text-align:left;color:var(--pse-ink);cursor:pointer;background-color:#fff;border-radius:14px;align-items:center;gap:13px;margin:0;padding:13px 16px;transition:border-color .15s,box-shadow .15s,transform .15s;display:flex}.pse-resume[data-v-ead5c402]:hover:not(:disabled){border-color:var(--pse-brand);transform:translateY(-1px);box-shadow:0 6px 18px -12px #14302180}.pse-resume[data-v-ead5c402]:focus{outline:none}.pse-resume[data-v-ead5c402]:focus-visible{border-color:var(--pse-brand);box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-resume[data-v-ead5c402]:disabled{background-color:var(--pse-well);color:var(--pse-ink-faint);cursor:not-allowed}.pse-resume-icon[data-v-ead5c402]{background-color:var(--pse-brand-soft);width:34px;height:34px;color:var(--pse-brand-ink);border-radius:10px;flex:none;justify-content:center;align-items:center;display:flex}.pse-resume:disabled .pse-resume-icon[data-v-ead5c402]{color:var(--pse-ink-faint);background-color:#1430210d}.pse-resume-text[data-v-ead5c402]{flex-direction:column;gap:2px;min-width:0;margin-right:auto;display:flex}.pse-resume-label[data-v-ead5c402]{font-size:13px;font-weight:600;line-height:1.3}.pse-resume-number[data-v-ead5c402]{color:var(--pse-ink-soft);font-variant-numeric:tabular-nums;font-size:12px;line-height:1.3}.pse-resume:disabled .pse-resume-number[data-v-ead5c402]{color:var(--pse-ink-faint)}.pse-resume-chevron[data-v-ead5c402]{color:var(--pse-ink-faint);flex:none;transition:transform .15s,color .15s}.pse-resume:hover:not(:disabled) .pse-resume-chevron[data-v-ead5c402]{color:var(--pse-brand-ink);transform:translate(2px)}.pse-picker-intro[data-v-585a06fb]{color:var(--pse-ink-soft);margin:0 0 16px;font-size:13.5px;line-height:1.45}.pse-picker-list[data-v-585a06fb]{flex-direction:column;gap:8px;margin:0;padding:0;list-style:none;display:flex}.pse-picker-row[data-v-585a06fb]{border:1px solid var(--pse-line);width:100%;font:inherit;text-align:left;color:var(--pse-ink);cursor:pointer;background-color:#fff;border-radius:12px;align-items:center;gap:12px;padding:11px 13px;transition:border-color .15s,background-color .15s;display:flex}.pse-picker-row[data-v-585a06fb]:hover:not(:disabled){border-color:var(--pse-brand);background-color:var(--pse-well)}.pse-picker-row[data-v-585a06fb]:disabled{opacity:.55;cursor:default}.pse-picker-row[data-v-585a06fb]:focus{outline:none}.pse-picker-row[data-v-585a06fb]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-picker-what[data-v-585a06fb]{flex-direction:column;flex:auto;gap:2px;min-width:0;display:flex}.pse-picker-barcode[data-v-585a06fb]{font-variant-numeric:tabular-nums;text-overflow:ellipsis;white-space:nowrap;font-size:14px;font-weight:650;overflow:hidden}.pse-picker-carrier[data-v-585a06fb]{color:var(--pse-ink-faint);font-size:12px}.pse-picker-icon[data-v-585a06fb]{color:var(--pse-brand-ink);flex:none;font-size:18px}.pse-picker-spinner[data-v-585a06fb]{border:2px solid var(--pse-line);border-top-color:var(--pse-brand);border-radius:50%;flex:none;width:14px;height:14px;animation:.7s linear infinite pse-picker-spin-585a06fb}@keyframes pse-picker-spin-585a06fb{to{transform:rotate(360deg)}}.pse-history[data-v-fffbc2dc]{border:1px solid var(--pse-line);background-color:var(--pse-well);border-radius:20px;flex-direction:column;align-self:start;min-width:0;max-height:460px;padding:18px 8px 8px 18px;display:flex}.pse-history-head[data-v-fffbc2dc]{align-items:flex-start;gap:11px;margin-bottom:14px;padding-right:10px;display:flex}.pse-history-icon[data-v-fffbc2dc]{background-color:var(--pse-brand-soft);width:32px;height:32px;color:var(--pse-brand-ink);border-radius:10px;flex:none;justify-content:center;align-items:center;display:flex}.pse-history-text[data-v-fffbc2dc]{min-width:0;margin-right:auto}.pse-history-title[data-v-fffbc2dc]{color:var(--pse-ink);margin:0;font-size:15px;font-weight:650;line-height:1.3}.pse-history-subtitle[data-v-fffbc2dc]{color:var(--pse-ink-soft);margin:1px 0 0;font-size:12px;line-height:1.4}.pse-history-clear[data-v-fffbc2dc]{font:inherit;color:var(--pse-ink-faint);cursor:pointer;background:0 0;border:0;border-radius:8px;flex:none;margin:0;padding:5px 9px;font-size:12px;font-weight:600;transition:background-color .15s,color .15s}.pse-history-clear[data-v-fffbc2dc]:hover{color:var(--pse-ink-soft);background-color:#1430210d}.pse-history-clear[data-v-fffbc2dc]:focus{outline:none}.pse-history-clear[data-v-fffbc2dc]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-history-list[data-v-fffbc2dc]{scrollbar-width:thin;scrollbar-color:var(--pse-line) transparent;flex-direction:column;gap:6px;min-height:0;margin:0;padding:4px 8px 10px 0;list-style:none;display:flex;overflow-y:auto;-webkit-mask-image:linear-gradient(#000 calc(100% - 18px),#0000);mask-image:linear-gradient(#000 calc(100% - 18px),#0000)}.pse-history-item[data-v-fffbc2dc]{align-items:stretch;gap:6px;display:flex}.pse-history-print[data-v-fffbc2dc]{width:38px;color:var(--pse-ink-faint);cursor:pointer;opacity:.7;background-color:#fff;border:1px solid #0000;border-radius:12px;flex:none;justify-content:center;align-items:center;transition:border-color .15s,color .15s,opacity .15s;display:flex}.pse-history-item:hover .pse-history-print[data-v-fffbc2dc]{opacity:1}.pse-history-print[data-v-fffbc2dc]:hover:not(:disabled){border-color:var(--pse-brand);color:var(--pse-brand-ink)}.pse-history-print[data-v-fffbc2dc]:disabled{opacity:.4;cursor:default}.pse-history-print-icon[data-v-fffbc2dc]{font-size:17px}.pse-history-spinner[data-v-fffbc2dc]{border:2px solid var(--pse-line);border-top-color:var(--pse-brand);border-radius:50%;width:13px;height:13px;animation:.7s linear infinite pse-history-spin-fffbc2dc}@keyframes pse-history-spin-fffbc2dc{to{transform:rotate(360deg)}}.pse-history-row[data-v-fffbc2dc]{width:100%;font:inherit;text-align:left;color:var(--pse-ink);cursor:pointer;background-color:#fff;border:1px solid #0000;border-radius:12px;align-items:center;gap:11px;margin:0;padding:9px 11px;transition:border-color .15s,box-shadow .15s,transform .15s;display:flex}.pse-history-row[data-v-fffbc2dc]:hover{border-color:var(--pse-brand);transform:translateY(-1px);box-shadow:0 6px 16px -12px #14302180}.pse-history-row[data-v-fffbc2dc]:focus{outline:none}.pse-history-row[data-v-fffbc2dc]:focus-visible{border-color:var(--pse-brand);box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-history-marker[data-v-fffbc2dc]{background-color:var(--pse-brand);border-radius:2px;flex:none;align-self:stretch;width:3px}.pse-history-row-failed .pse-history-marker[data-v-fffbc2dc]{background-color:var(--pse-alert)}.pse-history-body[data-v-fffbc2dc]{flex-direction:column;gap:2px;min-width:0;margin-right:auto;display:flex}.pse-history-number[data-v-fffbc2dc]{font-variant-numeric:tabular-nums;font-size:13.5px;font-weight:600;line-height:1.3}.pse-history-customer[data-v-fffbc2dc]{color:var(--pse-ink);white-space:nowrap;text-overflow:ellipsis;font-size:12.5px;line-height:1.35;overflow:hidden}.pse-history-meta[data-v-fffbc2dc]{color:var(--pse-ink-soft);align-items:center;gap:5px;font-size:11.5px;line-height:1.4;display:flex}.pse-history-dot[data-v-fffbc2dc]{color:var(--pse-ink-faint)}.pse-history-badge[data-v-fffbc2dc]{background-color:var(--pse-alert-soft);letter-spacing:.01em;color:var(--pse-alert-ink);border-radius:999px;padding:1px 6px;font-size:10.5px;font-weight:650}.pse-history-add[data-v-fffbc2dc]{color:var(--pse-ink-faint);opacity:.7;flex:none;transition:color .15s,opacity .15s}.pse-history-row:hover .pse-history-add[data-v-fffbc2dc]{color:var(--pse-brand-ink);opacity:1}@media (width<=1120px){.pse-history[data-v-fffbc2dc]{max-height:300px}}.pse-search[data-v-99949c5b]{box-sizing:border-box;width:100%;color:var(--pse-ink);text-align:left;margin:28px auto 56px;padding:0 24px}.pse-search[data-v-99949c5b] *{box-sizing:border-box}.pse-messages[data-v-99949c5b]:empty{display:none}.pse-search[data-v-99949c5b] .pse-notice{margin-bottom:18px}.pse-layout[data-v-99949c5b]{max-width:980px;margin:0 auto;display:grid}.pse-layout-history[data-v-99949c5b]{grid-template-columns:minmax(0,1fr) 322px;gap:20px;max-width:1300px}.pse-main[data-v-99949c5b]{min-width:0}.pse-card[data-v-99949c5b]{border:1px solid var(--pse-line);background-color:#fff;border-radius:20px;grid-template-columns:1fr auto 1fr;gap:34px;padding:30px 34px;display:grid;box-shadow:0 1px 2px #1430210a,0 18px 40px -28px #14302173}.pse-card-split[data-v-99949c5b]{background-color:var(--pse-line);width:1px}.pse-form[data-v-99949c5b]{flex-direction:column;flex:1;gap:18px;margin:0;display:flex}.pse-submit[data-v-99949c5b]{background-color:var(--pse-brand-ink);width:100%;height:48px;font:inherit;color:#fff;cursor:pointer;border:0;border-radius:12px;justify-content:center;align-items:center;gap:9px;margin:0;padding:0 18px;font-size:14.5px;font-weight:650;transition:background-color .15s,box-shadow .15s,transform .15s;display:flex}.pse-submit-end[data-v-99949c5b]{margin-top:auto}.pse-submit[data-v-99949c5b]:hover:not(:disabled){background-color:var(--pse-brand-ink-strong);transform:translateY(-1px);box-shadow:0 10px 22px -14px #143021cc}.pse-submit[data-v-99949c5b]:active:not(:disabled){box-shadow:none;transform:translateY(0)}.pse-submit[data-v-99949c5b]:focus{outline:none}.pse-submit[data-v-99949c5b]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-submit[data-v-99949c5b]:disabled{color:#fff;cursor:not-allowed;background-color:#cfdbd4}.pse-spinner[data-v-99949c5b]{border:2px solid #fff6;border-top-color:#fff;border-radius:50%;flex:none;width:15px;height:15px;animation:.7s linear infinite pse-spin-99949c5b}@keyframes pse-spin-99949c5b{to{transform:rotate(360deg)}}.pse-resume-row[data-v-99949c5b]{grid-template-columns:1fr 1fr;gap:14px;margin-top:18px;display:grid}@media (width<=1120px){.pse-layout-history[data-v-99949c5b]{grid-template-columns:minmax(0,1fr);max-width:980px}}@media (width<=860px){.pse-search[data-v-99949c5b]{padding:0 16px}.pse-card[data-v-99949c5b]{grid-template-columns:1fr;gap:26px;padding:26px 22px}.pse-card-split[data-v-99949c5b]{width:auto;height:1px}.pse-submit-end[data-v-99949c5b]{margin-top:0}.pse-resume-row[data-v-99949c5b]{grid-template-columns:1fr}}.pse-loading[data-v-38d33d98]{box-sizing:border-box;min-height:calc(100vh - 200px);color:var(--pse-ink);text-align:left;justify-content:center;align-items:center;padding:48px 24px;display:flex}.pse-loading-card[data-v-38d33d98]{border:1px solid var(--pse-line);background-color:#fff;border-radius:20px;align-items:center;gap:16px;width:100%;max-width:420px;padding:24px 26px;display:flex;box-shadow:0 1px 2px #1430210a,0 18px 40px -28px #14302173}.pse-loading-spinner[data-v-38d33d98]{border:3px solid var(--pse-brand-ring);border-top-color:var(--pse-brand);border-radius:50%;flex:none;width:28px;height:28px;animation:.7s linear infinite pse-loading-spin-38d33d98}@keyframes pse-loading-spin-38d33d98{to{transform:rotate(360deg)}}.pse-loading-text[data-v-38d33d98]{min-width:0}.pse-loading-title[data-v-38d33d98]{color:var(--pse-ink);margin:0;font-size:16px;font-weight:650;line-height:1.3}.pse-loading-subtitle[data-v-38d33d98]{color:var(--pse-ink-soft);margin:3px 0 0;font-size:12.5px;line-height:1.4}@media (prefers-reduced-motion:reduce){.pse-loading-spinner[data-v-38d33d98]{animation-duration:1.6s}}@media (width<=860px){.pse-loading[data-v-38d33d98]{padding:32px 16px}}.pse-rack-lead[data-v-76779723]{color:var(--pse-ink-soft);margin:0 0 16px;font-size:13px;line-height:1.45}.pse-rack[data-v-76779723]{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;display:grid}.pse-rack-column[data-v-76779723]{flex-direction:column;gap:7px;min-width:0;display:flex}.pse-rack-letter[data-v-76779723]{letter-spacing:.1em;text-align:center;color:var(--pse-ink-faint);font-size:11px;font-weight:700}.pse-rack-bays[data-v-76779723]{border:1px solid var(--pse-line);background-color:var(--pse-well);border-radius:14px;grid-template-rows:repeat(2,1fr);grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;height:232px;padding:7px;display:grid}.pse-rack-bays.is-rows-1 .pse-rack-bay[data-v-76779723]{grid-row:span 2}.pse-rack-bay[data-v-76779723]{border:1px solid var(--pse-line);min-width:0;font:inherit;color:var(--pse-ink-soft);cursor:pointer;background-color:#fff;border-radius:10px;flex-direction:column;justify-content:center;align-items:center;gap:3px;padding:4px;transition:border-color .15s,background-color .15s,color .15s,box-shadow .15s;display:flex}.pse-rack-bay[data-v-76779723]:hover{border-color:var(--pse-brand);background-color:var(--pse-brand-soft);color:var(--pse-brand-ink)}.pse-rack-bay[data-v-76779723]:focus{outline:none}.pse-rack-bay[data-v-76779723]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-rack-bay-label[data-v-76779723]{font-variant-numeric:tabular-nums;font-size:15px;font-weight:700;line-height:1.1}.pse-rack-bay-note[data-v-76779723]{text-align:center;opacity:.8;font-size:10px;font-weight:600;line-height:1.2}.pse-rack-bay.is-taken[data-v-76779723]{border-color:var(--pse-attention-line-soft);background-color:var(--pse-attention-soft);color:var(--pse-attention-ink)}.pse-rack-bay.is-current[data-v-76779723]{border-color:var(--pse-brand-ink);background-color:var(--pse-brand-ink);color:#fff}.pse-rack-bay.is-current[data-v-76779723]:hover{background-color:var(--pse-brand-ink-strong);color:#fff}@media (width<=720px){.pse-rack[data-v-76779723]{grid-template-columns:repeat(2,minmax(0,1fr))}}.pse-slotcard[data-v-7e6e3d84]{border:1px solid var(--pse-line);text-align:left;background-color:#fff;border-radius:14px;overflow:hidden;box-shadow:0 1px 2px #1430210a}.pse-slotcard-head[data-v-7e6e3d84]{border-bottom:1px solid var(--pse-line);background-color:var(--pse-well);align-items:center;gap:9px;padding:10px 14px;display:flex}.pse-slotcard-spinner[data-v-7e6e3d84]{border:2px solid var(--pse-line);border-top-color:var(--pse-brand);border-radius:50%;flex:none;width:13px;height:13px;margin-left:auto;animation:.7s linear infinite pse-slotcard-spin-7e6e3d84}@keyframes pse-slotcard-spin-7e6e3d84{to{transform:rotate(360deg)}}.pse-slot-chip .pse-slot-chip-empty[data-v-7e6e3d84]:only-child{opacity:.75}.pse-slotcard-icon[data-v-7e6e3d84]{color:var(--pse-ink-faint);flex:none;font-size:18px}.pse-slotcard-title[data-v-7e6e3d84]{letter-spacing:.06em;text-transform:uppercase;color:var(--pse-ink-faint);margin:0;font-size:10.5px;font-weight:650;line-height:1.6}.pse-slotcard-body[data-v-7e6e3d84]{padding:12px 14px 14px}.pse-slotcard-caption[data-v-7e6e3d84]{letter-spacing:.06em;text-transform:uppercase;color:var(--pse-ink-faint);margin-bottom:6px;font-size:10.5px;font-weight:650;line-height:1.6;display:block}.pse-slotcard-caption.is-spaced[data-v-7e6e3d84]{border-top:1px solid var(--pse-line);margin-top:14px;padding-top:12px}.pse-slotcard-list[data-v-7e6e3d84]{flex-wrap:wrap;gap:6px;display:flex}.pse-slotcard-hint[data-v-7e6e3d84]{color:var(--pse-ink-faint);margin:9px 0 0;font-size:12px;line-height:1.4}.pse-sidebar[data-v-048e97c2]{box-sizing:border-box;text-align:left;color:var(--pse-ink);flex-direction:column;gap:14px;display:flex}.pse-sidebar[data-v-048e97c2] *{box-sizing:border-box}.pse-sidebar-card[data-v-048e97c2]{border:1px solid var(--pse-line);background-color:#fff;border-radius:16px;padding:18px 18px 20px;box-shadow:0 1px 2px #1430210a,0 18px 40px -30px #14302173}.pse-sidebar-head[data-v-048e97c2]{border-bottom:1px solid var(--pse-line);margin-bottom:14px;padding-bottom:14px}.pse-sidebar-heading-row[data-v-048e97c2]{align-items:center;gap:4px;display:flex}.pse-sidebar-heading[data-v-048e97c2]{min-width:0;color:var(--pse-ink);margin:0;font-size:19px;font-weight:700;line-height:1.25}.pse-sidebar-chips[data-v-048e97c2]{flex-wrap:wrap;gap:6px;margin-top:10px;display:flex}.pse-sidebar-chip[data-v-048e97c2]{border:1px solid var(--pse-brand-ring);background-color:var(--pse-brand-soft);color:var(--pse-brand-ink);border-radius:999px;padding:3px 10px;font-size:11.5px;font-weight:650;line-height:1.5}.pse-sidebar-rows[data-v-048e97c2]{grid-template-columns:minmax(0,1fr);margin:0;display:grid}.pse-sidebar-label[data-v-048e97c2]{letter-spacing:.06em;text-transform:uppercase;color:var(--pse-ink-faint);margin:0;font-size:10.5px;font-weight:650;line-height:1.6}.pse-sidebar-value[data-v-048e97c2]{color:var(--pse-ink);overflow-wrap:anywhere;align-items:baseline;gap:6px;margin:2px 0 11px;font-size:13.5px;font-weight:550;line-height:1.35;display:flex}.pse-sidebar-value[data-v-048e97c2]:last-child{margin-bottom:0}.pse-sidebar-value-text[data-v-048e97c2]{overflow-wrap:anywhere;min-width:0}.pse-sidebar-address[data-v-048e97c2]{border-top:1px solid var(--pse-line);margin-top:16px;padding-top:14px}.pse-sidebar-address-body[data-v-048e97c2]{color:var(--pse-ink);flex-direction:column;margin:7px 0 0;font-size:13.5px;font-weight:550;line-height:1.45;display:flex}.pse-image[data-v-367f2428]{border:1px solid var(--pse-line);background-color:#fff;border-radius:14px;justify-content:center;align-items:center;padding:24px;display:flex}.pse-image-photo[data-v-367f2428]{object-fit:contain;width:100%;max-width:460px;height:46vh;min-height:260px;display:block}.pse-products[data-v-1f95e035]{box-sizing:border-box;color:var(--pse-ink);text-align:left;margin-bottom:26px}.pse-products[data-v-1f95e035] *{box-sizing:border-box}.pse-count[data-v-1f95e035]{font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--pse-ink);border-radius:8px;padding:3px 9px;font-size:13px;font-weight:600;display:inline-block}.pse-count-warn[data-v-1f95e035],.pse-count-alert[data-v-1f95e035]{animation:2.4s ease-in-out infinite pse-count-breathe-1f95e035}.pse-count-warn[data-v-1f95e035]{color:#8a5a10;background-color:#e2a02e2e}.pse-count-alert[data-v-1f95e035]{color:#a3372c;background-color:#b03a2e1f}@keyframes pse-count-breathe-1f95e035{50%{background-color:#e2a02e6b}}.pse-count-alert[data-v-1f95e035]{animation-name:pse-count-breathe-alert-1f95e035}@keyframes pse-count-breathe-alert-1f95e035{50%{background-color:#b03a2e4d}}.pse-count-resolved[data-v-1f95e035]{background-color:var(--pse-brand-soft);color:var(--pse-brand-ink)}.pse-mark[data-v-1f95e035]{vertical-align:middle;font-size:21px}.pse-mark-done[data-v-1f95e035]{color:var(--pse-brand)}.pse-mark-open[data-v-1f95e035]{color:var(--pse-ink-faint)}.pse-skeleton-row td[data-v-1f95e035]{height:58px}.pse-skeleton-cell[data-v-1f95e035]{background-color:var(--pse-line);border-radius:6px;height:12px;animation:1.4s ease-in-out infinite pse-products-pulse-1f95e035;display:block}@keyframes pse-products-pulse-1f95e035{50%{opacity:.45}}.pse-products-hint[data-v-1f95e035]{border:1px solid var(--pse-brand-ring);background-color:var(--pse-brand-soft);color:var(--pse-brand-ink);border-radius:12px;align-items:center;gap:8px;margin:12px 0 0;padding:10px 13px;font-size:13px;font-weight:550;line-height:1.4;display:flex}.pse-products-hint-icon[data-v-1f95e035]{flex:none;font-size:18px}@media (prefers-reduced-motion:reduce){.pse-skeleton-cell[data-v-1f95e035],.pse-count-warn[data-v-1f95e035],.pse-count-alert[data-v-1f95e035]{animation:none}}.pse-done[data-v-40eb085b]{box-sizing:border-box;min-height:calc(100vh - 260px);color:var(--pse-ink);text-align:left;justify-content:center;align-items:center;padding:48px 24px;display:flex}.pse-done[data-v-40eb085b] *{box-sizing:border-box}.pse-done-card[data-v-40eb085b]{border:1px solid var(--pse-line);text-align:center;background-color:#fff;border-radius:20px;flex-direction:column;align-items:center;width:100%;max-width:460px;padding:34px 34px 30px;display:flex;box-shadow:0 1px 2px #1430210a,0 18px 40px -28px #14302173}.pse-done-mark[data-v-40eb085b]{background-color:var(--pse-brand-soft);width:62px;height:62px;color:var(--pse-brand-ink);border-radius:50%;justify-content:center;align-items:center;margin-bottom:18px;display:flex}.pse-done.is-detailed[data-v-40eb085b]{align-items:flex-start;min-height:0;padding-top:32px}.pse-done-layout[data-v-40eb085b]{justify-content:center;align-items:flex-start;gap:20px;width:100%;display:flex}.pse-done-side[data-v-40eb085b],.pse-done-parcels-column[data-v-40eb085b]{text-align:left;flex-direction:column;flex:0 340px;gap:14px;min-width:0;display:flex}.pse-done-layout>.pse-done-card[data-v-40eb085b]{flex:460px}.pse-done-side[data-v-40eb085b] .pse-sidebar{width:100%}.pse-done-parcels[data-v-40eb085b]{border:1px solid var(--pse-line);background-color:#fff;border-radius:20px;padding:18px 20px 20px;box-shadow:0 1px 2px #1430210a,0 18px 40px -28px #14302173}.pse-done-parcels-title[data-v-40eb085b]{letter-spacing:.06em;text-transform:uppercase;color:var(--pse-ink-soft);margin:0 0 12px;font-size:12px;font-weight:700}.pse-done-parcel+.pse-done-parcel[data-v-40eb085b]{border-top:1px solid var(--pse-line);margin-top:14px;padding-top:14px}.pse-done-parcel-name[data-v-40eb085b]{color:var(--pse-ink);margin:0;font-size:14.5px;font-weight:700}.pse-done-parcel-fields[data-v-40eb085b]{grid-template-columns:auto minmax(0,1fr);gap:2px 10px;margin:10px 0 0;font-size:12.5px;line-height:1.45;display:grid}.pse-done-parcel-fields dt[data-v-40eb085b]{color:var(--pse-ink-faint)}.pse-done-parcel-fields dd[data-v-40eb085b]{color:var(--pse-ink);overflow-wrap:anywhere;margin:0}.pse-done-parcel-lines[data-v-40eb085b]{margin:12px 0 0;padding:0;list-style:none}.pse-done-parcel-lines li[data-v-40eb085b]{background-color:var(--pse-well);border-radius:10px;gap:10px;padding:8px 10px;font-size:12.5px;line-height:1.4;display:flex}.pse-done-parcel-lines li+li[data-v-40eb085b]{margin-top:6px}.pse-done-parcel-amount[data-v-40eb085b]{font-variant-numeric:tabular-nums;color:var(--pse-brand-ink);flex:none;font-weight:700}.pse-done-parcel-product[data-v-40eb085b]{flex-direction:column;min-width:0;display:flex}.pse-done-parcel-product-name[data-v-40eb085b]{color:var(--pse-ink);overflow-wrap:anywhere}.pse-done-parcel-barcode[data-v-40eb085b]{font-variant-numeric:tabular-nums;color:var(--pse-ink-faint);font-size:12px}.pse-done-card.is-failed[data-v-40eb085b]{border-color:var(--pse-alert-soft)}.pse-done-mark.is-failed[data-v-40eb085b]{background-color:var(--pse-alert-soft);color:var(--pse-alert-ink)}.pse-done-card.is-failed[data-v-40eb085b]{max-width:560px}.pse-done-card.is-failed .pse-done-number[data-v-40eb085b]{color:var(--pse-alert-ink)}.pse-done-card.is-failed .pse-done-text[data-v-40eb085b]{max-width:46ch}.pse-done-failures[data-v-40eb085b]{text-align:left;width:100%;margin:18px 0 0;padding:0;list-style:none}.pse-done-failure[data-v-40eb085b]{border:1px solid var(--pse-alert-soft);border-left:3px solid var(--pse-alert);background-color:var(--pse-alert-wash);border-radius:12px;padding:12px 14px}.pse-done-failure+.pse-done-failure[data-v-40eb085b]{margin-top:8px}.pse-done-failure-step[data-v-40eb085b]{color:var(--pse-alert-ink);font-size:13.5px;font-weight:650;line-height:1.35;display:block}.pse-done-failure-detail[data-v-40eb085b]{color:var(--pse-ink-soft);overflow-wrap:anywhere;margin-top:4px;font-size:13px;line-height:1.5;display:block}.pse-done-actions[data-v-40eb085b]{gap:10px;width:100%;margin-top:22px;display:flex}.pse-done-actions .pse-done-button[data-v-40eb085b]{margin-top:0}.pse-done-button.is-quiet[data-v-40eb085b]{border:1px solid var(--pse-line);color:var(--pse-ink-soft);background-color:#fff}.pse-done-button.is-quiet[data-v-40eb085b]:hover{border-color:var(--pse-ink-faint);background-color:var(--pse-well);color:var(--pse-ink);box-shadow:none}.pse-done-mark.is-working[data-v-40eb085b]{background-color:var(--pse-well)}.pse-done-spinner[data-v-40eb085b]{border:3px solid var(--pse-brand-ring);border-top-color:var(--pse-brand);border-radius:50%;width:26px;height:26px;animation:.7s linear infinite pse-done-spin-40eb085b}@keyframes pse-done-spin-40eb085b{to{transform:rotate(360deg)}}.pse-done-title[data-v-40eb085b]{color:var(--pse-ink);margin:0;font-size:20px;font-weight:700;line-height:1.25}.pse-done-number[data-v-40eb085b]{font-variant-numeric:tabular-nums;letter-spacing:.01em;color:var(--pse-brand-ink);justify-content:center;margin:8px 0 0;font-size:26px;font-weight:700;line-height:1.1}.pse-done-text[data-v-40eb085b]{max-width:34ch;color:var(--pse-ink-soft);margin:12px 0 0;font-size:13.5px;line-height:1.5}.pse-done-button[data-v-40eb085b]{background-color:var(--pse-brand-ink);width:100%;height:48px;font:inherit;color:#fff;cursor:pointer;border:0;border-radius:12px;margin-top:22px;padding:0 18px;font-size:14.5px;font-weight:650;transition:background-color .15s,box-shadow .15s,transform .15s}.pse-done-button[data-v-40eb085b]:hover{background-color:var(--pse-brand-ink-strong);transform:translateY(-1px);box-shadow:0 10px 22px -14px #143021cc}.pse-done-button[data-v-40eb085b]:active{box-shadow:none;transform:translateY(0)}.pse-done-button[data-v-40eb085b]:focus{outline:none}.pse-done-button[data-v-40eb085b]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}@media (prefers-reduced-motion:reduce){.pse-done-spinner[data-v-40eb085b]{animation-duration:1.6s}}@media (width<=1200px){.pse-done-layout[data-v-40eb085b]{flex-direction:column;align-items:center}.pse-done-layout>.pse-done-card[data-v-40eb085b]{flex:none;order:-1;width:100%}.pse-done-side[data-v-40eb085b],.pse-done-parcels-column[data-v-40eb085b]{flex:none;width:100%;max-width:560px}}@media (width<=860px){.pse-done[data-v-40eb085b]{padding:32px 16px}.pse-done-actions[data-v-40eb085b]{flex-direction:column}.pse-done-card[data-v-40eb085b]{padding:28px 22px 24px}}.pse-products[data-v-77facacc]{box-sizing:border-box;color:var(--pse-ink);text-align:left;margin-bottom:26px}.pse-products[data-v-77facacc] *{box-sizing:border-box}.pse-products-note[data-v-77facacc]{color:var(--pse-ink-faint);flex:none;font-size:12px}.pse-cell-quantity[data-v-77facacc]{font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:600}.pse-back-row[data-v-29aa4ab2]{text-align:left;justify-content:flex-end;margin-bottom:10px;display:flex}.pse-reprint[data-v-7ce2449e]{border:1px solid var(--pse-line);font:inherit;color:var(--pse-ink);cursor:pointer;background-color:#fff;border-radius:9px;align-items:center;gap:6px;padding:5px 11px;font-size:12.5px;font-weight:600;line-height:1.2;transition:background-color .15s,border-color .15s;display:inline-flex}.pse-reprint[data-v-7ce2449e]:hover:not(:disabled){border-color:var(--pse-brand);background-color:var(--pse-well)}.pse-reprint[data-v-7ce2449e]:disabled{opacity:.55;cursor:default}.pse-reprint[data-v-7ce2449e]:focus{outline:none}.pse-reprint[data-v-7ce2449e]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-reprint-icon[data-v-7ce2449e]{color:var(--pse-brand-ink);font-size:16px}.pse-reprint-spinner[data-v-7ce2449e]{border:2px solid var(--pse-line);border-top-color:var(--pse-brand);border-radius:50%;flex:none;width:12px;height:12px;animation:.7s linear infinite pse-reprint-spin-7ce2449e}@keyframes pse-reprint-spin-7ce2449e{to{transform:rotate(360deg)}}.pse-header[data-v-895c5c8c]{box-sizing:border-box;text-align:left;border-bottom:1px solid var(--pse-line);background-color:#fff;width:100%}@media (display-mode:window-controls-overlay){.pse-header[data-v-895c5c8c]{-webkit-app-region:drag;app-region:drag}.pse-header-inner[data-v-895c5c8c]{min-height:env(titlebar-area-height,0px);padding-top:4px;padding-bottom:4px}.pse-header-logo[data-v-895c5c8c]{height:24px}.pse-header-link[data-v-895c5c8c],.pse-header-logo[data-v-895c5c8c]{-webkit-app-region:no-drag;app-region:no-drag}}.pse-header-inner[data-v-895c5c8c]{box-sizing:border-box;align-items:center;max-width:980px;margin:0 auto;padding:16px 24px;display:flex}.pse-header-link[data-v-895c5c8c]{border-radius:10px;margin:-6px -8px;padding:6px 8px;display:inline-flex}.pse-header-link[data-v-895c5c8c]:focus{outline:none}.pse-header-link[data-v-895c5c8c]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-header-logo[data-v-895c5c8c]{width:auto;height:34px;display:block}@media (width<=860px){.pse-header-inner[data-v-895c5c8c]{padding:14px 16px}.pse-header-logo[data-v-895c5c8c]{height:28px}}.pse-settings-update[data-v-42ef061e],.pse-settings-update[data-v-42ef061e]:hover,.pse-settings-update[data-v-42ef061e]:focus,.pse-settings-update[data-v-42ef061e]:active,.pse-settings-update[data-v-42ef061e]:visited{color:#fff;align-items:center;gap:8px;margin-bottom:9px;text-decoration:none;display:inline-flex}.pse-settings-update-icon[data-v-42ef061e]{font-size:18px}.pse-settings-update-status[data-v-42ef061e]{color:var(--pse-ink);margin-top:7px;font-weight:600;display:block}.pse-settings-switch[data-v-42ef061e]{border:1px solid var(--pse-line);background-color:var(--pse-well);cursor:pointer;border-radius:13px;align-items:flex-start;gap:11px;padding:13px 14px;display:flex;margin:0 0 34px!important}.pse-settings-checkbox[data-v-42ef061e]{width:17px;height:17px;accent-color:var(--pse-brand-ink);cursor:pointer;flex:none;margin:1px 0 0}.pse-settings-switch-text[data-v-42ef061e]{min-width:0}.pse-settings-switch-title[data-v-42ef061e]{color:var(--pse-ink);font-size:14px;font-weight:650;line-height:1.3;display:block}.pse-settings-sound[data-v-42ef061e]{align-items:stretch;gap:8px;margin-bottom:8px;display:flex}.pse-settings-sound[data-v-42ef061e]:last-child{margin-bottom:0}.pse-settings-switch-compact[data-v-42ef061e]{flex:auto;min-width:0;margin:0!important}.pse-settings-listen[data-v-42ef061e]{border-radius:13px;flex:none;align-items:center;gap:6px;min-width:0;height:auto;padding:0 14px;display:inline-flex}.pse-settings-listen-icon[data-v-42ef061e]{font-size:18px}.pse-settings-field[data-v-42ef061e]{margin-bottom:16px}.pse-settings-field[data-v-42ef061e]:last-child{margin-bottom:0}.pse-settings-group[data-v-42ef061e]{border-top:1px solid var(--pse-line);margin-top:20px;padding-top:18px}.pse-settings-group-title[data-v-42ef061e]{color:var(--pse-ink);margin:0 0 14px;font-size:13px;font-weight:650}.pse-settings-masked[data-v-42ef061e]{-webkit-text-security:disc;text-security:disc}.pse-credentials-intro[data-v-a3fdb084]{align-items:flex-start;gap:13px;margin-bottom:20px;display:flex}.pse-credentials-logo[data-v-a3fdb084]{flex:none;margin-top:1px}.pse-credentials-subtitle[data-v-a3fdb084]{color:var(--pse-ink-soft);margin:0;font-size:13.5px;line-height:1.45}.pse-credentials-field[data-v-a3fdb084]{margin-bottom:16px}.pse-credentials-error[data-v-a3fdb084]{color:#a3372c;background-color:#b03a2e0f;border:1px solid #b03a2e47;border-radius:12px;margin:0 0 14px;padding:11px 13px;font-size:13px;line-height:1.45}.pse-credentials-error-enter-active[data-v-a3fdb084],.pse-credentials-error-leave-active[data-v-a3fdb084]{transition:opacity .15s}.pse-credentials-error-enter-from[data-v-a3fdb084],.pse-credentials-error-leave-to[data-v-a3fdb084]{opacity:0}.pse-credentials-footnote[data-v-a3fdb084]{color:var(--pse-ink-faint);margin:0;font-size:12.5px;line-height:1.4}.pse-credentials-masked[data-v-a3fdb084]{-webkit-text-security:disc;text-security:disc}.pse-credentials-spinner[data-v-a3fdb084]{border:2px solid #fff6;border-top-color:#fff;border-radius:50%;flex:none;width:14px;height:14px;animation:.7s linear infinite pse-credentials-spin-a3fdb084}@keyframes pse-credentials-spin-a3fdb084{to{transform:rotate(360deg)}}.pse-erp-subtitle[data-v-ebdfaa5a]{color:var(--pse-ink-soft);margin:0 0 20px;font-size:13.5px;line-height:1.45}.pse-erp-field[data-v-ebdfaa5a]{margin-bottom:16px}.pse-erp-error[data-v-ebdfaa5a]{color:#a3372c;background-color:#b03a2e0f;border:1px solid #b03a2e47;border-radius:12px;margin:0 0 14px;padding:11px 13px;font-size:13px;line-height:1.45}.pse-erp-error-enter-active[data-v-ebdfaa5a],.pse-erp-error-leave-active[data-v-ebdfaa5a]{transition:opacity .15s}.pse-erp-error-enter-from[data-v-ebdfaa5a],.pse-erp-error-leave-to[data-v-ebdfaa5a]{opacity:0}.pse-erp-spinner[data-v-ebdfaa5a]{border:2px solid #fff6;border-top-color:#fff;border-radius:50%;flex:none;width:14px;height:14px;animation:.7s linear infinite pse-erp-spin-ebdfaa5a}@keyframes pse-erp-spin-ebdfaa5a{to{transform:rotate(360deg)}}.pse-bar[data-v-93f65e5c]{--pse-on:#a8dcab;--pse-off:#f5bd74;--pse-ink:#ffffffb8;--pse-ink-strong:#fff;--pse-ink-soft:#ffffff73;--pse-well:#ffffff14;background-color:var(--pse-well);color:var(--pse-ink);white-space:nowrap;vertical-align:middle;border-radius:999px;align-items:center;gap:2px;margin-top:-5px;margin-bottom:-5px;padding:2px;font-family:inherit;font-size:12.5px;line-height:1;display:inline-flex}.pse-bar.is-minimal[data-v-93f65e5c]{background-color:#0000;margin:0;padding:0}.pse-bar[data-v-93f65e5c],.pse-bar[data-v-93f65e5c] *{box-sizing:border-box;line-height:1}.pse-pill[data-v-93f65e5c]{font:inherit;color:inherit;cursor:pointer;background-color:#0000;border:0;border-radius:999px;align-items:center;gap:7px;margin:0;padding:5px 11px;font-weight:600;transition:background-color .15s,color .15s;display:inline-flex}.pse-toggle-label[data-v-93f65e5c]{text-align:left;min-width:74px;display:inline-block}.pse-pill[data-v-93f65e5c]:focus,.pse-pill[data-v-93f65e5c]:active{box-shadow:none;outline:none}.pse-pill[data-v-93f65e5c]:focus-visible{outline-offset:2px;outline:2px solid}.pse-icon[data-v-93f65e5c]{flex:none;width:15px;height:15px}.pse-toggle.is-on[data-v-93f65e5c]{color:var(--pse-on);background-color:#a8dcab29}.pse-toggle.is-on[data-v-93f65e5c]:hover{background-color:#a8dcab47}.pse-toggle.is-on .pse-icon[data-v-93f65e5c]{filter:brightness(0)invert(88%)sepia(19%)saturate(505%)hue-rotate(72deg)brightness(97%)contrast(90%)}.pse-toggle.is-off[data-v-93f65e5c]{color:var(--pse-off);background-color:#f5bd7429}.pse-toggle.is-off[data-v-93f65e5c]:hover{background-color:#f5bd7447}.pse-toggle.is-off .pse-icon[data-v-93f65e5c]{filter:brightness(0)invert(84%)sepia(29%)saturate(958%)hue-rotate(324deg)brightness(101%)contrast(92%)}.pse-install[data-v-93f65e5c]{color:var(--pse-ink-strong);background-color:#ffffff24}.pse-install[data-v-93f65e5c]:hover{background-color:#ffffff3d}.pse-install .pse-icon[data-v-93f65e5c]{filter:brightness(0)invert()}.pse-settings[data-v-93f65e5c]{color:var(--pse-ink)}.pse-settings[data-v-93f65e5c]:hover{color:var(--pse-ink-strong);background-color:#ffffff24}.pse-settings .pse-icon[data-v-93f65e5c]{filter:brightness(0)invert();opacity:.72;transition:transform .3s,opacity .15s}.pse-settings:hover .pse-icon[data-v-93f65e5c]{opacity:1;transform:rotate(60deg)}.pse-divider[data-v-93f65e5c]{opacity:.18;background-color:currentColor;width:1px;height:15px;margin:0 4px}.pse-user[data-v-93f65e5c]{align-items:center;gap:6px;padding:0 6px;display:inline-flex}.pse-user-name[data-v-93f65e5c]{color:var(--pse-ink-strong);font-weight:600}.pse-dot[data-v-93f65e5c]{background-color:var(--pse-on);border-radius:50%;flex:none;width:6px;height:6px;animation:2.6s ease-out infinite pse-dot-pulse-93f65e5c}@keyframes pse-dot-pulse-93f65e5c{0%{box-shadow:0 0 #a8dcab80}70%{box-shadow:0 0 0 7px #a8dcab00}to{box-shadow:0 0 #a8dcab00}}@media (prefers-reduced-motion:reduce){.pse-dot[data-v-93f65e5c]{animation:none;box-shadow:0 0 0 3px #a8dcab33}}.pse-version[data-v-93f65e5c]{color:var(--pse-ink-soft);letter-spacing:.04em;text-transform:uppercase;align-items:baseline;gap:5px;padding:0 6px;font-size:10.5px;display:inline-flex}.pse-bar.is-minimal .pse-version[data-v-93f65e5c]{padding-left:0}.pse-version-number[data-v-93f65e5c]{font-variant-numeric:tabular-nums;letter-spacing:.02em}.pse-update[data-v-93f65e5c]{letter-spacing:.04em;color:var(--pse-off);white-space:nowrap;background-color:#f5bd742e;border-radius:999px;align-self:center;align-items:center;gap:5px;padding:2px 8px;font-size:10px;font-weight:700;text-decoration:none;transition:background-color .15s,color .15s;display:inline-flex}.pse-update[data-v-93f65e5c]:hover{color:#ffe1bb;background-color:#f5bd744d}.pse-update[data-v-93f65e5c]:focus{outline:none}.pse-update[data-v-93f65e5c]:focus-visible{outline:none;box-shadow:0 0 0 2px #f5bd7499}.pse-update-dot[data-v-93f65e5c]{background-color:currentColor;border-radius:50%;flex:none;width:5px;height:5px}@media (width<=991px){.pse-bar:not(.is-minimal) .pse-brand[data-v-93f65e5c]{display:none}}@media (width<=767px){.pse-settings-label[data-v-93f65e5c]{display:none}.pse-install-label[data-v-93f65e5c]{font-size:0}.pse-install-label[data-v-93f65e5c]:after{content:\"App\";font-size:12.5px}}.pse-login[data-v-e9eaf606]{box-sizing:border-box;min-height:calc(100vh - 200px);color:var(--pse-ink);text-align:left;justify-content:center;align-items:center;padding:48px 24px;display:flex}.pse-login[data-v-e9eaf606] *{box-sizing:border-box}.pse-login-card[data-v-e9eaf606]{border:1px solid var(--pse-line);background-color:#fff;border-radius:20px;width:100%;max-width:420px;padding:30px 34px;box-shadow:0 1px 2px #1430210a,0 18px 40px -28px #14302173}.pse-login-errors[data-v-e9eaf606]:not(:has(.validation-summary-errors)){display:none}.pse-login-errors[data-v-e9eaf606] ul{color:#a3372c;background-color:#b03a2e0f;border:1px solid #b03a2e47;border-radius:12px;margin:0;padding:12px 14px;font-size:13px;line-height:1.45;list-style:none}.pse-login[data-v-e9eaf606] input[type=number]{appearance:textfield}.pse-login[data-v-e9eaf606] input[type=number]::-webkit-outer-spin-button{appearance:none;margin:0}.pse-login[data-v-e9eaf606] input[type=number]::-webkit-inner-spin-button{appearance:none;margin:0}.pse-submit[data-v-e9eaf606]{background-color:var(--pse-brand-ink);width:100%;height:48px;font:inherit;color:#fff;cursor:pointer;border:0;border-radius:12px;justify-content:center;align-items:center;margin:4px 0 0;padding:0 18px;font-size:14.5px;font-weight:650;transition:background-color .15s,box-shadow .15s,transform .15s;display:flex}.pse-submit[data-v-e9eaf606]:hover{background-color:var(--pse-brand-ink-strong);transform:translateY(-1px);box-shadow:0 10px 22px -14px #143021cc}.pse-submit[data-v-e9eaf606]:active{box-shadow:none;transform:translateY(0)}.pse-submit[data-v-e9eaf606]:focus{outline:none}.pse-submit[data-v-e9eaf606]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}@media (width<=860px){.pse-login[data-v-e9eaf606]{padding:32px 16px}.pse-login-card[data-v-e9eaf606]{padding:26px 22px}}.pse-idle-lead[data-v-86dcdcbd]{color:var(--pse-ink);margin:0 0 8px;font-size:14px;line-height:1.5}.pse-idle-count[data-v-86dcdcbd]{font-variant-numeric:tabular-nums;color:var(--pse-attention-ink)}.pse-idle-hint[data-v-86dcdcbd]{color:var(--pse-ink-soft);margin:0;font-size:13px;line-height:1.45}\n/*$vite$:1*/ ");
+	_css(" .pse-modal[data-v-66d77727]{z-index:100;background-color:var(--pse-scrim);-webkit-backdrop-filter:blur(3px);text-align:left;color:var(--pse-ink);justify-content:center;align-items:center;padding:28px 20px;display:flex;position:fixed;inset:0}.pse-modal[data-v-66d77727] *{box-sizing:border-box}.is-elevated[data-v-66d77727]{z-index:200}.pse-modal-panel[data-v-66d77727]{box-sizing:border-box;border-radius:var(--pse-dialog-radius);width:100%;max-height:100%;box-shadow:var(--pse-dialog-shadow);background-color:#fff;flex-direction:column;display:flex}.is-sm[data-v-66d77727]{max-width:420px}.is-md[data-v-66d77727]{max-width:560px}.is-lg[data-v-66d77727]{max-width:780px}.is-xl[data-v-66d77727]{max-width:1000px}.pse-modal-head[data-v-66d77727]{border-bottom:1px solid var(--pse-line);flex:none;align-items:center;gap:16px;padding:17px 20px;display:flex}.pse-modal-title[data-v-66d77727]{min-width:0;color:var(--pse-ink);flex:1;margin:0;font-size:16px;font-weight:650;line-height:1.3}.pse-modal-close[data-v-66d77727]{width:32px;height:32px;color:var(--pse-ink-faint);cursor:pointer;background-color:#0000;border:0;border-radius:9px;flex:none;justify-content:center;align-items:center;padding:0;transition:background-color .15s,color .15s;display:flex}.pse-modal-close[data-v-66d77727]:hover{background-color:var(--pse-well);color:var(--pse-ink)}.pse-modal-close[data-v-66d77727]:focus{outline:none}.pse-modal-close[data-v-66d77727]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-modal-body[data-v-66d77727]{flex:1;min-height:0;padding:20px;font-size:14px;line-height:1.5;overflow-y:auto}.pse-modal-foot[data-v-66d77727]{border-top:1px solid var(--pse-line);flex:none;justify-content:flex-end;align-items:center;gap:9px;padding:15px 20px;display:flex}@media (width<=640px){.pse-modal[data-v-66d77727]{padding:16px 12px}.pse-modal-head[data-v-66d77727],.pse-modal-body[data-v-66d77727],.pse-modal-foot[data-v-66d77727]{padding-left:16px;padding-right:16px}}.pse-note[data-v-ab3fbaa7]{text-align:left}.pse-note-alert[data-v-ab3fbaa7]{color:#8a5a10;background-color:#e2a02e1c;border:1px solid #b4761452;border-left-width:3px;border-radius:12px;align-items:flex-start;gap:9px;margin:0 0 12px;padding:11px 13px;font-size:13px;font-weight:600;line-height:1.4;animation:2.4s ease-in-out infinite pse-note-breathe-ab3fbaa7;display:flex}.pse-note-alert-icon[data-v-ab3fbaa7]{flex:none;font-size:18px;line-height:1.2}@keyframes pse-note-breathe-ab3fbaa7{50%{background-color:#e2a02e3d;border-color:#b47614bf}}.pse-note-card[data-v-ab3fbaa7]{border:1px solid var(--pse-line);background-color:#fff;border-radius:14px;overflow:hidden;box-shadow:0 1px 2px #1430210a}.pse-note-head[data-v-ab3fbaa7]{border:0;border-bottom:1px solid var(--pse-line);background-color:var(--pse-well);width:100%;font:inherit;text-align:left;cursor:pointer;align-items:center;gap:9px;padding:10px 14px;transition:background-color .15s,border-color .15s;display:flex}.pse-note-head[aria-expanded=false][data-v-ab3fbaa7]{border-bottom-color:#0000}.pse-note-head[data-v-ab3fbaa7]:hover{background-color:var(--pse-brand-soft)}.pse-note-head[data-v-ab3fbaa7]:focus{outline:none}.pse-note-head[data-v-ab3fbaa7]:focus-visible{box-shadow:inset 0 0 0 2px var(--pse-brand-ring);outline:none}.pse-note-title[data-v-ab3fbaa7]{flex:1;min-width:0}.pse-note-empty[data-v-ab3fbaa7]{color:var(--pse-ink-faint);flex:none;font-size:11.5px;font-weight:550}.pse-note-spinner[data-v-ab3fbaa7]{border:2px solid var(--pse-line);border-top-color:var(--pse-brand);border-radius:50%;flex:none;width:13px;height:13px;animation:.7s linear infinite pse-note-spin-ab3fbaa7}@keyframes pse-note-spin-ab3fbaa7{to{transform:rotate(360deg)}}.pse-note-chevron[data-v-ab3fbaa7]{color:var(--pse-ink-faint);flex:none;font-size:19px;transition:transform .28s}.pse-note-chevron.is-open[data-v-ab3fbaa7]{transform:rotate(180deg)}.pse-note-collapse[data-v-ab3fbaa7]{grid-template-rows:0fr;transition:grid-template-rows .28s cubic-bezier(.33,1,.68,1);display:grid}.pse-note-collapse.is-open[data-v-ab3fbaa7]{grid-template-rows:1fr}.pse-note-collapse-inner[data-v-ab3fbaa7]{opacity:0;min-height:0;transition:opacity .2s;overflow:hidden}.pse-note-collapse.is-open .pse-note-collapse-inner[data-v-ab3fbaa7]{opacity:1;transition-delay:60ms}.pse-note-logo[data-v-ab3fbaa7]{filter:grayscale()brightness(.72);flex:none;width:18px;height:18px}.pse-note-title[data-v-ab3fbaa7]{letter-spacing:.06em;text-transform:uppercase;color:var(--pse-ink-faint);margin:0;font-size:10.5px;font-weight:650;line-height:1.6}.pse-note-body[data-v-ab3fbaa7]{padding:12px 14px 14px}.pse-note-field[data-v-ab3fbaa7]{box-sizing:border-box;border:1px solid var(--pse-line);background-color:var(--pse-well);field-sizing:content;width:100%;min-height:76px;max-height:260px;font:inherit;color:var(--pse-ink);resize:vertical;border-radius:10px;margin:0;padding:9px 11px;font-size:14px;line-height:1.45;transition:border-color .15s,background-color .15s,box-shadow .15s;display:block}.pse-note-field[data-v-ab3fbaa7]::placeholder{color:var(--pse-ink-faint)}.pse-note-field[data-v-ab3fbaa7]:focus{border-color:var(--pse-brand);box-shadow:0 0 0 3px var(--pse-brand-ring);background-color:#fff;outline:none}.pse-note-field[data-v-ab3fbaa7]:disabled{color:var(--pse-ink-soft);cursor:default}.pse-note-field-waiting[data-v-ab3fbaa7]{resize:none;flex-direction:column;justify-content:center;gap:9px;display:flex}.pse-note-shimmer[data-v-ab3fbaa7]{background-color:var(--pse-line);border-radius:5px;height:10px;animation:1.4s ease-in-out infinite pse-note-pulse-ab3fbaa7}.pse-note-shimmer-short[data-v-ab3fbaa7]{width:62%;animation-delay:.2s}@keyframes pse-note-pulse-ab3fbaa7{50%{opacity:.45}}.pse-note-actions[data-v-ab3fbaa7]{gap:8px;margin-top:10px;display:flex}.pse-note-btn[data-v-ab3fbaa7]{background-color:var(--pse-brand-ink);min-width:0;height:36px;font:inherit;color:#fff;white-space:nowrap;text-overflow:ellipsis;cursor:pointer;border:1px solid #0000;border-radius:10px;flex:1;padding:0 12px;font-size:13px;font-weight:650;transition:background-color .15s,border-color .15s,color .15s;overflow:hidden}.pse-note-btn[data-v-ab3fbaa7]:hover:not(:disabled){background-color:var(--pse-brand-ink-strong)}.pse-note-btn[data-v-ab3fbaa7]:focus{outline:none}.pse-note-btn[data-v-ab3fbaa7]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-note-btn[data-v-ab3fbaa7]:disabled{color:#fff;cursor:not-allowed;background-color:#dfe6e2}.pse-note-btn-quiet[data-v-ab3fbaa7]{border-color:var(--pse-line);color:var(--pse-ink-soft);background-color:#fff}.pse-note-btn-quiet[data-v-ab3fbaa7]:hover:not(:disabled){border-color:var(--pse-brand);background-color:var(--pse-brand-soft);color:var(--pse-brand-ink)}.pse-note-btn-quiet[data-v-ab3fbaa7]:disabled{border-color:var(--pse-line);color:var(--pse-ink-faint);background-color:#fff}@media (prefers-reduced-motion:reduce){.pse-note-collapse[data-v-ab3fbaa7],.pse-note-collapse-inner[data-v-ab3fbaa7],.pse-note-chevron[data-v-ab3fbaa7]{transition:none}.pse-note-spinner[data-v-ab3fbaa7]{animation:1.4s ease-in-out infinite pse-note-pulse-ab3fbaa7}.pse-note-alert[data-v-ab3fbaa7]{background-color:#e2a02e3d;border-color:#b47614bf;animation:none}.pse-note-shimmer[data-v-ab3fbaa7]{animation:none}}.pse-rack-lead[data-v-76779723]{color:var(--pse-ink-soft);margin:0 0 16px;font-size:13px;line-height:1.45}.pse-rack[data-v-76779723]{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;display:grid}.pse-rack-column[data-v-76779723]{flex-direction:column;gap:7px;min-width:0;display:flex}.pse-rack-letter[data-v-76779723]{letter-spacing:.1em;text-align:center;color:var(--pse-ink-faint);font-size:11px;font-weight:700}.pse-rack-bays[data-v-76779723]{border:1px solid var(--pse-line);background-color:var(--pse-well);border-radius:14px;grid-template-rows:repeat(2,1fr);grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;height:232px;padding:7px;display:grid}.pse-rack-bays.is-rows-1 .pse-rack-bay[data-v-76779723]{grid-row:span 2}.pse-rack-bay[data-v-76779723]{border:1px solid var(--pse-line);min-width:0;font:inherit;color:var(--pse-ink-soft);cursor:pointer;background-color:#fff;border-radius:10px;flex-direction:column;justify-content:center;align-items:center;gap:3px;padding:4px;transition:border-color .15s,background-color .15s,color .15s,box-shadow .15s;display:flex}.pse-rack-bay[data-v-76779723]:hover{border-color:var(--pse-brand);background-color:var(--pse-brand-soft);color:var(--pse-brand-ink)}.pse-rack-bay[data-v-76779723]:focus{outline:none}.pse-rack-bay[data-v-76779723]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-rack-bay-label[data-v-76779723]{font-variant-numeric:tabular-nums;font-size:15px;font-weight:700;line-height:1.1}.pse-rack-bay-note[data-v-76779723]{text-align:center;opacity:.8;font-size:10px;font-weight:600;line-height:1.2}.pse-rack-bay.is-taken[data-v-76779723]{border-color:var(--pse-attention-line-soft);background-color:var(--pse-attention-soft);color:var(--pse-attention-ink)}.pse-rack-bay.is-current[data-v-76779723]{border-color:var(--pse-brand-ink);background-color:var(--pse-brand-ink);color:#fff}.pse-rack-bay.is-current[data-v-76779723]:hover{background-color:var(--pse-brand-ink-strong);color:#fff}@media (width<=720px){.pse-rack[data-v-76779723]{grid-template-columns:repeat(2,minmax(0,1fr))}}.pse-slotpanel[data-v-025f11c3]{text-align:left}.pse-slotpanel-card[data-v-025f11c3]{border:1px solid var(--pse-line);background-color:#fff;border-radius:14px;overflow:hidden;box-shadow:0 1px 2px #1430210a}.pse-slotpanel-head[data-v-025f11c3]{border:0;border-bottom:1px solid var(--pse-line);background-color:var(--pse-well);width:100%;min-height:42px;font:inherit;text-align:left;cursor:pointer;align-items:center;gap:9px;padding:7px 14px;transition:background-color .15s,border-color .15s;display:flex}.pse-slotpanel-head[aria-expanded=false][data-v-025f11c3],.pse-slotpanel-head.is-plain[data-v-025f11c3]{border-bottom-color:#0000}.pse-slotpanel-head.is-plain[data-v-025f11c3]{cursor:default}.pse-slotpanel-head[data-v-025f11c3]:not(.is-plain):hover{background-color:var(--pse-brand-soft)}.pse-slotpanel-head[data-v-025f11c3]:focus{outline:none}.pse-slotpanel-head[data-v-025f11c3]:focus-visible{box-shadow:inset 0 0 0 2px var(--pse-brand-ring);outline:none}.pse-slotpanel-icon[data-v-025f11c3]{color:var(--pse-ink-faint);flex:none;font-size:18px}.pse-slotpanel-title[data-v-025f11c3]{letter-spacing:.06em;text-transform:uppercase;min-width:0;color:var(--pse-ink-faint);flex:1;margin:0;font-size:10.5px;font-weight:650;line-height:1.6}.pse-slotpanel-summary[data-v-025f11c3]{flex-wrap:wrap;flex:none;justify-content:flex-end;gap:5px;display:flex}.pse-slotpanel-empty[data-v-025f11c3]{color:var(--pse-ink-faint);flex:none;font-size:11.5px;font-weight:550}.pse-slotpanel-spinner[data-v-025f11c3]{border:2px solid var(--pse-line);border-top-color:var(--pse-brand);border-radius:50%;flex:none;width:13px;height:13px;animation:.7s linear infinite pse-slotpanel-spin-025f11c3}@keyframes pse-slotpanel-spin-025f11c3{to{transform:rotate(360deg)}}.pse-slotpanel-chevron[data-v-025f11c3]{color:var(--pse-ink-faint);flex:none;font-size:19px;transition:transform .28s}.pse-slotpanel-chevron.is-open[data-v-025f11c3]{transform:rotate(180deg)}.pse-slotpanel-collapse[data-v-025f11c3]{grid-template-rows:0fr;transition:grid-template-rows .28s cubic-bezier(.33,1,.68,1);display:grid}.pse-slotpanel-collapse.is-open[data-v-025f11c3]{grid-template-rows:1fr}.pse-slotpanel-collapse-inner[data-v-025f11c3]{opacity:0;min-height:0;transition:opacity .2s;overflow:hidden}.pse-slotpanel-collapse.is-open .pse-slotpanel-collapse-inner[data-v-025f11c3]{opacity:1;transition-delay:60ms}.pse-slotpanel-body[data-v-025f11c3]{flex-direction:column;gap:12px;padding:12px 14px 14px;display:flex}.pse-slotpanel-block[data-v-025f11c3]{flex-direction:column;align-items:flex-start;gap:6px;display:flex}.pse-slotpanel-caption[data-v-025f11c3]{letter-spacing:.06em;text-transform:uppercase;color:var(--pse-ink-faint);font-size:10.5px;font-weight:650}.pse-slotpanel-lines[data-v-025f11c3]{flex-direction:column;gap:6px;width:100%;margin:0;padding:0;list-style:none;display:flex}.pse-slotpanel-line[data-v-025f11c3]{align-items:center;gap:12px;display:flex}.pse-slotpanel-line-name[data-v-025f11c3]{white-space:nowrap;text-overflow:ellipsis;min-width:0;color:var(--pse-ink);flex:1;font-size:13px;overflow:hidden}.pse-slotpanel-hint[data-v-025f11c3]{color:var(--pse-ink-soft);margin:0;font-size:12px;line-height:1.45}@media (prefers-reduced-motion:reduce){.pse-slotpanel-collapse[data-v-025f11c3],.pse-slotpanel-collapse-inner[data-v-025f11c3],.pse-slotpanel-chevron[data-v-025f11c3]{transition:none}.pse-slotpanel-spinner[data-v-025f11c3]{animation:none}}.pse-rescard[data-v-b187fc81]{border:1px solid var(--pse-line);background-color:#fff;border-radius:16px;transition:border-color .15s,box-shadow .15s;overflow:hidden}.pse-rescard+.pse-rescard[data-v-b187fc81]{margin-top:10px}.pse-rescard[data-v-b187fc81]:not(.is-incomplete):hover{border-color:var(--pse-brand);box-shadow:0 1px 2px #1430210a,0 14px 30px -24px #14302180}.pse-rescard-head[data-v-b187fc81]{background-color:var(--pse-well);border-bottom:1px solid var(--pse-line);align-items:center;gap:20px;padding:13px 16px;display:flex}.pse-rescard-id[data-v-b187fc81]{flex:none;min-width:108px}.pse-rescard-number[data-v-b187fc81]{font-variant-numeric:tabular-nums;color:var(--pse-ink);font-size:17px;font-weight:700;line-height:1.2;display:block}.pse-rescard-reference[data-v-b187fc81]{font-variant-numeric:tabular-nums;color:var(--pse-ink-soft);margin-top:1px;font-size:12px;display:block}.pse-rescard-facts[data-v-b187fc81]{flex:1;gap:26px;min-width:0;margin:0;display:flex}.pse-rescard-fact[data-v-b187fc81]{min-width:0}.pse-rescard-fact dt[data-v-b187fc81]{letter-spacing:.06em;text-transform:uppercase;color:var(--pse-ink-faint);margin:0;font-size:10.5px;font-weight:650}.pse-rescard-fact dd[data-v-b187fc81]{white-space:nowrap;text-overflow:ellipsis;color:var(--pse-ink);margin:2px 0 0;font-size:13.5px;font-weight:600;overflow:hidden}.pse-rescard-open[data-v-b187fc81]{background-color:var(--pse-brand-ink);height:36px;font:inherit;color:#fff;cursor:pointer;border:0;border-radius:10px;flex:none;align-items:center;gap:2px;padding:0 10px 0 15px;font-size:13.5px;font-weight:650;transition:background-color .15s;display:inline-flex}.pse-rescard-open[data-v-b187fc81]:hover{background-color:var(--pse-brand-ink-strong)}.pse-rescard-open[data-v-b187fc81]:focus{outline:none}.pse-rescard-open[data-v-b187fc81]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-rescard-open-icon[data-v-b187fc81]{font-size:18px}.pse-rescard-products[data-v-b187fc81]{overflow-x:auto}.pse-rescard-amount[data-v-b187fc81]{font-variant-numeric:tabular-nums;white-space:nowrap;border-radius:8px;padding:2px 9px;font-size:13px;font-weight:600;display:inline-block}.pse-table tbody tr.is-short td[data-v-b187fc81]{background-color:var(--pse-attention-wash-strong);border-top-color:var(--pse-attention-line-soft)}.pse-table tbody tr.is-short .pse-rescard-amount[data-v-b187fc81]{color:var(--pse-attention-ink);font-weight:700}.pse-rescard-aside[data-v-b187fc81]{border-top:1px solid var(--pse-line);flex-direction:column;gap:10px;padding:14px 16px;display:flex}@media (width<=720px){.pse-rescard-head[data-v-b187fc81]{flex-wrap:wrap;gap:12px 20px}.pse-rescard-facts[data-v-b187fc81]{flex-basis:100%;order:1;gap:18px}.pse-rescard-open[data-v-b187fc81]{margin-left:auto}}.pse-row[data-v-51c20dba]{border-top:1px solid var(--pse-line);grid-template-columns:auto minmax(0,1.4fr) minmax(0,1fr) auto;align-items:center;gap:16px;padding:11px 16px;font-size:14px;transition:background-color .15s;display:grid}.pse-row[data-v-51c20dba]:first-child{border-top:0}.pse-row[data-v-51c20dba]:hover{background-color:var(--pse-well)}.pse-row-number[data-v-51c20dba]{font-variant-numeric:tabular-nums;color:var(--pse-ink);font-weight:650}.pse-row-customer[data-v-51c20dba],.pse-row-reference[data-v-51c20dba]{white-space:nowrap;text-overflow:ellipsis;overflow:hidden}.pse-row-customer[data-v-51c20dba]{color:var(--pse-ink)}.pse-row-reference[data-v-51c20dba]{font-variant-numeric:tabular-nums;color:var(--pse-ink-soft);font-size:13px}.pse-row-open[data-v-51c20dba]{border:1px solid var(--pse-line);height:32px;font:inherit;color:var(--pse-ink-soft);cursor:pointer;background-color:#fff;border-radius:9px;align-items:center;gap:2px;padding:0 8px 0 12px;font-size:13px;font-weight:650;transition:border-color .15s,background-color .15s,color .15s;display:inline-flex}.pse-row:hover .pse-row-open[data-v-51c20dba]{border-color:var(--pse-brand);background-color:var(--pse-brand-soft);color:var(--pse-brand-ink)}.pse-row-open[data-v-51c20dba]:focus{outline:none}.pse-row-open[data-v-51c20dba]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-row-open-icon[data-v-51c20dba]{font-size:18px}.pse-row-state[data-v-51c20dba]{white-space:nowrap;border-radius:999px;align-items:center;gap:7px;padding:4px 11px;font-size:12.5px;font-weight:650;display:inline-flex}.pse-row-mark[data-v-51c20dba]{background-color:currentColor;border-radius:50%;flex:none;width:7px;height:7px}.pse-row-state.is-queued[data-v-51c20dba]{background-color:var(--pse-well);color:var(--pse-ink-faint)}.pse-row-state.is-stopped[data-v-51c20dba]{background-color:var(--pse-well);color:var(--pse-ink-soft)}.pse-row-state.is-busy[data-v-51c20dba]{color:#8a5a10;background-color:#e2a02e29}.pse-row-state.is-busy .pse-row-mark[data-v-51c20dba]{animation:1.6s ease-in-out infinite pse-row-pulse-51c20dba}@keyframes pse-row-pulse-51c20dba{50%{opacity:.3}}.pse-row-state.is-done[data-v-51c20dba]{background-color:var(--pse-brand-soft);color:var(--pse-brand-ink)}.pse-row-state.is-failed[data-v-51c20dba]{background-color:var(--pse-alert-soft);color:var(--pse-alert-ink)}.pse-row.is-failed[data-v-51c20dba]{background-color:var(--pse-alert-wash)}@media (prefers-reduced-motion:reduce){.pse-row-state.is-busy .pse-row-mark[data-v-51c20dba]{animation:none}}@media (width<=720px){.pse-row[data-v-51c20dba]{grid-template-columns:auto minmax(0,1fr) auto;gap:12px}.pse-row-reference[data-v-51c20dba]{display:none}}.pse-mc[data-v-5c92f516]{border:1px solid var(--pse-line);background-color:var(--pse-well);border-radius:14px;margin-bottom:12px;padding:15px 17px;transition:border-color .2s,background-color .2s}.pse-mc.is-running[data-v-5c92f516]{background-color:#e2a02e12;border-color:#e2a02e66}.pse-mc.is-done[data-v-5c92f516]{border-color:var(--pse-brand);background-color:var(--pse-brand-soft)}.pse-mc.is-stopped[data-v-5c92f516]{border-color:var(--pse-alert-soft);background-color:var(--pse-alert-wash)}.pse-mc.is-stopped .pse-mc-icon[data-v-5c92f516]{border-color:var(--pse-alert-soft);color:var(--pse-alert-ink)}.pse-mc.is-stopped .pse-mc-progress-fill[data-v-5c92f516]{background-color:var(--pse-alert)}.pse-mc-head[data-v-5c92f516]{align-items:center;gap:13px;display:flex}.pse-mc-icon[data-v-5c92f516]{border:1px solid var(--pse-line);width:36px;height:36px;color:var(--pse-brand-ink);background-color:#fff;border-radius:11px;flex:none;justify-content:center;align-items:center;display:flex}.pse-mc.is-running .pse-mc-icon[data-v-5c92f516]{color:#8a5a10;border-color:#e2a02e66}.pse-mc-titles[data-v-5c92f516]{flex:1;min-width:0}.pse-mc-title[data-v-5c92f516]{color:var(--pse-ink);margin:0;font-size:14.5px;font-weight:650;line-height:1.3}.pse-mc-subtitle[data-v-5c92f516]{color:var(--pse-ink-soft);margin:3px 0 0;font-size:12.5px;line-height:1.4}.pse-mc-controls[data-v-5c92f516]{flex:none;align-items:center;gap:10px;display:flex}.pse-mc-stepper[data-v-5c92f516]{border:1px solid var(--pse-line);background-color:#fff;border-radius:11px;align-items:center;height:40px;display:flex;overflow:hidden}.pse-mc-step[data-v-5c92f516]{width:34px;height:100%;font:inherit;color:var(--pse-ink-soft);cursor:pointer;background-color:#0000;border:0;padding:0;font-size:17px;line-height:1;transition:background-color .15s,color .15s}.pse-mc-step[data-v-5c92f516]:hover:not(:disabled){background-color:var(--pse-brand-soft);color:var(--pse-brand-ink)}.pse-mc-step[data-v-5c92f516]:disabled{color:var(--pse-line);cursor:not-allowed}.pse-mc-step[data-v-5c92f516]:focus{outline:none}.pse-mc-step[data-v-5c92f516]:focus-visible{box-shadow:inset 0 0 0 2px var(--pse-brand-ring);outline:none}.pse-mc-amount[data-v-5c92f516]{border:0;border-left:1px solid var(--pse-line);border-right:1px solid var(--pse-line);width:46px;height:100%;font:inherit;font-variant-numeric:tabular-nums;text-align:center;color:var(--pse-ink);background-color:#0000;padding:0;font-size:15px;font-weight:650}.pse-mc-amount[data-v-5c92f516]:focus{background-color:var(--pse-brand-soft);outline:none}.pse-mc-amount[data-v-5c92f516]::-webkit-inner-spin-button{appearance:none;margin:0}.pse-mc-amount[data-v-5c92f516]::-webkit-outer-spin-button{appearance:none;margin:0}.pse-mc-start[data-v-5c92f516]{flex:none}.pse-mc-tally[data-v-5c92f516]{flex:none;align-items:baseline;gap:6px;display:flex}.pse-mc-tally-count[data-v-5c92f516]{font-variant-numeric:tabular-nums;color:var(--pse-ink);font-size:20px;font-weight:700;line-height:1}.pse-mc-tally-of[data-v-5c92f516]{color:var(--pse-ink-faint);font-size:14px;font-weight:650}.pse-mc-tally-label[data-v-5c92f516]{color:var(--pse-ink-soft);font-size:12px}.pse-mc-progress[data-v-5c92f516]{background-color:#142b2214;border-radius:999px;height:6px;margin-top:13px;overflow:hidden}.pse-mc-progress-fill[data-v-5c92f516]{background-color:var(--pse-brand);border-radius:999px;height:100%;transition:width .4s cubic-bezier(.2,.9,.3,1)}@media (width<=720px){.pse-mc.is-stopped[data-v-5c92f516]{border-color:var(--pse-alert-soft);background-color:var(--pse-alert-wash)}.pse-mc.is-stopped .pse-mc-icon[data-v-5c92f516]{border-color:var(--pse-alert-soft);color:var(--pse-alert-ink)}.pse-mc.is-stopped .pse-mc-progress-fill[data-v-5c92f516]{background-color:var(--pse-alert)}.pse-mc-head[data-v-5c92f516]{flex-wrap:wrap}.pse-mc-titles[data-v-5c92f516]{flex-basis:100%;order:-1}.pse-mc-controls[data-v-5c92f516],.pse-mc-tally[data-v-5c92f516]{margin-left:auto}}.pse-found[data-v-76f6f4a0]{border:1px solid var(--pse-line);background-color:var(--pse-well);border-radius:14px;align-items:center;gap:16px;margin-bottom:20px;padding:14px 16px;display:flex}.pse-found-image[data-v-76f6f4a0]{border:1px solid var(--pse-line);background-color:#fff;border-radius:11px;flex:none;justify-content:center;align-items:center;width:58px;height:58px;display:flex;overflow:hidden}.pse-found-image img[data-v-76f6f4a0]{object-fit:contain;max-width:100%;max-height:100%}.pse-found-text[data-v-76f6f4a0]{flex:1;min-width:0}.pse-found-name[data-v-76f6f4a0]{color:var(--pse-ink);margin:0;font-size:15.5px;font-weight:650;line-height:1.3}.pse-found-barcode[data-v-76f6f4a0]{font-variant-numeric:tabular-nums;color:var(--pse-ink-soft);margin:3px 0 0;font-size:13px}.pse-found-count[data-v-76f6f4a0]{flex:none;align-items:baseline;gap:6px;display:flex}.pse-found-count-number[data-v-76f6f4a0]{font-variant-numeric:tabular-nums;color:var(--pse-brand-ink);font-size:22px;font-weight:700;line-height:1}.pse-found-count-label[data-v-76f6f4a0]{color:var(--pse-ink-soft);font-size:12.5px}.pse-countdown[data-v-76f6f4a0]{border:1px solid var(--pse-brand);background-color:var(--pse-brand-soft);color:var(--pse-brand-ink);border-radius:12px;align-items:center;gap:9px;margin:0 0 20px;padding:11px 14px;font-size:13.5px;font-weight:600;display:flex}.pse-countdown-mark[data-v-76f6f4a0]{background-color:var(--pse-brand);border-radius:50%;flex:none;width:8px;height:8px;animation:1s ease-in-out infinite pse-countdown-tick-76f6f4a0}@keyframes pse-countdown-tick-76f6f4a0{50%{opacity:.25}}@media (prefers-reduced-motion:reduce){.pse-countdown-mark[data-v-76f6f4a0]{animation:none}}.pse-group+.pse-group[data-v-76f6f4a0]{margin-top:26px}.pse-group-head[data-v-76f6f4a0]{margin-bottom:10px}.pse-group-title[data-v-76f6f4a0]{letter-spacing:.02em;color:var(--pse-ink);align-items:center;gap:8px;margin:0;font-size:14px;font-weight:650;display:flex}.pse-group-count[data-v-76f6f4a0]{background-color:var(--pse-brand-soft);font-variant-numeric:tabular-nums;min-width:22px;height:20px;color:var(--pse-brand-ink);border-radius:999px;justify-content:center;align-items:center;padding:0 7px;font-size:12px;font-weight:700;display:inline-flex}.pse-group-note[data-v-76f6f4a0]{color:var(--pse-ink-soft);margin:4px 0 0;font-size:12.5px;line-height:1.45}.pse-rows[data-v-76f6f4a0]{border:1px solid var(--pse-line);background-color:#fff;border-radius:14px;overflow:hidden}.pse-panel[data-v-2ad9890a]{flex-direction:column;gap:18px;min-width:0;display:flex}.pse-panel-head[data-v-2ad9890a]{align-items:center;gap:12px;display:flex}.pse-panel-icon[data-v-2ad9890a]{background-color:var(--pse-brand-soft);width:38px;height:38px;color:var(--pse-brand-ink);border-radius:11px;flex:none;justify-content:center;align-items:center;display:flex}.pse-panel-text[data-v-2ad9890a]{min-width:0}.pse-panel-title[data-v-2ad9890a]{color:var(--pse-ink);margin:0;font-size:16px;font-weight:650;line-height:1.3}.pse-panel-subtitle[data-v-2ad9890a]{color:var(--pse-ink-soft);margin:2px 0 0;font-size:12.5px;line-height:1.4}.pse-field[data-v-e35ea7a8]{cursor:text;margin:0;display:block}.pse-field-label[data-v-e35ea7a8]{letter-spacing:.07em;text-transform:uppercase;color:var(--pse-ink-soft);margin-bottom:7px;font-size:11px;font-weight:650;display:block}.pse-field-shell[data-v-e35ea7a8]{display:block}.pse-field-shell[data-v-e35ea7a8] .pse-input{box-sizing:border-box;border:1px solid var(--pse-line);background-color:var(--pse-well);width:100%;height:48px;font:inherit;color:var(--pse-ink);border-radius:12px;margin:0;padding:0 15px;font-size:15px;transition:border-color .15s,background-color .15s,box-shadow .15s;display:block}.pse-field-shell[data-v-e35ea7a8] .pse-input::placeholder{color:var(--pse-ink-faint)}.pse-field-shell[data-v-e35ea7a8] .pse-input:-webkit-autofill{-webkit-text-fill-color:var(--pse-ink);box-shadow:0 0 0 100px var(--pse-well) inset}.pse-field-shell[data-v-e35ea7a8] .pse-input:-webkit-autofill:hover{-webkit-text-fill-color:var(--pse-ink);box-shadow:0 0 0 100px var(--pse-well) inset}.pse-field-shell[data-v-e35ea7a8] .pse-input:focus{border-color:var(--pse-brand);box-shadow:0 0 0 3px var(--pse-brand-ring);background-color:#fff;outline:none}.pse-field-shell[data-v-e35ea7a8] .pse-input:-webkit-autofill:focus{box-shadow:0 0 0 100px #fff inset, 0 0 0 3px var(--pse-brand-ring)}.pse-notice[data-v-0438713d]{border:1px solid var(--pse-line);text-align:left;background-color:#fff;border-radius:14px;align-items:flex-start;gap:12px;padding:14px 16px;display:flex;box-shadow:0 1px 2px #1430210a,0 14px 30px -26px #14302173}.pse-notice-icon[data-v-0438713d]{border-radius:10px;flex:none;justify-content:center;align-items:center;width:32px;height:32px;display:flex}.pse-notice.is-notice .pse-notice-icon[data-v-0438713d]{background-color:var(--pse-attention-soft);color:var(--pse-attention-ink)}.pse-notice.is-alert .pse-notice-icon[data-v-0438713d]{background-color:var(--pse-alert-soft);color:var(--pse-alert-ink)}.pse-notice-text[data-v-0438713d]{min-width:0;padding-top:4px;display:block}.pse-notice-title[data-v-0438713d]{color:var(--pse-ink);font-size:14px;font-weight:650;line-height:1.35;display:block}.pse-notice-detail[data-v-0438713d]{color:var(--pse-ink-soft);margin-top:2px;font-size:12.5px;line-height:1.45;display:block}.pse-notice-close[data-v-0438713d]{width:28px;height:28px;color:var(--pse-ink-faint);cursor:pointer;background:0 0;border:0;border-radius:8px;flex:none;justify-content:center;align-items:center;margin-left:auto;padding:0;transition:background-color .15s,color .15s;display:flex}.pse-notice-close[data-v-0438713d]:hover{background-color:var(--pse-well);color:var(--pse-ink)}.pse-notice-close[data-v-0438713d]:focus{outline:none}.pse-notice-close[data-v-0438713d]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-resume[data-v-ead5c402]{border:1px solid var(--pse-line);width:100%;font:inherit;text-align:left;color:var(--pse-ink);cursor:pointer;background-color:#fff;border-radius:14px;align-items:center;gap:13px;margin:0;padding:13px 16px;transition:border-color .15s,box-shadow .15s,transform .15s;display:flex}.pse-resume[data-v-ead5c402]:hover:not(:disabled){border-color:var(--pse-brand);transform:translateY(-1px);box-shadow:0 6px 18px -12px #14302180}.pse-resume[data-v-ead5c402]:focus{outline:none}.pse-resume[data-v-ead5c402]:focus-visible{border-color:var(--pse-brand);box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-resume[data-v-ead5c402]:disabled{background-color:var(--pse-well);color:var(--pse-ink-faint);cursor:not-allowed}.pse-resume-icon[data-v-ead5c402]{background-color:var(--pse-brand-soft);width:34px;height:34px;color:var(--pse-brand-ink);border-radius:10px;flex:none;justify-content:center;align-items:center;display:flex}.pse-resume:disabled .pse-resume-icon[data-v-ead5c402]{color:var(--pse-ink-faint);background-color:#1430210d}.pse-resume-text[data-v-ead5c402]{flex-direction:column;gap:2px;min-width:0;margin-right:auto;display:flex}.pse-resume-label[data-v-ead5c402]{font-size:13px;font-weight:600;line-height:1.3}.pse-resume-number[data-v-ead5c402]{color:var(--pse-ink-soft);font-variant-numeric:tabular-nums;font-size:12px;line-height:1.3}.pse-resume:disabled .pse-resume-number[data-v-ead5c402]{color:var(--pse-ink-faint)}.pse-resume-chevron[data-v-ead5c402]{color:var(--pse-ink-faint);flex:none;transition:transform .15s,color .15s}.pse-resume:hover:not(:disabled) .pse-resume-chevron[data-v-ead5c402]{color:var(--pse-brand-ink);transform:translate(2px)}.pse-picker-intro[data-v-585a06fb]{color:var(--pse-ink-soft);margin:0 0 16px;font-size:13.5px;line-height:1.45}.pse-picker-list[data-v-585a06fb]{flex-direction:column;gap:8px;margin:0;padding:0;list-style:none;display:flex}.pse-picker-row[data-v-585a06fb]{border:1px solid var(--pse-line);width:100%;font:inherit;text-align:left;color:var(--pse-ink);cursor:pointer;background-color:#fff;border-radius:12px;align-items:center;gap:12px;padding:11px 13px;transition:border-color .15s,background-color .15s;display:flex}.pse-picker-row[data-v-585a06fb]:hover:not(:disabled){border-color:var(--pse-brand);background-color:var(--pse-well)}.pse-picker-row[data-v-585a06fb]:disabled{opacity:.55;cursor:default}.pse-picker-row[data-v-585a06fb]:focus{outline:none}.pse-picker-row[data-v-585a06fb]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-picker-what[data-v-585a06fb]{flex-direction:column;flex:auto;gap:2px;min-width:0;display:flex}.pse-picker-barcode[data-v-585a06fb]{font-variant-numeric:tabular-nums;text-overflow:ellipsis;white-space:nowrap;font-size:14px;font-weight:650;overflow:hidden}.pse-picker-carrier[data-v-585a06fb]{color:var(--pse-ink-faint);font-size:12px}.pse-picker-icon[data-v-585a06fb]{color:var(--pse-brand-ink);flex:none;font-size:18px}.pse-picker-spinner[data-v-585a06fb]{border:2px solid var(--pse-line);border-top-color:var(--pse-brand);border-radius:50%;flex:none;width:14px;height:14px;animation:.7s linear infinite pse-picker-spin-585a06fb}@keyframes pse-picker-spin-585a06fb{to{transform:rotate(360deg)}}.pse-history[data-v-fffbc2dc]{border:1px solid var(--pse-line);background-color:var(--pse-well);border-radius:20px;flex-direction:column;align-self:start;min-width:0;max-height:460px;padding:18px 8px 8px 18px;display:flex}.pse-history-head[data-v-fffbc2dc]{align-items:flex-start;gap:11px;margin-bottom:14px;padding-right:10px;display:flex}.pse-history-icon[data-v-fffbc2dc]{background-color:var(--pse-brand-soft);width:32px;height:32px;color:var(--pse-brand-ink);border-radius:10px;flex:none;justify-content:center;align-items:center;display:flex}.pse-history-text[data-v-fffbc2dc]{min-width:0;margin-right:auto}.pse-history-title[data-v-fffbc2dc]{color:var(--pse-ink);margin:0;font-size:15px;font-weight:650;line-height:1.3}.pse-history-subtitle[data-v-fffbc2dc]{color:var(--pse-ink-soft);margin:1px 0 0;font-size:12px;line-height:1.4}.pse-history-clear[data-v-fffbc2dc]{font:inherit;color:var(--pse-ink-faint);cursor:pointer;background:0 0;border:0;border-radius:8px;flex:none;margin:0;padding:5px 9px;font-size:12px;font-weight:600;transition:background-color .15s,color .15s}.pse-history-clear[data-v-fffbc2dc]:hover{color:var(--pse-ink-soft);background-color:#1430210d}.pse-history-clear[data-v-fffbc2dc]:focus{outline:none}.pse-history-clear[data-v-fffbc2dc]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-history-list[data-v-fffbc2dc]{scrollbar-width:thin;scrollbar-color:var(--pse-line) transparent;flex-direction:column;gap:6px;min-height:0;margin:0;padding:4px 8px 10px 0;list-style:none;display:flex;overflow-y:auto;-webkit-mask-image:linear-gradient(#000 calc(100% - 18px),#0000);mask-image:linear-gradient(#000 calc(100% - 18px),#0000)}.pse-history-item[data-v-fffbc2dc]{align-items:stretch;gap:6px;display:flex}.pse-history-print[data-v-fffbc2dc]{width:38px;color:var(--pse-ink-faint);cursor:pointer;opacity:.7;background-color:#fff;border:1px solid #0000;border-radius:12px;flex:none;justify-content:center;align-items:center;transition:border-color .15s,color .15s,opacity .15s;display:flex}.pse-history-item:hover .pse-history-print[data-v-fffbc2dc]{opacity:1}.pse-history-print[data-v-fffbc2dc]:hover:not(:disabled){border-color:var(--pse-brand);color:var(--pse-brand-ink)}.pse-history-print[data-v-fffbc2dc]:disabled{opacity:.4;cursor:default}.pse-history-print-icon[data-v-fffbc2dc]{font-size:17px}.pse-history-spinner[data-v-fffbc2dc]{border:2px solid var(--pse-line);border-top-color:var(--pse-brand);border-radius:50%;width:13px;height:13px;animation:.7s linear infinite pse-history-spin-fffbc2dc}@keyframes pse-history-spin-fffbc2dc{to{transform:rotate(360deg)}}.pse-history-row[data-v-fffbc2dc]{width:100%;font:inherit;text-align:left;color:var(--pse-ink);cursor:pointer;background-color:#fff;border:1px solid #0000;border-radius:12px;align-items:center;gap:11px;margin:0;padding:9px 11px;transition:border-color .15s,box-shadow .15s,transform .15s;display:flex}.pse-history-row[data-v-fffbc2dc]:hover{border-color:var(--pse-brand);transform:translateY(-1px);box-shadow:0 6px 16px -12px #14302180}.pse-history-row[data-v-fffbc2dc]:focus{outline:none}.pse-history-row[data-v-fffbc2dc]:focus-visible{border-color:var(--pse-brand);box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-history-marker[data-v-fffbc2dc]{background-color:var(--pse-brand);border-radius:2px;flex:none;align-self:stretch;width:3px}.pse-history-row-failed .pse-history-marker[data-v-fffbc2dc]{background-color:var(--pse-alert)}.pse-history-body[data-v-fffbc2dc]{flex-direction:column;gap:2px;min-width:0;margin-right:auto;display:flex}.pse-history-number[data-v-fffbc2dc]{font-variant-numeric:tabular-nums;font-size:13.5px;font-weight:600;line-height:1.3}.pse-history-customer[data-v-fffbc2dc]{color:var(--pse-ink);white-space:nowrap;text-overflow:ellipsis;font-size:12.5px;line-height:1.35;overflow:hidden}.pse-history-meta[data-v-fffbc2dc]{color:var(--pse-ink-soft);align-items:center;gap:5px;font-size:11.5px;line-height:1.4;display:flex}.pse-history-dot[data-v-fffbc2dc]{color:var(--pse-ink-faint)}.pse-history-badge[data-v-fffbc2dc]{background-color:var(--pse-alert-soft);letter-spacing:.01em;color:var(--pse-alert-ink);border-radius:999px;padding:1px 6px;font-size:10.5px;font-weight:650}.pse-history-add[data-v-fffbc2dc]{color:var(--pse-ink-faint);opacity:.7;flex:none;transition:color .15s,opacity .15s}.pse-history-row:hover .pse-history-add[data-v-fffbc2dc]{color:var(--pse-brand-ink);opacity:1}@media (width<=1120px){.pse-history[data-v-fffbc2dc]{max-height:300px}}.pse-search[data-v-99949c5b]{box-sizing:border-box;width:100%;color:var(--pse-ink);text-align:left;margin:28px auto 56px;padding:0 24px}.pse-search[data-v-99949c5b] *{box-sizing:border-box}.pse-messages[data-v-99949c5b]:empty{display:none}.pse-search[data-v-99949c5b] .pse-notice{margin-bottom:18px}.pse-layout[data-v-99949c5b]{max-width:980px;margin:0 auto;display:grid}.pse-layout-history[data-v-99949c5b]{grid-template-columns:minmax(0,1fr) 322px;gap:20px;max-width:1300px}.pse-main[data-v-99949c5b]{min-width:0}.pse-card[data-v-99949c5b]{border:1px solid var(--pse-line);background-color:#fff;border-radius:20px;grid-template-columns:1fr auto 1fr;gap:34px;padding:30px 34px;display:grid;box-shadow:0 1px 2px #1430210a,0 18px 40px -28px #14302173}.pse-card-split[data-v-99949c5b]{background-color:var(--pse-line);width:1px}.pse-form[data-v-99949c5b]{flex-direction:column;flex:1;gap:18px;margin:0;display:flex}.pse-submit[data-v-99949c5b]{background-color:var(--pse-brand-ink);width:100%;height:48px;font:inherit;color:#fff;cursor:pointer;border:0;border-radius:12px;justify-content:center;align-items:center;gap:9px;margin:0;padding:0 18px;font-size:14.5px;font-weight:650;transition:background-color .15s,box-shadow .15s,transform .15s;display:flex}.pse-submit-end[data-v-99949c5b]{margin-top:auto}.pse-submit[data-v-99949c5b]:hover:not(:disabled){background-color:var(--pse-brand-ink-strong);transform:translateY(-1px);box-shadow:0 10px 22px -14px #143021cc}.pse-submit[data-v-99949c5b]:active:not(:disabled){box-shadow:none;transform:translateY(0)}.pse-submit[data-v-99949c5b]:focus{outline:none}.pse-submit[data-v-99949c5b]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-submit[data-v-99949c5b]:disabled{color:#fff;cursor:not-allowed;background-color:#cfdbd4}.pse-spinner[data-v-99949c5b]{border:2px solid #fff6;border-top-color:#fff;border-radius:50%;flex:none;width:15px;height:15px;animation:.7s linear infinite pse-spin-99949c5b}@keyframes pse-spin-99949c5b{to{transform:rotate(360deg)}}.pse-resume-row[data-v-99949c5b]{grid-template-columns:1fr 1fr;gap:14px;margin-top:18px;display:grid}@media (width<=1120px){.pse-layout-history[data-v-99949c5b]{grid-template-columns:minmax(0,1fr);max-width:980px}}@media (width<=860px){.pse-search[data-v-99949c5b]{padding:0 16px}.pse-card[data-v-99949c5b]{grid-template-columns:1fr;gap:26px;padding:26px 22px}.pse-card-split[data-v-99949c5b]{width:auto;height:1px}.pse-submit-end[data-v-99949c5b]{margin-top:0}.pse-resume-row[data-v-99949c5b]{grid-template-columns:1fr}}.pse-loading[data-v-38d33d98]{box-sizing:border-box;min-height:calc(100vh - 200px);color:var(--pse-ink);text-align:left;justify-content:center;align-items:center;padding:48px 24px;display:flex}.pse-loading-card[data-v-38d33d98]{border:1px solid var(--pse-line);background-color:#fff;border-radius:20px;align-items:center;gap:16px;width:100%;max-width:420px;padding:24px 26px;display:flex;box-shadow:0 1px 2px #1430210a,0 18px 40px -28px #14302173}.pse-loading-spinner[data-v-38d33d98]{border:3px solid var(--pse-brand-ring);border-top-color:var(--pse-brand);border-radius:50%;flex:none;width:28px;height:28px;animation:.7s linear infinite pse-loading-spin-38d33d98}@keyframes pse-loading-spin-38d33d98{to{transform:rotate(360deg)}}.pse-loading-text[data-v-38d33d98]{min-width:0}.pse-loading-title[data-v-38d33d98]{color:var(--pse-ink);margin:0;font-size:16px;font-weight:650;line-height:1.3}.pse-loading-subtitle[data-v-38d33d98]{color:var(--pse-ink-soft);margin:3px 0 0;font-size:12.5px;line-height:1.4}@media (prefers-reduced-motion:reduce){.pse-loading-spinner[data-v-38d33d98]{animation-duration:1.6s}}@media (width<=860px){.pse-loading[data-v-38d33d98]{padding:32px 16px}}.pse-slotcard[data-v-7e6e3d84]{border:1px solid var(--pse-line);text-align:left;background-color:#fff;border-radius:14px;overflow:hidden;box-shadow:0 1px 2px #1430210a}.pse-slotcard-head[data-v-7e6e3d84]{border-bottom:1px solid var(--pse-line);background-color:var(--pse-well);align-items:center;gap:9px;padding:10px 14px;display:flex}.pse-slotcard-spinner[data-v-7e6e3d84]{border:2px solid var(--pse-line);border-top-color:var(--pse-brand);border-radius:50%;flex:none;width:13px;height:13px;margin-left:auto;animation:.7s linear infinite pse-slotcard-spin-7e6e3d84}@keyframes pse-slotcard-spin-7e6e3d84{to{transform:rotate(360deg)}}.pse-slot-chip .pse-slot-chip-empty[data-v-7e6e3d84]:only-child{opacity:.75}.pse-slotcard-icon[data-v-7e6e3d84]{color:var(--pse-ink-faint);flex:none;font-size:18px}.pse-slotcard-title[data-v-7e6e3d84]{letter-spacing:.06em;text-transform:uppercase;color:var(--pse-ink-faint);margin:0;font-size:10.5px;font-weight:650;line-height:1.6}.pse-slotcard-body[data-v-7e6e3d84]{padding:12px 14px 14px}.pse-slotcard-caption[data-v-7e6e3d84]{letter-spacing:.06em;text-transform:uppercase;color:var(--pse-ink-faint);margin-bottom:6px;font-size:10.5px;font-weight:650;line-height:1.6;display:block}.pse-slotcard-caption.is-spaced[data-v-7e6e3d84]{border-top:1px solid var(--pse-line);margin-top:14px;padding-top:12px}.pse-slotcard-list[data-v-7e6e3d84]{flex-wrap:wrap;gap:6px;display:flex}.pse-slotcard-hint[data-v-7e6e3d84]{color:var(--pse-ink-faint);margin:9px 0 0;font-size:12px;line-height:1.4}.pse-sidebar[data-v-048e97c2]{box-sizing:border-box;text-align:left;color:var(--pse-ink);flex-direction:column;gap:14px;display:flex}.pse-sidebar[data-v-048e97c2] *{box-sizing:border-box}.pse-sidebar-card[data-v-048e97c2]{border:1px solid var(--pse-line);background-color:#fff;border-radius:16px;padding:18px 18px 20px;box-shadow:0 1px 2px #1430210a,0 18px 40px -30px #14302173}.pse-sidebar-head[data-v-048e97c2]{border-bottom:1px solid var(--pse-line);margin-bottom:14px;padding-bottom:14px}.pse-sidebar-heading-row[data-v-048e97c2]{align-items:center;gap:4px;display:flex}.pse-sidebar-heading[data-v-048e97c2]{min-width:0;color:var(--pse-ink);margin:0;font-size:19px;font-weight:700;line-height:1.25}.pse-sidebar-chips[data-v-048e97c2]{flex-wrap:wrap;gap:6px;margin-top:10px;display:flex}.pse-sidebar-chip[data-v-048e97c2]{border:1px solid var(--pse-brand-ring);background-color:var(--pse-brand-soft);color:var(--pse-brand-ink);border-radius:999px;padding:3px 10px;font-size:11.5px;font-weight:650;line-height:1.5}.pse-sidebar-rows[data-v-048e97c2]{grid-template-columns:minmax(0,1fr);margin:0;display:grid}.pse-sidebar-label[data-v-048e97c2]{letter-spacing:.06em;text-transform:uppercase;color:var(--pse-ink-faint);margin:0;font-size:10.5px;font-weight:650;line-height:1.6}.pse-sidebar-value[data-v-048e97c2]{color:var(--pse-ink);overflow-wrap:anywhere;align-items:baseline;gap:6px;margin:2px 0 11px;font-size:13.5px;font-weight:550;line-height:1.35;display:flex}.pse-sidebar-value[data-v-048e97c2]:last-child{margin-bottom:0}.pse-sidebar-value-text[data-v-048e97c2]{overflow-wrap:anywhere;min-width:0}.pse-sidebar-address[data-v-048e97c2]{border-top:1px solid var(--pse-line);margin-top:16px;padding-top:14px}.pse-sidebar-address-body[data-v-048e97c2]{color:var(--pse-ink);flex-direction:column;margin:7px 0 0;font-size:13.5px;font-weight:550;line-height:1.45;display:flex}.pse-image[data-v-367f2428]{border:1px solid var(--pse-line);background-color:#fff;border-radius:14px;justify-content:center;align-items:center;padding:24px;display:flex}.pse-image-photo[data-v-367f2428]{object-fit:contain;width:100%;max-width:460px;height:46vh;min-height:260px;display:block}.pse-products[data-v-db7a6ae9]{box-sizing:border-box;color:var(--pse-ink);text-align:left;margin-bottom:26px}.pse-products[data-v-db7a6ae9] *{box-sizing:border-box}.pse-count[data-v-db7a6ae9]{font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--pse-ink);border-radius:8px;padding:3px 9px;font-size:13px;font-weight:600;display:inline-block}.pse-count-warn[data-v-db7a6ae9],.pse-count-alert[data-v-db7a6ae9]{animation:2.4s ease-in-out infinite pse-count-breathe-db7a6ae9}.pse-count-warn[data-v-db7a6ae9]{color:#8a5a10;background-color:#e2a02e2e}.pse-count-alert[data-v-db7a6ae9]{color:#a3372c;background-color:#b03a2e1f}@keyframes pse-count-breathe-db7a6ae9{50%{background-color:#e2a02e6b}}.pse-count-alert[data-v-db7a6ae9]{animation-name:pse-count-breathe-alert-db7a6ae9}@keyframes pse-count-breathe-alert-db7a6ae9{50%{background-color:#b03a2e4d}}.pse-count-resolved[data-v-db7a6ae9]{background-color:var(--pse-brand-soft);color:var(--pse-brand-ink)}.pse-mark[data-v-db7a6ae9]{vertical-align:middle;font-size:21px}.pse-mark-done[data-v-db7a6ae9]{color:var(--pse-brand)}.pse-mark-open[data-v-db7a6ae9]{color:var(--pse-ink-faint)}.pse-skeleton-row td[data-v-db7a6ae9]{height:58px}.pse-skeleton-cell[data-v-db7a6ae9]{background-color:var(--pse-line);border-radius:6px;height:12px;animation:1.4s ease-in-out infinite pse-products-pulse-db7a6ae9;display:block}@keyframes pse-products-pulse-db7a6ae9{50%{opacity:.45}}.pse-products-hint[data-v-db7a6ae9]{border:1px solid var(--pse-brand-ring);background-color:var(--pse-brand-soft);color:var(--pse-brand-ink);border-radius:12px;align-items:center;gap:8px;margin:12px 0 0;padding:10px 13px;font-size:13px;font-weight:550;line-height:1.4;display:flex}.pse-products-hint-icon[data-v-db7a6ae9]{flex:none;font-size:18px}@media (prefers-reduced-motion:reduce){.pse-skeleton-cell[data-v-db7a6ae9],.pse-count-warn[data-v-db7a6ae9],.pse-count-alert[data-v-db7a6ae9]{animation:none}}.pse-done[data-v-40eb085b]{box-sizing:border-box;min-height:calc(100vh - 260px);color:var(--pse-ink);text-align:left;justify-content:center;align-items:center;padding:48px 24px;display:flex}.pse-done[data-v-40eb085b] *{box-sizing:border-box}.pse-done-card[data-v-40eb085b]{border:1px solid var(--pse-line);text-align:center;background-color:#fff;border-radius:20px;flex-direction:column;align-items:center;width:100%;max-width:460px;padding:34px 34px 30px;display:flex;box-shadow:0 1px 2px #1430210a,0 18px 40px -28px #14302173}.pse-done-mark[data-v-40eb085b]{background-color:var(--pse-brand-soft);width:62px;height:62px;color:var(--pse-brand-ink);border-radius:50%;justify-content:center;align-items:center;margin-bottom:18px;display:flex}.pse-done.is-detailed[data-v-40eb085b]{align-items:flex-start;min-height:0;padding-top:32px}.pse-done-layout[data-v-40eb085b]{justify-content:center;align-items:flex-start;gap:20px;width:100%;display:flex}.pse-done-side[data-v-40eb085b],.pse-done-parcels-column[data-v-40eb085b]{text-align:left;flex-direction:column;flex:0 340px;gap:14px;min-width:0;display:flex}.pse-done-layout>.pse-done-card[data-v-40eb085b]{flex:460px}.pse-done-side[data-v-40eb085b] .pse-sidebar{width:100%}.pse-done-parcels[data-v-40eb085b]{border:1px solid var(--pse-line);background-color:#fff;border-radius:20px;padding:18px 20px 20px;box-shadow:0 1px 2px #1430210a,0 18px 40px -28px #14302173}.pse-done-parcels-title[data-v-40eb085b]{letter-spacing:.06em;text-transform:uppercase;color:var(--pse-ink-soft);margin:0 0 12px;font-size:12px;font-weight:700}.pse-done-parcel+.pse-done-parcel[data-v-40eb085b]{border-top:1px solid var(--pse-line);margin-top:14px;padding-top:14px}.pse-done-parcel-name[data-v-40eb085b]{color:var(--pse-ink);margin:0;font-size:14.5px;font-weight:700}.pse-done-parcel-fields[data-v-40eb085b]{grid-template-columns:auto minmax(0,1fr);gap:2px 10px;margin:10px 0 0;font-size:12.5px;line-height:1.45;display:grid}.pse-done-parcel-fields dt[data-v-40eb085b]{color:var(--pse-ink-faint)}.pse-done-parcel-fields dd[data-v-40eb085b]{color:var(--pse-ink);overflow-wrap:anywhere;margin:0}.pse-done-parcel-lines[data-v-40eb085b]{margin:12px 0 0;padding:0;list-style:none}.pse-done-parcel-lines li[data-v-40eb085b]{background-color:var(--pse-well);border-radius:10px;gap:10px;padding:8px 10px;font-size:12.5px;line-height:1.4;display:flex}.pse-done-parcel-lines li+li[data-v-40eb085b]{margin-top:6px}.pse-done-parcel-amount[data-v-40eb085b]{font-variant-numeric:tabular-nums;color:var(--pse-brand-ink);flex:none;font-weight:700}.pse-done-parcel-product[data-v-40eb085b]{flex-direction:column;min-width:0;display:flex}.pse-done-parcel-product-name[data-v-40eb085b]{color:var(--pse-ink);overflow-wrap:anywhere}.pse-done-parcel-barcode[data-v-40eb085b]{font-variant-numeric:tabular-nums;color:var(--pse-ink-faint);font-size:12px}.pse-done-card.is-failed[data-v-40eb085b]{border-color:var(--pse-alert-soft)}.pse-done-mark.is-failed[data-v-40eb085b]{background-color:var(--pse-alert-soft);color:var(--pse-alert-ink)}.pse-done-card.is-failed[data-v-40eb085b]{max-width:560px}.pse-done-card.is-failed .pse-done-number[data-v-40eb085b]{color:var(--pse-alert-ink)}.pse-done-card.is-failed .pse-done-text[data-v-40eb085b]{max-width:46ch}.pse-done-failures[data-v-40eb085b]{text-align:left;width:100%;margin:18px 0 0;padding:0;list-style:none}.pse-done-failure[data-v-40eb085b]{border:1px solid var(--pse-alert-soft);border-left:3px solid var(--pse-alert);background-color:var(--pse-alert-wash);border-radius:12px;padding:12px 14px}.pse-done-failure+.pse-done-failure[data-v-40eb085b]{margin-top:8px}.pse-done-failure-step[data-v-40eb085b]{color:var(--pse-alert-ink);font-size:13.5px;font-weight:650;line-height:1.35;display:block}.pse-done-failure-detail[data-v-40eb085b]{color:var(--pse-ink-soft);overflow-wrap:anywhere;margin-top:4px;font-size:13px;line-height:1.5;display:block}.pse-done-actions[data-v-40eb085b]{gap:10px;width:100%;margin-top:22px;display:flex}.pse-done-actions .pse-done-button[data-v-40eb085b]{margin-top:0}.pse-done-button.is-quiet[data-v-40eb085b]{border:1px solid var(--pse-line);color:var(--pse-ink-soft);background-color:#fff}.pse-done-button.is-quiet[data-v-40eb085b]:hover{border-color:var(--pse-ink-faint);background-color:var(--pse-well);color:var(--pse-ink);box-shadow:none}.pse-done-mark.is-working[data-v-40eb085b]{background-color:var(--pse-well)}.pse-done-spinner[data-v-40eb085b]{border:3px solid var(--pse-brand-ring);border-top-color:var(--pse-brand);border-radius:50%;width:26px;height:26px;animation:.7s linear infinite pse-done-spin-40eb085b}@keyframes pse-done-spin-40eb085b{to{transform:rotate(360deg)}}.pse-done-title[data-v-40eb085b]{color:var(--pse-ink);margin:0;font-size:20px;font-weight:700;line-height:1.25}.pse-done-number[data-v-40eb085b]{font-variant-numeric:tabular-nums;letter-spacing:.01em;color:var(--pse-brand-ink);justify-content:center;margin:8px 0 0;font-size:26px;font-weight:700;line-height:1.1}.pse-done-text[data-v-40eb085b]{max-width:34ch;color:var(--pse-ink-soft);margin:12px 0 0;font-size:13.5px;line-height:1.5}.pse-done-button[data-v-40eb085b]{background-color:var(--pse-brand-ink);width:100%;height:48px;font:inherit;color:#fff;cursor:pointer;border:0;border-radius:12px;margin-top:22px;padding:0 18px;font-size:14.5px;font-weight:650;transition:background-color .15s,box-shadow .15s,transform .15s}.pse-done-button[data-v-40eb085b]:hover{background-color:var(--pse-brand-ink-strong);transform:translateY(-1px);box-shadow:0 10px 22px -14px #143021cc}.pse-done-button[data-v-40eb085b]:active{box-shadow:none;transform:translateY(0)}.pse-done-button[data-v-40eb085b]:focus{outline:none}.pse-done-button[data-v-40eb085b]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}@media (prefers-reduced-motion:reduce){.pse-done-spinner[data-v-40eb085b]{animation-duration:1.6s}}@media (width<=1200px){.pse-done-layout[data-v-40eb085b]{flex-direction:column;align-items:center}.pse-done-layout>.pse-done-card[data-v-40eb085b]{flex:none;order:-1;width:100%}.pse-done-side[data-v-40eb085b],.pse-done-parcels-column[data-v-40eb085b]{flex:none;width:100%;max-width:560px}}@media (width<=860px){.pse-done[data-v-40eb085b]{padding:32px 16px}.pse-done-actions[data-v-40eb085b]{flex-direction:column}.pse-done-card[data-v-40eb085b]{padding:28px 22px 24px}}.pse-products[data-v-77facacc]{box-sizing:border-box;color:var(--pse-ink);text-align:left;margin-bottom:26px}.pse-products[data-v-77facacc] *{box-sizing:border-box}.pse-products-note[data-v-77facacc]{color:var(--pse-ink-faint);flex:none;font-size:12px}.pse-cell-quantity[data-v-77facacc]{font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:600}.pse-back-row[data-v-29aa4ab2]{text-align:left;justify-content:flex-end;margin-bottom:10px;display:flex}.pse-reprint[data-v-7ce2449e]{border:1px solid var(--pse-line);font:inherit;color:var(--pse-ink);cursor:pointer;background-color:#fff;border-radius:9px;align-items:center;gap:6px;padding:5px 11px;font-size:12.5px;font-weight:600;line-height:1.2;transition:background-color .15s,border-color .15s;display:inline-flex}.pse-reprint[data-v-7ce2449e]:hover:not(:disabled){border-color:var(--pse-brand);background-color:var(--pse-well)}.pse-reprint[data-v-7ce2449e]:disabled{opacity:.55;cursor:default}.pse-reprint[data-v-7ce2449e]:focus{outline:none}.pse-reprint[data-v-7ce2449e]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-reprint-icon[data-v-7ce2449e]{color:var(--pse-brand-ink);font-size:16px}.pse-reprint-spinner[data-v-7ce2449e]{border:2px solid var(--pse-line);border-top-color:var(--pse-brand);border-radius:50%;flex:none;width:12px;height:12px;animation:.7s linear infinite pse-reprint-spin-7ce2449e}@keyframes pse-reprint-spin-7ce2449e{to{transform:rotate(360deg)}}.pse-header[data-v-895c5c8c]{box-sizing:border-box;text-align:left;border-bottom:1px solid var(--pse-line);background-color:#fff;width:100%}@media (display-mode:window-controls-overlay){.pse-header[data-v-895c5c8c]{-webkit-app-region:drag;app-region:drag}.pse-header-inner[data-v-895c5c8c]{min-height:env(titlebar-area-height,0px);padding-top:4px;padding-bottom:4px}.pse-header-logo[data-v-895c5c8c]{height:24px}.pse-header-link[data-v-895c5c8c],.pse-header-logo[data-v-895c5c8c]{-webkit-app-region:no-drag;app-region:no-drag}}.pse-header-inner[data-v-895c5c8c]{box-sizing:border-box;align-items:center;max-width:980px;margin:0 auto;padding:16px 24px;display:flex}.pse-header-link[data-v-895c5c8c]{border-radius:10px;margin:-6px -8px;padding:6px 8px;display:inline-flex}.pse-header-link[data-v-895c5c8c]:focus{outline:none}.pse-header-link[data-v-895c5c8c]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-header-logo[data-v-895c5c8c]{width:auto;height:34px;display:block}@media (width<=860px){.pse-header-inner[data-v-895c5c8c]{padding:14px 16px}.pse-header-logo[data-v-895c5c8c]{height:28px}}.pse-settings-update[data-v-42ef061e],.pse-settings-update[data-v-42ef061e]:hover,.pse-settings-update[data-v-42ef061e]:focus,.pse-settings-update[data-v-42ef061e]:active,.pse-settings-update[data-v-42ef061e]:visited{color:#fff;align-items:center;gap:8px;margin-bottom:9px;text-decoration:none;display:inline-flex}.pse-settings-update-icon[data-v-42ef061e]{font-size:18px}.pse-settings-update-status[data-v-42ef061e]{color:var(--pse-ink);margin-top:7px;font-weight:600;display:block}.pse-settings-switch[data-v-42ef061e]{border:1px solid var(--pse-line);background-color:var(--pse-well);cursor:pointer;border-radius:13px;align-items:flex-start;gap:11px;padding:13px 14px;display:flex;margin:0 0 34px!important}.pse-settings-checkbox[data-v-42ef061e]{width:17px;height:17px;accent-color:var(--pse-brand-ink);cursor:pointer;flex:none;margin:1px 0 0}.pse-settings-switch-text[data-v-42ef061e]{min-width:0}.pse-settings-switch-title[data-v-42ef061e]{color:var(--pse-ink);font-size:14px;font-weight:650;line-height:1.3;display:block}.pse-settings-sound[data-v-42ef061e]{align-items:stretch;gap:8px;margin-bottom:8px;display:flex}.pse-settings-sound[data-v-42ef061e]:last-child{margin-bottom:0}.pse-settings-switch-compact[data-v-42ef061e]{flex:auto;min-width:0;margin:0!important}.pse-settings-listen[data-v-42ef061e]{border-radius:13px;flex:none;align-items:center;gap:6px;min-width:0;height:auto;padding:0 14px;display:inline-flex}.pse-settings-listen-icon[data-v-42ef061e]{font-size:18px}.pse-settings-field[data-v-42ef061e]{margin-bottom:16px}.pse-settings-field[data-v-42ef061e]:last-child{margin-bottom:0}.pse-settings-group[data-v-42ef061e]{border-top:1px solid var(--pse-line);margin-top:20px;padding-top:18px}.pse-settings-group-title[data-v-42ef061e]{color:var(--pse-ink);margin:0 0 14px;font-size:13px;font-weight:650}.pse-settings-masked[data-v-42ef061e]{-webkit-text-security:disc;text-security:disc}.pse-credentials-intro[data-v-a3fdb084]{align-items:flex-start;gap:13px;margin-bottom:20px;display:flex}.pse-credentials-logo[data-v-a3fdb084]{flex:none;margin-top:1px}.pse-credentials-subtitle[data-v-a3fdb084]{color:var(--pse-ink-soft);margin:0;font-size:13.5px;line-height:1.45}.pse-credentials-field[data-v-a3fdb084]{margin-bottom:16px}.pse-credentials-error[data-v-a3fdb084]{color:#a3372c;background-color:#b03a2e0f;border:1px solid #b03a2e47;border-radius:12px;margin:0 0 14px;padding:11px 13px;font-size:13px;line-height:1.45}.pse-credentials-error-enter-active[data-v-a3fdb084],.pse-credentials-error-leave-active[data-v-a3fdb084]{transition:opacity .15s}.pse-credentials-error-enter-from[data-v-a3fdb084],.pse-credentials-error-leave-to[data-v-a3fdb084]{opacity:0}.pse-credentials-footnote[data-v-a3fdb084]{color:var(--pse-ink-faint);margin:0;font-size:12.5px;line-height:1.4}.pse-credentials-masked[data-v-a3fdb084]{-webkit-text-security:disc;text-security:disc}.pse-credentials-spinner[data-v-a3fdb084]{border:2px solid #fff6;border-top-color:#fff;border-radius:50%;flex:none;width:14px;height:14px;animation:.7s linear infinite pse-credentials-spin-a3fdb084}@keyframes pse-credentials-spin-a3fdb084{to{transform:rotate(360deg)}}.pse-erp-subtitle[data-v-ebdfaa5a]{color:var(--pse-ink-soft);margin:0 0 20px;font-size:13.5px;line-height:1.45}.pse-erp-field[data-v-ebdfaa5a]{margin-bottom:16px}.pse-erp-error[data-v-ebdfaa5a]{color:#a3372c;background-color:#b03a2e0f;border:1px solid #b03a2e47;border-radius:12px;margin:0 0 14px;padding:11px 13px;font-size:13px;line-height:1.45}.pse-erp-error-enter-active[data-v-ebdfaa5a],.pse-erp-error-leave-active[data-v-ebdfaa5a]{transition:opacity .15s}.pse-erp-error-enter-from[data-v-ebdfaa5a],.pse-erp-error-leave-to[data-v-ebdfaa5a]{opacity:0}.pse-erp-spinner[data-v-ebdfaa5a]{border:2px solid #fff6;border-top-color:#fff;border-radius:50%;flex:none;width:14px;height:14px;animation:.7s linear infinite pse-erp-spin-ebdfaa5a}@keyframes pse-erp-spin-ebdfaa5a{to{transform:rotate(360deg)}}.pse-bar[data-v-93f65e5c]{--pse-on:#a8dcab;--pse-off:#f5bd74;--pse-ink:#ffffffb8;--pse-ink-strong:#fff;--pse-ink-soft:#ffffff73;--pse-well:#ffffff14;background-color:var(--pse-well);color:var(--pse-ink);white-space:nowrap;vertical-align:middle;border-radius:999px;align-items:center;gap:2px;margin-top:-5px;margin-bottom:-5px;padding:2px;font-family:inherit;font-size:12.5px;line-height:1;display:inline-flex}.pse-bar.is-minimal[data-v-93f65e5c]{background-color:#0000;margin:0;padding:0}.pse-bar[data-v-93f65e5c],.pse-bar[data-v-93f65e5c] *{box-sizing:border-box;line-height:1}.pse-pill[data-v-93f65e5c]{font:inherit;color:inherit;cursor:pointer;background-color:#0000;border:0;border-radius:999px;align-items:center;gap:7px;margin:0;padding:5px 11px;font-weight:600;transition:background-color .15s,color .15s;display:inline-flex}.pse-toggle-label[data-v-93f65e5c]{text-align:left;min-width:74px;display:inline-block}.pse-pill[data-v-93f65e5c]:focus,.pse-pill[data-v-93f65e5c]:active{box-shadow:none;outline:none}.pse-pill[data-v-93f65e5c]:focus-visible{outline-offset:2px;outline:2px solid}.pse-icon[data-v-93f65e5c]{flex:none;width:15px;height:15px}.pse-toggle.is-on[data-v-93f65e5c]{color:var(--pse-on);background-color:#a8dcab29}.pse-toggle.is-on[data-v-93f65e5c]:hover{background-color:#a8dcab47}.pse-toggle.is-on .pse-icon[data-v-93f65e5c]{filter:brightness(0)invert(88%)sepia(19%)saturate(505%)hue-rotate(72deg)brightness(97%)contrast(90%)}.pse-toggle.is-off[data-v-93f65e5c]{color:var(--pse-off);background-color:#f5bd7429}.pse-toggle.is-off[data-v-93f65e5c]:hover{background-color:#f5bd7447}.pse-toggle.is-off .pse-icon[data-v-93f65e5c]{filter:brightness(0)invert(84%)sepia(29%)saturate(958%)hue-rotate(324deg)brightness(101%)contrast(92%)}.pse-install[data-v-93f65e5c]{color:var(--pse-ink-strong);background-color:#ffffff24}.pse-install[data-v-93f65e5c]:hover{background-color:#ffffff3d}.pse-install .pse-icon[data-v-93f65e5c]{filter:brightness(0)invert()}.pse-settings[data-v-93f65e5c]{color:var(--pse-ink)}.pse-settings[data-v-93f65e5c]:hover{color:var(--pse-ink-strong);background-color:#ffffff24}.pse-settings .pse-icon[data-v-93f65e5c]{filter:brightness(0)invert();opacity:.72;transition:transform .3s,opacity .15s}.pse-settings:hover .pse-icon[data-v-93f65e5c]{opacity:1;transform:rotate(60deg)}.pse-divider[data-v-93f65e5c]{opacity:.18;background-color:currentColor;width:1px;height:15px;margin:0 4px}.pse-user[data-v-93f65e5c]{align-items:center;gap:6px;padding:0 6px;display:inline-flex}.pse-user-name[data-v-93f65e5c]{color:var(--pse-ink-strong);font-weight:600}.pse-dot[data-v-93f65e5c]{background-color:var(--pse-on);border-radius:50%;flex:none;width:6px;height:6px;animation:2.6s ease-out infinite pse-dot-pulse-93f65e5c}@keyframes pse-dot-pulse-93f65e5c{0%{box-shadow:0 0 #a8dcab80}70%{box-shadow:0 0 0 7px #a8dcab00}to{box-shadow:0 0 #a8dcab00}}@media (prefers-reduced-motion:reduce){.pse-dot[data-v-93f65e5c]{animation:none;box-shadow:0 0 0 3px #a8dcab33}}.pse-version[data-v-93f65e5c]{color:var(--pse-ink-soft);letter-spacing:.04em;text-transform:uppercase;align-items:baseline;gap:5px;padding:0 6px;font-size:10.5px;display:inline-flex}.pse-bar.is-minimal .pse-version[data-v-93f65e5c]{padding-left:0}.pse-version-number[data-v-93f65e5c]{font-variant-numeric:tabular-nums;letter-spacing:.02em}.pse-update[data-v-93f65e5c]{letter-spacing:.04em;color:var(--pse-off);white-space:nowrap;background-color:#f5bd742e;border-radius:999px;align-self:center;align-items:center;gap:5px;padding:2px 8px;font-size:10px;font-weight:700;text-decoration:none;transition:background-color .15s,color .15s;display:inline-flex}.pse-update[data-v-93f65e5c]:hover{color:#ffe1bb;background-color:#f5bd744d}.pse-update[data-v-93f65e5c]:focus{outline:none}.pse-update[data-v-93f65e5c]:focus-visible{outline:none;box-shadow:0 0 0 2px #f5bd7499}.pse-update-dot[data-v-93f65e5c]{background-color:currentColor;border-radius:50%;flex:none;width:5px;height:5px}@media (width<=991px){.pse-bar:not(.is-minimal) .pse-brand[data-v-93f65e5c]{display:none}}@media (width<=767px){.pse-settings-label[data-v-93f65e5c]{display:none}.pse-install-label[data-v-93f65e5c]{font-size:0}.pse-install-label[data-v-93f65e5c]:after{content:\"App\";font-size:12.5px}}.pse-login[data-v-e9eaf606]{box-sizing:border-box;min-height:calc(100vh - 200px);color:var(--pse-ink);text-align:left;justify-content:center;align-items:center;padding:48px 24px;display:flex}.pse-login[data-v-e9eaf606] *{box-sizing:border-box}.pse-login-card[data-v-e9eaf606]{border:1px solid var(--pse-line);background-color:#fff;border-radius:20px;width:100%;max-width:420px;padding:30px 34px;box-shadow:0 1px 2px #1430210a,0 18px 40px -28px #14302173}.pse-login-errors[data-v-e9eaf606]:not(:has(.validation-summary-errors)){display:none}.pse-login-errors[data-v-e9eaf606] ul{color:#a3372c;background-color:#b03a2e0f;border:1px solid #b03a2e47;border-radius:12px;margin:0;padding:12px 14px;font-size:13px;line-height:1.45;list-style:none}.pse-login[data-v-e9eaf606] input[type=number]{appearance:textfield}.pse-login[data-v-e9eaf606] input[type=number]::-webkit-outer-spin-button{appearance:none;margin:0}.pse-login[data-v-e9eaf606] input[type=number]::-webkit-inner-spin-button{appearance:none;margin:0}.pse-submit[data-v-e9eaf606]{background-color:var(--pse-brand-ink);width:100%;height:48px;font:inherit;color:#fff;cursor:pointer;border:0;border-radius:12px;justify-content:center;align-items:center;margin:4px 0 0;padding:0 18px;font-size:14.5px;font-weight:650;transition:background-color .15s,box-shadow .15s,transform .15s;display:flex}.pse-submit[data-v-e9eaf606]:hover{background-color:var(--pse-brand-ink-strong);transform:translateY(-1px);box-shadow:0 10px 22px -14px #143021cc}.pse-submit[data-v-e9eaf606]:active{box-shadow:none;transform:translateY(0)}.pse-submit[data-v-e9eaf606]:focus{outline:none}.pse-submit[data-v-e9eaf606]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}@media (width<=860px){.pse-login[data-v-e9eaf606]{padding:32px 16px}.pse-login-card[data-v-e9eaf606]{padding:26px 22px}}.pse-idle-lead[data-v-86dcdcbd]{color:var(--pse-ink);margin:0 0 8px;font-size:14px;line-height:1.5}.pse-idle-count[data-v-86dcdcbd]{font-variant-numeric:tabular-nums;color:var(--pse-attention-ink)}.pse-idle-hint[data-v-86dcdcbd]{color:var(--pse-ink-soft);margin:0;font-size:13px;line-height:1.45}\n/*$vite$:1*/ ");
 	function makeMap(str) {
 		const map = Object.create(null);
 		for (const key of str.split(",")) map[key] = 1;
@@ -2329,7 +2329,28 @@
 	function onErrorCaptured(hook, target = currentInstance) {
 		injectHook("ec", hook, target);
 	}
+	var COMPONENTS = "components";
 	var NULL_DYNAMIC_COMPONENT = Symbol.for("v-ndc");
+	function resolveDynamicComponent(component) {
+		if (isString(component)) return resolveAsset(COMPONENTS, component, false) || component;
+		else return component || NULL_DYNAMIC_COMPONENT;
+	}
+	function resolveAsset(type, name, warnMissing = true, maybeSelfReference = false) {
+		const instance = currentRenderingInstance || currentInstance;
+		if (instance) {
+			const Component = instance.type;
+			if (type === COMPONENTS) {
+				const selfName = getComponentName(Component, false);
+				if (selfName && (selfName === name || selfName === camelize(name) || selfName === capitalize(camelize(name)))) return Component;
+			}
+			const res = resolve(instance[type] || Component[type], name) || resolve(instance.appContext[type], name);
+			if (!res && maybeSelfReference) return Component;
+			return res;
+		}
+	}
+	function resolve(registry, name) {
+		return registry && (registry[name] || registry[camelize(name)] || registry[capitalize(camelize(name))]);
+	}
 	function renderList(source, renderItem, cache, index) {
 		let ret;
 		const cached = cache && cache[index];
@@ -4374,6 +4395,9 @@
 		}));
 		else return instance.proxy;
 	}
+	function getComponentName(Component, includeInferred = true) {
+		return isFunction(Component) ? Component.displayName || Component.name : Component.name || includeInferred && Component.__name;
+	}
 	function isClassComponent(value) {
 		return isFunction(value) && "__vccOpts" in value;
 	}
@@ -5148,6 +5172,11 @@
 		submit: "ctl00$MasterContent$cmdLogin"
 	};
 	var ERP_PAGE_PATH = "/Default.aspx";
+	var ERP_SEARCH_PAGE_ID_VARIABLE = "navigationIconsSearchPageId";
+	var ERP_SEARCH_NUMBER_SELECTOR = "[id$='rvcReservationNumber_TextBox']";
+	var ERP_SEARCH_SUBMIT_SELECTOR = "[id$='ctl00_cmdSearch']";
+	var ERP_MAIN_WINDOW_FUNCTION = "getMainWindow";
+	var ERP_MAIN_ITEM_FUNCTION = "SetMainItemId";
 	var ERP_SET_ITEM_FUNCTION = "SetDisplayItemId";
 	var ERP_NOTE_SELECTOR = "[name$=\"rvcNote$TextBox\"]";
 	var ERP_EDIT_BUTTON_ID = "ctl00_ctl00_MasterContent_NavigationIcons_ctl00_cmdEdit";
@@ -5445,6 +5474,16 @@
 	}
 	function getReservationId(target) {
 		return target.querySelector("#ReservationId").value;
+	}
+	async function fetchReservationId(url) {
+		try {
+			const holder = document.createElement("div");
+			holder.innerHTML = await fetchReservation(url);
+			return holder.querySelector("#ReservationId")?.value ?? "";
+		} catch (error) {
+			console.error("Pack&Ship Extended could not read the reservation id.", error);
+			return "";
+		}
 	}
 	async function fetchReservation(url) {
 		return new Promise((resolve) => {
@@ -7021,76 +7060,347 @@
 		});
 		return updatePromise;
 	}
-	var _hoisted_1$30 = ["aria-label"];
-	var _hoisted_2$30 = { class: "pse-modal-head" };
-	var _hoisted_3$25 = { class: "pse-modal-title" };
-	var _hoisted_4$22 = { class: "pse-modal-body" };
-	var _hoisted_5$21 = {
-		key: 0,
-		class: "pse-modal-foot"
+	var ErpSignedOutError = class extends Error {
+		constructor() {
+			super("The ERP session has expired.");
+			this.name = "ErpSignedOutError";
+		}
 	};
-	var ModalShell_vue_vue_type_script_setup_true_lang_default = defineComponent({
-		__name: "ModalShell",
-		props: {
-			title: {},
-			size: { default: "md" },
-			elevated: {
-				type: Boolean,
-				default: false
+	var STEP_TIMEOUT = 2e4;
+	var framePromise;
+	var currentPage = "";
+	var queue = Promise.resolve();
+	function erpTask(work) {
+		const run = async () => {
+			watchFocus();
+			try {
+				return await work(await ensurePage());
+			} finally {
+				releaseFocus();
+			}
+		};
+		const result = queue.then(run, run);
+		queue = result.catch(() => void 0);
+		return result;
+	}
+	async function ensurePage() {
+		const frame = await ensureFrame();
+		return {
+			get document() {
+				requireSession(frame);
+				return frame.contentDocument;
 			},
-			dismissable: {
-				type: Boolean,
-				default: true
+			async open(pathAndQuery) {
+				if (currentPage == pathAndQuery && frame.contentDocument?.body) {
+					requireSession(frame);
+					return frame.contentDocument;
+				}
+				const loaded = whenLoaded(frame, pathAndQuery);
+				frame.src = `${ERP_URL}/${pathAndQuery.replace(/^\//, "")}`;
+				await loaded;
+				requireSession(frame);
+				currentPage = pathAndQuery;
+				return frame.contentDocument;
+			},
+			async call(functionName, ...args) {
+				const target = frame.contentWindow[functionName];
+				if (typeof target != "function") throw new Error(`The ERP screen has no ${functionName}().`);
+				const loaded = whenLoaded(frame, functionName);
+				target.apply(frame.contentWindow, args);
+				await loaded;
+				requireSession(frame);
+				currentPage = "";
+				return frame.contentDocument;
+			},
+			async press(elementId, what) {
+				const button = frame.contentDocument?.getElementById(elementId);
+				if (!button) throw new Error(`The ERP screen has no ${what} control (#${elementId}).`);
+				const loaded = whenLoaded(frame, what);
+				button.click();
+				await loaded;
+				requireSession(frame);
+				currentPage = "";
+				return frame.contentDocument;
+			},
+			find(selector) {
+				requireSession(frame);
+				return frame.contentDocument.querySelector(selector);
+			},
+			get window() {
+				requireSession(frame);
+				return frame.contentWindow;
 			}
-		},
-		emits: ["close"],
-		setup(__props, { emit: __emit }) {
-			const props = __props;
-			const emit = __emit;
-			onMounted(() => document.addEventListener("keydown", onKeydown));
-			onBeforeUnmount(() => document.removeEventListener("keydown", onKeydown));
-			function onKeydown(event) {
-				if (event.key == "Escape" && props.dismissable) emit("close");
+		};
+	}
+	function ensureFrame() {
+		framePromise ??= createFrame();
+		return framePromise;
+	}
+	var frameElement;
+	var lastFocusOutsideFrame = null;
+	var FOCUS_WATCH_INTERVAL = 100;
+	var FOCUS_WATCH_TAIL = 1e3;
+	var focusWatchJobs = 0;
+	var focusWatchTimer;
+	var focusWatchStopTimer;
+	document.addEventListener("focusin", (event) => {
+		lastFocusOutsideFrame = outsideFocusCandidate(event.target) ?? lastFocusOutsideFrame;
+	}, true);
+	function handFocusBack() {
+		const frame = frameElement;
+		if (!frame) return;
+		if (document.activeElement != frame) {
+			lastFocusOutsideFrame = outsideFocusCandidate(document.activeElement) ?? lastFocusOutsideFrame;
+			return;
+		}
+		const previous = lastFocusOutsideFrame;
+		frame.blur();
+		if (previous instanceof HTMLElement && previous.isConnected) previous.focus({ preventScroll: true });
+	}
+	function outsideFocusCandidate(element) {
+		return element && element != document.body && element != frameElement ? element : null;
+	}
+	function watchFocus() {
+		focusWatchJobs++;
+		lastFocusOutsideFrame = outsideFocusCandidate(document.activeElement) ?? lastFocusOutsideFrame;
+		window.clearTimeout(focusWatchStopTimer);
+		focusWatchStopTimer = void 0;
+		focusWatchTimer ??= window.setInterval(handFocusBack, FOCUS_WATCH_INTERVAL);
+	}
+	function releaseFocus() {
+		focusWatchJobs = Math.max(0, focusWatchJobs - 1);
+		if (focusWatchJobs > 0 || focusWatchStopTimer !== void 0) return;
+		focusWatchStopTimer = window.setTimeout(() => {
+			focusWatchStopTimer = void 0;
+			if (focusWatchJobs == 0) {
+				window.clearInterval(focusWatchTimer);
+				focusWatchTimer = void 0;
 			}
-			function onBackdropClick(event) {
-				if (props.dismissable && event.target == event.currentTarget) emit("close");
+		}, FOCUS_WATCH_TAIL);
+	}
+	var mainItemListener;
+	function whenErpHandsBackItem(listener) {
+		mainItemListener = listener;
+		return () => {
+			if (mainItemListener == listener) mainItemListener = void 0;
+		};
+	}
+	function standInForLauncher() {
+		const host = window;
+		if (typeof host["getMainWindow"] == "function") return;
+		host[ERP_MAIN_ITEM_FUNCTION] = (_source, itemId) => {
+			mainItemListener?.(String(itemId ?? "").trim());
+		};
+		const nothing = () => void 0;
+		const launcher = {
+			ModalDialogs: [],
+			CloseButtonUrl: "",
+			RetailVistaPage: {
+				DisplayLoadingMessage: nothing,
+				HideLoadingMessage: nothing
 			}
-			return (_ctx, _cache) => {
-				return openBlock(), createElementBlock("div", {
-					class: normalizeClass(["pse-modal", { "is-elevated": __props.elevated }]),
-					role: "dialog",
-					"aria-modal": "true",
-					"aria-label": __props.title,
-					onMousedown: onBackdropClick
-				}, [createBaseVNode("div", { class: normalizeClass(["pse-modal-panel", `is-${__props.size}`]) }, [
-					createBaseVNode("header", _hoisted_2$30, [createBaseVNode("h2", _hoisted_3$25, toDisplayString(__props.title), 1), createBaseVNode("button", {
-						type: "button",
-						class: "pse-modal-close",
-						"aria-label": "Sluiten",
-						onClick: _cache[0] || (_cache[0] = ($event) => emit("close"))
-					}, [..._cache[1] || (_cache[1] = [createBaseVNode("svg", {
-						viewBox: "0 0 24 24",
-						width: "17",
-						height: "17",
-						fill: "none",
-						stroke: "currentColor",
-						"stroke-width": "2.2",
-						"stroke-linecap": "round",
-						"aria-hidden": "true"
-					}, [createBaseVNode("path", { d: "M6 6l12 12M18 6L6 18" })], -1)])])]),
-					createBaseVNode("div", _hoisted_4$22, [renderSlot(_ctx.$slots, "default", {}, void 0, true)]),
-					_ctx.$slots.footer ? (openBlock(), createElementBlock("footer", _hoisted_5$21, [renderSlot(_ctx.$slots, "footer", {}, void 0, true)])) : createCommentVNode("", true)
-				], 2)], 42, _hoisted_1$30);
+		};
+		host[ERP_MAIN_WINDOW_FUNCTION] = () => launcher;
+	}
+	async function createFrame() {
+		standInForLauncher();
+		const frame = document.createElement("iframe");
+		frame.className = "pse-erp-frame";
+		frame.setAttribute("aria-hidden", "true");
+		frame.setAttribute("tabindex", "-1");
+		frame.title = "RetailVista";
+		frame.src = "about:blank";
+		const loaded = whenLoaded(frame, "the ERP frame");
+		frameElement = frame;
+		document.body.append(frame);
+		await loaded;
+		currentPage = "";
+		return frame;
+	}
+	function whenLoaded(frame, what) {
+		return new Promise((resolve, reject) => {
+			const timer = window.setTimeout(() => {
+				frame.removeEventListener("load", onLoad);
+				reject(new Error(`Timed out waiting for ${what}.`));
+			}, STEP_TIMEOUT);
+			function onLoad() {
+				window.clearTimeout(timer);
+				window.setTimeout(resolve, 0);
+			}
+			frame.addEventListener("load", onLoad, { once: true });
+		});
+	}
+	function requireSession(frame) {
+		const document_ = frame.contentDocument;
+		if (!document_ || document_.body?.innerHTML.includes("txtCompanyNumber")) {
+			currentPage = "";
+			throw new ErpSignedOutError();
+		}
+	}
+	function resetErpFrame() {
+		framePromise?.then((frame) => frame.remove()).catch(() => void 0);
+		framePromise = void 0;
+		frameElement = void 0;
+		currentPage = "";
+	}
+	function readReservationNote(reservationId) {
+		return erpTask(async (page) => {
+			await showReservation(page, reservationId);
+			return noteField(page).value;
+		});
+	}
+	function readReservationNotes(reservationIds) {
+		return erpTask(async (page) => {
+			const notes = new Map();
+			for (const id of reservationIds) {
+				if (!id || notes.has(id)) continue;
+				try {
+					await showReservation(page, id);
+					notes.set(id, noteField(page).value);
+				} catch (error) {
+					if (error instanceof ErpSignedOutError) throw error;
+					debug("Could not read the note of reservation", id, error);
+				}
+			}
+			return notes;
+		});
+	}
+	function writeReservationNote(reservationId, text) {
+		return erpTask(async (page) => {
+			await showReservation(page, reservationId);
+			await page.press(ERP_EDIT_BUTTON_ID, "edit");
+			const field = noteField(page);
+			if (field.readOnly) throw new Error("The reservation note is still read-only after entering edit mode.");
+			field.value = text;
+			field.dispatchEvent(new Event("input", { bubbles: true }));
+			field.dispatchEvent(new Event("change", { bubbles: true }));
+			await page.press(ERP_SAVE_BUTTON_ID, "save");
+			const saved = noteField(page).value;
+			debug("Wrote the reservation note.", {
+				reservationId,
+				length: saved.length
+			});
+			return saved;
+		});
+	}
+	async function showReservation(page, reservationId) {
+		await page.open(`${ERP_PAGE_PATH}?pageId=374`);
+		if (page.find("[name$=\"rvcNote$TextBox\"]")) debug("The ERP reservation screen is already showing a record.");
+		await page.call(ERP_SET_ITEM_FUNCTION, Number(reservationId), "view");
+	}
+	function noteField(page) {
+		const field = page.find(ERP_NOTE_SELECTOR);
+		if (!field) throw new Error("The ERP reservation screen has no note field.");
+		return field;
+	}
+	var known = new Map();
+	async function findReservationId(reservationNumber) {
+		const number = reservationNumber.trim();
+		if (!number) return "";
+		const remembered = known.get(number);
+		if (remembered) return remembered;
+		const id = await erpTask((page) => look(page, number));
+		if (id) known.set(number, id);
+		return id;
+	}
+	async function look(page, number) {
+		await page.open(`${ERP_PAGE_PATH}?pageId=374`);
+		const searchPageId = Number(page.window[ERP_SEARCH_PAGE_ID_VARIABLE]);
+		if (!searchPageId) throw new Error("The ERP reservation screen does not name a search form.");
+		await page.open(`${ERP_PAGE_PATH}?pageId=${searchPageId}`);
+		const field = page.find(ERP_SEARCH_NUMBER_SELECTOR);
+		const submit = page.find(ERP_SEARCH_SUBMIT_SELECTOR);
+		if (!field || !submit) throw new Error("The reservation search form is missing its number field or its search button.");
+		field.value = number;
+		field.dispatchEvent(new Event("input", { bubbles: true }));
+		field.dispatchEvent(new Event("change", { bubbles: true }));
+		let handedBack = "";
+		const stopListening = whenErpHandsBackItem((itemId) => handedBack = itemId);
+		let found;
+		try {
+			await page.press(submit.id, "the reservation search");
+			found = await settle(page, number, () => handedBack);
+		} finally {
+			stopListening();
+		}
+		if (!found) {
+			debug("The ERP knows no reservation with this number, in this store", number);
+			return "";
+		}
+		await confirm(page, found, number);
+		debug("Looked up a reservation by number", {
+			number,
+			id: found
+		});
+		return found;
+	}
+	var ANSWER_TIMEOUT = 8e3;
+	var ANSWER_INTERVAL = 150;
+	function settle(page, number, handedBack) {
+		return new Promise((resolve, reject) => {
+			const deadline = performance.now() + ANSWER_TIMEOUT;
+			const look = () => {
+				try {
+					const given = handedBack();
+					if (given) {
+						resolve(given);
+						return;
+					}
+					if (findGrid(page)) {
+						resolve(readResult(page, number));
+						return;
+					}
+				} catch (error) {
+					reject(error);
+					return;
+				}
+				if (performance.now() > deadline) {
+					reject(new Error("The reservation search never came back with a result."));
+					return;
+				}
+				window.setTimeout(look, ANSWER_INTERVAL);
+			};
+			look();
+		});
+	}
+	function readResult(page, number) {
+		const grid = findGrid(page);
+		if (!grid) throw new Error("The reservation search came back without a result grid.");
+		const matches = grid.rows.filter((row) => row.some((cell) => String(cell ?? "").trim() == number));
+		if (matches.length != 1) {
+			debug("The reservation search did not come back with one row", {
+				number,
+				rows: matches.length
+			});
+			return "";
+		}
+		return String(matches[0][grid.keyIndex] ?? "").trim();
+	}
+	function findGrid(page) {
+		const window_ = page.window;
+		for (const name of Object.keys(window_)) {
+			let value;
+			try {
+				value = window_[name];
+			} catch {
+				continue;
+			}
+			const candidate = value;
+			if (!candidate || typeof candidate != "object" || !Array.isArray(candidate.Data)) continue;
+			const keyIndex = Number(candidate.DataKeyField ?? 0);
+			if (!Number.isInteger(keyIndex) || keyIndex < 0) continue;
+			return {
+				rows: candidate.Data,
+				keyIndex
 			};
 		}
-	});
-	var _plugin_vue_export_helper_default = (sfc, props) => {
-		const target = sfc.__vccOpts || sfc;
-		for (const [key, val] of props) target[key] = val;
-		return target;
-	};
-	var ModalShell_default = _plugin_vue_export_helper_default(ModalShell_vue_vue_type_script_setup_true_lang_default, [["__scopeId", "data-v-66d77727"]]);
-	var shopware_default = "data:image/svg+xml,%3csvg%20width='34'%20height='34'%20xmlns='http://www.w3.org/2000/svg'%20xmlns:xlink='http://www.w3.org/1999/xlink'%3e%3cdefs%3e%3cpath%20d='M26.927%2030.07a.244.244%200%2001-.002.39%2016.76%2016.76%200%2001-10.04%203.307c-4.51%200-8.75-1.756-11.94-4.944A16.772%2016.772%200%20010%2016.884c0-4.51%201.756-8.75%204.945-11.939A16.775%2016.775%200%200116.885%200c4.173%200%208.18%201.535%2011.28%204.323a.243.243%200%2001-.195.42%2028.559%2028.559%200%2000-3.86-.248c-4.918%200-8.911%201.096-11.548%203.172-2.35%201.85-3.593%204.41-3.593%207.404%200%203.338%201.277%205.976%203.905%208.067%202.319%201.846%205.408%203.044%208.133%204.1%202.29.889%204.453%201.727%205.92%202.832zm6.77-14.746c.046.537.07%201.062.07%201.56%200%202.12-.389%204.19-1.155%206.154a.244.244%200%2001-.344.124c-2.008-1.114-4.195-1.93-6.31-2.718-4.104-1.53-7.647-2.852-7.647-5.752%200-1.035.433-1.917%201.252-2.55.946-.73%202.363-1.101%204.21-1.101%203.463%200%206.313%201.192%209.837%204.117.05.041.08.102.086.166z'%20id='a'/%3e%3c/defs%3e%3cuse%20fill='%23FFF'%20xlink:href='%23a'%20fill-rule='evenodd'/%3e%3c/svg%3e";
+	}
+	async function confirm(page, id, number) {
+		await page.open(`${ERP_PAGE_PATH}?pageId=374`);
+		await page.call(ERP_SET_ITEM_FUNCTION, Number(id), "view");
+		const shown = page.find(ERP_SEARCH_NUMBER_SELECTOR)?.value?.trim();
+		if (shown != number) throw new Error(`The ERP record ${id} is reservation ${shown || "(none)"}, not ${number}.`);
+	}
 	var RACK = [
 		{
 			letter: "A",
@@ -7183,945 +7493,6 @@
 			const slot = entry.slice(separator + 1).trim().toUpperCase();
 			if (barcode && isSlot(slot)) into.lines[barcode] = slot;
 		}
-	}
-	var _hoisted_1$29 = { class: "pse-note" };
-	var _hoisted_2$29 = {
-		key: 0,
-		class: "pse-note-alert"
-	};
-	var _hoisted_3$24 = { class: "pse-note-card" };
-	var _hoisted_4$21 = ["aria-expanded", "title"];
-	var _hoisted_5$20 = ["src"];
-	var _hoisted_6$17 = {
-		key: 0,
-		class: "pse-note-spinner",
-		role: "status",
-		"aria-label": "Notitie wordt opgehaald"
-	};
-	var _hoisted_7$15 = {
-		key: 1,
-		class: "pse-note-empty"
-	};
-	var _hoisted_8$14 = { class: "pse-note-collapse-inner" };
-	var _hoisted_9$13 = { class: "pse-note-body" };
-	var _hoisted_10$13 = ["disabled", "placeholder"];
-	var _hoisted_11$11 = {
-		key: 1,
-		class: "pse-note-field pse-note-field-waiting",
-		"aria-hidden": "true"
-	};
-	var _hoisted_12$10 = { class: "pse-note-actions" };
-	var _hoisted_13$10 = ["disabled"];
-	var _hoisted_14$9 = ["disabled"];
-	var ShopwareNote_default = _plugin_vue_export_helper_default(defineComponent({
-		__name: "ShopwareNote",
-		props: {
-			orderData: {},
-			enabled: { type: Boolean },
-			showOpen: { type: Boolean },
-			showAlert: { type: Boolean }
-		},
-		emits: ["save", "open"],
-		setup(__props) {
-			const props = __props;
-			const note = computed({
-				get: () => props.orderData ? parseComment(props.orderData.customerComment).text : "",
-				set: (value) => {
-					if (props.orderData) props.orderData.customerComment = stripMarkers(value);
-				}
-			});
-			const hasNote = computed(() => Boolean(note.value.trim()));
-			const ready = computed(() => props.enabled && Boolean(props.orderData));
-			const loading = computed(() => !props.orderData);
-			const open = ref(false);
-			watch(() => props.orderData, (order) => {
-				if (order) open.value = hasNote.value;
-			}, { immediate: true });
-			return (_ctx, _cache) => {
-				return openBlock(), createElementBlock("section", _hoisted_1$29, [createVNode(Transition, null, {
-					default: withCtx(() => [__props.showAlert && hasNote.value ? (openBlock(), createElementBlock("p", _hoisted_2$29, [..._cache[4] || (_cache[4] = [createBaseVNode("span", {
-						class: "material-icons pse-note-alert-icon",
-						"aria-hidden": "true"
-					}, "error_outline", -1), createTextVNode(" Let op — er is een notitie bij deze order. ", -1)])])) : createCommentVNode("", true)]),
-					_: 1
-				}), createBaseVNode("div", _hoisted_3$24, [createBaseVNode("button", {
-					type: "button",
-					class: "pse-note-head",
-					"aria-expanded": open.value,
-					title: open.value ? "Notitie inklappen" : "Notitie uitklappen",
-					onClick: _cache[0] || (_cache[0] = ($event) => open.value = !open.value)
-				}, [
-					createBaseVNode("img", {
-						class: "pse-note-logo",
-						src: unref(shopware_default),
-						alt: ""
-					}, null, 8, _hoisted_5$20),
-					_cache[5] || (_cache[5] = createBaseVNode("h3", { class: "pse-note-title" }, "Shopware notitie", -1)),
-					loading.value ? (openBlock(), createElementBlock("span", _hoisted_6$17)) : !open.value && !hasNote.value ? (openBlock(), createElementBlock("span", _hoisted_7$15, "Geen notitie")) : createCommentVNode("", true),
-					createBaseVNode("span", {
-						class: normalizeClass(["material-icons pse-note-chevron", { "is-open": open.value }]),
-						"aria-hidden": "true"
-					}, "expand_more", 2)
-				], 8, _hoisted_4$21), createBaseVNode("div", { class: normalizeClass(["pse-note-collapse", { "is-open": open.value }]) }, [createBaseVNode("div", _hoisted_8$14, [createBaseVNode("div", _hoisted_9$13, [__props.orderData ? withDirectives((openBlock(), createElementBlock("textarea", {
-					key: 0,
-					class: "pse-note-field",
-					"onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => note.value = $event),
-					disabled: !ready.value,
-					placeholder: ready.value ? "Nog geen notitie..." : ""
-				}, null, 8, _hoisted_10$13)), [[vModelText, note.value]]) : (openBlock(), createElementBlock("div", _hoisted_11$11, [..._cache[6] || (_cache[6] = [createBaseVNode("span", { class: "pse-note-shimmer" }, null, -1), createBaseVNode("span", { class: "pse-note-shimmer pse-note-shimmer-short" }, null, -1)])])), createBaseVNode("div", _hoisted_12$10, [__props.showOpen ? (openBlock(), createElementBlock("button", {
-					key: 0,
-					type: "button",
-					class: "pse-note-btn pse-note-btn-quiet",
-					disabled: !ready.value,
-					onClick: _cache[2] || (_cache[2] = ($event) => _ctx.$emit("open"))
-				}, " Open in Shopware ", 8, _hoisted_13$10)) : createCommentVNode("", true), createBaseVNode("button", {
-					type: "button",
-					class: "pse-note-btn",
-					disabled: !ready.value,
-					onClick: _cache[3] || (_cache[3] = ($event) => _ctx.$emit("save"))
-				}, " Opslaan ", 8, _hoisted_14$9)])])])], 2)])]);
-			};
-		}
-	}), [["__scopeId", "data-v-ab3fbaa7"]]);
-	async function writeToClipboard(value) {
-		try {
-			await navigator.clipboard.writeText(value);
-			return true;
-		} catch {
-			return copyFallback(value);
-		}
-	}
-	function copyFallback(value) {
-		const field = document.createElement("textarea");
-		field.value = value;
-		field.style.cssText = "position:fixed;top:-1000px;opacity:0;";
-		document.body.append(field);
-		field.select();
-		let copied = false;
-		try {
-			copied = document.execCommand("copy");
-		} catch (error) {
-			console.error("Pack&Ship Extended could not copy to the clipboard.", error);
-		}
-		field.remove();
-		return copied;
-	}
-	var _hoisted_1$28 = ["title"];
-	var _hoisted_2$28 = {
-		class: "material-icons pse-copy-icon",
-		"aria-hidden": "true"
-	};
-	var CopyButton_default = defineComponent({
-		__name: "CopyButton",
-		props: {
-			value: {},
-			label: {}
-		},
-		setup(__props) {
-			const props = __props;
-			const state = ref();
-			let timeout;
-			const icon = computed(() => state.value == void 0 ? "content_copy" : state.value ? "check" : "error_outline");
-			onUnmounted(() => clearTimeout(timeout));
-			async function copy() {
-				if (!props.value) return;
-				state.value = await writeToClipboard(props.value);
-				clearTimeout(timeout);
-				timeout = setTimeout(() => state.value = void 0, 1400);
-			}
-			return (_ctx, _cache) => {
-				return openBlock(), createElementBlock("button", {
-					type: "button",
-					class: normalizeClass(["pse-copy", {
-						"is-copied": state.value == true,
-						"is-failed": state.value == false
-					}]),
-					title: `${__props.label} kopiëren`,
-					onClick: _cache[0] || (_cache[0] = withModifiers(($event) => copy(), ["stop"]))
-				}, [createBaseVNode("span", _hoisted_2$28, toDisplayString(icon.value), 1)], 10, _hoisted_1$28);
-			};
-		}
-	});
-	var _hoisted_1$27 = { class: "pse-rescard-head" };
-	var _hoisted_2$27 = { class: "pse-rescard-id" };
-	var _hoisted_3$23 = { class: "pse-rescard-number" };
-	var _hoisted_4$20 = { class: "pse-rescard-reference" };
-	var _hoisted_5$19 = { class: "pse-rescard-facts" };
-	var _hoisted_6$16 = { class: "pse-rescard-fact" };
-	var _hoisted_7$14 = { class: "pse-rescard-fact" };
-	var _hoisted_8$13 = { class: "pse-rescard-fact" };
-	var _hoisted_9$12 = {
-		key: 0,
-		class: "pse-rescard-products"
-	};
-	var _hoisted_10$12 = { class: "pse-table" };
-	var _hoisted_11$10 = { class: "pse-cell-barcode" };
-	var _hoisted_12$9 = { class: "pse-cell-description" };
-	var _hoisted_13$9 = { class: "pse-cell-barcode" };
-	var _hoisted_14$8 = { class: "pse-copy-cell" };
-	var _hoisted_15$7 = { class: "pse-table-right" };
-	var _hoisted_16$6 = { class: "pse-rescard-amount" };
-	var _hoisted_17$5 = {
-		key: 1,
-		class: "pse-rescard-note"
-	};
-	var ReservationCard_default = _plugin_vue_export_helper_default(defineComponent({
-		__name: "ReservationCard",
-		props: {
-			reservation: {},
-			showProducts: { type: Boolean },
-			showOpenButton: { type: Boolean },
-			highlightIncomplete: { type: Boolean },
-			showNote: { type: Boolean },
-			noteEnabled: { type: Boolean }
-		},
-		emits: ["open", "saveNote"],
-		setup(__props) {
-			const props = __props;
-			function hasShopwareNote() {
-				return matchShopwareOrderNumber(props.reservation.saleOrderReference);
-			}
-			function isShort(amount) {
-				return props.highlightIncomplete && !isAmountStringComplete(amount);
-			}
-			return (_ctx, _cache) => {
-				return openBlock(), createElementBlock("article", { class: normalizeClass(["pse-rescard", { "is-incomplete": __props.highlightIncomplete }]) }, [
-					createBaseVNode("header", _hoisted_1$27, [
-						createBaseVNode("div", _hoisted_2$27, [createBaseVNode("span", _hoisted_3$23, toDisplayString(__props.reservation.reservationNumber), 1), createBaseVNode("span", _hoisted_4$20, toDisplayString(__props.reservation.saleOrderReference), 1)]),
-						createBaseVNode("dl", _hoisted_5$19, [
-							createBaseVNode("div", _hoisted_6$16, [_cache[2] || (_cache[2] = createBaseVNode("dt", null, "Klant", -1)), createBaseVNode("dd", null, toDisplayString(__props.reservation.customer), 1)]),
-							createBaseVNode("div", _hoisted_7$14, [_cache[3] || (_cache[3] = createBaseVNode("dt", null, "Status", -1)), createBaseVNode("dd", null, toDisplayString(__props.reservation.status), 1)]),
-							createBaseVNode("div", _hoisted_8$13, [_cache[4] || (_cache[4] = createBaseVNode("dt", null, "Logistiek", -1)), createBaseVNode("dd", null, toDisplayString(__props.reservation.deliveryStatus), 1)])
-						]),
-						createVNode(Transition, null, {
-							default: withCtx(() => [__props.showOpenButton ? (openBlock(), createElementBlock("button", {
-								key: 0,
-								type: "button",
-								class: "pse-rescard-open",
-								onClick: _cache[0] || (_cache[0] = ($event) => _ctx.$emit("open", __props.reservation.url))
-							}, [..._cache[5] || (_cache[5] = [createTextVNode(" Open ", -1), createBaseVNode("span", {
-								class: "material-icons pse-rescard-open-icon",
-								"aria-hidden": "true"
-							}, "chevron_right", -1)])])) : createCommentVNode("", true)]),
-							_: 1
-						})
-					]),
-					__props.showProducts ? (openBlock(), createElementBlock("div", _hoisted_9$12, [createBaseVNode("table", _hoisted_10$12, [_cache[6] || (_cache[6] = createBaseVNode("thead", null, [createBaseVNode("tr", null, [
-						createBaseVNode("th", null, "Artikel nr"),
-						createBaseVNode("th", null, "Omschrijving"),
-						createBaseVNode("th", null, "Hoofd barcode"),
-						createBaseVNode("th", { class: "pse-table-right" }, "Geraapt")
-					])], -1)), createBaseVNode("tbody", null, [(openBlock(true), createElementBlock(Fragment, null, renderList(__props.reservation.products, (product, index) => {
-						return openBlock(), createElementBlock("tr", {
-							key: index,
-							class: normalizeClass({ "is-short": isShort(product.amount) })
-						}, [
-							createBaseVNode("td", _hoisted_11$10, toDisplayString(product.number), 1),
-							createBaseVNode("td", _hoisted_12$9, toDisplayString(product.description), 1),
-							createBaseVNode("td", _hoisted_13$9, [createBaseVNode("span", _hoisted_14$8, [createTextVNode(toDisplayString(product.barcode) + " ", 1), createVNode(CopyButton_default, {
-								value: product.barcode,
-								label: "Barcode"
-							}, null, 8, ["value"])])]),
-							createBaseVNode("td", _hoisted_15$7, [createBaseVNode("span", _hoisted_16$6, toDisplayString(product.amount), 1)])
-						], 2);
-					}), 128))])])])) : createCommentVNode("", true),
-					__props.showNote && hasShopwareNote() ? (openBlock(), createElementBlock("div", _hoisted_17$5, [createVNode(ShopwareNote_default, {
-						"order-data": __props.reservation.swOrderData,
-						enabled: !!__props.noteEnabled,
-						onSave: _cache[1] || (_cache[1] = ($event) => _ctx.$emit("saveNote"))
-					}, null, 8, ["order-data", "enabled"])])) : createCommentVNode("", true)
-				], 2);
-			};
-		}
-	}), [["__scopeId", "data-v-99ff8266"]]);
-	var _hoisted_1$26 = { class: "pse-row-number" };
-	var _hoisted_2$26 = { class: "pse-row-customer" };
-	var _hoisted_3$22 = { class: "pse-row-reference" };
-	var _hoisted_4$19 = { key: 2 };
-	var ReservationRow_default = _plugin_vue_export_helper_default(defineComponent({
-		__name: "ReservationRow",
-		props: {
-			reservation: {},
-			status: {},
-			showOpen: { type: Boolean }
-		},
-		emits: ["open"],
-		setup(__props) {
-			const props = __props;
-			const STATES = {
-				[MassCompleteStatus.idle]: {
-					label: "In wachtrij",
-					modifier: "is-queued"
-				},
-				[MassCompleteStatus.started]: {
-					label: "Bezig",
-					modifier: "is-busy"
-				},
-				[MassCompleteStatus.finished]: {
-					label: "Afgerond",
-					modifier: "is-done"
-				},
-				[MassCompleteStatus.failed]: {
-					label: "Mislukt",
-					modifier: "is-failed"
-				},
-				[MassCompleteStatus.stopped]: {
-					label: "Gestopt",
-					modifier: "is-stopped"
-				}
-			};
-			const state = computed(() => props.status == void 0 ? void 0 : STATES[props.status] ?? STATES[MassCompleteStatus.failed]);
-			return (_ctx, _cache) => {
-				return openBlock(), createElementBlock("div", { class: normalizeClass(["pse-row", state.value?.modifier]) }, [
-					createBaseVNode("span", _hoisted_1$26, toDisplayString(__props.reservation.reservationNumber), 1),
-					createBaseVNode("span", _hoisted_2$26, toDisplayString(__props.reservation.customer), 1),
-					createBaseVNode("span", _hoisted_3$22, toDisplayString(__props.reservation.saleOrderReference), 1),
-					state.value ? (openBlock(), createElementBlock("span", {
-						key: 0,
-						class: normalizeClass(["pse-row-state", state.value.modifier])
-					}, [_cache[1] || (_cache[1] = createBaseVNode("span", {
-						class: "pse-row-mark",
-						"aria-hidden": "true"
-					}, null, -1)), createTextVNode(" " + toDisplayString(state.value.label), 1)], 2)) : __props.showOpen ? (openBlock(), createElementBlock("button", {
-						key: 1,
-						type: "button",
-						class: "pse-row-open",
-						onClick: _cache[0] || (_cache[0] = ($event) => _ctx.$emit("open", __props.reservation.url))
-					}, [..._cache[2] || (_cache[2] = [createTextVNode(" Open ", -1), createBaseVNode("span", {
-						class: "material-icons pse-row-open-icon",
-						"aria-hidden": "true"
-					}, "chevron_right", -1)])])) : (openBlock(), createElementBlock("span", _hoisted_4$19))
-				], 2);
-			};
-		}
-	}), [["__scopeId", "data-v-51c20dba"]]);
-	var _hoisted_1$25 = { class: "pse-mc-head" };
-	var _hoisted_2$25 = { class: "pse-mc-titles" };
-	var _hoisted_3$21 = {
-		key: 0,
-		class: "pse-mc-subtitle"
-	};
-	var _hoisted_4$18 = {
-		key: 1,
-		class: "pse-mc-subtitle"
-	};
-	var _hoisted_5$18 = {
-		key: 2,
-		class: "pse-mc-subtitle"
-	};
-	var _hoisted_6$15 = {
-		key: 3,
-		class: "pse-mc-subtitle"
-	};
-	var _hoisted_7$13 = {
-		key: 4,
-		class: "pse-mc-subtitle"
-	};
-	var _hoisted_8$12 = {
-		key: 0,
-		class: "pse-mc-controls"
-	};
-	var _hoisted_9$11 = { class: "pse-mc-stepper" };
-	var _hoisted_10$11 = ["disabled"];
-	var _hoisted_11$9 = ["value"];
-	var _hoisted_12$8 = ["disabled"];
-	var _hoisted_13$8 = {
-		key: 1,
-		class: "pse-mc-tally"
-	};
-	var _hoisted_14$7 = { class: "pse-mc-tally-count" };
-	var _hoisted_15$6 = { class: "pse-mc-tally-of" };
-	var _hoisted_16$5 = { class: "pse-mc-tally-label" };
-	var _hoisted_17$4 = {
-		key: 0,
-		class: "pse-mc-progress"
-	};
-	var MassCompletePanel_default = _plugin_vue_export_helper_default(defineComponent({
-		__name: "MassCompletePanel",
-		props: {
-			total: {},
-			max: {},
-			amount: {},
-			started: { type: Boolean },
-			finished: {},
-			failed: {},
-			stopped: { type: Boolean }
-		},
-		emits: ["update:amount", "start"],
-		setup(__props, { emit: __emit }) {
-			const props = __props;
-			const emit = __emit;
-			const settled = computed(() => props.finished + props.failed);
-			const done = computed(() => props.started && (props.stopped || settled.value >= props.amount));
-			const progress = computed(() => props.started && props.amount > 0 ? Math.round(settled.value / props.amount * 100) : 0);
-			function step(by) {
-				emit("update:amount", props.amount + by);
-			}
-			return (_ctx, _cache) => {
-				return openBlock(), createElementBlock("section", { class: normalizeClass(["pse-mc", {
-					"is-running": __props.started && !done.value,
-					"is-done": done.value,
-					"is-stopped": __props.stopped
-				}]) }, [createBaseVNode("div", _hoisted_1$25, [
-					_cache[6] || (_cache[6] = createBaseVNode("span", {
-						class: "pse-mc-icon",
-						"aria-hidden": "true"
-					}, [createBaseVNode("svg", {
-						viewBox: "0 0 24 24",
-						width: "19",
-						height: "19",
-						fill: "none",
-						stroke: "currentColor",
-						"stroke-width": "2",
-						"stroke-linecap": "round",
-						"stroke-linejoin": "round"
-					}, [createBaseVNode("path", { d: "M4 7h16M4 12h16M4 17h9" }), createBaseVNode("path", { d: "M15.5 18.5l2 2 4-4.5" })])], -1)),
-					createBaseVNode("div", _hoisted_2$25, [_cache[5] || (_cache[5] = createBaseVNode("h3", { class: "pse-mc-title" }, "Massa voltooien", -1)), !__props.started ? (openBlock(), createElementBlock("p", _hoisted_3$21, " Opent " + toDisplayString(__props.amount) + " van de " + toDisplayString(__props.total) + " reserveringen in de achtergrond en rondt ze af. ", 1)) : !done.value ? (openBlock(), createElementBlock("p", _hoisted_4$18, toDisplayString(settled.value) + " van " + toDisplayString(__props.amount) + " afgerond — laat dit scherm openstaan. ", 1)) : __props.stopped ? (openBlock(), createElementBlock("p", _hoisted_5$18, " Gestopt na een mislukte reservering. " + toDisplayString(__props.finished) + " afgerond, de rest is niet geprobeerd — het tabblad met de fout staat nog open. ", 1)) : __props.failed > 0 ? (openBlock(), createElementBlock("p", _hoisted_6$15, toDisplayString(__props.finished) + " afgerond, " + toDisplayString(__props.failed) + " mislukt. Mislukte reserveringen staan hieronder. ", 1)) : (openBlock(), createElementBlock("p", _hoisted_7$13, " Alle " + toDisplayString(__props.finished) + " reserveringen zijn afgerond. ", 1))]),
-					!__props.started ? (openBlock(), createElementBlock("div", _hoisted_8$12, [createBaseVNode("div", _hoisted_9$11, [
-						createBaseVNode("button", {
-							type: "button",
-							class: "pse-mc-step",
-							"aria-label": "Eén minder",
-							disabled: __props.amount <= 2,
-							onClick: _cache[0] || (_cache[0] = ($event) => step(-1))
-						}, "−", 8, _hoisted_10$11),
-						createBaseVNode("input", {
-							type: "number",
-							class: "pse-mc-amount",
-							value: __props.amount,
-							inputmode: "numeric",
-							"aria-label": "Aantal reserveringen",
-							onInput: _cache[1] || (_cache[1] = ($event) => emit("update:amount", Number($event.target.value))),
-							onFocusout: _cache[2] || (_cache[2] = ($event) => emit("update:amount", __props.amount))
-						}, null, 40, _hoisted_11$9),
-						createBaseVNode("button", {
-							type: "button",
-							class: "pse-mc-step",
-							"aria-label": "Eén meer",
-							disabled: __props.amount >= Math.min(__props.max, __props.total),
-							onClick: _cache[3] || (_cache[3] = ($event) => step(1))
-						}, "+", 8, _hoisted_12$8)
-					]), createBaseVNode("button", {
-						type: "button",
-						class: "pse-dialog-btn pse-mc-start",
-						onClick: _cache[4] || (_cache[4] = ($event) => emit("start"))
-					}, " Start voltooien ")])) : (openBlock(), createElementBlock("div", _hoisted_13$8, [createBaseVNode("span", _hoisted_14$7, [createTextVNode(toDisplayString(settled.value), 1), createBaseVNode("span", _hoisted_15$6, "/" + toDisplayString(__props.amount), 1)]), createBaseVNode("span", _hoisted_16$5, toDisplayString(__props.stopped ? "gestopt" : done.value ? "klaar" : "afgerond"), 1)]))
-				]), __props.started ? (openBlock(), createElementBlock("div", _hoisted_17$4, [createBaseVNode("div", {
-					class: "pse-mc-progress-fill",
-					style: normalizeStyle({ width: `${progress.value}%` })
-				}, null, 4)])) : createCommentVNode("", true)], 2);
-			};
-		}
-	}), [["__scopeId", "data-v-5c92f516"]]);
-	var _hoisted_1$24 = { class: "pse-found" };
-	var _hoisted_2$24 = { class: "pse-found-image" };
-	var _hoisted_3$20 = ["src"];
-	var _hoisted_4$17 = { class: "pse-found-text" };
-	var _hoisted_5$17 = { class: "pse-found-name" };
-	var _hoisted_6$14 = { class: "pse-found-barcode pse-copy-cell" };
-	var _hoisted_7$12 = { class: "pse-found-count" };
-	var _hoisted_8$11 = { class: "pse-found-count-number" };
-	var _hoisted_9$10 = {
-		key: 0,
-		class: "pse-countdown"
-	};
-	var _hoisted_10$10 = {
-		key: 0,
-		class: "pse-group"
-	};
-	var _hoisted_11$8 = { class: "pse-group-head" };
-	var _hoisted_12$7 = { class: "pse-group-title" };
-	var _hoisted_13$7 = { class: "pse-group-count" };
-	var _hoisted_14$6 = { class: "pse-rows" };
-	var _hoisted_15$5 = {
-		key: 1,
-		class: "pse-group"
-	};
-	var _hoisted_16$4 = { class: "pse-group-head" };
-	var _hoisted_17$3 = { class: "pse-group-title" };
-	var _hoisted_18$3 = { class: "pse-group-count" };
-	var _hoisted_19$3 = {
-		key: 2,
-		class: "pse-group"
-	};
-	var _hoisted_20$3 = { class: "pse-group-head" };
-	var _hoisted_21$3 = { class: "pse-group-title" };
-	var _hoisted_22$3 = { class: "pse-group-count" };
-	var massCompleteMax = 50;
-	var massCompleteThreshold = 2;
-	var ReservationSelectionModal_default = _plugin_vue_export_helper_default(defineComponent({
-		__name: "ReservationSelectionModal",
-		props: { modalData: {} },
-		emits: ["open", "close"],
-		setup(__props, { emit: __emit }) {
-			const emit = __emit;
-			const props = __props;
-			const swToken = ref();
-			const swCommentBoxesEnabled = ref(false);
-			const countdown = ref(2);
-			let saveTimeoutId;
-			const massCompleteShowDialog = ref(false);
-			const massCompleteStarted = ref(false);
-			const massCompleteAmount = ref(100);
-			const massCompleteStatus = ref();
-			const massCompleteStopped = ref(false);
-			initMassComplete();
-			onMounted(() => {
-				shopwareInitialize().then((token) => {
-					swToken.value = token;
-					retrieveCommentData();
-					autoSelectReservationCountdown();
-				});
-			});
-			function onSaveButtonClick(orderData, orderNumber) {
-				if (swToken.value) saveOrderComment(swToken.value, orderData, orderNumber);
-				swCommentBoxesEnabled.value = false;
-				if (saveTimeoutId) clearTimeout(saveTimeoutId);
-				saveTimeoutId = setTimeout(() => {
-					swCommentBoxesEnabled.value = true;
-				}, 250);
-			}
-			function retrieveCommentData() {
-				const reservationsToFetch = props.modalData.invalidReservations.concat(props.modalData.validReservations);
-				Promise.all(reservationsToFetch.map((reservation) => shopwareGetOrderData(swToken.value, reservation.saleOrderReference))).then((responses) => {
-					responses.forEach((response, index) => {
-						reservationsToFetch[index].swOrderData = response.data[0];
-					});
-				}).then(() => {
-					swCommentBoxesEnabled.value = true;
-				});
-			}
-			function autoSelectReservationCountdown() {
-				if (!canAutoProceed()) return;
-				let countdownInterval = setInterval(() => {
-					countdown.value--;
-					if (countdown.value <= 0) {
-						clearInterval(countdownInterval);
-						autoSelectReservation();
-					}
-				}, 1e3);
-			}
-			function autoSelectReservation() {
-				if (props.modalData.singleLineReservations.length > 0) {
-					emit("open", props.modalData.singleLineReservations[0].url);
-					return;
-				}
-				if (props.modalData.validReservations.length > 0) {
-					emit("open", props.modalData.validReservations[0].url);
-					return;
-				}
-			}
-			function canAutoProceed() {
-				if (!Settings.autoMasterSwitch) return false;
-				if (props.modalData.singleLineReservations.length <= 0 && props.modalData.validReservations.length <= 0) return false;
-				if (massCompleteShowDialog.value == true) return false;
-				return true;
-			}
-			function initMassComplete() {
-				if (props.modalData.singleLineReservations && props.modalData.singleLineReservations.length >= massCompleteThreshold) {
-					setMassCompleteAmount(props.modalData.singleLineReservations.length);
-					massCompleteShowDialog.value = true;
-				}
-			}
-			function setMassCompleteAmount(value) {
-				const totalReservations = props.modalData.singleLineReservations.length;
-				massCompleteAmount.value = Math.min(Math.min(Math.max(2, value), massCompleteMax), totalReservations);
-			}
-			async function startMassComplete() {
-				setMassCompleteAmount(massCompleteAmount.value);
-				massCompleteStarted.value = true;
-				let startedReservations = [];
-				for (let i = 0; i < massCompleteAmount.value; i++) {
-					const reservation = props.modalData.singleLineReservations[i];
-					let tab = await _GM.openInTab(reservation.url, { active: false });
-					const entry = {
-						reservationNumber: String(reservation.reservationNumber),
-						status: MassCompleteStatus.idle,
-						close: tab.close
-					};
-					startedReservations.push(entry);
-					monitorMassCompleteEntry(entry);
-				}
-				initMassCompleteStatus(startedReservations);
-				massCompleteStatus.value = startedReservations;
-			}
-			function monitorMassCompleteEntry(entry) {
-				_GM_addValueChangeListener(`PSE_MCEntry_${entry.reservationNumber}`, (_key, _oldValue, newValue, _remote) => {
-					if (massCompleteStatus.value) {
-						const entryIndex = massCompleteStatus.value.findIndex((statusEnt) => statusEnt.reservationNumber == entry.reservationNumber);
-						if (entryIndex != -1) massCompleteStatus.value[entryIndex].status = newValue;
-						if (newValue == MassCompleteStatus.finished) entry.close?.();
-						if (newValue == MassCompleteStatus.failed) stopMassComplete(entry);
-					}
-				});
-			}
-			function stopMassComplete(failed) {
-				if (massCompleteStopped.value) return;
-				massCompleteStopped.value = true;
-				for (const entry of massCompleteStatus.value ?? []) {
-					if (entry.reservationNumber == failed.reservationNumber) continue;
-					if (entry.status == MassCompleteStatus.finished || entry.status == MassCompleteStatus.failed) continue;
-					entry.close?.();
-					entry.status = MassCompleteStatus.stopped;
-				}
-			}
-			function statusFor(reservationNumber) {
-				return massCompleteStatus.value?.find((entry) => entry.reservationNumber == String(reservationNumber))?.status;
-			}
-			const massCompleteFinished = computed(() => countStatus(MassCompleteStatus.finished));
-			const massCompleteFailed = computed(() => countStatus(MassCompleteStatus.failed));
-			function countStatus(status) {
-				return massCompleteStatus.value?.filter((entry) => entry.status == status).length ?? 0;
-			}
-			return (_ctx, _cache) => {
-				return openBlock(), createBlock(ModalShell_default, {
-					title: `${__props.modalData.searchProductAmount} reserveringen met dit product`,
-					size: "xl",
-					dismissable: false,
-					onClose: _cache[4] || (_cache[4] = ($event) => emit("close"))
-				}, {
-					footer: withCtx(() => [createBaseVNode("button", {
-						type: "button",
-						class: "pse-dialog-btn pse-dialog-btn-quiet",
-						onClick: _cache[3] || (_cache[3] = ($event) => emit("close"))
-					}, " Sluiten ")]),
-					default: withCtx(() => [
-						createBaseVNode("section", _hoisted_1$24, [
-							createBaseVNode("div", _hoisted_2$24, [__props.modalData.searchProductImageUrl ? (openBlock(), createElementBlock("img", {
-								key: 0,
-								src: __props.modalData.searchProductImageUrl,
-								alt: "",
-								loading: "lazy"
-							}, null, 8, _hoisted_3$20)) : createCommentVNode("", true)]),
-							createBaseVNode("div", _hoisted_4$17, [createBaseVNode("h3", _hoisted_5$17, toDisplayString(__props.modalData.searchProductName), 1), createBaseVNode("p", _hoisted_6$14, [createTextVNode(toDisplayString(__props.modalData.searchProductBarcode) + " ", 1), createVNode(CopyButton_default, {
-								value: __props.modalData.searchProductBarcode,
-								label: "Barcode"
-							}, null, 8, ["value"])])]),
-							createBaseVNode("div", _hoisted_7$12, [createBaseVNode("span", _hoisted_8$11, toDisplayString(__props.modalData.searchProductAmount), 1), _cache[5] || (_cache[5] = createBaseVNode("span", { class: "pse-found-count-label" }, "reserveringen", -1))])
-						]),
-						createVNode(Transition, null, {
-							default: withCtx(() => [canAutoProceed() ? (openBlock(), createElementBlock("p", _hoisted_9$10, [_cache[6] || (_cache[6] = createBaseVNode("span", {
-								class: "pse-countdown-mark",
-								"aria-hidden": "true"
-							}, null, -1)), createTextVNode(" Gaat automatisch verder over " + toDisplayString(countdown.value) + " seconden... ", 1)])) : createCommentVNode("", true)]),
-							_: 1
-						}),
-						__props.modalData.singleLineReservations.length > 0 ? (openBlock(), createElementBlock("section", _hoisted_10$10, [
-							createBaseVNode("header", _hoisted_11$8, [createBaseVNode("h3", _hoisted_12$7, [_cache[7] || (_cache[7] = createTextVNode(" Singleline ", -1)), createBaseVNode("span", _hoisted_13$7, toDisplayString(__props.modalData.singleLineReservations.length), 1)]), _cache[8] || (_cache[8] = createBaseVNode("p", { class: "pse-group-note" }, "Deze reserveringen bevatten 1 stuk van het product.", -1))]),
-							massCompleteShowDialog.value ? (openBlock(), createBlock(MassCompletePanel_default, {
-								key: 0,
-								total: __props.modalData.singleLineReservations.length,
-								max: massCompleteMax,
-								amount: massCompleteAmount.value,
-								started: massCompleteStarted.value,
-								finished: massCompleteFinished.value,
-								failed: massCompleteFailed.value,
-								stopped: massCompleteStopped.value,
-								"onUpdate:amount": setMassCompleteAmount,
-								onStart: _cache[0] || (_cache[0] = ($event) => startMassComplete())
-							}, null, 8, [
-								"total",
-								"amount",
-								"started",
-								"finished",
-								"failed",
-								"stopped"
-							])) : createCommentVNode("", true),
-							createBaseVNode("div", _hoisted_14$6, [(openBlock(true), createElementBlock(Fragment, null, renderList(__props.modalData.singleLineReservations, (reservation) => {
-								return openBlock(), createBlock(ReservationRow_default, {
-									key: reservation.reservationNumber,
-									reservation,
-									status: statusFor(reservation.reservationNumber),
-									"show-open": !massCompleteStarted.value,
-									onOpen: _cache[1] || (_cache[1] = (url) => emit("open", url))
-								}, null, 8, [
-									"reservation",
-									"status",
-									"show-open"
-								]);
-							}), 128))])
-						])) : createCommentVNode("", true),
-						__props.modalData.validReservations.length > 0 ? (openBlock(), createElementBlock("section", _hoisted_15$5, [createBaseVNode("header", _hoisted_16$4, [createBaseVNode("h3", _hoisted_17$3, [_cache[9] || (_cache[9] = createTextVNode(" Reserveringen ", -1)), createBaseVNode("span", _hoisted_18$3, toDisplayString(__props.modalData.validReservations.length), 1)]), _cache[10] || (_cache[10] = createBaseVNode("p", { class: "pse-group-note" }, "Klaar om verwerkt te worden.", -1))]), (openBlock(true), createElementBlock(Fragment, null, renderList(__props.modalData.validReservations, (reservation) => {
-							return openBlock(), createBlock(ReservationCard_default, {
-								key: reservation.reservationNumber,
-								reservation,
-								"show-products": "",
-								"show-open-button": !massCompleteStarted.value,
-								"show-note": "",
-								"note-enabled": swCommentBoxesEnabled.value,
-								onOpen: _cache[2] || (_cache[2] = (url) => emit("open", url)),
-								onSaveNote: ($event) => onSaveButtonClick(reservation.swOrderData, reservation.saleOrderReference)
-							}, null, 8, [
-								"reservation",
-								"show-open-button",
-								"note-enabled",
-								"onSaveNote"
-							]);
-						}), 128))])) : createCommentVNode("", true),
-						__props.modalData.invalidReservations.length > 0 ? (openBlock(), createElementBlock("section", _hoisted_19$3, [createBaseVNode("header", _hoisted_20$3, [createBaseVNode("h3", _hoisted_21$3, [_cache[11] || (_cache[11] = createTextVNode(" Nog niet volledig geraapt ", -1)), createBaseVNode("span", _hoisted_22$3, toDisplayString(__props.modalData.invalidReservations.length), 1)]), _cache[12] || (_cache[12] = createBaseVNode("p", { class: "pse-group-note" }, " Deze reserveringen bevatten het product, maar hebben niet de juiste logistieke status of zijn nog niet volledig geraapt. Ze kunnen hier niet geopend worden. ", -1))]), (openBlock(true), createElementBlock(Fragment, null, renderList(__props.modalData.invalidReservations, (reservation) => {
-							return openBlock(), createBlock(ReservationCard_default, {
-								key: reservation.reservationNumber,
-								reservation,
-								"show-products": "",
-								"highlight-incomplete": "",
-								"show-note": "",
-								"note-enabled": swCommentBoxesEnabled.value,
-								onSaveNote: ($event) => onSaveButtonClick(reservation.swOrderData, reservation.saleOrderReference)
-							}, null, 8, [
-								"reservation",
-								"note-enabled",
-								"onSaveNote"
-							]);
-						}), 128))])) : createCommentVNode("", true)
-					]),
-					_: 1
-				}, 8, ["title"]);
-			};
-		}
-	}), [["__scopeId", "data-v-d0ff4a59"]]);
-	var _hoisted_1$23 = { class: "pse-panel" };
-	var _hoisted_2$23 = { class: "pse-panel-head" };
-	var _hoisted_3$19 = {
-		class: "pse-panel-icon",
-		"aria-hidden": "true"
-	};
-	var _hoisted_4$16 = { class: "pse-panel-text" };
-	var _hoisted_5$16 = { class: "pse-panel-title" };
-	var _hoisted_6$13 = { class: "pse-panel-subtitle" };
-	var SearchPanel_default = _plugin_vue_export_helper_default(defineComponent({
-		__name: "SearchPanel",
-		props: {
-			title: {},
-			subtitle: {}
-		},
-		setup(__props) {
-			return (_ctx, _cache) => {
-				return openBlock(), createElementBlock("section", _hoisted_1$23, [createBaseVNode("header", _hoisted_2$23, [createBaseVNode("span", _hoisted_3$19, [renderSlot(_ctx.$slots, "icon", {}, void 0, true)]), createBaseVNode("span", _hoisted_4$16, [createBaseVNode("h2", _hoisted_5$16, toDisplayString(__props.title), 1), createBaseVNode("p", _hoisted_6$13, toDisplayString(__props.subtitle), 1)])]), renderSlot(_ctx.$slots, "default", {}, void 0, true)]);
-			};
-		}
-	}), [["__scopeId", "data-v-2ad9890a"]]);
-	var _hoisted_1$22 = { class: "pse-field" };
-	var _hoisted_2$22 = { class: "pse-field-label" };
-	var _hoisted_3$18 = ["placeholder"];
-	var SearchField_default = _plugin_vue_export_helper_default(defineComponent({
-		__name: "SearchField",
-		props: mergeModels({
-			label: {},
-			placeholder: {},
-			adopt: {}
-		}, {
-			"modelValue": {},
-			"modelModifiers": {}
-		}),
-		emits: ["update:modelValue"],
-		setup(__props) {
-			const props = __props;
-			const model = useModel(__props, "modelValue");
-			const shell = useTemplateRef("shell");
-			onMounted(() => {
-				if (!props.adopt) return;
-				adoptElement(shell.value, document.querySelector(props.adopt), "pse-input");
-			});
-			return (_ctx, _cache) => {
-				return openBlock(), createElementBlock("label", _hoisted_1$22, [createBaseVNode("span", _hoisted_2$22, toDisplayString(__props.label), 1), createBaseVNode("span", {
-					class: "pse-field-shell",
-					ref_key: "shell",
-					ref: shell
-				}, [!__props.adopt ? withDirectives((openBlock(), createElementBlock("input", {
-					key: 0,
-					class: "pse-input",
-					type: "text",
-					autocomplete: "off",
-					placeholder: __props.placeholder,
-					"onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => model.value = $event)
-				}, null, 8, _hoisted_3$18)), [[vModelText, model.value]]) : createCommentVNode("", true)], 512)]);
-			};
-		}
-	}), [["__scopeId", "data-v-e35ea7a8"]]);
-	var _hoisted_1$21 = { class: "pse-notice-text" };
-	var _hoisted_2$21 = { class: "pse-notice-title" };
-	var _hoisted_3$17 = {
-		key: 0,
-		class: "pse-notice-detail"
-	};
-	var SearchNotice_default = _plugin_vue_export_helper_default(defineComponent({
-		__name: "SearchNotice",
-		props: {
-			title: {},
-			detail: {},
-			tone: {}
-		},
-		emits: ["dismiss"],
-		setup(__props) {
-			return (_ctx, _cache) => {
-				return openBlock(), createElementBlock("div", {
-					class: normalizeClass(["pse-notice", `is-${__props.tone}`]),
-					role: "status"
-				}, [
-					_cache[2] || (_cache[2] = createStaticVNode("<span class=\"pse-notice-icon\" aria-hidden=\"true\" data-v-0438713d><svg viewBox=\"0 0 24 24\" width=\"20\" height=\"20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" data-v-0438713d><circle cx=\"12\" cy=\"12\" r=\"8.5\" data-v-0438713d></circle><path d=\"M12 8v5\" data-v-0438713d></path><path d=\"M12 16.2v.1\" data-v-0438713d></path></svg></span>", 1)),
-					createBaseVNode("span", _hoisted_1$21, [createBaseVNode("span", _hoisted_2$21, toDisplayString(__props.title), 1), __props.detail ? (openBlock(), createElementBlock("span", _hoisted_3$17, toDisplayString(__props.detail), 1)) : createCommentVNode("", true)]),
-					createBaseVNode("button", {
-						type: "button",
-						class: "pse-notice-close",
-						"aria-label": "Melding sluiten",
-						onClick: _cache[0] || (_cache[0] = ($event) => _ctx.$emit("dismiss"))
-					}, [..._cache[1] || (_cache[1] = [createBaseVNode("svg", {
-						viewBox: "0 0 24 24",
-						width: "16",
-						height: "16",
-						fill: "none",
-						stroke: "currentColor",
-						"stroke-width": "2.2",
-						"stroke-linecap": "round"
-					}, [createBaseVNode("path", { d: "M6 6l12 12M18 6L6 18" })], -1)])])
-				], 2);
-			};
-		}
-	}), [["__scopeId", "data-v-0438713d"]]);
-	var _hoisted_1$20 = ["disabled"];
-	var _hoisted_2$20 = {
-		class: "pse-resume-icon",
-		"aria-hidden": "true"
-	};
-	var _hoisted_3$16 = { class: "pse-resume-text" };
-	var _hoisted_4$15 = { class: "pse-resume-label" };
-	var _hoisted_5$15 = { class: "pse-resume-number" };
-	var ResumeButton_default = _plugin_vue_export_helper_default(defineComponent({
-		__name: "ResumeButton",
-		props: {
-			label: {},
-			reservationNumber: {},
-			disabled: { type: Boolean }
-		},
-		emits: ["click"],
-		setup(__props) {
-			return (_ctx, _cache) => {
-				return openBlock(), createElementBlock("button", {
-					type: "button",
-					class: "pse-resume",
-					disabled: __props.disabled,
-					onClick: _cache[0] || (_cache[0] = ($event) => _ctx.$emit("click"))
-				}, [
-					createBaseVNode("span", _hoisted_2$20, [renderSlot(_ctx.$slots, "icon", {}, void 0, true)]),
-					createBaseVNode("span", _hoisted_3$16, [createBaseVNode("span", _hoisted_4$15, toDisplayString(__props.label), 1), createBaseVNode("span", _hoisted_5$15, toDisplayString(__props.reservationNumber || "Nog geen"), 1)]),
-					_cache[1] || (_cache[1] = createBaseVNode("svg", {
-						class: "pse-resume-chevron",
-						viewBox: "0 0 24 24",
-						width: "18",
-						height: "18",
-						fill: "none",
-						stroke: "currentColor",
-						"stroke-width": "2",
-						"stroke-linecap": "round",
-						"stroke-linejoin": "round",
-						"aria-hidden": "true"
-					}, [createBaseVNode("path", { d: "M9 6l6 6-6 6" })], -1))
-				], 8, _hoisted_1$20);
-			};
-		}
-	}), [["__scopeId", "data-v-ead5c402"]]);
-	var ErpSignedOutError = class extends Error {
-		constructor() {
-			super("The ERP session has expired.");
-			this.name = "ErpSignedOutError";
-		}
-	};
-	var STEP_TIMEOUT = 2e4;
-	var framePromise;
-	var currentPage = "";
-	var queue = Promise.resolve();
-	function erpTask(work) {
-		const run = async () => work(await ensurePage());
-		const result = queue.then(run, run);
-		queue = result.catch(() => void 0);
-		return result;
-	}
-	async function ensurePage() {
-		const frame = await ensureFrame();
-		return {
-			get document() {
-				requireSession(frame);
-				return frame.contentDocument;
-			},
-			async open(pathAndQuery) {
-				if (currentPage == pathAndQuery && frame.contentDocument?.body) {
-					requireSession(frame);
-					return frame.contentDocument;
-				}
-				const loaded = whenLoaded(frame, pathAndQuery);
-				frame.src = `${ERP_URL}/${pathAndQuery.replace(/^\//, "")}`;
-				await loaded;
-				requireSession(frame);
-				currentPage = pathAndQuery;
-				return frame.contentDocument;
-			},
-			async call(functionName, ...args) {
-				const target = frame.contentWindow[functionName];
-				if (typeof target != "function") throw new Error(`The ERP screen has no ${functionName}().`);
-				const loaded = whenLoaded(frame, functionName);
-				target.apply(frame.contentWindow, args);
-				await loaded;
-				requireSession(frame);
-				currentPage = "";
-				return frame.contentDocument;
-			},
-			async press(elementId, what) {
-				const button = frame.contentDocument?.getElementById(elementId);
-				if (!button) throw new Error(`The ERP screen has no ${what} control (#${elementId}).`);
-				const loaded = whenLoaded(frame, what);
-				button.click();
-				await loaded;
-				requireSession(frame);
-				currentPage = "";
-				return frame.contentDocument;
-			},
-			find(selector) {
-				requireSession(frame);
-				return frame.contentDocument.querySelector(selector);
-			}
-		};
-	}
-	function ensureFrame() {
-		framePromise ??= createFrame();
-		return framePromise;
-	}
-	async function createFrame() {
-		const frame = document.createElement("iframe");
-		frame.className = "pse-erp-frame";
-		frame.setAttribute("aria-hidden", "true");
-		frame.setAttribute("tabindex", "-1");
-		frame.title = "RetailVista";
-		frame.src = "about:blank";
-		const loaded = whenLoaded(frame, "the ERP frame");
-		document.body.append(frame);
-		await loaded;
-		currentPage = "";
-		return frame;
-	}
-	function whenLoaded(frame, what) {
-		return new Promise((resolve, reject) => {
-			const timer = window.setTimeout(() => {
-				frame.removeEventListener("load", onLoad);
-				reject(new Error(`Timed out waiting for ${what}.`));
-			}, STEP_TIMEOUT);
-			function onLoad() {
-				window.clearTimeout(timer);
-				window.setTimeout(resolve, 0);
-			}
-			frame.addEventListener("load", onLoad, { once: true });
-		});
-	}
-	function requireSession(frame) {
-		const document_ = frame.contentDocument;
-		if (!document_ || document_.body?.innerHTML.includes("txtCompanyNumber")) {
-			currentPage = "";
-			throw new ErpSignedOutError();
-		}
-	}
-	function resetErpFrame() {
-		framePromise?.then((frame) => frame.remove()).catch(() => void 0);
-		framePromise = void 0;
-		currentPage = "";
 	}
 	async function probeErpSession() {
 		try {
@@ -8245,40 +7616,6 @@
 			inFlight = false;
 		}
 	}
-	function readReservationNote(reservationId) {
-		return erpTask(async (page) => {
-			await showReservation(page, reservationId);
-			return noteField(page).value;
-		});
-	}
-	function writeReservationNote(reservationId, text) {
-		return erpTask(async (page) => {
-			await showReservation(page, reservationId);
-			await page.press(ERP_EDIT_BUTTON_ID, "edit");
-			const field = noteField(page);
-			if (field.readOnly) throw new Error("The reservation note is still read-only after entering edit mode.");
-			field.value = text;
-			field.dispatchEvent(new Event("input", { bubbles: true }));
-			field.dispatchEvent(new Event("change", { bubbles: true }));
-			await page.press(ERP_SAVE_BUTTON_ID, "save");
-			const saved = noteField(page).value;
-			debug("Wrote the reservation note.", {
-				reservationId,
-				length: saved.length
-			});
-			return saved;
-		});
-	}
-	async function showReservation(page, reservationId) {
-		await page.open(`${ERP_PAGE_PATH}?pageId=374`);
-		if (page.find("[name$=\"rvcNote$TextBox\"]")) debug("The ERP reservation screen is already showing a record.");
-		await page.call(ERP_SET_ITEM_FUNCTION, Number(reservationId), "view");
-	}
-	function noteField(page) {
-		const field = page.find(ERP_NOTE_SELECTOR);
-		if (!field) throw new Error("The ERP reservation screen has no note field.");
-		return field;
-	}
 	function getCurrentUser() {
 		const user = _GM_getValue(STORAGE_KEYS.currentUser, void 0);
 		return user?.userName ? user : void 0;
@@ -8344,6 +7681,1330 @@
 			refused.value = false;
 		}
 	};
+	function createSlotHandle() {
+		const slots = reactive(emptyAssignment());
+		const reservationId = ref("");
+		const reservationNumber = ref("");
+		const loaded = ref(false);
+		const saving = ref(false);
+		const settled = ref(false);
+		function reset(id, number) {
+			reservationId.value = id;
+			reservationNumber.value = number;
+			loaded.value = false;
+			settled.value = false;
+			slots.order = "";
+			slots.lines = {};
+		}
+		function take(note) {
+			const parsed = parseComment(note);
+			slots.order = parsed.slots.order;
+			slots.lines = parsed.slots.lines;
+			loaded.value = true;
+			debug("Rack bays read off the reservation note", reservationNumber.value, JSON.stringify(slots));
+		}
+		async function attach(id, number) {
+			reset(id, number);
+			if (!id) {
+				settled.value = true;
+				return;
+			}
+			try {
+				take(await readReservationNote(id));
+			} catch (error) {
+				reportReadFailure(error);
+			} finally {
+				settled.value = true;
+			}
+		}
+		function adopt(id, number, note) {
+			reset(id, number);
+			if (note !== void 0) take(note);
+			settled.value = true;
+		}
+		function reportReadFailure(error) {
+			if (error instanceof ErpSignedOutError) erpStore.reportSignedOut();
+			console.error("Pack&Ship Extended could not read the reservation note.", error);
+		}
+		function save() {
+			if (!reservationId.value) return Promise.resolve();
+			saving.value = true;
+			const promise = (async () => {
+				const current = parseComment(await readReservationNote(reservationId.value));
+				await writeReservationNote(reservationId.value, composeComment(current.text, slots));
+			})();
+			l.promise(promise, {
+				pending: `Reservering ${reservationNumber.value} vak wordt opgeslagen...`,
+				success: `Reservering ${reservationNumber.value} vak succesvol opgeslagen.`,
+				error: `Er is een fout opgetreden bij het opslaan van het vak van reservering ${reservationNumber.value}.`
+			}).catch(() => void 0);
+			promise.catch((error) => {
+				if (error instanceof ErpSignedOutError) erpStore.reportSignedOut();
+				console.error("Failed to save the reservation note.", error);
+				playSound("error");
+			});
+			promise.catch(() => void 0).then(() => saving.value = false);
+			return promise;
+		}
+		return {
+			slots,
+			saving,
+			reservationNumber,
+			ready: computed(() => loaded.value),
+			loading: computed(() => !settled.value),
+			hasOrderSlot: computed(() => Boolean(slots.order)),
+			hasLineSlots: computed(() => Object.values(slots.lines).some(Boolean)),
+			attach,
+			adopt,
+			setOrderSlot(slot) {
+				slots.order = slots.order == slot ? "" : slot;
+				return save();
+			},
+			setLineSlot(barcode, slot) {
+				if (slots.lines[barcode] == slot) delete slots.lines[barcode];
+				else slots.lines[barcode] = slot;
+				return save();
+			},
+			lineSlot(barcode) {
+				return slots.lines[barcode] ?? "";
+			},
+			takenBy(exceptBarcode) {
+				const taken = new Map();
+				for (const [barcode, slot] of Object.entries(slots.lines)) {
+					if (!slot || barcode == exceptBarcode) continue;
+					taken.set(slot, [...taken.get(slot) ?? [], barcode]);
+				}
+				return taken;
+			}
+		};
+	}
+	var _hoisted_1$31 = ["aria-label"];
+	var _hoisted_2$31 = { class: "pse-modal-head" };
+	var _hoisted_3$26 = { class: "pse-modal-title" };
+	var _hoisted_4$23 = { class: "pse-modal-body" };
+	var _hoisted_5$22 = {
+		key: 0,
+		class: "pse-modal-foot"
+	};
+	var ModalShell_vue_vue_type_script_setup_true_lang_default = defineComponent({
+		__name: "ModalShell",
+		props: {
+			title: {},
+			size: { default: "md" },
+			elevated: {
+				type: Boolean,
+				default: false
+			},
+			dismissable: {
+				type: Boolean,
+				default: true
+			}
+		},
+		emits: ["close"],
+		setup(__props, { emit: __emit }) {
+			const props = __props;
+			const emit = __emit;
+			onMounted(() => document.addEventListener("keydown", onKeydown));
+			onBeforeUnmount(() => document.removeEventListener("keydown", onKeydown));
+			function onKeydown(event) {
+				if (event.key == "Escape" && props.dismissable) emit("close");
+			}
+			function onBackdropClick(event) {
+				if (props.dismissable && event.target == event.currentTarget) emit("close");
+			}
+			return (_ctx, _cache) => {
+				return openBlock(), createElementBlock("div", {
+					class: normalizeClass(["pse-modal", { "is-elevated": __props.elevated }]),
+					role: "dialog",
+					"aria-modal": "true",
+					"aria-label": __props.title,
+					onMousedown: onBackdropClick
+				}, [createBaseVNode("div", { class: normalizeClass(["pse-modal-panel", `is-${__props.size}`]) }, [
+					createBaseVNode("header", _hoisted_2$31, [createBaseVNode("h2", _hoisted_3$26, toDisplayString(__props.title), 1), createBaseVNode("button", {
+						type: "button",
+						class: "pse-modal-close",
+						"aria-label": "Sluiten",
+						onClick: _cache[0] || (_cache[0] = ($event) => emit("close"))
+					}, [..._cache[1] || (_cache[1] = [createBaseVNode("svg", {
+						viewBox: "0 0 24 24",
+						width: "17",
+						height: "17",
+						fill: "none",
+						stroke: "currentColor",
+						"stroke-width": "2.2",
+						"stroke-linecap": "round",
+						"aria-hidden": "true"
+					}, [createBaseVNode("path", { d: "M6 6l12 12M18 6L6 18" })], -1)])])]),
+					createBaseVNode("div", _hoisted_4$23, [renderSlot(_ctx.$slots, "default", {}, void 0, true)]),
+					_ctx.$slots.footer ? (openBlock(), createElementBlock("footer", _hoisted_5$22, [renderSlot(_ctx.$slots, "footer", {}, void 0, true)])) : createCommentVNode("", true)
+				], 2)], 42, _hoisted_1$31);
+			};
+		}
+	});
+	var _plugin_vue_export_helper_default = (sfc, props) => {
+		const target = sfc.__vccOpts || sfc;
+		for (const [key, val] of props) target[key] = val;
+		return target;
+	};
+	var ModalShell_default = _plugin_vue_export_helper_default(ModalShell_vue_vue_type_script_setup_true_lang_default, [["__scopeId", "data-v-66d77727"]]);
+	var shopware_default = "data:image/svg+xml,%3csvg%20width='34'%20height='34'%20xmlns='http://www.w3.org/2000/svg'%20xmlns:xlink='http://www.w3.org/1999/xlink'%3e%3cdefs%3e%3cpath%20d='M26.927%2030.07a.244.244%200%2001-.002.39%2016.76%2016.76%200%2001-10.04%203.307c-4.51%200-8.75-1.756-11.94-4.944A16.772%2016.772%200%20010%2016.884c0-4.51%201.756-8.75%204.945-11.939A16.775%2016.775%200%200116.885%200c4.173%200%208.18%201.535%2011.28%204.323a.243.243%200%2001-.195.42%2028.559%2028.559%200%2000-3.86-.248c-4.918%200-8.911%201.096-11.548%203.172-2.35%201.85-3.593%204.41-3.593%207.404%200%203.338%201.277%205.976%203.905%208.067%202.319%201.846%205.408%203.044%208.133%204.1%202.29.889%204.453%201.727%205.92%202.832zm6.77-14.746c.046.537.07%201.062.07%201.56%200%202.12-.389%204.19-1.155%206.154a.244.244%200%2001-.344.124c-2.008-1.114-4.195-1.93-6.31-2.718-4.104-1.53-7.647-2.852-7.647-5.752%200-1.035.433-1.917%201.252-2.55.946-.73%202.363-1.101%204.21-1.101%203.463%200%206.313%201.192%209.837%204.117.05.041.08.102.086.166z'%20id='a'/%3e%3c/defs%3e%3cuse%20fill='%23FFF'%20xlink:href='%23a'%20fill-rule='evenodd'/%3e%3c/svg%3e";
+	var _hoisted_1$30 = { class: "pse-note" };
+	var _hoisted_2$30 = {
+		key: 0,
+		class: "pse-note-alert"
+	};
+	var _hoisted_3$25 = { class: "pse-note-card" };
+	var _hoisted_4$22 = ["aria-expanded", "title"];
+	var _hoisted_5$21 = ["src"];
+	var _hoisted_6$18 = {
+		key: 0,
+		class: "pse-note-spinner",
+		role: "status",
+		"aria-label": "Notitie wordt opgehaald"
+	};
+	var _hoisted_7$16 = {
+		key: 1,
+		class: "pse-note-empty"
+	};
+	var _hoisted_8$15 = { class: "pse-note-collapse-inner" };
+	var _hoisted_9$14 = { class: "pse-note-body" };
+	var _hoisted_10$14 = ["disabled", "placeholder"];
+	var _hoisted_11$12 = {
+		key: 1,
+		class: "pse-note-field pse-note-field-waiting",
+		"aria-hidden": "true"
+	};
+	var _hoisted_12$11 = { class: "pse-note-actions" };
+	var _hoisted_13$11 = ["disabled"];
+	var _hoisted_14$10 = ["disabled"];
+	var ShopwareNote_default = _plugin_vue_export_helper_default(defineComponent({
+		__name: "ShopwareNote",
+		props: {
+			orderData: {},
+			enabled: { type: Boolean },
+			showOpen: { type: Boolean },
+			showAlert: { type: Boolean }
+		},
+		emits: ["save", "open"],
+		setup(__props) {
+			const props = __props;
+			const note = computed({
+				get: () => props.orderData ? parseComment(props.orderData.customerComment).text : "",
+				set: (value) => {
+					if (props.orderData) props.orderData.customerComment = stripMarkers(value);
+				}
+			});
+			const hasNote = computed(() => Boolean(note.value.trim()));
+			const ready = computed(() => props.enabled && Boolean(props.orderData));
+			const loading = computed(() => !props.orderData);
+			const open = ref(false);
+			watch(() => props.orderData, (order) => {
+				if (order) open.value = hasNote.value;
+			}, { immediate: true });
+			return (_ctx, _cache) => {
+				return openBlock(), createElementBlock("section", _hoisted_1$30, [createVNode(Transition, null, {
+					default: withCtx(() => [__props.showAlert && hasNote.value ? (openBlock(), createElementBlock("p", _hoisted_2$30, [..._cache[4] || (_cache[4] = [createBaseVNode("span", {
+						class: "material-icons pse-note-alert-icon",
+						"aria-hidden": "true"
+					}, "error_outline", -1), createTextVNode(" Let op — er is een notitie bij deze order. ", -1)])])) : createCommentVNode("", true)]),
+					_: 1
+				}), createBaseVNode("div", _hoisted_3$25, [createBaseVNode("button", {
+					type: "button",
+					class: "pse-note-head",
+					"aria-expanded": open.value,
+					title: open.value ? "Notitie inklappen" : "Notitie uitklappen",
+					onClick: _cache[0] || (_cache[0] = ($event) => open.value = !open.value)
+				}, [
+					createBaseVNode("img", {
+						class: "pse-note-logo",
+						src: unref(shopware_default),
+						alt: ""
+					}, null, 8, _hoisted_5$21),
+					_cache[5] || (_cache[5] = createBaseVNode("h3", { class: "pse-note-title" }, "Shopware notitie", -1)),
+					loading.value ? (openBlock(), createElementBlock("span", _hoisted_6$18)) : !open.value && !hasNote.value ? (openBlock(), createElementBlock("span", _hoisted_7$16, "Geen notitie")) : createCommentVNode("", true),
+					createBaseVNode("span", {
+						class: normalizeClass(["material-icons pse-note-chevron", { "is-open": open.value }]),
+						"aria-hidden": "true"
+					}, "expand_more", 2)
+				], 8, _hoisted_4$22), createBaseVNode("div", { class: normalizeClass(["pse-note-collapse", { "is-open": open.value }]) }, [createBaseVNode("div", _hoisted_8$15, [createBaseVNode("div", _hoisted_9$14, [__props.orderData ? withDirectives((openBlock(), createElementBlock("textarea", {
+					key: 0,
+					class: "pse-note-field",
+					"onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => note.value = $event),
+					disabled: !ready.value,
+					placeholder: ready.value ? "Nog geen notitie..." : ""
+				}, null, 8, _hoisted_10$14)), [[vModelText, note.value]]) : (openBlock(), createElementBlock("div", _hoisted_11$12, [..._cache[6] || (_cache[6] = [createBaseVNode("span", { class: "pse-note-shimmer" }, null, -1), createBaseVNode("span", { class: "pse-note-shimmer pse-note-shimmer-short" }, null, -1)])])), createBaseVNode("div", _hoisted_12$11, [__props.showOpen ? (openBlock(), createElementBlock("button", {
+					key: 0,
+					type: "button",
+					class: "pse-note-btn pse-note-btn-quiet",
+					disabled: !ready.value,
+					onClick: _cache[2] || (_cache[2] = ($event) => _ctx.$emit("open"))
+				}, " Open in Shopware ", 8, _hoisted_13$11)) : createCommentVNode("", true), createBaseVNode("button", {
+					type: "button",
+					class: "pse-note-btn",
+					disabled: !ready.value,
+					onClick: _cache[3] || (_cache[3] = ($event) => _ctx.$emit("save"))
+				}, " Opslaan ", 8, _hoisted_14$10)])])])], 2)])]);
+			};
+		}
+	}), [["__scopeId", "data-v-ab3fbaa7"]]);
+	var settingsVersion = ref(0);
+	var slotScope = computed(() => {
+		settingsVersion.value;
+		return Settings.slotScope;
+	});
+	var canAssignLines = computed(() => slotScope.value == "line");
+	document.addEventListener(SETTINGS_SAVED_EVENT, () => {
+		Settings.load();
+		settingsVersion.value++;
+	});
+	var _hoisted_1$29 = { class: "pse-rack" };
+	var _hoisted_2$29 = { class: "pse-rack-letter" };
+	var _hoisted_3$24 = ["title", "onClick"];
+	var _hoisted_4$21 = { class: "pse-rack-bay-label" };
+	var _hoisted_5$20 = {
+		key: 0,
+		class: "pse-rack-bay-note"
+	};
+	var _hoisted_6$17 = {
+		key: 1,
+		class: "pse-rack-bay-note"
+	};
+	var SlotPicker_default = _plugin_vue_export_helper_default(defineComponent({
+		__name: "SlotPicker",
+		props: {
+			subject: {},
+			current: {},
+			taken: {}
+		},
+		emits: ["close", "pick"],
+		setup(__props, { emit: __emit }) {
+			const props = __props;
+			const emit = __emit;
+			function label(letter, bay) {
+				return `${letter}${bay}`;
+			}
+			function occupants(slot) {
+				return props.taken?.get(slot) ?? [];
+			}
+			return (_ctx, _cache) => {
+				return openBlock(), createBlock(ModalShell_default, {
+					title: `Vak kiezen — ${__props.subject}`,
+					size: "lg",
+					onClose: _cache[2] || (_cache[2] = ($event) => emit("close"))
+				}, {
+					footer: withCtx(() => [__props.current ? (openBlock(), createElementBlock("button", {
+						key: 0,
+						type: "button",
+						class: "pse-dialog-btn pse-dialog-btn-quiet",
+						onClick: _cache[0] || (_cache[0] = ($event) => emit("pick", __props.current))
+					}, " Vak leegmaken ")) : createCommentVNode("", true), createBaseVNode("button", {
+						type: "button",
+						class: "pse-dialog-btn pse-dialog-btn-quiet",
+						onClick: _cache[1] || (_cache[1] = ($event) => emit("close"))
+					}, " Annuleren ")]),
+					default: withCtx(() => [_cache[3] || (_cache[3] = createBaseVNode("p", { class: "pse-rack-lead" }, " Kies het vak waar dit blijft staan. Nog een keer op het huidige vak drukken maakt het weer leeg. ", -1)), createBaseVNode("div", _hoisted_1$29, [(openBlock(true), createElementBlock(Fragment, null, renderList(unref(RACK), (column) => {
+						return openBlock(), createElementBlock("div", {
+							key: column.letter,
+							class: "pse-rack-column"
+						}, [createBaseVNode("span", _hoisted_2$29, toDisplayString(column.letter), 1), createBaseVNode("div", { class: normalizeClass(["pse-rack-bays", `is-rows-${column.rows.length}`]) }, [(openBlock(true), createElementBlock(Fragment, null, renderList(column.rows.flat(), (bay) => {
+							return openBlock(), createElementBlock("button", {
+								key: bay,
+								type: "button",
+								class: normalizeClass(["pse-rack-bay", {
+									"is-current": __props.current == label(column.letter, bay),
+									"is-taken": occupants(label(column.letter, bay)).length > 0
+								}]),
+								title: occupants(label(column.letter, bay)).length ? `Vak ${label(column.letter, bay)} — al in gebruik voor deze order` : `Vak ${label(column.letter, bay)}`,
+								onClick: ($event) => emit("pick", label(column.letter, bay))
+							}, [createBaseVNode("span", _hoisted_4$21, toDisplayString(label(column.letter, bay)), 1), occupants(label(column.letter, bay)).length ? (openBlock(), createElementBlock("span", _hoisted_5$20, toDisplayString(occupants(label(column.letter, bay)).length) + " regel" + toDisplayString(occupants(label(column.letter, bay)).length > 1 ? "s" : ""), 1)) : __props.current == label(column.letter, bay) ? (openBlock(), createElementBlock("span", _hoisted_6$17, " Huidig ")) : createCommentVNode("", true)], 10, _hoisted_3$24);
+						}), 128))], 2)]);
+					}), 128))])]),
+					_: 1
+				}, 8, ["title"]);
+			};
+		}
+	}), [["__scopeId", "data-v-76779723"]]);
+	var _hoisted_1$28 = { class: "pse-slotpanel" };
+	var _hoisted_2$28 = { class: "pse-slotpanel-card" };
+	var _hoisted_3$23 = { class: "pse-slotpanel-title" };
+	var _hoisted_4$20 = {
+		key: 0,
+		class: "pse-slotpanel-spinner",
+		role: "status",
+		"aria-label": "Vak wordt opgehaald"
+	};
+	var _hoisted_5$19 = ["disabled", "title"];
+	var _hoisted_6$16 = {
+		key: 0,
+		class: "pse-slot-chip-label"
+	};
+	var _hoisted_7$15 = {
+		key: 1,
+		class: "pse-slot-chip-empty"
+	};
+	var _hoisted_8$14 = {
+		key: 2,
+		class: "pse-slot-chip-empty"
+	};
+	var _hoisted_9$13 = {
+		key: 2,
+		class: "pse-slotpanel-summary"
+	};
+	var _hoisted_10$13 = { class: "pse-slot-chip-label" };
+	var _hoisted_11$11 = {
+		key: 3,
+		class: "pse-slotpanel-empty"
+	};
+	var _hoisted_12$10 = {
+		key: 4,
+		class: "pse-slotpanel-empty"
+	};
+	var _hoisted_13$10 = { class: "pse-slotpanel-collapse-inner" };
+	var _hoisted_14$9 = { class: "pse-slotpanel-body" };
+	var _hoisted_15$8 = {
+		key: 0,
+		class: "pse-slotpanel-block"
+	};
+	var _hoisted_16$7 = ["disabled", "title"];
+	var _hoisted_17$6 = {
+		key: 0,
+		class: "pse-slot-chip-label"
+	};
+	var _hoisted_18$4 = {
+		key: 1,
+		class: "pse-slot-chip-empty"
+	};
+	var _hoisted_19$4 = { class: "pse-slotpanel-block" };
+	var _hoisted_20$4 = {
+		key: 0,
+		class: "pse-slotpanel-caption"
+	};
+	var _hoisted_21$4 = { class: "pse-slotpanel-lines" };
+	var _hoisted_22$4 = ["title"];
+	var _hoisted_23$3 = [
+		"disabled",
+		"title",
+		"onClick"
+	];
+	var _hoisted_24$2 = {
+		key: 0,
+		class: "pse-slot-chip-label"
+	};
+	var _hoisted_25$1 = {
+		key: 1,
+		class: "pse-slot-chip-empty"
+	};
+	var _hoisted_26 = {
+		key: 1,
+		class: "pse-slotpanel-hint"
+	};
+	var ReservationSlotPanel_default = _plugin_vue_export_helper_default(defineComponent({
+		__name: "ReservationSlotPanel",
+		props: {
+			handle: {},
+			products: {}
+		},
+		setup(__props) {
+			const props = __props;
+			const picking = ref();
+			const orderSlot = computed(() => props.handle.slots.order);
+			const showOrderSlot = computed(() => slotScope.value == "order" || props.handle.hasOrderSlot.value);
+			const showLineSlots = computed(() => slotScope.value == "line" || props.handle.hasLineSlots.value);
+			const usedSlots = computed(() => {
+				const used = new Set();
+				if (orderSlot.value) used.add(orderSlot.value);
+				for (const slot of Object.values(props.handle.slots.lines)) if (slot) used.add(slot);
+				return [...used].sort();
+			});
+			const unavailable = computed(() => !props.handle.loading.value && !props.handle.ready.value);
+			function lineChipDisabled(barcode) {
+				return !props.handle.ready.value || props.handle.saving.value || !props.handle.lineSlot(barcode) && !canAssignLines.value;
+			}
+			function onPick(slot) {
+				const subject = picking.value;
+				picking.value = void 0;
+				if (!subject) return;
+				if (subject.barcode) props.handle.setLineSlot(subject.barcode, slot);
+				else props.handle.setOrderSlot(slot);
+			}
+			const foldable = computed(() => showLineSlots.value);
+			const open = ref(false);
+			watch(() => props.handle.loading.value, (loading) => {
+				if (!loading) open.value = usedSlots.value.length > 0;
+			}, { immediate: true });
+			return (_ctx, _cache) => {
+				return openBlock(), createElementBlock(Fragment, null, [(openBlock(), createBlock(Teleport, { to: "body" }, [createVNode(Transition, { name: "modal" }, {
+					default: withCtx(() => [picking.value ? (openBlock(), createBlock(SlotPicker_default, {
+						key: 0,
+						subject: picking.value.subject,
+						current: picking.value.barcode ? __props.handle.lineSlot(picking.value.barcode) : orderSlot.value,
+						taken: __props.handle.takenBy(picking.value.barcode),
+						onPick,
+						onClose: _cache[0] || (_cache[0] = ($event) => picking.value = void 0)
+					}, null, 8, [
+						"subject",
+						"current",
+						"taken"
+					])) : createCommentVNode("", true)]),
+					_: 1
+				})])), createBaseVNode("section", _hoisted_1$28, [createBaseVNode("div", _hoisted_2$28, [(openBlock(), createBlock(resolveDynamicComponent(foldable.value ? "button" : "div"), {
+					class: normalizeClass(["pse-slotpanel-head", { "is-plain": !foldable.value }]),
+					type: foldable.value ? "button" : void 0,
+					"aria-expanded": foldable.value ? open.value : void 0,
+					title: foldable.value ? open.value ? "Vakken inklappen" : "Vakken uitklappen" : void 0,
+					onClick: _cache[2] || (_cache[2] = ($event) => foldable.value && (open.value = !open.value))
+				}, {
+					default: withCtx(() => [
+						_cache[5] || (_cache[5] = createBaseVNode("span", {
+							class: "material-icons pse-slotpanel-icon",
+							"aria-hidden": "true"
+						}, "inventory_2", -1)),
+						createBaseVNode("h4", _hoisted_3$23, toDisplayString(foldable.value ? "Vakken" : "Vak"), 1),
+						__props.handle.loading.value ? (openBlock(), createElementBlock("span", _hoisted_4$20)) : !foldable.value ? (openBlock(), createElementBlock("button", {
+							key: 1,
+							type: "button",
+							class: normalizeClass(["pse-slot-chip", { "is-empty": !orderSlot.value }]),
+							disabled: !__props.handle.ready.value || __props.handle.saving.value,
+							title: orderSlot.value ? `Deze order staat in vak ${orderSlot.value}` : "Kies een vak voor deze order",
+							onClick: _cache[1] || (_cache[1] = ($event) => picking.value = { subject: `Reservering ${__props.handle.reservationNumber.value}` })
+						}, [orderSlot.value ? (openBlock(), createElementBlock("span", _hoisted_6$16, toDisplayString(orderSlot.value), 1)) : unavailable.value ? (openBlock(), createElementBlock("span", _hoisted_7$15, "Niet beschikbaar")) : (openBlock(), createElementBlock("span", _hoisted_8$14, [..._cache[4] || (_cache[4] = [createBaseVNode("span", {
+							class: "material-icons pse-slot-chip-empty-icon",
+							"aria-hidden": "true"
+						}, "add", -1), createTextVNode(" Vak kiezen ", -1)])]))], 10, _hoisted_5$19)) : !open.value && usedSlots.value.length ? (openBlock(), createElementBlock("span", _hoisted_9$13, [(openBlock(true), createElementBlock(Fragment, null, renderList(usedSlots.value, (used) => {
+							return openBlock(), createElementBlock("span", {
+								key: used,
+								class: "pse-slot-chip is-static"
+							}, [createBaseVNode("span", _hoisted_10$13, toDisplayString(used), 1)]);
+						}), 128))])) : !open.value && unavailable.value ? (openBlock(), createElementBlock("span", _hoisted_11$11, "Niet beschikbaar")) : !open.value ? (openBlock(), createElementBlock("span", _hoisted_12$10, "Geen vak")) : createCommentVNode("", true),
+						foldable.value ? (openBlock(), createElementBlock("span", {
+							key: 5,
+							class: normalizeClass(["material-icons pse-slotpanel-chevron", { "is-open": open.value }]),
+							"aria-hidden": "true"
+						}, "expand_more", 2)) : createCommentVNode("", true)
+					]),
+					_: 1
+				}, 8, [
+					"class",
+					"type",
+					"aria-expanded",
+					"title"
+				])), foldable.value ? (openBlock(), createElementBlock("div", {
+					key: 0,
+					class: normalizeClass(["pse-slotpanel-collapse", { "is-open": open.value }])
+				}, [createBaseVNode("div", _hoisted_13$10, [createBaseVNode("div", _hoisted_14$9, [
+					showOrderSlot.value ? (openBlock(), createElementBlock("div", _hoisted_15$8, [_cache[7] || (_cache[7] = createBaseVNode("span", { class: "pse-slotpanel-caption" }, "Hele order", -1)), createBaseVNode("button", {
+						type: "button",
+						class: normalizeClass(["pse-slot-chip", { "is-empty": !orderSlot.value }]),
+						disabled: !__props.handle.ready.value || __props.handle.saving.value,
+						title: orderSlot.value ? `Deze order staat in vak ${orderSlot.value}` : "Kies een vak voor deze order",
+						onClick: _cache[3] || (_cache[3] = ($event) => picking.value = { subject: `Reservering ${__props.handle.reservationNumber.value}` })
+					}, [orderSlot.value ? (openBlock(), createElementBlock("span", _hoisted_17$6, toDisplayString(orderSlot.value), 1)) : (openBlock(), createElementBlock("span", _hoisted_18$4, [..._cache[6] || (_cache[6] = [createBaseVNode("span", {
+						class: "material-icons pse-slot-chip-empty-icon",
+						"aria-hidden": "true"
+					}, "add", -1), createTextVNode(" Vak kiezen ", -1)])]))], 10, _hoisted_16$7)])) : createCommentVNode("", true),
+					createBaseVNode("div", _hoisted_19$4, [showOrderSlot.value ? (openBlock(), createElementBlock("span", _hoisted_20$4, "Losse regels")) : createCommentVNode("", true), createBaseVNode("ul", _hoisted_21$4, [(openBlock(true), createElementBlock(Fragment, null, renderList(__props.products, (product) => {
+						return openBlock(), createElementBlock("li", {
+							key: product.barcode,
+							class: "pse-slotpanel-line"
+						}, [createBaseVNode("span", {
+							class: "pse-slotpanel-line-name",
+							title: product.description
+						}, toDisplayString(product.description), 9, _hoisted_22$4), createBaseVNode("button", {
+							type: "button",
+							class: normalizeClass(["pse-slot-chip", { "is-empty": !__props.handle.lineSlot(product.barcode) }]),
+							disabled: lineChipDisabled(product.barcode),
+							title: __props.handle.lineSlot(product.barcode) ? `Staat in vak ${__props.handle.lineSlot(product.barcode)}` : unref(canAssignLines) ? "Kies een vak voor dit product" : `Deze werkplek zet één vak per order. Zet de instelling op 'een vak per productregel' om losse regels weg te zetten.`,
+							onClick: ($event) => picking.value = {
+								barcode: product.barcode,
+								subject: product.description
+							}
+						}, [__props.handle.lineSlot(product.barcode) ? (openBlock(), createElementBlock("span", _hoisted_24$2, toDisplayString(__props.handle.lineSlot(product.barcode)), 1)) : (openBlock(), createElementBlock("span", _hoisted_25$1, [..._cache[8] || (_cache[8] = [createBaseVNode("span", {
+							class: "material-icons pse-slot-chip-empty-icon",
+							"aria-hidden": "true"
+						}, "add", -1), createTextVNode(" Vak ", -1)])]))], 10, _hoisted_23$3)]);
+					}), 128))])]),
+					unavailable.value ? (openBlock(), createElementBlock("p", _hoisted_26, " Geen verbinding met RetailVista, dus het vak van deze order is niet bekend. ")) : createCommentVNode("", true)
+				])])], 2)) : createCommentVNode("", true)])])], 64);
+			};
+		}
+	}), [["__scopeId", "data-v-025f11c3"]]);
+	async function writeToClipboard(value) {
+		try {
+			await navigator.clipboard.writeText(value);
+			return true;
+		} catch {
+			return copyFallback(value);
+		}
+	}
+	function copyFallback(value) {
+		const field = document.createElement("textarea");
+		field.value = value;
+		field.style.cssText = "position:fixed;top:-1000px;opacity:0;";
+		document.body.append(field);
+		field.select();
+		let copied = false;
+		try {
+			copied = document.execCommand("copy");
+		} catch (error) {
+			console.error("Pack&Ship Extended could not copy to the clipboard.", error);
+		}
+		field.remove();
+		return copied;
+	}
+	var _hoisted_1$27 = ["title"];
+	var _hoisted_2$27 = {
+		class: "material-icons pse-copy-icon",
+		"aria-hidden": "true"
+	};
+	var CopyButton_default = defineComponent({
+		__name: "CopyButton",
+		props: {
+			value: {},
+			label: {}
+		},
+		setup(__props) {
+			const props = __props;
+			const state = ref();
+			let timeout;
+			const icon = computed(() => state.value == void 0 ? "content_copy" : state.value ? "check" : "error_outline");
+			onUnmounted(() => clearTimeout(timeout));
+			async function copy() {
+				if (!props.value) return;
+				state.value = await writeToClipboard(props.value);
+				clearTimeout(timeout);
+				timeout = setTimeout(() => state.value = void 0, 1400);
+			}
+			return (_ctx, _cache) => {
+				return openBlock(), createElementBlock("button", {
+					type: "button",
+					class: normalizeClass(["pse-copy", {
+						"is-copied": state.value == true,
+						"is-failed": state.value == false
+					}]),
+					title: `${__props.label} kopiëren`,
+					onClick: _cache[0] || (_cache[0] = withModifiers(($event) => copy(), ["stop"]))
+				}, [createBaseVNode("span", _hoisted_2$27, toDisplayString(icon.value), 1)], 10, _hoisted_1$27);
+			};
+		}
+	});
+	var _hoisted_1$26 = { class: "pse-rescard-head" };
+	var _hoisted_2$26 = { class: "pse-rescard-id" };
+	var _hoisted_3$22 = { class: "pse-rescard-number" };
+	var _hoisted_4$19 = { class: "pse-rescard-reference" };
+	var _hoisted_5$18 = { class: "pse-rescard-facts" };
+	var _hoisted_6$15 = { class: "pse-rescard-fact" };
+	var _hoisted_7$14 = { class: "pse-rescard-fact" };
+	var _hoisted_8$13 = { class: "pse-rescard-fact" };
+	var _hoisted_9$12 = {
+		key: 0,
+		class: "pse-rescard-products"
+	};
+	var _hoisted_10$12 = { class: "pse-table" };
+	var _hoisted_11$10 = { class: "pse-cell-barcode" };
+	var _hoisted_12$9 = { class: "pse-cell-description" };
+	var _hoisted_13$9 = { class: "pse-cell-barcode" };
+	var _hoisted_14$8 = { class: "pse-copy-cell" };
+	var _hoisted_15$7 = { class: "pse-table-right" };
+	var _hoisted_16$6 = { class: "pse-rescard-amount" };
+	var _hoisted_17$5 = {
+		key: 1,
+		class: "pse-rescard-aside"
+	};
+	var ReservationCard_default = _plugin_vue_export_helper_default(defineComponent({
+		__name: "ReservationCard",
+		props: {
+			reservation: {},
+			showProducts: { type: Boolean },
+			showOpenButton: { type: Boolean },
+			highlightIncomplete: { type: Boolean },
+			showNote: { type: Boolean },
+			noteEnabled: { type: Boolean },
+			slotHandle: {}
+		},
+		emits: ["open", "saveNote"],
+		setup(__props) {
+			const props = __props;
+			function hasShopwareNote() {
+				return matchShopwareOrderNumber(props.reservation.saleOrderReference);
+			}
+			function isShort(amount) {
+				return props.highlightIncomplete && !isAmountStringComplete(amount);
+			}
+			return (_ctx, _cache) => {
+				return openBlock(), createElementBlock("article", { class: normalizeClass(["pse-rescard", { "is-incomplete": __props.highlightIncomplete }]) }, [
+					createBaseVNode("header", _hoisted_1$26, [
+						createBaseVNode("div", _hoisted_2$26, [createBaseVNode("span", _hoisted_3$22, toDisplayString(__props.reservation.reservationNumber), 1), createBaseVNode("span", _hoisted_4$19, toDisplayString(__props.reservation.saleOrderReference), 1)]),
+						createBaseVNode("dl", _hoisted_5$18, [
+							createBaseVNode("div", _hoisted_6$15, [_cache[2] || (_cache[2] = createBaseVNode("dt", null, "Klant", -1)), createBaseVNode("dd", null, toDisplayString(__props.reservation.customer), 1)]),
+							createBaseVNode("div", _hoisted_7$14, [_cache[3] || (_cache[3] = createBaseVNode("dt", null, "Status", -1)), createBaseVNode("dd", null, toDisplayString(__props.reservation.status), 1)]),
+							createBaseVNode("div", _hoisted_8$13, [_cache[4] || (_cache[4] = createBaseVNode("dt", null, "Logistiek", -1)), createBaseVNode("dd", null, toDisplayString(__props.reservation.deliveryStatus), 1)])
+						]),
+						createVNode(Transition, null, {
+							default: withCtx(() => [__props.showOpenButton ? (openBlock(), createElementBlock("button", {
+								key: 0,
+								type: "button",
+								class: "pse-rescard-open",
+								onClick: _cache[0] || (_cache[0] = ($event) => _ctx.$emit("open", __props.reservation.url))
+							}, [..._cache[5] || (_cache[5] = [createTextVNode(" Open ", -1), createBaseVNode("span", {
+								class: "material-icons pse-rescard-open-icon",
+								"aria-hidden": "true"
+							}, "chevron_right", -1)])])) : createCommentVNode("", true)]),
+							_: 1
+						})
+					]),
+					__props.showProducts ? (openBlock(), createElementBlock("div", _hoisted_9$12, [createBaseVNode("table", _hoisted_10$12, [_cache[6] || (_cache[6] = createBaseVNode("thead", null, [createBaseVNode("tr", null, [
+						createBaseVNode("th", null, "Artikel nr"),
+						createBaseVNode("th", null, "Omschrijving"),
+						createBaseVNode("th", null, "Hoofd barcode"),
+						createBaseVNode("th", { class: "pse-table-right" }, "Geraapt")
+					])], -1)), createBaseVNode("tbody", null, [(openBlock(true), createElementBlock(Fragment, null, renderList(__props.reservation.products, (product, index) => {
+						return openBlock(), createElementBlock("tr", {
+							key: index,
+							class: normalizeClass({ "is-short": isShort(product.amount) })
+						}, [
+							createBaseVNode("td", _hoisted_11$10, toDisplayString(product.number), 1),
+							createBaseVNode("td", _hoisted_12$9, toDisplayString(product.description), 1),
+							createBaseVNode("td", _hoisted_13$9, [createBaseVNode("span", _hoisted_14$8, [createTextVNode(toDisplayString(product.barcode) + " ", 1), createVNode(CopyButton_default, {
+								value: product.barcode,
+								label: "Barcode"
+							}, null, 8, ["value"])])]),
+							createBaseVNode("td", _hoisted_15$7, [createBaseVNode("span", _hoisted_16$6, toDisplayString(product.amount), 1)])
+						], 2);
+					}), 128))])])])) : createCommentVNode("", true),
+					__props.showNote && hasShopwareNote() || __props.slotHandle ? (openBlock(), createElementBlock("div", _hoisted_17$5, [__props.slotHandle ? (openBlock(), createBlock(ReservationSlotPanel_default, {
+						key: 0,
+						handle: __props.slotHandle,
+						products: __props.reservation.products
+					}, null, 8, ["handle", "products"])) : createCommentVNode("", true), __props.showNote && hasShopwareNote() ? (openBlock(), createBlock(ShopwareNote_default, {
+						key: 1,
+						"order-data": __props.reservation.swOrderData,
+						enabled: !!__props.noteEnabled,
+						onSave: _cache[1] || (_cache[1] = ($event) => _ctx.$emit("saveNote"))
+					}, null, 8, ["order-data", "enabled"])) : createCommentVNode("", true)])) : createCommentVNode("", true)
+				], 2);
+			};
+		}
+	}), [["__scopeId", "data-v-b187fc81"]]);
+	var _hoisted_1$25 = { class: "pse-row-number" };
+	var _hoisted_2$25 = { class: "pse-row-customer" };
+	var _hoisted_3$21 = { class: "pse-row-reference" };
+	var _hoisted_4$18 = { key: 2 };
+	var ReservationRow_default = _plugin_vue_export_helper_default(defineComponent({
+		__name: "ReservationRow",
+		props: {
+			reservation: {},
+			status: {},
+			showOpen: { type: Boolean }
+		},
+		emits: ["open"],
+		setup(__props) {
+			const props = __props;
+			const STATES = {
+				[MassCompleteStatus.idle]: {
+					label: "In wachtrij",
+					modifier: "is-queued"
+				},
+				[MassCompleteStatus.started]: {
+					label: "Bezig",
+					modifier: "is-busy"
+				},
+				[MassCompleteStatus.finished]: {
+					label: "Afgerond",
+					modifier: "is-done"
+				},
+				[MassCompleteStatus.failed]: {
+					label: "Mislukt",
+					modifier: "is-failed"
+				},
+				[MassCompleteStatus.stopped]: {
+					label: "Gestopt",
+					modifier: "is-stopped"
+				}
+			};
+			const state = computed(() => props.status == void 0 ? void 0 : STATES[props.status] ?? STATES[MassCompleteStatus.failed]);
+			return (_ctx, _cache) => {
+				return openBlock(), createElementBlock("div", { class: normalizeClass(["pse-row", state.value?.modifier]) }, [
+					createBaseVNode("span", _hoisted_1$25, toDisplayString(__props.reservation.reservationNumber), 1),
+					createBaseVNode("span", _hoisted_2$25, toDisplayString(__props.reservation.customer), 1),
+					createBaseVNode("span", _hoisted_3$21, toDisplayString(__props.reservation.saleOrderReference), 1),
+					state.value ? (openBlock(), createElementBlock("span", {
+						key: 0,
+						class: normalizeClass(["pse-row-state", state.value.modifier])
+					}, [_cache[1] || (_cache[1] = createBaseVNode("span", {
+						class: "pse-row-mark",
+						"aria-hidden": "true"
+					}, null, -1)), createTextVNode(" " + toDisplayString(state.value.label), 1)], 2)) : __props.showOpen ? (openBlock(), createElementBlock("button", {
+						key: 1,
+						type: "button",
+						class: "pse-row-open",
+						onClick: _cache[0] || (_cache[0] = ($event) => _ctx.$emit("open", __props.reservation.url))
+					}, [..._cache[2] || (_cache[2] = [createTextVNode(" Open ", -1), createBaseVNode("span", {
+						class: "material-icons pse-row-open-icon",
+						"aria-hidden": "true"
+					}, "chevron_right", -1)])])) : (openBlock(), createElementBlock("span", _hoisted_4$18))
+				], 2);
+			};
+		}
+	}), [["__scopeId", "data-v-51c20dba"]]);
+	var _hoisted_1$24 = { class: "pse-mc-head" };
+	var _hoisted_2$24 = { class: "pse-mc-titles" };
+	var _hoisted_3$20 = {
+		key: 0,
+		class: "pse-mc-subtitle"
+	};
+	var _hoisted_4$17 = {
+		key: 1,
+		class: "pse-mc-subtitle"
+	};
+	var _hoisted_5$17 = {
+		key: 2,
+		class: "pse-mc-subtitle"
+	};
+	var _hoisted_6$14 = {
+		key: 3,
+		class: "pse-mc-subtitle"
+	};
+	var _hoisted_7$13 = {
+		key: 4,
+		class: "pse-mc-subtitle"
+	};
+	var _hoisted_8$12 = {
+		key: 0,
+		class: "pse-mc-controls"
+	};
+	var _hoisted_9$11 = { class: "pse-mc-stepper" };
+	var _hoisted_10$11 = ["disabled"];
+	var _hoisted_11$9 = ["value"];
+	var _hoisted_12$8 = ["disabled"];
+	var _hoisted_13$8 = {
+		key: 1,
+		class: "pse-mc-tally"
+	};
+	var _hoisted_14$7 = { class: "pse-mc-tally-count" };
+	var _hoisted_15$6 = { class: "pse-mc-tally-of" };
+	var _hoisted_16$5 = { class: "pse-mc-tally-label" };
+	var _hoisted_17$4 = {
+		key: 0,
+		class: "pse-mc-progress"
+	};
+	var MassCompletePanel_default = _plugin_vue_export_helper_default(defineComponent({
+		__name: "MassCompletePanel",
+		props: {
+			total: {},
+			max: {},
+			amount: {},
+			started: { type: Boolean },
+			finished: {},
+			failed: {},
+			stopped: { type: Boolean }
+		},
+		emits: ["update:amount", "start"],
+		setup(__props, { emit: __emit }) {
+			const props = __props;
+			const emit = __emit;
+			const settled = computed(() => props.finished + props.failed);
+			const done = computed(() => props.started && (props.stopped || settled.value >= props.amount));
+			const progress = computed(() => props.started && props.amount > 0 ? Math.round(settled.value / props.amount * 100) : 0);
+			function step(by) {
+				emit("update:amount", props.amount + by);
+			}
+			return (_ctx, _cache) => {
+				return openBlock(), createElementBlock("section", { class: normalizeClass(["pse-mc", {
+					"is-running": __props.started && !done.value,
+					"is-done": done.value,
+					"is-stopped": __props.stopped
+				}]) }, [createBaseVNode("div", _hoisted_1$24, [
+					_cache[6] || (_cache[6] = createBaseVNode("span", {
+						class: "pse-mc-icon",
+						"aria-hidden": "true"
+					}, [createBaseVNode("svg", {
+						viewBox: "0 0 24 24",
+						width: "19",
+						height: "19",
+						fill: "none",
+						stroke: "currentColor",
+						"stroke-width": "2",
+						"stroke-linecap": "round",
+						"stroke-linejoin": "round"
+					}, [createBaseVNode("path", { d: "M4 7h16M4 12h16M4 17h9" }), createBaseVNode("path", { d: "M15.5 18.5l2 2 4-4.5" })])], -1)),
+					createBaseVNode("div", _hoisted_2$24, [_cache[5] || (_cache[5] = createBaseVNode("h3", { class: "pse-mc-title" }, "Massa voltooien", -1)), !__props.started ? (openBlock(), createElementBlock("p", _hoisted_3$20, " Opent " + toDisplayString(__props.amount) + " van de " + toDisplayString(__props.total) + " reserveringen in de achtergrond en rondt ze af. ", 1)) : !done.value ? (openBlock(), createElementBlock("p", _hoisted_4$17, toDisplayString(settled.value) + " van " + toDisplayString(__props.amount) + " afgerond — laat dit scherm openstaan. ", 1)) : __props.stopped ? (openBlock(), createElementBlock("p", _hoisted_5$17, " Gestopt na een mislukte reservering. " + toDisplayString(__props.finished) + " afgerond, de rest is niet geprobeerd — het tabblad met de fout staat nog open. ", 1)) : __props.failed > 0 ? (openBlock(), createElementBlock("p", _hoisted_6$14, toDisplayString(__props.finished) + " afgerond, " + toDisplayString(__props.failed) + " mislukt. Mislukte reserveringen staan hieronder. ", 1)) : (openBlock(), createElementBlock("p", _hoisted_7$13, " Alle " + toDisplayString(__props.finished) + " reserveringen zijn afgerond. ", 1))]),
+					!__props.started ? (openBlock(), createElementBlock("div", _hoisted_8$12, [createBaseVNode("div", _hoisted_9$11, [
+						createBaseVNode("button", {
+							type: "button",
+							class: "pse-mc-step",
+							"aria-label": "Eén minder",
+							disabled: __props.amount <= 2,
+							onClick: _cache[0] || (_cache[0] = ($event) => step(-1))
+						}, "−", 8, _hoisted_10$11),
+						createBaseVNode("input", {
+							type: "number",
+							class: "pse-mc-amount",
+							value: __props.amount,
+							inputmode: "numeric",
+							"aria-label": "Aantal reserveringen",
+							onInput: _cache[1] || (_cache[1] = ($event) => emit("update:amount", Number($event.target.value))),
+							onFocusout: _cache[2] || (_cache[2] = ($event) => emit("update:amount", __props.amount))
+						}, null, 40, _hoisted_11$9),
+						createBaseVNode("button", {
+							type: "button",
+							class: "pse-mc-step",
+							"aria-label": "Eén meer",
+							disabled: __props.amount >= Math.min(__props.max, __props.total),
+							onClick: _cache[3] || (_cache[3] = ($event) => step(1))
+						}, "+", 8, _hoisted_12$8)
+					]), createBaseVNode("button", {
+						type: "button",
+						class: "pse-dialog-btn pse-mc-start",
+						onClick: _cache[4] || (_cache[4] = ($event) => emit("start"))
+					}, " Start voltooien ")])) : (openBlock(), createElementBlock("div", _hoisted_13$8, [createBaseVNode("span", _hoisted_14$7, [createTextVNode(toDisplayString(settled.value), 1), createBaseVNode("span", _hoisted_15$6, "/" + toDisplayString(__props.amount), 1)]), createBaseVNode("span", _hoisted_16$5, toDisplayString(__props.stopped ? "gestopt" : done.value ? "klaar" : "afgerond"), 1)]))
+				]), __props.started ? (openBlock(), createElementBlock("div", _hoisted_17$4, [createBaseVNode("div", {
+					class: "pse-mc-progress-fill",
+					style: normalizeStyle({ width: `${progress.value}%` })
+				}, null, 4)])) : createCommentVNode("", true)], 2);
+			};
+		}
+	}), [["__scopeId", "data-v-5c92f516"]]);
+	var _hoisted_1$23 = { class: "pse-found" };
+	var _hoisted_2$23 = { class: "pse-found-image" };
+	var _hoisted_3$19 = ["src"];
+	var _hoisted_4$16 = { class: "pse-found-text" };
+	var _hoisted_5$16 = { class: "pse-found-name" };
+	var _hoisted_6$13 = { class: "pse-found-barcode pse-copy-cell" };
+	var _hoisted_7$12 = { class: "pse-found-count" };
+	var _hoisted_8$11 = { class: "pse-found-count-number" };
+	var _hoisted_9$10 = {
+		key: 0,
+		class: "pse-countdown"
+	};
+	var _hoisted_10$10 = {
+		key: 0,
+		class: "pse-group"
+	};
+	var _hoisted_11$8 = { class: "pse-group-head" };
+	var _hoisted_12$7 = { class: "pse-group-title" };
+	var _hoisted_13$7 = { class: "pse-group-count" };
+	var _hoisted_14$6 = { class: "pse-rows" };
+	var _hoisted_15$5 = {
+		key: 1,
+		class: "pse-group"
+	};
+	var _hoisted_16$4 = { class: "pse-group-head" };
+	var _hoisted_17$3 = { class: "pse-group-title" };
+	var _hoisted_18$3 = { class: "pse-group-count" };
+	var _hoisted_19$3 = {
+		key: 2,
+		class: "pse-group"
+	};
+	var _hoisted_20$3 = { class: "pse-group-head" };
+	var _hoisted_21$3 = { class: "pse-group-title" };
+	var _hoisted_22$3 = { class: "pse-group-count" };
+	var massCompleteMax = 50;
+	var massCompleteThreshold = 2;
+	var ReservationSelectionModal_default = _plugin_vue_export_helper_default(defineComponent({
+		__name: "ReservationSelectionModal",
+		props: { modalData: {} },
+		emits: ["open", "close"],
+		setup(__props, { emit: __emit }) {
+			const emit = __emit;
+			const props = __props;
+			const swToken = ref();
+			const swCommentBoxesEnabled = ref(false);
+			const countdown = ref(2);
+			let saveTimeoutId;
+			const massCompleteShowDialog = ref(false);
+			const massCompleteStarted = ref(false);
+			const massCompleteAmount = ref(100);
+			const massCompleteStatus = ref();
+			const slotReservations = props.modalData.validReservations.concat(props.modalData.invalidReservations);
+			const slotHandles = new Map(slotReservations.map((reservation) => [reservation.reservationNumber, createSlotHandle()]));
+			function slotsFor(reservationNumber) {
+				return slotHandles.get(reservationNumber);
+			}
+			const massCompleteStopped = ref(false);
+			initMassComplete();
+			onMounted(() => {
+				loadSlots();
+				shopwareInitialize().then((token) => {
+					swToken.value = token;
+					retrieveCommentData();
+					autoSelectReservationCountdown();
+				});
+			});
+			function onSaveButtonClick(orderData, orderNumber) {
+				if (swToken.value) saveOrderComment(swToken.value, orderData, orderNumber);
+				swCommentBoxesEnabled.value = false;
+				if (saveTimeoutId) clearTimeout(saveTimeoutId);
+				saveTimeoutId = setTimeout(() => {
+					swCommentBoxesEnabled.value = true;
+				}, 250);
+			}
+			function identify(reservation) {
+				if (reservation.url) return fetchReservationId(reservation.url);
+				return findReservationId(String(reservation.reservationNumber)).catch((error) => {
+					if (error instanceof ErpSignedOutError) throw error;
+					console.error("Pack&Ship Extended could not find reservation " + reservation.reservationNumber + " in RetailVista.", error);
+					return "";
+				});
+			}
+			function loadSlots() {
+				const reservations = slotReservations;
+				if (reservations.length == 0) return;
+				Promise.all(reservations.map(identify)).then(async (ids) => {
+					const notes = await readReservationNotes(ids.filter(Boolean));
+					reservations.forEach((reservation, index) => {
+						slotHandles.get(reservation.reservationNumber)?.adopt(ids[index], String(reservation.reservationNumber), notes.get(ids[index]));
+					});
+				}).catch((error) => {
+					if (error instanceof ErpSignedOutError) erpStore.reportSignedOut();
+					console.error("Pack&Ship Extended could not read the rack bays of the listed reservations.", error);
+					reservations.forEach((reservation) => {
+						slotHandles.get(reservation.reservationNumber)?.adopt("", String(reservation.reservationNumber), void 0);
+					});
+				});
+			}
+			function retrieveCommentData() {
+				const reservationsToFetch = props.modalData.invalidReservations.concat(props.modalData.validReservations);
+				Promise.all(reservationsToFetch.map((reservation) => shopwareGetOrderData(swToken.value, reservation.saleOrderReference))).then((responses) => {
+					responses.forEach((response, index) => {
+						reservationsToFetch[index].swOrderData = response.data[0];
+					});
+				}).then(() => {
+					swCommentBoxesEnabled.value = true;
+				});
+			}
+			function autoSelectReservationCountdown() {
+				if (!canAutoProceed()) return;
+				let countdownInterval = setInterval(() => {
+					countdown.value--;
+					if (countdown.value <= 0) {
+						clearInterval(countdownInterval);
+						autoSelectReservation();
+					}
+				}, 1e3);
+			}
+			function autoSelectReservation() {
+				if (props.modalData.singleLineReservations.length > 0) {
+					emit("open", props.modalData.singleLineReservations[0].url);
+					return;
+				}
+				if (props.modalData.validReservations.length > 0) {
+					emit("open", props.modalData.validReservations[0].url);
+					return;
+				}
+			}
+			function canAutoProceed() {
+				if (!Settings.autoMasterSwitch) return false;
+				if (props.modalData.singleLineReservations.length <= 0 && props.modalData.validReservations.length <= 0) return false;
+				if (massCompleteShowDialog.value == true) return false;
+				return true;
+			}
+			function initMassComplete() {
+				if (props.modalData.singleLineReservations && props.modalData.singleLineReservations.length >= massCompleteThreshold) {
+					setMassCompleteAmount(props.modalData.singleLineReservations.length);
+					massCompleteShowDialog.value = true;
+				}
+			}
+			function setMassCompleteAmount(value) {
+				const totalReservations = props.modalData.singleLineReservations.length;
+				massCompleteAmount.value = Math.min(Math.min(Math.max(2, value), massCompleteMax), totalReservations);
+			}
+			async function startMassComplete() {
+				setMassCompleteAmount(massCompleteAmount.value);
+				massCompleteStarted.value = true;
+				let startedReservations = [];
+				for (let i = 0; i < massCompleteAmount.value; i++) {
+					const reservation = props.modalData.singleLineReservations[i];
+					let tab = await _GM.openInTab(reservation.url, { active: false });
+					const entry = {
+						reservationNumber: String(reservation.reservationNumber),
+						status: MassCompleteStatus.idle,
+						close: tab.close
+					};
+					startedReservations.push(entry);
+					monitorMassCompleteEntry(entry);
+				}
+				initMassCompleteStatus(startedReservations);
+				massCompleteStatus.value = startedReservations;
+			}
+			function monitorMassCompleteEntry(entry) {
+				_GM_addValueChangeListener(`PSE_MCEntry_${entry.reservationNumber}`, (_key, _oldValue, newValue, _remote) => {
+					if (massCompleteStatus.value) {
+						const entryIndex = massCompleteStatus.value.findIndex((statusEnt) => statusEnt.reservationNumber == entry.reservationNumber);
+						if (entryIndex != -1) massCompleteStatus.value[entryIndex].status = newValue;
+						if (newValue == MassCompleteStatus.finished) entry.close?.();
+						if (newValue == MassCompleteStatus.failed) stopMassComplete(entry);
+					}
+				});
+			}
+			function stopMassComplete(failed) {
+				if (massCompleteStopped.value) return;
+				massCompleteStopped.value = true;
+				for (const entry of massCompleteStatus.value ?? []) {
+					if (entry.reservationNumber == failed.reservationNumber) continue;
+					if (entry.status == MassCompleteStatus.finished || entry.status == MassCompleteStatus.failed) continue;
+					entry.close?.();
+					entry.status = MassCompleteStatus.stopped;
+				}
+			}
+			function statusFor(reservationNumber) {
+				return massCompleteStatus.value?.find((entry) => entry.reservationNumber == String(reservationNumber))?.status;
+			}
+			const massCompleteFinished = computed(() => countStatus(MassCompleteStatus.finished));
+			const massCompleteFailed = computed(() => countStatus(MassCompleteStatus.failed));
+			function countStatus(status) {
+				return massCompleteStatus.value?.filter((entry) => entry.status == status).length ?? 0;
+			}
+			return (_ctx, _cache) => {
+				return openBlock(), createBlock(ModalShell_default, {
+					title: `${__props.modalData.searchProductAmount} reserveringen met dit product`,
+					size: "xl",
+					dismissable: false,
+					onClose: _cache[4] || (_cache[4] = ($event) => emit("close"))
+				}, {
+					footer: withCtx(() => [createBaseVNode("button", {
+						type: "button",
+						class: "pse-dialog-btn pse-dialog-btn-quiet",
+						onClick: _cache[3] || (_cache[3] = ($event) => emit("close"))
+					}, " Sluiten ")]),
+					default: withCtx(() => [
+						createBaseVNode("section", _hoisted_1$23, [
+							createBaseVNode("div", _hoisted_2$23, [__props.modalData.searchProductImageUrl ? (openBlock(), createElementBlock("img", {
+								key: 0,
+								src: __props.modalData.searchProductImageUrl,
+								alt: "",
+								loading: "lazy"
+							}, null, 8, _hoisted_3$19)) : createCommentVNode("", true)]),
+							createBaseVNode("div", _hoisted_4$16, [createBaseVNode("h3", _hoisted_5$16, toDisplayString(__props.modalData.searchProductName), 1), createBaseVNode("p", _hoisted_6$13, [createTextVNode(toDisplayString(__props.modalData.searchProductBarcode) + " ", 1), createVNode(CopyButton_default, {
+								value: __props.modalData.searchProductBarcode,
+								label: "Barcode"
+							}, null, 8, ["value"])])]),
+							createBaseVNode("div", _hoisted_7$12, [createBaseVNode("span", _hoisted_8$11, toDisplayString(__props.modalData.searchProductAmount), 1), _cache[5] || (_cache[5] = createBaseVNode("span", { class: "pse-found-count-label" }, "reserveringen", -1))])
+						]),
+						createVNode(Transition, null, {
+							default: withCtx(() => [canAutoProceed() ? (openBlock(), createElementBlock("p", _hoisted_9$10, [_cache[6] || (_cache[6] = createBaseVNode("span", {
+								class: "pse-countdown-mark",
+								"aria-hidden": "true"
+							}, null, -1)), createTextVNode(" Gaat automatisch verder over " + toDisplayString(countdown.value) + " seconden... ", 1)])) : createCommentVNode("", true)]),
+							_: 1
+						}),
+						__props.modalData.singleLineReservations.length > 0 ? (openBlock(), createElementBlock("section", _hoisted_10$10, [
+							createBaseVNode("header", _hoisted_11$8, [createBaseVNode("h3", _hoisted_12$7, [_cache[7] || (_cache[7] = createTextVNode(" Singleline ", -1)), createBaseVNode("span", _hoisted_13$7, toDisplayString(__props.modalData.singleLineReservations.length), 1)]), _cache[8] || (_cache[8] = createBaseVNode("p", { class: "pse-group-note" }, "Deze reserveringen bevatten 1 stuk van het product.", -1))]),
+							massCompleteShowDialog.value ? (openBlock(), createBlock(MassCompletePanel_default, {
+								key: 0,
+								total: __props.modalData.singleLineReservations.length,
+								max: massCompleteMax,
+								amount: massCompleteAmount.value,
+								started: massCompleteStarted.value,
+								finished: massCompleteFinished.value,
+								failed: massCompleteFailed.value,
+								stopped: massCompleteStopped.value,
+								"onUpdate:amount": setMassCompleteAmount,
+								onStart: _cache[0] || (_cache[0] = ($event) => startMassComplete())
+							}, null, 8, [
+								"total",
+								"amount",
+								"started",
+								"finished",
+								"failed",
+								"stopped"
+							])) : createCommentVNode("", true),
+							createBaseVNode("div", _hoisted_14$6, [(openBlock(true), createElementBlock(Fragment, null, renderList(__props.modalData.singleLineReservations, (reservation) => {
+								return openBlock(), createBlock(ReservationRow_default, {
+									key: reservation.reservationNumber,
+									reservation,
+									status: statusFor(reservation.reservationNumber),
+									"show-open": !massCompleteStarted.value,
+									onOpen: _cache[1] || (_cache[1] = (url) => emit("open", url))
+								}, null, 8, [
+									"reservation",
+									"status",
+									"show-open"
+								]);
+							}), 128))])
+						])) : createCommentVNode("", true),
+						__props.modalData.validReservations.length > 0 ? (openBlock(), createElementBlock("section", _hoisted_15$5, [createBaseVNode("header", _hoisted_16$4, [createBaseVNode("h3", _hoisted_17$3, [_cache[9] || (_cache[9] = createTextVNode(" Reserveringen ", -1)), createBaseVNode("span", _hoisted_18$3, toDisplayString(__props.modalData.validReservations.length), 1)]), _cache[10] || (_cache[10] = createBaseVNode("p", { class: "pse-group-note" }, "Klaar om verwerkt te worden.", -1))]), (openBlock(true), createElementBlock(Fragment, null, renderList(__props.modalData.validReservations, (reservation) => {
+							return openBlock(), createBlock(ReservationCard_default, {
+								key: reservation.reservationNumber,
+								reservation,
+								"show-products": "",
+								"show-open-button": !massCompleteStarted.value,
+								"show-note": "",
+								"note-enabled": swCommentBoxesEnabled.value,
+								"slot-handle": slotsFor(reservation.reservationNumber),
+								onOpen: _cache[2] || (_cache[2] = (url) => emit("open", url)),
+								onSaveNote: ($event) => onSaveButtonClick(reservation.swOrderData, reservation.saleOrderReference)
+							}, null, 8, [
+								"reservation",
+								"show-open-button",
+								"note-enabled",
+								"slot-handle",
+								"onSaveNote"
+							]);
+						}), 128))])) : createCommentVNode("", true),
+						__props.modalData.invalidReservations.length > 0 ? (openBlock(), createElementBlock("section", _hoisted_19$3, [createBaseVNode("header", _hoisted_20$3, [createBaseVNode("h3", _hoisted_21$3, [_cache[11] || (_cache[11] = createTextVNode(" Nog niet volledig geraapt ", -1)), createBaseVNode("span", _hoisted_22$3, toDisplayString(__props.modalData.invalidReservations.length), 1)]), _cache[12] || (_cache[12] = createBaseVNode("p", { class: "pse-group-note" }, " Deze reserveringen bevatten het product, maar hebben niet de juiste logistieke status of zijn nog niet volledig geraapt. Ze kunnen hier niet geopend worden. ", -1))]), (openBlock(true), createElementBlock(Fragment, null, renderList(__props.modalData.invalidReservations, (reservation) => {
+							return openBlock(), createBlock(ReservationCard_default, {
+								key: reservation.reservationNumber,
+								reservation,
+								"show-products": "",
+								"highlight-incomplete": "",
+								"show-note": "",
+								"note-enabled": swCommentBoxesEnabled.value,
+								"slot-handle": slotsFor(reservation.reservationNumber),
+								onSaveNote: ($event) => onSaveButtonClick(reservation.swOrderData, reservation.saleOrderReference)
+							}, null, 8, [
+								"reservation",
+								"note-enabled",
+								"slot-handle",
+								"onSaveNote"
+							]);
+						}), 128))])) : createCommentVNode("", true)
+					]),
+					_: 1
+				}, 8, ["title"]);
+			};
+		}
+	}), [["__scopeId", "data-v-76f6f4a0"]]);
+	var _hoisted_1$22 = { class: "pse-panel" };
+	var _hoisted_2$22 = { class: "pse-panel-head" };
+	var _hoisted_3$18 = {
+		class: "pse-panel-icon",
+		"aria-hidden": "true"
+	};
+	var _hoisted_4$15 = { class: "pse-panel-text" };
+	var _hoisted_5$15 = { class: "pse-panel-title" };
+	var _hoisted_6$12 = { class: "pse-panel-subtitle" };
+	var SearchPanel_default = _plugin_vue_export_helper_default(defineComponent({
+		__name: "SearchPanel",
+		props: {
+			title: {},
+			subtitle: {}
+		},
+		setup(__props) {
+			return (_ctx, _cache) => {
+				return openBlock(), createElementBlock("section", _hoisted_1$22, [createBaseVNode("header", _hoisted_2$22, [createBaseVNode("span", _hoisted_3$18, [renderSlot(_ctx.$slots, "icon", {}, void 0, true)]), createBaseVNode("span", _hoisted_4$15, [createBaseVNode("h2", _hoisted_5$15, toDisplayString(__props.title), 1), createBaseVNode("p", _hoisted_6$12, toDisplayString(__props.subtitle), 1)])]), renderSlot(_ctx.$slots, "default", {}, void 0, true)]);
+			};
+		}
+	}), [["__scopeId", "data-v-2ad9890a"]]);
+	var _hoisted_1$21 = { class: "pse-field" };
+	var _hoisted_2$21 = { class: "pse-field-label" };
+	var _hoisted_3$17 = ["placeholder"];
+	var SearchField_default = _plugin_vue_export_helper_default(defineComponent({
+		__name: "SearchField",
+		props: mergeModels({
+			label: {},
+			placeholder: {},
+			adopt: {}
+		}, {
+			"modelValue": {},
+			"modelModifiers": {}
+		}),
+		emits: ["update:modelValue"],
+		setup(__props) {
+			const props = __props;
+			const model = useModel(__props, "modelValue");
+			const shell = useTemplateRef("shell");
+			onMounted(() => {
+				if (!props.adopt) return;
+				adoptElement(shell.value, document.querySelector(props.adopt), "pse-input");
+			});
+			return (_ctx, _cache) => {
+				return openBlock(), createElementBlock("label", _hoisted_1$21, [createBaseVNode("span", _hoisted_2$21, toDisplayString(__props.label), 1), createBaseVNode("span", {
+					class: "pse-field-shell",
+					ref_key: "shell",
+					ref: shell
+				}, [!__props.adopt ? withDirectives((openBlock(), createElementBlock("input", {
+					key: 0,
+					class: "pse-input",
+					type: "text",
+					autocomplete: "off",
+					placeholder: __props.placeholder,
+					"onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => model.value = $event)
+				}, null, 8, _hoisted_3$17)), [[vModelText, model.value]]) : createCommentVNode("", true)], 512)]);
+			};
+		}
+	}), [["__scopeId", "data-v-e35ea7a8"]]);
+	var _hoisted_1$20 = { class: "pse-notice-text" };
+	var _hoisted_2$20 = { class: "pse-notice-title" };
+	var _hoisted_3$16 = {
+		key: 0,
+		class: "pse-notice-detail"
+	};
+	var SearchNotice_default = _plugin_vue_export_helper_default(defineComponent({
+		__name: "SearchNotice",
+		props: {
+			title: {},
+			detail: {},
+			tone: {}
+		},
+		emits: ["dismiss"],
+		setup(__props) {
+			return (_ctx, _cache) => {
+				return openBlock(), createElementBlock("div", {
+					class: normalizeClass(["pse-notice", `is-${__props.tone}`]),
+					role: "status"
+				}, [
+					_cache[2] || (_cache[2] = createStaticVNode("<span class=\"pse-notice-icon\" aria-hidden=\"true\" data-v-0438713d><svg viewBox=\"0 0 24 24\" width=\"20\" height=\"20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" data-v-0438713d><circle cx=\"12\" cy=\"12\" r=\"8.5\" data-v-0438713d></circle><path d=\"M12 8v5\" data-v-0438713d></path><path d=\"M12 16.2v.1\" data-v-0438713d></path></svg></span>", 1)),
+					createBaseVNode("span", _hoisted_1$20, [createBaseVNode("span", _hoisted_2$20, toDisplayString(__props.title), 1), __props.detail ? (openBlock(), createElementBlock("span", _hoisted_3$16, toDisplayString(__props.detail), 1)) : createCommentVNode("", true)]),
+					createBaseVNode("button", {
+						type: "button",
+						class: "pse-notice-close",
+						"aria-label": "Melding sluiten",
+						onClick: _cache[0] || (_cache[0] = ($event) => _ctx.$emit("dismiss"))
+					}, [..._cache[1] || (_cache[1] = [createBaseVNode("svg", {
+						viewBox: "0 0 24 24",
+						width: "16",
+						height: "16",
+						fill: "none",
+						stroke: "currentColor",
+						"stroke-width": "2.2",
+						"stroke-linecap": "round"
+					}, [createBaseVNode("path", { d: "M6 6l12 12M18 6L6 18" })], -1)])])
+				], 2);
+			};
+		}
+	}), [["__scopeId", "data-v-0438713d"]]);
+	var _hoisted_1$19 = ["disabled"];
+	var _hoisted_2$19 = {
+		class: "pse-resume-icon",
+		"aria-hidden": "true"
+	};
+	var _hoisted_3$15 = { class: "pse-resume-text" };
+	var _hoisted_4$14 = { class: "pse-resume-label" };
+	var _hoisted_5$14 = { class: "pse-resume-number" };
+	var ResumeButton_default = _plugin_vue_export_helper_default(defineComponent({
+		__name: "ResumeButton",
+		props: {
+			label: {},
+			reservationNumber: {},
+			disabled: { type: Boolean }
+		},
+		emits: ["click"],
+		setup(__props) {
+			return (_ctx, _cache) => {
+				return openBlock(), createElementBlock("button", {
+					type: "button",
+					class: "pse-resume",
+					disabled: __props.disabled,
+					onClick: _cache[0] || (_cache[0] = ($event) => _ctx.$emit("click"))
+				}, [
+					createBaseVNode("span", _hoisted_2$19, [renderSlot(_ctx.$slots, "icon", {}, void 0, true)]),
+					createBaseVNode("span", _hoisted_3$15, [createBaseVNode("span", _hoisted_4$14, toDisplayString(__props.label), 1), createBaseVNode("span", _hoisted_5$14, toDisplayString(__props.reservationNumber || "Nog geen"), 1)]),
+					_cache[1] || (_cache[1] = createBaseVNode("svg", {
+						class: "pse-resume-chevron",
+						viewBox: "0 0 24 24",
+						width: "18",
+						height: "18",
+						fill: "none",
+						stroke: "currentColor",
+						"stroke-width": "2",
+						"stroke-linecap": "round",
+						"stroke-linejoin": "round",
+						"aria-hidden": "true"
+					}, [createBaseVNode("path", { d: "M9 6l6 6-6 6" })], -1))
+				], 8, _hoisted_1$19);
+			};
+		}
+	}), [["__scopeId", "data-v-ead5c402"]]);
 	var printerCache = new Map();
 	async function parcelPrinterFor(environmentId) {
 		const known = printerCache.get(environmentId);
@@ -8419,16 +9080,16 @@
 			return false;
 		}
 	}
-	var _hoisted_1$19 = { class: "pse-picker-intro" };
-	var _hoisted_2$19 = { class: "pse-picker-list" };
-	var _hoisted_3$15 = [
+	var _hoisted_1$18 = { class: "pse-picker-intro" };
+	var _hoisted_2$18 = { class: "pse-picker-list" };
+	var _hoisted_3$14 = [
 		"disabled",
 		"title",
 		"onClick"
 	];
-	var _hoisted_4$14 = { class: "pse-picker-what" };
-	var _hoisted_5$14 = { class: "pse-picker-barcode" };
-	var _hoisted_6$12 = { class: "pse-picker-carrier" };
+	var _hoisted_4$13 = { class: "pse-picker-what" };
+	var _hoisted_5$13 = { class: "pse-picker-barcode" };
+	var _hoisted_6$11 = { class: "pse-picker-carrier" };
 	var _hoisted_7$11 = {
 		key: 0,
 		class: "pse-picker-spinner",
@@ -8465,26 +9126,26 @@
 					elevated: "",
 					onClose: _cache[0] || (_cache[0] = ($event) => emit("close"))
 				}, {
-					default: withCtx(() => [createBaseVNode("p", _hoisted_1$19, " Deze reservering heeft " + toDisplayString(__props.parcels.length) + " etiketten. Kies welk etiket opnieuw geprint moet worden. ", 1), createBaseVNode("ul", _hoisted_2$19, [(openBlock(true), createElementBlock(Fragment, null, renderList(__props.parcels, (parcel) => {
+					default: withCtx(() => [createBaseVNode("p", _hoisted_1$18, " Deze reservering heeft " + toDisplayString(__props.parcels.length) + " etiketten. Kies welk etiket opnieuw geprint moet worden. ", 1), createBaseVNode("ul", _hoisted_2$18, [(openBlock(true), createElementBlock(Fragment, null, renderList(__props.parcels, (parcel) => {
 						return openBlock(), createElementBlock("li", { key: parcel.id }, [createBaseVNode("button", {
 							type: "button",
 							class: "pse-picker-row",
 							disabled: Boolean(printing.value),
 							title: `Print het etiket van pakket ${parcel.barcode} opnieuw`,
 							onClick: ($event) => pick(parcel)
-						}, [createBaseVNode("span", _hoisted_4$14, [createBaseVNode("span", _hoisted_5$14, toDisplayString(parcel.barcode), 1), createBaseVNode("span", _hoisted_6$12, toDisplayString([parcel.number, parcel.carrier || parcel.service].filter(Boolean).join(" - ")), 1)]), printing.value == parcel.id ? (openBlock(), createElementBlock("span", _hoisted_7$11)) : (openBlock(), createElementBlock("span", _hoisted_8$10, "print"))], 8, _hoisted_3$15)]);
+						}, [createBaseVNode("span", _hoisted_4$13, [createBaseVNode("span", _hoisted_5$13, toDisplayString(parcel.barcode), 1), createBaseVNode("span", _hoisted_6$11, toDisplayString([parcel.number, parcel.carrier || parcel.service].filter(Boolean).join(" - ")), 1)]), printing.value == parcel.id ? (openBlock(), createElementBlock("span", _hoisted_7$11)) : (openBlock(), createElementBlock("span", _hoisted_8$10, "print"))], 8, _hoisted_3$14)]);
 					}), 128))])]),
 					_: 1
 				}, 8, ["title"]);
 			};
 		}
 	}), [["__scopeId", "data-v-585a06fb"]]);
-	var _hoisted_1$18 = { class: "pse-history" };
-	var _hoisted_2$18 = { class: "pse-history-head" };
-	var _hoisted_3$14 = { class: "pse-history-text" };
-	var _hoisted_4$13 = { class: "pse-history-subtitle" };
-	var _hoisted_5$13 = { class: "pse-history-list" };
-	var _hoisted_6$11 = ["title", "onClick"];
+	var _hoisted_1$17 = { class: "pse-history" };
+	var _hoisted_2$17 = { class: "pse-history-head" };
+	var _hoisted_3$13 = { class: "pse-history-text" };
+	var _hoisted_4$12 = { class: "pse-history-subtitle" };
+	var _hoisted_5$12 = { class: "pse-history-list" };
+	var _hoisted_6$10 = ["title", "onClick"];
 	var _hoisted_7$10 = { class: "pse-history-body" };
 	var _hoisted_8$9 = { class: "pse-history-number" };
 	var _hoisted_9$9 = {
@@ -8576,8 +9237,8 @@
 				return count == 1 ? "1 pakket" : `${count} pakketten`;
 			}
 			return (_ctx, _cache) => {
-				return openBlock(), createElementBlock("aside", _hoisted_1$18, [
-					createBaseVNode("header", _hoisted_2$18, [
+				return openBlock(), createElementBlock("aside", _hoisted_1$17, [
+					createBaseVNode("header", _hoisted_2$17, [
 						_cache[3] || (_cache[3] = createBaseVNode("span", {
 							class: "pse-history-icon",
 							"aria-hidden": "true"
@@ -8595,14 +9256,14 @@
 							cy: "12",
 							r: "8.5"
 						}), createBaseVNode("path", { d: "M12 7.5V12l3 2" })])], -1)),
-						createBaseVNode("span", _hoisted_3$14, [_cache[2] || (_cache[2] = createBaseVNode("h2", { class: "pse-history-title" }, "Afgerond", -1)), createBaseVNode("p", _hoisted_4$13, [createTextVNode(toDisplayString(__props.entries.length) + " " + toDisplayString(__props.entries.length == 1 ? "reservering" : "reserveringen"), 1), failedCount.value ? (openBlock(), createElementBlock(Fragment, { key: 0 }, [createTextVNode(", " + toDisplayString(failedCount.value) + " geweigerd", 1)], 64)) : createCommentVNode("", true)])]),
+						createBaseVNode("span", _hoisted_3$13, [_cache[2] || (_cache[2] = createBaseVNode("h2", { class: "pse-history-title" }, "Afgerond", -1)), createBaseVNode("p", _hoisted_4$12, [createTextVNode(toDisplayString(__props.entries.length) + " " + toDisplayString(__props.entries.length == 1 ? "reservering" : "reserveringen"), 1), failedCount.value ? (openBlock(), createElementBlock(Fragment, { key: 0 }, [createTextVNode(", " + toDisplayString(failedCount.value) + " geweigerd", 1)], 64)) : createCommentVNode("", true)])]),
 						createBaseVNode("button", {
 							type: "button",
 							class: "pse-history-clear",
 							onClick: _cache[0] || (_cache[0] = ($event) => _ctx.$emit("clear"))
 						}, "Wissen")
 					]),
-					createBaseVNode("ol", _hoisted_5$13, [(openBlock(true), createElementBlock(Fragment, null, renderList(__props.entries, (entry) => {
+					createBaseVNode("ol", _hoisted_5$12, [(openBlock(true), createElementBlock(Fragment, null, renderList(__props.entries, (entry) => {
 						return openBlock(), createElementBlock("li", {
 							key: entry.number,
 							class: "pse-history-item"
@@ -8644,7 +9305,7 @@
 								createBaseVNode("path", { d: "M4 7.5l8 4.5 8-4.5" }),
 								createBaseVNode("path", { d: "M12 12v9" })
 							], -1))
-						], 10, _hoisted_6$11), !entry.failed && entry.parcels > 0 ? (openBlock(), createElementBlock("button", {
+						], 10, _hoisted_6$10), !entry.failed && entry.parcels > 0 ? (openBlock(), createElementBlock("button", {
 							key: 0,
 							type: "button",
 							class: "pse-history-print",
@@ -8671,16 +9332,16 @@
 			};
 		}
 	}), [["__scopeId", "data-v-fffbc2dc"]]);
-	var _hoisted_1$17 = { class: "pse-search" };
-	var _hoisted_2$17 = { class: "pse-main" };
-	var _hoisted_3$13 = { class: "pse-card" };
-	var _hoisted_4$12 = ["disabled"];
-	var _hoisted_5$12 = {
+	var _hoisted_1$16 = { class: "pse-search" };
+	var _hoisted_2$16 = { class: "pse-main" };
+	var _hoisted_3$12 = { class: "pse-card" };
+	var _hoisted_4$11 = ["disabled"];
+	var _hoisted_5$11 = {
 		key: 0,
 		class: "pse-spinner",
 		"aria-hidden": "true"
 	};
-	var _hoisted_6$10 = ["disabled"];
+	var _hoisted_6$9 = ["disabled"];
 	var _hoisted_7$9 = { class: "pse-resume-row" };
 	var RESERVATION_FORM_ID = "frmReservations";
 	var RESERVATION_NUMBER_INPUT = "#ReservationNumber";
@@ -8872,7 +9533,7 @@
 						onOpen: _cache[1] || (_cache[1] = (reservationId) => openReservation(reservationId))
 					}, null, 8, ["modal-data"])) : createCommentVNode("", true)]),
 					_: 1
-				})])), createBaseVNode("div", _hoisted_1$17, [
+				})])), createBaseVNode("div", _hoisted_1$16, [
 					createBaseVNode("div", {
 						class: "pse-messages",
 						ref_key: "messages",
@@ -8889,7 +9550,7 @@
 						"detail",
 						"tone"
 					])) : createCommentVNode("", true),
-					createBaseVNode("div", { class: normalizeClass(["pse-layout", { "pse-layout-history": hasHistory.value }]) }, [createBaseVNode("div", _hoisted_2$17, [createBaseVNode("div", _hoisted_3$13, [
+					createBaseVNode("div", { class: normalizeClass(["pse-layout", { "pse-layout-history": hasHistory.value }]) }, [createBaseVNode("div", _hoisted_2$16, [createBaseVNode("div", _hoisted_3$12, [
 						createVNode(SearchPanel_default, {
 							title: "Zoek reservering",
 							subtitle: "Scan een product of vul een reserveringsnummer in."
@@ -8925,7 +9586,7 @@
 									class: "pse-submit pse-submit-end",
 									form: RESERVATION_FORM_ID,
 									disabled: searching.value
-								}, [searching.value ? (openBlock(), createElementBlock("span", _hoisted_5$12)) : createCommentVNode("", true), createTextVNode(" " + toDisplayString(searching.value ? "Bezig met zoeken" : "Zoek"), 1)], 8, _hoisted_4$12)
+								}, [searching.value ? (openBlock(), createElementBlock("span", _hoisted_5$11)) : createCommentVNode("", true), createTextVNode(" " + toDisplayString(searching.value ? "Bezig met zoeken" : "Zoek"), 1)], 8, _hoisted_4$11)
 							]),
 							_: 1
 						}),
@@ -8963,7 +9624,7 @@
 								type: "submit",
 								class: "pse-submit pse-submit-end",
 								disabled: !addParcelsNumber.value
-							}, " Zoek ", 8, _hoisted_6$10)], 32)]),
+							}, " Zoek ", 8, _hoisted_6$9)], 32)]),
 							_: 1
 						})
 					]), createBaseVNode("div", _hoisted_7$9, [createVNode(ResumeButton_default, {
@@ -9014,11 +9675,11 @@
 			};
 		}
 	}), [["__scopeId", "data-v-99949c5b"]]);
-	var _hoisted_1$16 = { class: "pse-loading" };
-	var _hoisted_2$16 = { class: "pse-loading-card" };
-	var _hoisted_3$12 = { class: "pse-loading-text" };
-	var _hoisted_4$11 = { class: "pse-loading-title" };
-	var _hoisted_5$11 = {
+	var _hoisted_1$15 = { class: "pse-loading" };
+	var _hoisted_2$15 = { class: "pse-loading-card" };
+	var _hoisted_3$11 = { class: "pse-loading-text" };
+	var _hoisted_4$10 = { class: "pse-loading-title" };
+	var _hoisted_5$10 = {
 		key: 0,
 		class: "pse-loading-subtitle"
 	};
@@ -9030,10 +9691,10 @@
 		},
 		setup(__props) {
 			return (_ctx, _cache) => {
-				return openBlock(), createElementBlock("div", _hoisted_1$16, [createBaseVNode("div", _hoisted_2$16, [_cache[0] || (_cache[0] = createBaseVNode("span", {
+				return openBlock(), createElementBlock("div", _hoisted_1$15, [createBaseVNode("div", _hoisted_2$15, [_cache[0] || (_cache[0] = createBaseVNode("span", {
 					class: "pse-loading-spinner",
 					"aria-hidden": "true"
-				}, null, -1)), createBaseVNode("div", _hoisted_3$12, [createBaseVNode("h2", _hoisted_4$11, toDisplayString(__props.title), 1), __props.subtitle ? (openBlock(), createElementBlock("p", _hoisted_5$11, toDisplayString(__props.subtitle), 1)) : createCommentVNode("", true)])])]);
+				}, null, -1)), createBaseVNode("div", _hoisted_3$11, [createBaseVNode("h2", _hoisted_4$10, toDisplayString(__props.title), 1), __props.subtitle ? (openBlock(), createElementBlock("p", _hoisted_5$10, toDisplayString(__props.subtitle), 1)) : createCommentVNode("", true)])])]);
 			};
 		}
 	}), [["__scopeId", "data-v-38d33d98"]]);
@@ -9068,171 +9729,35 @@
 	});
 	var add_default = "data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20height='24px'%20viewBox='0%20-960%20960%20960'%20width='24px'%20fill='ffffff'%3e%3cpath%20d='M440-440H200v-80h240v-240h80v240h240v80H520v240h-80v-240Z'/%3e%3c/svg%3e";
 	var image_default = "data:image/svg+xml,%3csvg%20xmlns='http://www.w3.org/2000/svg'%20height='24px'%20viewBox='0%20-960%20960%20960'%20width='24px'%20fill='ffffff'%3e%3cpath%20d='M200-120q-33%200-56.5-23.5T120-200v-560q0-33%2023.5-56.5T200-840h560q33%200%2056.5%2023.5T840-760v560q0%2033-23.5%2056.5T760-120H200Zm0-80h560v-560H200v560Zm40-80h480L570-480%20450-320l-90-120-120%20160Zm-40%2080v-560%20560Z'/%3e%3c/svg%3e";
-	var slots = reactive(emptyAssignment());
-	var reservationId = ref("");
-	var reservationNumber = ref("");
-	var loaded = ref(false);
-	var saving = ref(false);
-	var settled = ref(false);
+	var handle = createSlotHandle();
 	var singleUnit = ref(false);
-	var settingsVersion = ref(0);
-	var scope = computed(() => {
-		settingsVersion.value;
-		return Settings.slotScope;
-	});
-	document.addEventListener(SETTINGS_SAVED_EVENT, () => {
-		Settings.load();
-		settingsVersion.value++;
-	});
-	async function attachReservation(id, number) {
-		reservationId.value = id;
-		reservationNumber.value = number;
-		loaded.value = false;
-		settled.value = false;
-		slots.order = "";
-		slots.lines = {};
-		if (!id) {
-			settled.value = true;
-			return;
-		}
-		try {
-			const parsed = parseComment(await readReservationNote(id));
-			slots.order = parsed.slots.order;
-			slots.lines = parsed.slots.lines;
-			loaded.value = true;
-			debug("Rack bays read off the reservation note", JSON.stringify(slots));
-		} catch (error) {
-			if (error instanceof ErpSignedOutError) erpStore.reportSignedOut();
-			console.error("Pack&Ship Extended could not read the reservation note.", error);
-		} finally {
-			settled.value = true;
-		}
-	}
-	function save() {
-		if (!reservationId.value) return Promise.resolve();
-		saving.value = true;
-		const promise = (async () => {
-			const current = parseComment(await readReservationNote(reservationId.value));
-			await writeReservationNote(reservationId.value, composeComment(current.text, slots));
-		})();
-		l.promise(promise, {
-			pending: `Reservering ${reservationNumber.value} vak wordt opgeslagen...`,
-			success: `Reservering ${reservationNumber.value} vak succesvol opgeslagen.`,
-			error: `Er is een fout opgetreden bij het opslaan van het vak van reservering ${reservationNumber.value}.`
-		}).catch(() => void 0);
-		promise.catch((error) => {
-			if (error instanceof ErpSignedOutError) erpStore.reportSignedOut();
-			console.error("Failed to save the reservation note.", error);
-			playSound("error");
-		});
-		promise.catch(() => void 0).then(() => saving.value = false);
-		return promise;
+	var lastReservationId = "";
+	function attachReservation(id, number) {
+		lastReservationId = id;
+		return handle.attach(id, number);
 	}
 	erpStore.onRestored(() => {
-		if (reservationId.value) attachReservation(reservationId.value, reservationNumber.value);
+		if (lastReservationId) attachReservation(lastReservationId, handle.reservationNumber.value);
 	});
 	var slotStore = {
-		slots,
-		scope,
-		saving,
-		orderNumber: reservationNumber,
-		ready: computed(() => loaded.value),
-		loading: computed(() => !settled.value),
-		hasOrderSlot: computed(() => Boolean(slots.order)),
-		hasLineSlots: computed(() => Object.values(slots.lines).some(Boolean)),
-		showSlots: computed(() => !singleUnit.value || Boolean(slots.order) || Object.values(slots.lines).some(Boolean)),
+		slots: handle.slots,
+		scope: slotScope,
+		saving: handle.saving,
+		orderNumber: handle.reservationNumber,
+		ready: handle.ready,
+		loading: handle.loading,
+		hasOrderSlot: handle.hasOrderSlot,
+		hasLineSlots: handle.hasLineSlots,
+		showSlots: computed(() => !singleUnit.value || handle.hasOrderSlot.value || handle.hasLineSlots.value),
 		attachReservation,
 		setSingleUnit(value) {
 			singleUnit.value = value;
 		},
-		setOrderSlot(slot) {
-			slots.order = slots.order == slot ? "" : slot;
-			return save();
-		},
-		setLineSlot(barcode, slot) {
-			if (slots.lines[barcode] == slot) delete slots.lines[barcode];
-			else slots.lines[barcode] = slot;
-			return save();
-		},
-		lineSlot(barcode) {
-			return slots.lines[barcode] ?? "";
-		},
-		takenBy(exceptBarcode) {
-			const taken = new Map();
-			for (const [barcode, slot] of Object.entries(slots.lines)) {
-				if (!slot || barcode == exceptBarcode) continue;
-				taken.set(slot, [...taken.get(slot) ?? [], barcode]);
-			}
-			return taken;
-		}
+		setOrderSlot: handle.setOrderSlot,
+		setLineSlot: handle.setLineSlot,
+		lineSlot: handle.lineSlot,
+		takenBy: handle.takenBy
 	};
-	var _hoisted_1$15 = { class: "pse-rack" };
-	var _hoisted_2$15 = { class: "pse-rack-letter" };
-	var _hoisted_3$11 = ["title", "onClick"];
-	var _hoisted_4$10 = { class: "pse-rack-bay-label" };
-	var _hoisted_5$10 = {
-		key: 0,
-		class: "pse-rack-bay-note"
-	};
-	var _hoisted_6$9 = {
-		key: 1,
-		class: "pse-rack-bay-note"
-	};
-	var SlotPicker_default = _plugin_vue_export_helper_default(defineComponent({
-		__name: "SlotPicker",
-		props: {
-			subject: {},
-			current: {},
-			taken: {}
-		},
-		emits: ["close", "pick"],
-		setup(__props, { emit: __emit }) {
-			const props = __props;
-			const emit = __emit;
-			function label(letter, bay) {
-				return `${letter}${bay}`;
-			}
-			function occupants(slot) {
-				return props.taken?.get(slot) ?? [];
-			}
-			return (_ctx, _cache) => {
-				return openBlock(), createBlock(ModalShell_default, {
-					title: `Vak kiezen — ${__props.subject}`,
-					size: "lg",
-					onClose: _cache[2] || (_cache[2] = ($event) => emit("close"))
-				}, {
-					footer: withCtx(() => [__props.current ? (openBlock(), createElementBlock("button", {
-						key: 0,
-						type: "button",
-						class: "pse-dialog-btn pse-dialog-btn-quiet",
-						onClick: _cache[0] || (_cache[0] = ($event) => emit("pick", __props.current))
-					}, " Vak leegmaken ")) : createCommentVNode("", true), createBaseVNode("button", {
-						type: "button",
-						class: "pse-dialog-btn pse-dialog-btn-quiet",
-						onClick: _cache[1] || (_cache[1] = ($event) => emit("close"))
-					}, " Annuleren ")]),
-					default: withCtx(() => [_cache[3] || (_cache[3] = createBaseVNode("p", { class: "pse-rack-lead" }, " Kies het vak waar dit blijft staan. Nog een keer op het huidige vak drukken maakt het weer leeg. ", -1)), createBaseVNode("div", _hoisted_1$15, [(openBlock(true), createElementBlock(Fragment, null, renderList(unref(RACK), (column) => {
-						return openBlock(), createElementBlock("div", {
-							key: column.letter,
-							class: "pse-rack-column"
-						}, [createBaseVNode("span", _hoisted_2$15, toDisplayString(column.letter), 1), createBaseVNode("div", { class: normalizeClass(["pse-rack-bays", `is-rows-${column.rows.length}`]) }, [(openBlock(true), createElementBlock(Fragment, null, renderList(column.rows.flat(), (bay) => {
-							return openBlock(), createElementBlock("button", {
-								key: bay,
-								type: "button",
-								class: normalizeClass(["pse-rack-bay", {
-									"is-current": __props.current == label(column.letter, bay),
-									"is-taken": occupants(label(column.letter, bay)).length > 0
-								}]),
-								title: occupants(label(column.letter, bay)).length ? `Vak ${label(column.letter, bay)} — al in gebruik voor deze order` : `Vak ${label(column.letter, bay)}`,
-								onClick: ($event) => emit("pick", label(column.letter, bay))
-							}, [createBaseVNode("span", _hoisted_4$10, toDisplayString(label(column.letter, bay)), 1), occupants(label(column.letter, bay)).length ? (openBlock(), createElementBlock("span", _hoisted_5$10, toDisplayString(occupants(label(column.letter, bay)).length) + " regel" + toDisplayString(occupants(label(column.letter, bay)).length > 1 ? "s" : ""), 1)) : __props.current == label(column.letter, bay) ? (openBlock(), createElementBlock("span", _hoisted_6$9, " Huidig ")) : createCommentVNode("", true)], 10, _hoisted_3$11);
-						}), 128))], 2)]);
-					}), 128))])]),
-					_: 1
-				}, 8, ["title"]);
-			};
-		}
-	}), [["__scopeId", "data-v-76779723"]]);
 	var _hoisted_1$14 = { class: "pse-slotcard" };
 	var _hoisted_2$14 = { class: "pse-slotcard-head" };
 	var _hoisted_3$10 = { class: "pse-slotcard-title" };
@@ -9602,7 +10127,6 @@
 				slotStore.setSingleUnit(lines.value.length == 1 && lines.value[0].requiredQuantity == 1);
 			});
 			const perLineSlots = computed(() => slotStore.showSlots.value && (slotStore.scope.value == "line" || slotStore.hasLineSlots.value));
-			const canAssignLines = computed(() => slotStore.scope.value == "line");
 			function lineChipDisabled(barcode) {
 				return !slotStore.ready.value || slotStore.saving.value || !slotStore.lineSlot(barcode) && !canAssignLines.value;
 			}
@@ -9895,7 +10419,7 @@
 				], 64);
 			};
 		}
-	}), [["__scopeId", "data-v-1f95e035"]]);
+	}), [["__scopeId", "data-v-db7a6ae9"]]);
 	function standInForPortalPage(block) {
 		const main = block.closest(MAIN_CONTENT_SELECTOR);
 		if (!main) return () => {};
@@ -10659,7 +11183,7 @@
 	var package_default = {
 		name: "pack-ship-extended",
 		"private": true,
-		version: "1.1.0",
+		version: "1.1.1",
 		type: "module",
 		scripts: {
 			"dev": "vite",
