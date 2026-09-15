@@ -234,12 +234,11 @@ function replacePortalSearchBlock() {
 	// control carries its form association in an attribute, so it does not have
 	// to be a descendant of the form to be submitted with it.
 	//
-	// Kept, because it is what lets the submit button reach the form from our
-	// card. Not relied on for anything else: when the association does not take,
-	// the form owns neither field, so it serialises to its hidden fields alone
-	// -- a search the portal answers with "no search criteria specified" -- and
-	// a return key in a field with no form owner does nothing at all. Both of
-	// those are handled here instead of being left to the browser.
+	// Kept so the form serialises the barcode along with its own hidden fields,
+	// which is what `buildSearchQuery` starts from. Nothing is relied on it: the
+	// query sets both criteria by name afterwards, the search button no longer
+	// goes through the form at all, and the return key below is answered on
+	// keydown rather than left to implicit submission.
 	for (const selector of [BARCODE_INPUT]) {
 		const input = document.querySelector(selector);
 
@@ -263,10 +262,26 @@ function replacePortalSearchBlock() {
 		});
 	}
 
-	// The submit button still goes through the form, so there is one handler for
-	// it whether it is clicked or reached with the keyboard.
+	// A safety net, not the way the search is started.
+	//
+	// The portal has its own submit handler on this form -- it is what writes
+	// into the messages row we adopted above, so it is demonstrably still bound.
+	// `preventDefault` stops the browser's own submission and nothing else: the
+	// portal's handler runs on the same event, serialises the form, and finds
+	// only the barcode there, because the reservation number the operator typed
+	// is in a field of ours that the form does not own. An empty barcode and an
+	// empty `#ReservationNumber` is a search with nothing in it, which the portal
+	// answers with "geen zoekcriteria opgegeven" -- written straight into the
+	// messages row and rendered as an alert over a search of ours that was fine.
+	//
+	// `stopImmediatePropagation` covers a handler bound after ours; a handler
+	// bound before ours it cannot reach. So the real answer is that nothing here
+	// fires a submit event on this form any more -- the button is a button and
+	// the return key in the barcode field is answered on keydown. This stays for
+	// anything that reaches the form another way.
 	document.querySelector("#" + RESERVATION_FORM_ID)?.addEventListener("submit", (e) => {
 		e.preventDefault();
+		e.stopImmediatePropagation();
 		onSearchReservation();
 	});
 }
@@ -312,27 +327,79 @@ function buildSearchQuery(): string {
 	return params.toString();
 }
 
-async function onSearchReservation() {
+// The query the search in flight was made with.
+//
+// Kept because a search can have to be asked twice: a reservation in an
+// unfinished picking run is answered with the run rather than the reservation,
+// and the same question is put again once the run has been finished off. It
+// cannot be rebuilt at that point -- the fields were emptied the moment the
+// first request went out, so a rebuilt query is an empty one, which the portal
+// answers with "no search criteria specified". So the retry resends this.
+let searchQuery = "";
+
+// Whether the search in flight has already had a picking run finished off for
+// it, so the same answer twice is reported rather than chased.
+let finishedRun = false;
+
+// Whether a query asks the portal anything at all.
+//
+// The two criteria by the names they were written under, so this reads the
+// query that is actually about to be sent rather than the fields it came from
+// -- a retry carries its own copy and has no fields behind it any more.
+function hasSearchCriteria(formData: string): boolean {
+	const params = new URLSearchParams(formData);
+	const named = (selector: string, fallback: string) =>
+		params.get(document.querySelector<HTMLInputElement>(selector)?.name || fallback)?.trim() ?? "";
+
+	return Boolean(named(BARCODE_INPUT, BARCODE_INPUT.slice(1))
+		|| named(RESERVATION_NUMBER_INPUT, RESERVATION_NUMBER_INPUT.slice(1)));
+}
+
+async function onSearchReservation(retryOf?: string) {
 	// A scanner that fires twice, or a return held down, is one search. The
 	// button is disabled while one is in flight; the return key is not.
-	if (searching.value) {
+	//
+	// A retry is the search already in flight asking again, not a second one, so
+	// it passes the guard -- it is the one caller that is meant to.
+	if (searching.value && retryOf === undefined) {
 		return;
 	}
-
-	searching.value = true;
 
 	// Serialised before the fields are emptied, and both of them are emptied:
 	// they are two ways of asking the same form one question, and whichever was
 	// just used, the other has to be blank when the next scan lands. A number
 	// left standing in the reservation field is sent along with the next barcode
 	// and answered first, so the scan appears to be ignored.
-	const formData = buildSearchQuery();
+	const formData = retryOf ?? buildSearchQuery();
+
+	// Nothing to search for. The portal answers this with "geen zoekcriteria
+	// opgegeven", which is a true statement about a request that should not have
+	// been made: an empty Zoek is the operator finding out they are on a field
+	// they have not typed in yet, and it reads better said here than fetched.
+	if (!hasSearchCriteria(formData)) {
+		notice.value = {
+			title: "Geen zoekcriteria opgegeven.",
+			detail: "Vul een reserveringsnummer in of scan een product.",
+			tone: "notice",
+		};
+
+		RVUtils.focusBarcodeInput();
+
+		return;
+	}
+
+	searching.value = true;
+	searchQuery = formData;
+
+	if (retryOf === undefined) {
+		finishedRun = false;
+	}
 
 	clearSearchFields();
 	RVUtils.focusBarcodeInput();
 
 	try {
-		handleResponse(await RVUtils.reservationSearchRequest(formData));
+		await handleResponse(await RVUtils.reservationSearchRequest(formData));
 	} catch (error) {
 		// Whatever went wrong, the button cannot be left spinning: it is
 		// disabled while a search is in flight, so a search that ends in a throw
@@ -416,10 +483,31 @@ async function handleResponse(response: string) {
 			break;
 
 		case ReservationSearchResponseType.UnfinishedRun:
-			RVUtils.handleUnfinishedRun(responseElement).then(() => {
-				// Run function again to re-evaluate
-				onSearchReservation();
-			});
+			// Finish the picking run off, then put the same question again --
+			// awaited, and with the original query, so a run that cannot be
+			// finished reaches the caller's error handling instead of leaving the
+			// button spinning, and the second search asks what the first one did.
+			//
+			// Once. A portal that answers the second search with the same run
+			// would otherwise be asked forever, which is a spinning button and a
+			// request every second -- worse than the stall it replaces.
+			if (finishedRun) {
+				notice.value = {
+					title: "De raapronde van deze reservering kon niet worden afgerond.",
+					detail: "Rond de raapronde af in RetailVista en zoek de reservering daarna opnieuw.",
+					tone: "alert",
+				};
+
+				playSound("error");
+				searching.value = false;
+				RVUtils.setBusy(false);
+				break;
+			}
+
+			finishedRun = true;
+
+			await RVUtils.handleUnfinishedRun(responseElement);
+			await onSearchReservation(searchQuery);
 			break;
 	}
 }
@@ -454,10 +542,26 @@ function clearHistory() {
 	completedHistory.value = [];
 }
 
-function openReservation(url: string) {
-	RVUtils.fetchReservation(url).then((response) => {
-		handleResponse(response);
-	});
+// A reservation picked out of the selection dialog. The same failure the search
+// itself can meet -- the request that reads the reservation can fail now that it
+// says so -- and the same answer: the operator is told, rather than left looking
+// at a dialog that closed and a page that did nothing.
+async function openReservation(url: string) {
+	try {
+		await handleResponse(await RVUtils.fetchReservation(url));
+	} catch (error) {
+		debug("The reservation could not be opened:", error);
+
+		notice.value = {
+			title: "De reservering kon niet worden geopend.",
+			detail: "Probeer het opnieuw. Blijft het misgaan, ververs dan de pagina.",
+			tone: "alert",
+		};
+
+		playSound("error");
+		searching.value = false;
+		RVUtils.setBusy(false);
+	}
 }
 </script>
 
@@ -497,8 +601,13 @@ function openReservation(url: string) {
 							@keydown.enter.prevent="onSearchReservation()" />
 						<SearchField label="Product barcode" :adopt="BARCODE_INPUT" />
 
-						<button type="submit" class="pse-submit pse-submit-end" :form="RESERVATION_FORM_ID"
-							:disabled="searching">
+						<!-- Deliberately not a submit button for the portal's form. It was
+						     one, and every click fired a submit event the portal answers as
+						     well as we do -- with a form that no longer holds the number the
+						     operator typed, so its half of it came back "geen zoekcriteria
+						     opgegeven". The search is ours to start. -->
+						<button type="button" class="pse-submit pse-submit-end" :disabled="searching"
+							@click="onSearchReservation()">
 							<span class="pse-spinner" v-if="searching" aria-hidden="true"></span>
 							{{ searching ? "Bezig met zoeken" : "Zoek" }}
 						</button>

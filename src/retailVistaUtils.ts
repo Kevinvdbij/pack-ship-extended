@@ -514,30 +514,44 @@ export async function fetchReservationId(url: string): Promise<string> {
 	}
 }
 
-export async function fetchReservation(url:string): Promise<string> {
-		return new Promise((resolve) => {
+// One GET to the portal, as a promise that always ends.
+//
+// Every one of these used to be a `new Promise` with a `success` handler and
+// nothing else, which is a promise that settles only when the request works. A
+// portal that answered with a 500, a session that expired into a redirect, a
+// shop connection that dropped mid-request -- none of those resolve and none of
+// them reject, so the caller's `await` never comes back. On the search screen
+// that is a packer looking at a button stuck on "Bezig met zoeken" with no way
+// out but a refresh, and no sign anywhere of what went wrong.
+//
+// So: an error handler that rejects, and a timeout, because a stalled socket is
+// neither a success nor an error and would otherwise hang the same way. The
+// timeout is generous -- these are portal pages on a shop connection, and the
+// cost of giving up early is telling a packer their search failed when it was
+// merely slow.
+const PORTAL_REQUEST_TIMEOUT = 30000;
+
+function portalRequest(url: string, what: string, data?: string): Promise<string> {
+	return new Promise((resolve, reject) => {
 		$.ajax({
-			url: url,
+			url,
 			type: "GET",
-			success: function(data: string) {
-				resolve(data);
-			},
+			data,
+			timeout: PORTAL_REQUEST_TIMEOUT,
+			success: (response: string) => resolve(response),
+			error: (_request: unknown, status: string, error: string) =>
+				reject(new Error(`${what} failed (${status}${error ? `: ${error}` : ""}).`)),
 		});
 	});
 }
 
+export async function fetchReservation(url:string): Promise<string> {
+	return portalRequest(url, "Reading a reservation");
+}
+
 // Request that retrieves reservations from submitted data
 export async function reservationSearchRequest(formData: string): Promise<string> {
-	return new Promise((resolve) => {
-		$.ajax({
-			url: "/outdoor/packship/Reservations/Search",
-			type: "GET",
-			data: formData,
-			success: function(data: string) {
-				resolve(data);
-			},
-		});
-	});
+	return portalRequest("/outdoor/packship/Reservations/Search", "The reservation search", formData);
 }
 
 // Evaluate the state of the given response
@@ -778,17 +792,14 @@ export function isAmountStringComplete(amount:string) {
 
 // Send http request that sets the orderpickingrun state to finished
 export async function handleUnfinishedRun(target:HTMLElement): Promise<string> {
-	return new Promise((resolve) => {
-		const finishRunUrl = (target.querySelector("[id=unfinishedOrderPickingRunsModal]")!.querySelector(".btn") as HTMLAnchorElement).href;
+	const finishRunUrl = (target.querySelector("[id=unfinishedOrderPickingRunsModal]")
+		?.querySelector(".btn") as HTMLAnchorElement | null | undefined)?.href;
 
-		$.ajax({
-			url: finishRunUrl,
-			type: "GET",
-			success: function(data: string) {
-				resolve(data);
-			},
-		});
-	});
+	if (!finishRunUrl) {
+		throw new Error("The unfinished order picking run has no way to finish it.");
+	}
+
+	return portalRequest(finishRunUrl, "Finishing the order picking run");
 }
 
 // What the reservation on this page was for, as far as this workstation still
