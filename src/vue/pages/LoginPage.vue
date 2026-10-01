@@ -20,6 +20,7 @@ const LOGIN_FORM_ID = "account";
 const COMPANY_INPUT = "#Input_CompanyNumber";
 const USER_NAME_INPUT = "#Input_UserName";
 const PASSWORD_INPUT = "#Input_Password";
+const TOKEN_INPUT = 'input[name="__RequestVerificationToken"]';
 
 // Landing on this page means there is no usable session: a fresh visit, a
 // rejected login (the portal re-renders this page) or an expiry redirect. Drop
@@ -38,6 +39,10 @@ erpLogout();
 // answer on a shop connection, short enough that an ERP which is simply not
 // there is a pause rather than a wait.
 const ERP_SIGN_IN_BUDGET = 6000;
+
+// How long the post may wait for a fresh antiforgery token. See
+// `refreshAntiforgeryToken`.
+const TOKEN_REFRESH_BUDGET = 4000;
 
 // Whether the portal's post has already been let go, so a second press does not
 // start a second one.
@@ -155,9 +160,53 @@ function replacePortalLoginBlock() {
 					debug("Signed into the portal without an ERP session.");
 				}
 
-				form.submit();
-			});
+				return withTimeout(refreshAntiforgeryToken(form), TOKEN_REFRESH_BUDGET);
+			})
+			.catch(() => false)
+			.then(() => form.submit());
 	});
+}
+
+// Swaps the form's antiforgery token for one issued just now.
+//
+// The portal's login page signs the browser out as it is served -- and stamps
+// the form it serves with a token for whoever the browser was on the way in. So
+// a station that opens this page while it is still signed in is handed a form
+// that cannot be posted: the token is for the user who has just been signed out,
+// the browser posting it is nobody, and the portal answers the mismatch with a
+// bare 400 instead of a login.
+//
+// That is one bookmark away. The portal's own redirect lands here with a
+// `ReturnUrl`, which is the address people save, and opening that bookmark on a
+// station somebody is signed in on is exactly this. It happens in the unmodified
+// portal too. Measured against the live page: the token from a copy fetched
+// while signed in was refused with a 400, and the token from a copy fetched a
+// moment later, by the same browser, was accepted.
+//
+// So the page is asked for again, in the background, immediately before the
+// post. By then the browser is as signed out as it is going to be, and what
+// comes back carries a token that fits it.
+//
+// Anything that goes wrong here leaves the form as it was served, which is what
+// would have been posted anyway.
+async function refreshAntiforgeryToken(form: HTMLFormElement): Promise<boolean> {
+	const field = form.querySelector<HTMLInputElement>(TOKEN_INPUT);
+
+	if (!field) {
+		return false;
+	}
+
+	const response = await fetch(window.location.href, { credentials: "same-origin", cache: "no-store" });
+	const page = new DOMParser().parseFromString(await response.text(), "text/html");
+	const fresh = page.querySelector<HTMLInputElement>(`#${LOGIN_FORM_ID} ${TOKEN_INPUT}`)?.value;
+
+	if (!fresh) {
+		return false;
+	}
+
+	field.value = fresh;
+
+	return true;
 }
 
 // The portal's footer here is one line of its own text in a container, so it is

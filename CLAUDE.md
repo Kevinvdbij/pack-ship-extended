@@ -116,6 +116,19 @@ feeds the note writer, and a wrong id parks a bay on somebody else's reservation
 - **Load timing cannot be judged in `npm run dev`** (see README). Build and install before believing
   anything about paint order.
 
+## The portal's login page signs you out
+
+A GET of `/outdoor/packship/Identity/Account/Login` **ends the portal session** — a `fetch` of it
+counts, not only a visit — and the form it serves carries an antiforgery token for whoever the
+browser was on the way in. Posted by the now signed-out browser, that token is refused with a bare
+**400**; so is a sign-out posted by a browser that is already signed out. Both were measured, and
+both happen in the unmodified portal: a station with the login URL bookmarked gets the first one by
+opening it while signed in.
+
+So never request the login page from a page that has a session, and never navigate a tab to the
+answer of a post whose token may be stale. `LoginPage.vue` fetches a fresh token immediately before
+it posts, and `idleLogout.ts` posts the sign-out in the background and then asks for the portal.
+
 ## Brand
 
 Colours come from one palette in `src/style.css` (`--pse-*` on `:root`). The green is Kampeerhal

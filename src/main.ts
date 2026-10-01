@@ -18,7 +18,7 @@ import { ENVIRONMENT_FORM_SELECTOR, FOOTER_SLOT_SELECTOR, MAIN_CONTENT_SELECTOR,
 import { armReveal, reveal } from './reveal.ts';
 import { installManifest } from './pwa.ts';
 import { pinFooter } from './stickyFooter.ts';
-import { completePendingLogout, startIdleLogout } from './idleLogout.ts';
+import { completePendingLogout, guardLogoutForm, startIdleLogout } from './idleLogout.ts';
 import { startErpKeepAlive } from './erpKeepAlive.ts';
 // The portal's own elements first, ours second, so a tie between the two is
 // settled the way it reads: our markup wins on the page it is on. Both go up at
@@ -409,6 +409,7 @@ function armIdleLogout() {
 	}
 
 	startIdleLogout();
+	guardLogoutForm();
 
 	// The ERP session is kept for as long as this one is: the pages this runs on
 	// are the ones with a portal session, and the timer above is what takes them

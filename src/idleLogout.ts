@@ -248,7 +248,7 @@ function signOutOfPortal() {
 	if (form) {
 		debug("Idle timeout reached, signing out.");
 		GM_setValue(STORAGE_KEYS.pendingLogout, false);
-		form.submit();
+		postLogout(form);
 
 		return;
 	}
@@ -286,7 +286,62 @@ export function completePendingLogout(): boolean {
 
 	GM_setValue(STORAGE_KEYS.pendingLogout, false);
 	debug("Carrying out the sign-out that was held over from the previous page.");
-	form.submit();
+	postLogout(form);
 
 	return true;
+}
+
+// The portal's sign-out, posted from here rather than by submitting its form.
+//
+// The form's antiforgery token is only good for the session the page was served
+// under. Once that session has ended somewhere else the portal answers the post
+// with a bare 400, and a submitted form navigates to whatever it is answered
+// with -- so the tab is left on the browser's own error page, where nothing of
+// ours runs and there is nothing to press.
+//
+// That is not a rare case, it is the ordinary one with two tabs open: every tab
+// counts the same idle clock, so they all reach the deadline within a second of
+// each other and all post. The first signs the workplace out and every one after
+// it is refused -- a sign-out posted by a browser that is already signed out was
+// measured against the live portal, and it is a 400. The same thing happens by
+// hand in the unmodified portal: sign out in one tab, then in the other.
+//
+// So the post is made in the background and its answer is not navigated to. A
+// refusal means the session this page belonged to is already gone, which is what
+// was wanted. Either way the tab then asks for the portal, and the portal
+// answers a signed-out browser with its login page.
+async function postLogout(form: HTMLFormElement) {
+	try {
+		const response = await fetch(form.action, {
+			method: "POST",
+			credentials: "same-origin",
+			body: new URLSearchParams(new FormData(form) as unknown as Record<string, string>),
+		});
+
+		if (!response.ok) {
+			debug(`The portal answered the sign-out with ${response.status}; the session was already over.`);
+		}
+	} catch (error) {
+		debug("The sign-out could not be posted.", error);
+	}
+
+	window.location.assign(PACKING_PORTAL_URL);
+}
+
+// The portal's own "Uitloggen", pressed by hand, taken the same way.
+//
+// It is the same form with the same token, so on a tab whose session was ended
+// from another one it lands on the same error page. Heard on the document, since
+// the footer the form sits in may not have been parsed when this is armed.
+export function guardLogoutForm() {
+	document.addEventListener("submit", (event) => {
+		const form = event.target;
+
+		if (!(form instanceof HTMLFormElement) || !/Logout/i.test(form.getAttribute("action") ?? "")) {
+			return;
+		}
+
+		event.preventDefault();
+		postLogout(form);
+	});
 }
