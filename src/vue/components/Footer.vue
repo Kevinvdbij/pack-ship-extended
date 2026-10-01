@@ -3,8 +3,10 @@ import { computed, onMounted, ref, Teleport, Transition } from 'vue';
 import Modal from "../components/SettingsModal.vue";
 import CredentialsPrompt from "../components/CredentialsPrompt.vue";
 import ErpLoginPrompt from "../components/ErpLoginPrompt.vue";
+import InstructionsModal from "../components/InstructionsModal.vue";
 import { erpStore } from "../erpStore.ts";
 import pkg from "../../../package.json";
+import helpIconUrl from "../../assets/help.svg";
 import installIconUrl from "../../assets/install.svg";
 import powerIconUrl from "../../assets/power.svg";
 import settingsIconUrl from "../../assets/settings.svg";
@@ -14,6 +16,7 @@ import { FOOTER_SLOT_SELECTOR } from '../../constants.ts';
 import { hasCredentials } from '../../shopware.ts';
 import { canInstall, installApp } from '../../pwa.ts';
 import { AvailableUpdate, checkForUpdate, getKnownUpdate } from '../../update.ts';
+import { instructionsDue, markInstructionsSeen } from '../../instructions.ts';
 
 // The same bar in two shapes. The full one is the control strip on the pages
 // behind the login; `minimal` drops everything that needs a session -- the
@@ -64,6 +67,21 @@ const masterSwitch = ref(Settings.autoMasterSwitch);
 // credentials are for, and a dialog over the login form would be the first
 // thing somebody meets on a page they came to sign in on.
 const showCredentialsPrompt = ref(!props.minimal && !hasCredentials());
+
+// The packing instructions, open on their own on the first page after a login
+// and from the help control after that. Every page behind the login mounts this
+// bar, so whichever one the portal lands on first is the one that shows them --
+// and closing them is what settles it for the rest of the session.
+//
+// Not on the minimal bar: that is the login page, where nobody is signed in to
+// be shown anything.
+const showInstructions = ref(!props.minimal && instructionsDue());
+
+function closeInstructions() {
+	showInstructions.value = false;
+
+	markInstructionsSeen();
+}
 
 // Undefined when no login has been observed, in which case the badge stays
 // hidden rather than guessing.
@@ -167,6 +185,14 @@ function masterSwitchToggle() {
 
 			<span v-if="!minimal" class="pse-divider" aria-hidden="true"></span>
 
+			<!-- Beside the settings and in the same quiet weight: both are things
+			     to go and look at, not things the packing turns on. -->
+			<button v-if="!minimal" type="button" class="pse-pill pse-help"
+				title="Instructies webshop" @click="showInstructions = true;">
+				<img class="pse-icon" :src="helpIconUrl" alt="" />
+				<span class="pse-help-label">Instructies</span>
+			</button>
+
 			<button v-if="!minimal" type="button" class="pse-pill pse-settings"
 				title="Pack&Ship Extended instellingen" @click="showModal = true;">
 				<img class="pse-icon" :src="settingsIconUrl" alt="" />
@@ -187,6 +213,14 @@ function masterSwitchToggle() {
 		<Transition name="modal">
 			<CredentialsPrompt v-if="showCredentialsPrompt && !showModal"
 				@saved="showCredentialsPrompt = false" @dismiss="showCredentialsPrompt = false" />
+		</Transition>
+
+		<!-- Behind the credentials prompt when both are owed: that one is about
+		     whether the station can work at all, and it is asked once per
+		     machine rather than once per login. -->
+		<Transition name="modal">
+			<InstructionsModal v-if="showInstructions && !showCredentialsPrompt && !showModal"
+				@close="closeInstructions()" />
 		</Transition>
 
 		<!-- The ERP session, which expires on its own clock rather than with the
@@ -355,23 +389,30 @@ function masterSwitchToggle() {
 	filter: brightness(0) invert(1);
 }
 
+.pse-help,
 .pse-settings {
 	color: var(--pse-ink);
 }
 
+.pse-help:hover,
 .pse-settings:hover {
 	color: var(--pse-ink-strong);
 	background-color: rgba(255, 255, 255, 0.14);
 }
 
+.pse-help .pse-icon,
 .pse-settings .pse-icon {
 	filter: brightness(0) invert(1);
 	opacity: 0.72;
 	transition: transform 0.3s ease, opacity 0.15s ease;
 }
 
+.pse-help:hover .pse-icon,
 .pse-settings:hover .pse-icon {
 	opacity: 1;
+}
+
+.pse-settings:hover .pse-icon {
 	transform: rotate(60deg);
 }
 
@@ -518,6 +559,7 @@ function masterSwitchToggle() {
 }
 
 @media (max-width: 767px) {
+	.pse-help-label,
 	.pse-settings-label {
 		display: none;
 	}

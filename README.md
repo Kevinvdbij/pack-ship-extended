@@ -239,6 +239,7 @@ is installed by hand from the release asset and has to be updated alongside the 
 | `src/reveal.ts` | Shows the page once the boot is done, and the failsafe that shows it regardless |
 | `src/environment.ts` | Pins the portal's environment ("Omgeving") to the machine |
 | `src/pwa.ts` | The web app manifest, so the portal installs as an app |
+| `src/instructions.ts` | The webshop's packing instructions, shown once per login and from the footer's help control, and the flyer reminder on the wait for the label |
 | `src/currentUser.ts` | Name of the logged-in employee, captured on the Login page and shown in the footer |
 | `src/erpFrame.ts` | The hidden same-origin frame the ERP screens are driven in, one job at a time |
 | `src/erpSession.ts` | The ERP's sign-in, sign-out and session probe, all as whole-form WebForms posts |

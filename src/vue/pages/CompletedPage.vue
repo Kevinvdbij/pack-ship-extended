@@ -6,6 +6,7 @@ import { MassCompleteStatus } from '../../interfaces.ts';
 import { afterPaint, afterReveal } from '../../reveal.ts';
 import { standInForPortalPage } from '../../standIn.ts';
 import { playSound } from '../../sounds.ts';
+import { FLYER_REMINDER } from '../../instructions.ts';
 import ReservationSidebar from '../components/ReservationSidebar.vue';
 import { slotStore } from '../slotStore.ts';
 import CopyButton from '../components/CopyButton.vue';
@@ -566,6 +567,12 @@ function updateAutoComplete() {
 						De pakketten zijn aangemeld. Sluit de reservering af om verder te gaan.
 					</p>
 
+					<!-- The reminder from the wait before this screen, said once
+					     more where the label has just come out: the box is still
+					     open here. Not on a refused reservation, which is going
+					     back to the bench, nor on a parcel added afterwards. -->
+					<p class="pse-done-flyer" v-if="!failed && !announced">{{ FLYER_REMINDER }}</p>
+
 					<!-- On a failure the way back is the offer, and finishing
 					     anyway is kept as the quiet one beside it: it is a real
 					     thing to want -- the label may have come out regardless
@@ -969,6 +976,20 @@ function updateAutoComplete() {
 	font-size: 13.5px;
 	line-height: 1.5;
 	color: var(--pse-ink-soft);
+}
+
+/* The same notice the busy overlay carries -- see `.pse-busy-note` in
+   `src/styles/portal.css` -- so the two read as one reminder said twice. */
+.pse-done-flyer {
+	margin: 16px 0 0;
+	padding: 11px 14px;
+	border-radius: 12px;
+	background-color: var(--pse-attention-soft);
+	font-size: 14.5px;
+	font-weight: 650;
+	line-height: 1.4;
+	text-align: center;
+	color: var(--pse-attention-ink);
 }
 
 .pse-done-button {

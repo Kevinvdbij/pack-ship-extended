@@ -433,6 +433,9 @@ export const STORAGE_KEYS = {
 	// which is the same reason the run's own state is stored this way.
 	completedEntryPrefix: "PSE_Completed_",
 	currentUser: "PSE_Current_User",
+	// The login the packing instructions were last read under, as the time that
+	// login was submitted. See `src/instructions.ts`.
+	instructionsSeen: "PSE_Instructions_Seen",
 	// What the last update check found, shared by every tab on the machine.
 	updateCheck: "PSE_Update_Check",
 	// When this machine was last touched by somebody, and whether a sign-out is

@@ -346,6 +346,30 @@
 	color: var(--pse-ink);
 }
 
+/* A line of ours under the banner -- `setBusyNote()` puts it there. Only ever
+ * shown for the wait it was written for: the overlay is raised for every scan
+ * on the parcels page, and the reminder is about one of them.
+ *
+ * Set as a notice rather than as more of the banner. The banner says the page
+ * is working; this says there is something for the packer to do meanwhile, and
+ * it has to be picked out in the second or two the card is up. */
+:root .nfSpinner .pse-busy-note {
+	display: none;
+	max-width: 280px;
+	margin: 0;
+	padding: 11px 14px;
+	border-radius: 12px;
+	background-color: var(--pse-attention-soft);
+	font-size: 14.5px;
+	font-weight: 650;
+	line-height: 1.4;
+	color: var(--pse-attention-ink);
+}
+
+:root body.pse-announcing .nfSpinner .pse-busy-note {
+	display: block;
+}
+
 @keyframes pse-busy-spin {
 	to {
 		transform: rotate(360deg);

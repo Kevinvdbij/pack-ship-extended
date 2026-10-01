@@ -4,6 +4,7 @@ import * as RVUtils from '../../retailVistaUtils.ts';
 import { domReady, mountApp } from '../mount.ts';
 import {
 	PACKING_PORTAL_URL,
+	PARCEL_CONTAINER_SELECTOR,
 	PARCEL_GROUP_SELECTOR,
 	PARCEL_TABS_SELECTOR,
 	PARCELS_RETURN_HASH,
@@ -21,6 +22,7 @@ import { canAssignLines } from '../slotScope.ts';
 import Settings from '../../settings.ts';
 import * as Shopware from "../../shopware.ts";
 import { playSound, warmUpAudio } from '../../sounds.ts';
+import { FLYER_REMINDER } from '../../instructions.ts';
 
 const showRows = ref(false);
 
@@ -156,6 +158,7 @@ onMounted(() => {
 
 			processAutoComplete();
 			observeParcelContainer();
+			armFlyerReminder();
 		});
 
 	setupSidebar();
@@ -422,6 +425,57 @@ function setupSidebar() {
 		{ showRaaplijst: true });
 }
 
+// The portal's button that announces the parcels, which is the press that ends
+// the packing: the label comes out of the printer on the answer to it. Addressed
+// by position within the parcel container, which is all the portal gives it.
+const ANNOUNCE_BUTTON = "div > div:nth-child(4) > div > button";
+
+// On `body` from the press that announces until the overlay it raised comes
+// down again. What `src/styles/portal.css` shows the reminder under.
+const ANNOUNCING_CLASS = "pse-announcing";
+
+// The flyer that goes in every box, said on the one screen the packer is
+// certain to be looking at with the box still open: the wait for the label.
+//
+// Heard on the document rather than bound to the button, because the portal
+// replaces the whole parcel container after every parcel change and the button
+// with it. In the capture phase, so the class is on before the portal's own
+// handler raises the overlay -- and a press made for the packer by
+// `autoAnnounceParcels` is a click like any other and arrives here the same way.
+//
+// The overlay is the portal's to raise and to lower; this only says what is
+// written on it. An announcement that comes back to this page takes the class
+// off again with the overlay, so the reminder is not left standing on the wait
+// for the next scan.
+function armFlyerReminder() {
+	RVUtils.setBusyNote(FLYER_REMINDER);
+
+	document.addEventListener("click", (event) => {
+		const button = (event.target as Element | null)?.closest?.("button");
+		const container = document.querySelector(PARCEL_CONTAINER_SELECTOR);
+
+		if (button && button == container?.querySelector(ANNOUNCE_BUTTON)) {
+			// Again, and a no-op while the line is still there: an overlay that
+			// was re-rendered since the page opened has lost it.
+			RVUtils.setBusyNote(FLYER_REMINDER);
+
+			document.body.classList.add(ANNOUNCING_CLASS);
+		}
+	}, true);
+
+	let wasBusy = false;
+
+	new MutationObserver(() => {
+		const busy = document.body.classList.contains("busy");
+
+		if (wasBusy && !busy) {
+			document.body.classList.remove(ANNOUNCING_CLASS);
+		}
+
+		wasBusy = busy;
+	}).observe(document.body, { attributes: true, attributeFilter: ["class"] });
+}
+
 let announceTimer: ReturnType<typeof setTimeout> | undefined;
 
 function autoAnnounceParcels(parcelContainerElement: Element) {
@@ -450,7 +504,7 @@ function autoAnnounceParcels(parcelContainerElement: Element) {
 		return;
 	}
 
-	const announceButton = parcelContainerElement?.querySelector("div > div:nth-child(4) > div > button") as HTMLButtonElement;
+	const announceButton = parcelContainerElement?.querySelector(ANNOUNCE_BUTTON) as HTMLButtonElement;
 	if (!announceButton?.hasAttribute("disabled")) {
 		announceButton?.click();
 		debug("Announcing labels");

@@ -28,10 +28,16 @@ const props = withDefaults(defineProps<{
 	// Off for a dialog whose work would be lost by a stray click on the page
 	// behind it.
 	dismissable?: boolean;
+	// The scrim and the panel's place on it, and nothing inside: no title bar,
+	// no padding, no row of actions. For the one dialog that is a sheet with a
+	// design of its own -- the packing instructions -- and still has to open,
+	// close and sit on the page the way every other dialog does.
+	bare?: boolean;
 }>(), {
 	size: "md",
 	elevated: false,
 	dismissable: true,
+	bare: false,
 });
 
 const emit = defineEmits<{ close: [] }>();
@@ -62,7 +68,11 @@ function onBackdropClick(event: MouseEvent) {
 <template>
 	<div class="pse-modal" :class="{ 'is-elevated': elevated }" role="dialog" aria-modal="true"
 		:aria-label="title" @mousedown="onBackdropClick">
-		<div class="pse-modal-panel" :class="`is-${size}`">
+		<div v-if="bare" class="pse-modal-panel is-bare" :class="`is-${size}`">
+			<slot />
+		</div>
+
+		<div v-else class="pse-modal-panel" :class="`is-${size}`">
 			<header class="pse-modal-head">
 				<h2 class="pse-modal-title">{{ title }}</h2>
 
@@ -128,6 +138,13 @@ function onBackdropClick(event: MouseEvent) {
 	border-radius: var(--pse-dialog-radius);
 	background-color: #ffffff;
 	box-shadow: var(--pse-dialog-shadow);
+}
+
+/* What is inside brings its own surface, so the panel only clips it to the
+   dialog's corners. */
+.is-bare {
+	overflow: hidden;
+	background-color: transparent;
 }
 
 .is-sm {

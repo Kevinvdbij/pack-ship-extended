@@ -622,6 +622,33 @@ export function setBusy(state: boolean) {
 	}
 }
 
+// A line under the overlay's "Laden...", for a wait that has something to say.
+//
+// Written into the overlay's own card rather than drawn beside it, so it is the
+// same card with one more line on it. It is on the page from the moment this is
+// called and shown only while `body` carries `showWhile` -- which is the
+// caller's to put on and take off, and is what keeps the line off every other
+// wait the same overlay is raised for. See `.pse-busy-note` in
+// `src/styles/portal.css`.
+//
+// A `<p>`, because that stylesheet drops every `<div>` in the card: those are
+// the vendor's five stretching bars.
+export function setBusyNote(text: string) {
+	ensureBusyOverlay();
+
+	const card = document.querySelector(".loading .nfSpinner");
+
+	if (!card || card.querySelector(".pse-busy-note")) {
+		return;
+	}
+
+	const note = document.createElement("p");
+	note.className = "pse-busy-note";
+	note.textContent = text;
+
+	card.append(note);
+}
+
 // The portal renders the busy overlay into the pages that use it, and does not
 // render one at all on the login page -- which is exactly where signing in needs
 // to say that something is happening, since the post that follows can sit there
