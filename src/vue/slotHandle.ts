@@ -1,5 +1,5 @@
 import { computed, ComputedRef, reactive, Ref, ref } from "vue";
-import { toast } from "vue3-toastify";
+import { toast } from "./toast.ts";
 import { composeComment, emptyAssignment, parseComment, SlotAssignment } from "../slots.ts";
 import { ErpSignedOutError, readReservationNote, writeReservationNote } from "../reservationNote.ts";
 import { erpStore } from "./erpStore.ts";
@@ -162,7 +162,7 @@ export function createSlotHandle(): SlotHandle {
 			pending: `Reservering ${reservationNumber.value} vak wordt opgeslagen...`,
 			success: `Reservering ${reservationNumber.value} vak succesvol opgeslagen.`,
 			error: `Er is een fout opgetreden bij het opslaan van het vak van reservering ${reservationNumber.value}.`,
-		}).catch(() => undefined);
+		});
 
 		promise.catch((error) => {
 			if (error instanceof ErpSignedOutError) {

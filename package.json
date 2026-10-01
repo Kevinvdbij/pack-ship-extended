@@ -11,8 +11,7 @@
   },
   "dependencies": {
     "@types/jquery": "^4.0.0",
-    "vue": "^3.5.34",
-    "vue3-toastify": "^0.2.9"
+    "vue": "^3.5.34"
   },
   "devDependencies": {
     "@types/node": "^26.4.1",

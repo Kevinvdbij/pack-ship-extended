@@ -25,7 +25,6 @@ import { startErpKeepAlive } from './erpKeepAlive.ts';
 // document-start, which is behind the cloak -- see `src/styles/cloak.css`.
 import "./styles/portal.css";
 import "./style.css";
-import "vue3-toastify/dist/index.css";
 // The one sheet that has to go up by hand: see the file for why the build's CSS
 // pipeline cannot carry it. Last, so it sits after `style.css` the way it would
 // have if it were still part of it, and onto `documentElement` rather than

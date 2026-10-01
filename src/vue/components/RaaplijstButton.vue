@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { toast } from "vue3-toastify";
+import { toast } from "../toast.ts";
 import { printRaaplijst } from "../../raaplijst.ts";
 import { ErpSignedOutError } from "../../erpFrame.ts";
 import { erpStore } from "../erpStore.ts";

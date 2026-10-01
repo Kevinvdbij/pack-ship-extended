@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onBeforeUnmount, onMounted, ref } from "vue";
 import { Teleport, Transition } from "vue";
-import { toast } from "vue3-toastify";
+import { toast } from "../toast.ts";
 import { CompletedReservation, ReservationParcel } from "../../interfaces.ts";
 import { fetchReservationParcels } from "../../retailVistaUtils.ts";
 import { ErpSignedOutError } from "../../erpFrame.ts";

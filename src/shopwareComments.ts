@@ -1,4 +1,4 @@
-import { toast } from "vue3-toastify";
+import { toast } from "./vue/toast.ts";
 import { ShopwareOrderEntry, ShopwareToken, updateOrderComment } from "./shopware.ts";
 import { playSound } from "./sounds.ts";
 
@@ -21,7 +21,9 @@ export function saveOrderComment(
 		pending: `Order ${orderNumber} ${subject} wordt opgeslagen...`,
 		success: `Order ${orderNumber} ${subject} succesvol opgeslagen.`,
 		error: `Er is een fout opgetreden bij het opslaan van de ${subject} van order ${orderNumber}.`
-	}).catch((error) => {
+	});
+
+	updatePromise.catch((error) => {
 		console.error("Failed to save order comment.", error);
 		// The toast says so on screen; this says so to whoever has already
 		// turned back to the box.

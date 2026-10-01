@@ -1,4 +1,4 @@
-import { toast } from "vue3-toastify";
+import { toast } from "./toast.ts";
 import { ReservationParcel } from "../interfaces.ts";
 import { printParcelLabel } from "../parcelLabel.ts";
 import { ErpSignedOutError } from "../erpFrame.ts";
@@ -36,11 +36,9 @@ export async function reprintParcel(reservationId: string, parcel: ReservationPa
 		// The printer is named on the way out. The one real risk in this feature
 		// is a label appearing at a bench nobody is standing at, and the answer to
 		// that is to say which bench before anyone goes looking for it.
-		success: {
-			render: ({ data }) => `Etiket ${parcel.barcode} geprint op ${(data as { printer: string }).printer}.`,
-		},
+		success: ({ printer }) => `Etiket ${parcel.barcode} geprint op ${printer}.`,
 		error: `Etiket ${parcel.barcode} kon niet opnieuw geprint worden.`,
-	}).catch(() => undefined);
+	});
 
 	try {
 		await work;
