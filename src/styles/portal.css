@@ -553,6 +553,79 @@
 	filter: brightness(0) invert(1);
 }
 
+/* ---- Bins for the CVP ---- *
+ * Portal parcels that are put wall bins, drawn by `src/bins.ts` into the same
+ * strip after the portal's own add button. Told apart in the bin's own colours
+ * -- the wall's yellow on its dark grey when open -- because a scan lands in
+ * whichever tab is open, and whether that is a box on this bench or a bin for
+ * the machine has to read from across the counter.
+ */
+:root #tabs-parcels .pse-bin-divider {
+	align-self: center;
+	margin-left: 6px;
+	padding-left: 14px;
+	border-left: 1px solid var(--pse-line);
+	font-size: 10.5px;
+	font-weight: 650;
+	letter-spacing: 0.06em;
+	text-transform: uppercase;
+	color: var(--pse-ink-faint);
+}
+
+:root #tabs-parcels .btn-outline-primary.pse-bin-tab {
+	border-color: rgba(186, 130, 32, 0.45);
+	background-color: #fffaf0;
+	color: var(--pse-attention-ink);
+}
+
+:root #tabs-parcels .btn-outline-primary.pse-bin-tab:hover {
+	border-color: var(--pse-attention-ink);
+	background-color: var(--pse-attention-soft);
+}
+
+:root #tabs-parcels .btn-outline-primary.pse-bin-tab.active {
+	border-color: #3c3c3b;
+	background-color: #3c3c3b;
+	color: #ffe163;
+}
+
+/* The portal's number and box glyph say "parcel 2"; the bin's code is what the
+   packer is holding, so it is the only thing on the tab. */
+:root #tabs-parcels .pse-bin-tab .tab-parcelnumber,
+:root #tabs-parcels .pse-bin-tab img {
+	display: none;
+}
+
+:root #tabs-parcels .pse-bin-code {
+	font-size: 15px;
+	font-weight: 650;
+	letter-spacing: 0.02em;
+}
+
+:root #tabs-parcels .pse-bin-hint {
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	padding: 0 4px;
+	font-size: 13px;
+	font-weight: 550;
+	color: var(--pse-ink-soft);
+}
+
+:root #tabs-parcels .pse-bin-hint .material-icons {
+	font-size: 20px;
+	color: var(--pse-ink-faint);
+}
+
+:root .parcels-content .pse-bin-card .card-header {
+	background-color: #fffaf0;
+}
+
+:root .parcels-content .pse-bin-card .pse-bin-note {
+	font-weight: 650;
+	color: var(--pse-attention-ink);
+}
+
 /* ---- The parcel panes ---- */
 :root .parcels-content .card {
 	border: 1px solid var(--pse-line);

@@ -147,3 +147,14 @@ export interface ReservationParcel {
 	service: string;
 	carrier: string;
 }
+
+// A parcel as the completed screen shows it, reduced to what sending its label
+// needs. See `BinLabelsPanel.vue`.
+export interface CompletedParcel {
+	// The parcel's number, as the portal writes it in front of the service:
+	// "349637 / SendCloud".
+	number: string;
+	// The carrier's barcode, empty on a parcel the carrier refused.
+	barcode: string;
+	units: number;
+}

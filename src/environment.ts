@@ -1,4 +1,4 @@
-import { ENVIRONMENT_FORM_SELECTOR, ENVIRONMENT_SELECT_SELECTOR } from "./constants.ts";
+import { ENVIRONMENT_FORM_SELECTOR, ENVIRONMENT_SELECT_SELECTOR, PACKING_PORTAL_URL } from "./constants.ts";
 import { debug } from "./logger.ts";
 import Settings from "./settings.ts";
 
@@ -143,6 +143,39 @@ export function applyConfiguredEnvironment() {
 	// The portal posts the picker from a jQuery change handler, so going
 	// through that handler keeps us on the path a click would take.
 	$(select).trigger("change");
+}
+
+// Puts the session on an environment for one announcement, and resolves once the
+// portal has it -- which `applyConfiguredEnvironment` above does not wait for,
+// and an announcement that follows straight after has to.
+//
+// Posts the portal's own form, with its antiforgery token, the way its change
+// handler would; only the value is ours. The dropdown is left showing the
+// workplace's own environment, so the next page the portal renders comes up on
+// this one, is found to differ from the setting, and is put back by
+// `applyConfiguredEnvironment` -- with no step of ours that has to remember to.
+export async function switchSessionEnvironment(environmentId: number): Promise<void> {
+	const form = document.querySelector<HTMLFormElement>(ENVIRONMENT_FORM_SELECTOR);
+
+	if (!form) {
+		throw new Error("This page has no environment form to post.");
+	}
+
+	const body = new URLSearchParams();
+
+	for (const [name, value] of new FormData(form)) {
+		body.append(name, String(value));
+	}
+
+	body.set("EnviromentId", String(environmentId));
+
+	const response = await fetch(`${PACKING_PORTAL_URL}/Home/SetEnviroment`, { method: "POST", body });
+
+	if (!response.ok) {
+		throw new Error(`The portal refused environment ${environmentId} (${response.status}).`);
+	}
+
+	debug(`Session environment set to (${environmentId}) for this announcement.`);
 }
 
 // The stored name first: it is the only source available before the portal has

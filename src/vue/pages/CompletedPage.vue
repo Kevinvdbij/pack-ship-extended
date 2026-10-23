@@ -2,7 +2,7 @@
 import { computed, onMounted, ref, useTemplateRef } from 'vue';
 import * as RVUtils from '../../retailVistaUtils.ts';
 import Settings from '../../settings.ts';
-import { MassCompleteStatus } from '../../interfaces.ts';
+import { MassCompleteStatus, type CompletedParcel } from '../../interfaces.ts';
 import { afterPaint, afterReveal } from '../../reveal.ts';
 import { standInForPortalPage } from '../../standIn.ts';
 import { playSound } from '../../sounds.ts';
@@ -11,6 +11,8 @@ import ReservationSidebar from '../components/ReservationSidebar.vue';
 import { slotStore } from '../slotStore.ts';
 import CopyButton from '../components/CopyButton.vue';
 import PickupNotice from '../components/PickupNotice.vue';
+import BinLabelsPanel from '../components/BinLabelsPanel.vue';
+import { clearBinRecord, getBinRecord } from '../../bins.ts';
 import {
 	COMPLETED_CONTAINER_SELECTOR, COMPLETED_HEADING_SELECTOR, COMPLETED_PROCEED_SELECTOR,
 	COMPLETED_STEP_DETAIL_SELECTOR, COMPLETED_STEP_ERROR_SELECTOR, COMPLETED_STEP_SELECTOR,
@@ -155,6 +157,22 @@ const parcels = ref<Parcel[]>([]);
 // the control actually does the way a copy of it here would.
 const proceedLabel = ref("Afronden");
 
+// An order with a bin for the CVP: announced without printing, so its labels are
+// sent from this screen before it may close. See `BinLabelsPanel.vue`. Off on a
+// refused reservation -- that one is going back to the parcels page, where the
+// bins still are -- and on a parcel added afterwards, which never has a bin.
+const binLabels = ref(false);
+const binLabelsFailed = ref(false);
+const reservationId = ref("");
+
+// The parcels as the label panel needs them: by number, with the carrier's
+// barcode and how many units went in.
+const completedParcels = computed<CompletedParcel[]>(() => parcels.value.map((parcel) => ({
+	number: parcel.title.split("/")[0].trim(),
+	barcode: parcel.fields.find((field) => isBarcode(field.label))?.value ?? "",
+	units: parcel.lines.reduce((sum, line) => sum + (parseInt(line.amount, 10) || 0), 0),
+})));
+
 // Our own block, once it is in the document: what the rest of the portal's page
 // is hidden around. See `standInForPortalPage`.
 const root = useTemplateRef<HTMLElement>("root");
@@ -190,6 +208,11 @@ onMounted(() => {
 	};
 
 	RVUtils.setLastCompletedReservation(finished);
+
+	reservationId.value = finished.id;
+	binLabels.value = !failed.value
+		&& !props.announced
+		&& Boolean(getBinRecord(finished.id)?.bins.length);
 
 	// And into the list the search screen shows. A parcel announced afterwards
 	// lands on this same screen, and is recorded too: from the list's point of
@@ -261,7 +284,9 @@ onMounted(() => {
 		playSound("warning");
 	}
 
-	if (failed.value || props.announced || pickup.value || !Settings.autoMasterSwitch) {
+	// The labels first: closing the reservation leaves this screen, and with it
+	// the only place they are sent from. The panel finishes it when they are.
+	if (failed.value || props.announced || pickup.value || binLabels.value || !Settings.autoMasterSwitch) {
 		return;
 	}
 
@@ -458,13 +483,36 @@ function finalize() {
 	button.click();
 }
 
+// Every label is where it belongs. The screen goes on the way it would have
+// without bins: pressed through where automatic handling is on, offered where it
+// is not.
+function onBinLabelsDone() {
+	binLabels.value = false;
+	binLabelsFailed.value = false;
+
+	if (!Settings.autoMasterSwitch || pickup.value) {
+		return;
+	}
+
+	finalizing.value = true;
+	afterPaint(finalize);
+}
+
+// Closed with a label that did not go out. The record goes with it: this screen
+// is the only one that reads it, and it is not coming back. A bin left waiting
+// for its tracking number shows on the put wall's stuck view.
+function finalizeWithoutLabels() {
+	clearBinRecord(reservationId.value);
+	finalize();
+}
+
 // The dialog pressed: the boxes are on the collection shelf, and the screen can
 // go on doing what it would have done without it -- pressing the portal's own
 // button where automatic handling is on, and offering it where it is not.
 function confirmPickup() {
 	pickup.value = false;
 
-	if (!Settings.autoMasterSwitch) {
+	if (!Settings.autoMasterSwitch || binLabels.value) {
 		return;
 	}
 
@@ -560,6 +608,9 @@ function updateAutoComplete() {
 						Het label is geprint en het pakket is aangemeld. De reservering was al
 						afgerond en blijft dat.
 					</p>
+					<p class="pse-done-text" v-else-if="binLabels">
+						De pakketten zijn aangemeld. De labels gaan nu naar hun printer: de bakken naar de CVP.
+					</p>
 					<p class="pse-done-text" v-else-if="finalizing">
 						Wordt afgesloten en gaat terug naar zoeken...
 					</p>
@@ -572,6 +623,9 @@ function updateAutoComplete() {
 					     open here. Not on a refused reservation, which is going
 					     back to the bench, nor on a parcel added afterwards. -->
 					<p class="pse-done-flyer" v-if="!failed && !announced">{{ FLYER_REMINDER }}</p>
+
+					<BinLabelsPanel v-if="binLabels" :reservation-id="reservationId" :parcels="completedParcels"
+						@done="onBinLabelsDone()" @failed="binLabelsFailed = true" />
 
 					<!-- On a failure the way back is the offer, and finishing
 					     anyway is kept as the quiet one beside it: it is a real
@@ -586,8 +640,17 @@ function updateAutoComplete() {
 						</button>
 					</div>
 
+					<!-- Closing with a label that did not go out is a real thing to
+					     want -- it can be printed from the ERP -- but it is the
+					     quiet one, beside the panel's own retry. -->
+					<button v-else-if="binLabels && binLabelsFailed" type="button" class="pse-done-button is-quiet"
+						@click="finalizeWithoutLabels()">
+						{{ proceedLabel }}
+					</button>
+
 					<!-- One control, and only when it is the operator's to press. -->
-					<button v-else-if="!finalizing" type="button" class="pse-done-button" @click="finalize()">
+					<button v-else-if="!finalizing && !binLabels" type="button" class="pse-done-button"
+						@click="finalize()">
 						{{ proceedLabel }}
 					</button>
 				</div>

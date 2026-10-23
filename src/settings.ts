@@ -42,7 +42,23 @@ type SettingsData = {
 	// landed, a scan that landed wrong, and a step that failed.
 	soundSuccess: boolean,
 	soundWarning: boolean,
-	soundError: boolean
+	soundError: boolean,
+	// Bins for the CVP on the parcels page -- see `src/bins.ts`. Off unless
+	// this workplace is set up for it, and set up means all of the four below:
+	// the two environments are what make the labels come out in the right
+	// place, and the put wall is what hands a bin out and is told its label.
+	binsEnabled: boolean,
+	// The environment the reservation is announced under when it has a bin. Its
+	// printer discards, so the announcement prints nothing and every label is
+	// sent where it belongs afterwards.
+	noPrintEnvironmentId: number,
+	// The environment whose parcel printer is the CVP's: the bin wall. Read for
+	// its printer, never applied to the session.
+	binWallEnvironmentId: number,
+	// The put wall service, and its PLUGIN_TOKEN (Coolify's
+	// SERVICE_PASSWORD_64_PLUGIN), which its /api/plugin routes require.
+	putWallUrl: string,
+	putWallToken: string
 }
 
 function defaults(): SettingsData {
@@ -62,7 +78,12 @@ function defaults(): SettingsData {
 		idleLogoutSeconds: 15 * 60,
 		soundSuccess: true,
 		soundWarning: true,
-		soundError: true
+		soundError: true,
+		binsEnabled: false,
+		noPrintEnvironmentId: -1,
+		binWallEnvironmentId: -1,
+		putWallUrl: "",
+		putWallToken: ""
 	}
 }
 
@@ -90,8 +111,33 @@ const Settings = {
 			idleLogoutSeconds: this.idleLogoutSeconds,
 			soundSuccess: this.soundSuccess,
 			soundWarning: this.soundWarning,
-			soundError: this.soundError
+			soundError: this.soundError,
+			binsEnabled: this.binsEnabled,
+			noPrintEnvironmentId: this.noPrintEnvironmentId,
+			binWallEnvironmentId: this.binWallEnvironmentId,
+			putWallUrl: this.putWallUrl,
+			putWallToken: this.putWallToken
 		});
+	},
+
+	// What bins still need on this workplace before one can be added, worded for
+	// the packer who presses + Bak. A bin with no NOPRINT environment would print
+	// its label at the bench as well as at the CVP, so nothing here is optional.
+	binsMissing(): string[] {
+		const missing: string[] = [];
+
+		if (!(this.environmentId > 0)) missing.push("de omgeving van deze werkplek");
+		if (!(this.noPrintEnvironmentId > 0)) missing.push("de omgeving zonder printer");
+		if (!(this.binWallEnvironmentId > 0)) missing.push("de omgeving van de sorteerwand");
+		if (!this.putWallUrl.trim()) missing.push("het adres van de sorteerwand");
+		if (!this.putWallToken.trim()) missing.push("de plugin-sleutel van de sorteerwand");
+
+		return missing;
+	},
+
+	// Whether a bin can actually be added: switched on and fully set up.
+	binsReady(): boolean {
+		return this.binsEnabled && this.binsMissing().length == 0;
 	}
 };
 

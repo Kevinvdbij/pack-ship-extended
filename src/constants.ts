@@ -336,6 +336,11 @@ export const COMPLETED_CONTAINER_SELECTOR = "#ReservationContainer";
 // sees it.
 export const PARCELS_RETURN_HASH = "#pse-return";
 
+// The portal's button that announces the parcels, which is the press that ends
+// the packing: the label comes out of the printer on the answer to it. Addressed
+// by position within the parcel container, which is all the portal gives it.
+export const PARCELS_ANNOUNCE_BUTTON_SELECTOR = "div > div:nth-child(4) > div > button";
+
 export const COMPLETED_HEADING_SELECTOR = "#ReservationContainer h3";
 
 // What the portal did with the reservation, one list item per step -- announced
@@ -453,6 +458,11 @@ export const STORAGE_KEYS = {
 	swClientSecret: "PSE_Shopware_Client_Secret",
 	// Suffixed with a reservation number, one key per mass complete entry.
 	massCompleteEntryPrefix: "PSE_MCEntry_",
+	// Suffixed with a reservation id: which of its parcels are bins for the CVP,
+	// and how far their labels have got. See `src/bins.ts`. Per reservation for
+	// the same reason as the two above -- two tabs packing two orders must not
+	// write over each other's list.
+	binParcelsPrefix: "PSE_Bins_",
 } as const;
 
 // How many finished reservations the search screen keeps.
@@ -471,4 +481,27 @@ export function completedEntryKey(reservationNumber: string) {
 
 export function massCompleteEntryKey(reservationNumber: string) {
 	return `${STORAGE_KEYS.massCompleteEntryPrefix}${reservationNumber}`;
+}
+
+export function binParcelsKey(reservationId: string) {
+	return `${STORAGE_KEYS.binParcelsPrefix}${reservationId}`;
+}
+
+// A bin on the put wall: `BK` and four digits, printed on both ends of every
+// tote. No product barcode, reservation number or order reference in the portal
+// starts with letters, so a scan of this shape is a bin and nothing else.
+export const BIN_CODE_PATTERN = /^BK\d{4}$/;
+
+// How a bin is named on screen: "Bak 17", the number on the tote, rather than
+// the code its barcode carries. The code is for scanners and for the put wall.
+export function binLabel(code: string): string {
+	const number = Number(code.replace(/^BK/i, ""));
+
+	return Number.isFinite(number) ? `Bak ${number}` : code;
+}
+
+// The same, inside a sentence that came from somewhere else -- the put wall's
+// own refusals name bins by code.
+export function withBinLabels(text: string): string {
+	return text.replace(/\bBK\d{4}\b/g, (code) => binLabel(code));
 }

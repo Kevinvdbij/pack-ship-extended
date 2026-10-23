@@ -7,6 +7,7 @@ import {
 	PARCEL_CONTAINER_SELECTOR,
 	PARCEL_GROUP_SELECTOR,
 	PARCEL_TABS_SELECTOR,
+	PARCELS_ANNOUNCE_BUTTON_SELECTOR,
 	PARCELS_RETURN_HASH,
 } from '../../constants.ts';
 import { debug } from '../../logger.ts';
@@ -23,6 +24,8 @@ import Settings from '../../settings.ts';
 import * as Shopware from "../../shopware.ts";
 import { playSound, warmUpAudio } from '../../sounds.ts';
 import { FLYER_REMINDER } from '../../instructions.ts';
+import { armBins, type BinsHandle } from '../../bins.ts';
+import { keepParcelFormInStep } from '../../parcelArea.ts';
 
 const showRows = ref(false);
 
@@ -158,7 +161,11 @@ onMounted(() => {
 
 			processAutoComplete();
 			observeParcelContainer();
+			// The portal's own form goes wrong after a parcel is deleted, and a
+			// scan after that lands in the wrong parcel. See `src/parcelArea.ts`.
+			keepParcelFormInStep();
 			armFlyerReminder();
+			bins = armBins();
 		});
 
 	setupSidebar();
@@ -425,11 +432,6 @@ function setupSidebar() {
 		{ showRaaplijst: true });
 }
 
-// The portal's button that announces the parcels, which is the press that ends
-// the packing: the label comes out of the printer on the answer to it. Addressed
-// by position within the parcel container, which is all the portal gives it.
-const ANNOUNCE_BUTTON = "div > div:nth-child(4) > div > button";
-
 // On `body` from the press that announces until the overlay it raised comes
 // down again. What `src/styles/portal.css` shows the reminder under.
 const ANNOUNCING_CLASS = "pse-announcing";
@@ -454,7 +456,7 @@ function armFlyerReminder() {
 		const button = (event.target as Element | null)?.closest?.("button");
 		const container = document.querySelector(PARCEL_CONTAINER_SELECTOR);
 
-		if (button && button == container?.querySelector(ANNOUNCE_BUTTON)) {
+		if (button && button == container?.querySelector(PARCELS_ANNOUNCE_BUTTON_SELECTOR)) {
 			// Again, and a no-op while the line is still there: an overlay that
 			// was re-rendered since the page opened has lost it.
 			RVUtils.setBusyNote(FLYER_REMINDER);
@@ -478,6 +480,13 @@ function armFlyerReminder() {
 
 let announceTimer: ReturnType<typeof setTimeout> | undefined;
 
+// Bins for the CVP, where this workplace has them -- see `src/bins.ts`. Nothing
+// is armed until the page has settled, and until then nothing is being added.
+let bins: BinsHandle = { busy: () => false };
+
+// How often the automatic announcement looks again while a bin is being added.
+const BIN_HOLD_MS = 400;
+
 function autoAnnounceParcels(parcelContainerElement: Element) {
 	if (returning) {
 		return;
@@ -491,7 +500,9 @@ function autoAnnounceParcels(parcelContainerElement: Element) {
 	// a timer rather than held in a loop, and only one timer at a time: the
 	// observer fires more than once per portal refresh, and each firing gets
 	// here.
-	const hold = soundHoldMs();
+	// A bin being added holds it too: announcing in the middle would leave the
+	// bin claimed and its parcel half made.
+	const hold = Math.max(soundHoldMs(), bins.busy() ? BIN_HOLD_MS : 0);
 
 	if (hold > 0) {
 		if (announceTimer === undefined) {
@@ -504,7 +515,7 @@ function autoAnnounceParcels(parcelContainerElement: Element) {
 		return;
 	}
 
-	const announceButton = parcelContainerElement?.querySelector(ANNOUNCE_BUTTON) as HTMLButtonElement;
+	const announceButton = parcelContainerElement?.querySelector(PARCELS_ANNOUNCE_BUTTON_SELECTOR) as HTMLButtonElement;
 	if (!announceButton?.hasAttribute("disabled")) {
 		announceButton?.click();
 		debug("Announcing labels");

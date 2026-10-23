@@ -50,6 +50,15 @@ const environmentId = ref(Settings.environmentId);
 const slotScope = ref(Settings.slotScope);
 const idleLogoutSeconds = ref(Settings.idleLogoutSeconds);
 
+// Bins for the CVP -- see `src/bins.ts`. Both environments are picked from the
+// same list as the workplace's own: they are RetailVista's, and what is read
+// from them is their printer.
+const binsEnabled = ref(Settings.binsEnabled);
+const noPrintEnvironmentId = ref(Settings.noPrintEnvironmentId);
+const binWallEnvironmentId = ref(Settings.binWallEnvironmentId);
+const putWallUrl = ref(Settings.putWallUrl);
+const putWallToken = ref(Settings.putWallToken);
+
 // The times worth offering rather than a box to type a number into. Every one of
 // these is a decision about how long a counter stands empty between reservations,
 // and picking from a list is what stops a workplace being signed out every thirty
@@ -107,6 +116,11 @@ function save() {
 	Settings.showCompletedHistory = showCompletedHistory.value;
 	Settings.slotScope = slotScope.value;
 	Settings.idleLogoutSeconds = Number(idleLogoutSeconds.value);
+	Settings.binsEnabled = binsEnabled.value;
+	Settings.noPrintEnvironmentId = Number(noPrintEnvironmentId.value);
+	Settings.binWallEnvironmentId = Number(binWallEnvironmentId.value);
+	Settings.putWallUrl = putWallUrl.value.trim();
+	Settings.putWallToken = putWallToken.value.trim();
 	Settings.save();
 
 	// The pages are mounted separately from this footer, so anything of theirs
@@ -216,6 +230,66 @@ function save() {
 					<span class="material-icons pse-settings-listen-icon" aria-hidden="true">volume_up</span>
 					Luister
 				</button>
+			</div>
+		</div>
+
+		<div class="pse-settings-group">
+			<h3 class="pse-settings-group-title">Bakken voor de CVP</h3>
+
+			<label class="pse-settings-switch pse-settings-switch-compact">
+				<input type="checkbox" class="pse-settings-checkbox" v-model="binsEnabled" />
+				<span class="pse-settings-switch-text">
+					<span class="pse-settings-switch-title">Bakken op deze werkplek</span>
+					<span class="pse-dialog-hint">
+						De barcode van een bak scannen op de pakketpagina maakt er een pakket voor. Wat erin gaat, gaat
+						naar de CVP; de andere pakketten krijgen hier hun label.
+					</span>
+				</span>
+			</label>
+
+			<div class="pse-settings-field">
+				<label class="pse-dialog-label" for="pseNoPrintEnvironment">Omgeving zonder printer</label>
+				<select id="pseNoPrintEnvironment" class="pse-dialog-input" v-model.number="noPrintEnvironmentId"
+					:disabled="environmentOptions.length == 0">
+					<option :value="-1">Niet gekozen</option>
+					<option v-for="option in environmentOptions" :key="option.id" :value="option.id">
+						{{ option.name }}
+					</option>
+				</select>
+				<small class="pse-dialog-hint">
+					Een order met een bak wordt hieronder aangemeld, zodat er niets geprint wordt. Daarna gaat elk
+					label naar zijn eigen printer.
+				</small>
+			</div>
+
+			<div class="pse-settings-field">
+				<label class="pse-dialog-label" for="pseBinWallEnvironment">Omgeving van de sorteerwand</label>
+				<select id="pseBinWallEnvironment" class="pse-dialog-input" v-model.number="binWallEnvironmentId"
+					:disabled="environmentOptions.length == 0">
+					<option :value="-1">Niet gekozen</option>
+					<option v-for="option in environmentOptions" :key="option.id" :value="option.id">
+						{{ option.name }}
+					</option>
+				</select>
+				<small class="pse-dialog-hint">De printer van deze omgeving is die van de CVP.</small>
+			</div>
+
+			<div class="pse-settings-field">
+				<label class="pse-dialog-label" for="psePutWallUrl">Adres van de sorteerwand</label>
+				<input type="text" id="psePutWallUrl" name="psePutWallUrl" class="pse-dialog-input"
+					v-model="putWallUrl" placeholder="https://putwall.apps.kampeerhalroden.nl" autocomplete="off"
+					spellcheck="false" data-1p-ignore data-lpignore="true" data-form-type="other" />
+			</div>
+
+			<div class="pse-settings-field">
+				<label class="pse-dialog-label" for="psePutWallKey">Plugin-sleutel van de sorteerwand</label>
+				<input type="text" id="psePutWallKey" name="psePutWallKey"
+					class="pse-dialog-input pse-settings-masked" v-model="putWallToken" autocomplete="off"
+					spellcheck="false" data-1p-ignore data-lpignore="true" data-form-type="other" />
+				<small class="pse-dialog-hint">
+					De PLUGIN_TOKEN van de sorteerwand: in Coolify bij de omgevingsvariabelen van putwall als
+					SERVICE_PASSWORD_64_PLUGIN.
+				</small>
 			</div>
 		</div>
 

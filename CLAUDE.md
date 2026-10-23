@@ -62,6 +62,33 @@ longer than the reveal failsafe, so waiting for a band that never comes cost thr
 screen on every trip into a reservation. `mountHeader()` races that lookup against `domReady()` and
 mounts our band at the top of `PAGE_COLUMN_SELECTOR` when the portal serves none.
 
+## Bins for the CVP
+
+`src/bins.ts` (parcels page) and `BinLabelsPanel.vue` (completed screen), off unless a workplace has
+*Bakken voor de CVP* switched on and filled in. A bin is an ordinary portal parcel; what makes it a bin is
+the record in GM storage (`PSE_Bins_<reservationId>`), because nothing of ours survives `refresh()`. The
+put wall side of the contract is in `put-wall-service/handover-packship-bins.md`.
+
+What it leans on in the portal. The first three were watched working on reservation 417053; the last two
+are read from the portal's scripts (`put-wall-service/captured/portal`) and not yet seen live:
+
+- A scan lands in the parcel whose tab is open: the tab's `show.bs.tab` handler sets `Items[n].Active`,
+  and `VerifyProduct` posts the whole form. So opening the bin's tab is what routes the next scan.
+- A parcel is added without the dialog: `Parcels/Create` (the arguments off `#add-parcel`'s
+  `newParcel(...)`), its `#parcelForm` posted as served to `Parcels/Edit`, then the page's `refresh()`.
+- **After a parcel is deleted, the hidden `Items[n].*` inputs are wrong.** `refresh()` posts the old
+  form and ASP.NET refills hidden fields from the posted values by position, so every parcel after the
+  deleted one carries its predecessor's hidden values, the deleted id among them. The tabs and cards are
+  right. Measured: tabs `…461, …467`, hidden ids `…461, …466` with `…466` deleted. So read parcels off the
+  panes (`getRenderedParcels()` in `src/parcelArea.ts`), never off the hidden ids, and
+  `keepParcelFormInStep()` reloads the area from a plain GET when they disagree, or the next scan is
+  posted against the wrong parcel. A deleted parcel's `Parcels/Edit?itemid=` answers 500, a live one
+  200; a bin is only handed back on that definite answer.
+- The announcement of an order with a bin runs under the NOPRINT environment: `#selectEnviroment` is
+  posted to `Home/SetEnviroment` before the announce button's own handler is let through. The next page
+  puts the workplace's environment back through `applyConfiguredEnvironment`, with nothing to remember.
+- The completed screen matches its parcel cards to parcel ids by the number in front of " / ".
+
 ## Never load the ERP's launcher or its login page
 
 `src/erpFrame.ts` drives the ERP by loading `Default.aspx?pageId=<n>` bare in a frame. Keep it that
