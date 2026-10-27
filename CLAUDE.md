@@ -89,6 +89,15 @@ are read from the portal's scripts (`put-wall-service/captured/portal`) and not 
   puts the workplace's environment back through `applyConfiguredEnvironment`, with nothing to remember.
 - The completed screen matches its parcel cards to parcel ids by the number in front of " / ".
 
+An order that came from the wall in its own bin (`complete` for the reservation) gets that bin added
+unasked when the parcels page arms — `adoptOrderBin()`, through the put wall's
+`GET /api/plugin/reservations/:reservationId/bins`, so the service has to be deployed with that route
+first (against an older one the lookup fails quietly and nothing changes). A bin whose parcel the packer
+deletes goes into the record's `declined` and is not added again. The announcement refuses a bin parcel
+with nothing scanned into it; `parcelHasItems()` reads that off the `Items[p].Items[i].Amount` inputs of
+the pane's own index, which is the naming `getParcelItems()` already relies on but has not been watched
+on a bin parcel.
+
 ## Never load the ERP's launcher or its login page
 
 `src/erpFrame.ts` drives the ERP by loading `Default.aspx?pageId=<n>` bare in a frame. Keep it that

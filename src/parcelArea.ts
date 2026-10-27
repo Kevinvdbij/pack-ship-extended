@@ -95,6 +95,27 @@ export async function parcelExists(parcelId: string): Promise<boolean | undefine
 	}
 }
 
+// Whether anything has been scanned into a parcel. Its products are the hidden
+// `Items[p].Items[i]` groups under its own index p, which is read off the
+// parcel's `Items[p].ItemId` in its pane -- the products' inputs are found by
+// that name, wherever the portal put them. Undefined when the pane gives no
+// index, which callers do not take as empty.
+//
+// Only right on an area that is in step: see `parcelAreaSettled()`.
+export function parcelHasItems(parcelId: string): boolean | undefined {
+	const index = Array.from(document.querySelectorAll<HTMLInputElement>(
+		`#${PARCEL_PANE_PREFIX}${parcelId} input[name^='Items['][name$='.ItemId']`))
+		.map((input) => input.name.match(/^Items\[(\d+)\]\.ItemId$/)?.[1])
+		.find((found) => found !== undefined);
+
+	if (index === undefined) {
+		return undefined;
+	}
+
+	return Array.from(document.querySelectorAll<HTMLInputElement>(`input[name^='Items[${index}].Items['][name$='].Amount']`))
+		.some((input) => (Number(input.value.split(",").shift()) || 0) > 0);
+}
+
 // ---- Keeping the form right ----
 
 let repairing: Promise<void> | null = null;

@@ -4,10 +4,10 @@ import {
 	PARCELS_ANNOUNCE_BUTTON_SELECTOR
 } from "./constants.ts";
 import * as RVUtils from "./retailVistaUtils.ts";
-import { claimBin, unclaimBin } from "./putWall.ts";
+import { claimBin, getReservationBins, unclaimBin, type ReservationBin } from "./putWall.ts";
 import { switchSessionEnvironment } from "./environment.ts";
 import {
-	getRenderedParcels, isParcelFormStale, isRepairingParcelArea, parcelAreaSettled, parcelExists
+	getRenderedParcels, isParcelFormStale, isRepairingParcelArea, parcelAreaSettled, parcelExists, parcelHasItems
 } from "./parcelArea.ts";
 import { toast } from "./vue/toast.ts";
 import { playSound } from "./sounds.ts";
@@ -28,6 +28,9 @@ import Settings from "./settings.ts";
 // it, which the rest of the order is then scanned into. The announcement runs
 // under the NOPRINT environment, so nothing prints there; the completed screen
 // sends each label to where its parcel is going. See `src/binLabels.ts`.
+//
+// An order that was sorted on the wall comes to the manual station in its own
+// bin, and that bin is added without being scanned: see `adoptOrderBin()`.
 //
 // The record is kept outside the page, because nothing of ours survives inside
 // the parcel area -- the portal's `refresh()` replaces it after every scan --
@@ -51,6 +54,10 @@ export interface BinRecord {
 	// not print a second label or tell the wall twice.
 	printed: string[];
 	reported: string[];
+	// Bins whose parcel the packer deleted. The order's own bin from the wall
+	// is added unasked; one taken off again is not added a second time. Absent
+	// in a record written before there was any such thing.
+	declined?: string[];
 }
 
 export function getBinRecord(reservationId: string): BinRecord | undefined {
@@ -66,7 +73,7 @@ export function clearBinRecord(reservationId: string) {
 }
 
 function emptyRecord(reservationNumber: string): BinRecord {
-	return { reservationNumber, bins: [], parcels: [], printed: [], reported: [] };
+	return { reservationNumber, bins: [], parcels: [], printed: [], reported: [], declined: [] };
 }
 
 // ---- The parcels page ----
@@ -126,6 +133,9 @@ export function armBins(): BinsHandle {
 	}
 
 	let adding = false;
+	// Whether the wall is being asked for the order's bins. Holds the automatic
+	// announcement like an add does: the answer may be a bin to add.
+	let looking = false;
 	// Set once the session is on the NOPRINT environment, so the press that is
 	// replayed after the switch goes through rather than being caught again.
 	let announcing = false;
@@ -191,7 +201,9 @@ export function armBins(): BinsHandle {
 		return false;
 	}
 
-	async function addBin(code: string) {
+	// `automatic` for the order's own bin, added without a scan, which is told
+	// as such.
+	async function addBin(code: string, automatic = false) {
 		if (!readyForBins()) {
 			return;
 		}
@@ -257,7 +269,9 @@ export function armBins(): BinsHandle {
 			decorate();
 			showParcel(parcelId);
 			playSound("success");
-			toast.success(`${binLabel(code)} toegevoegd. Scan wat erin gaat.`);
+			toast.success(automatic
+				? `${binLabel(code)} hoort bij deze reservering en is toegevoegd. Scan wat erin gaat naar de CVP.`
+				: `${binLabel(code)} toegevoegd. Scan wat erin gaat.`);
 		} catch (error) {
 			console.error("Pack&Ship Extended could not add a parcel for the bin.", error);
 			playSound("error");
@@ -463,6 +477,7 @@ export function armBins(): BinsHandle {
 			const current = record();
 
 			current.bins = current.bins.filter((candidate) => candidate.bin != entry.bin);
+			current.declined = [...new Set([...current.declined ?? [], entry.bin])];
 			saveBinRecord(reservationId, current);
 
 			toast.info(`${binLabel(entry.bin)} is weer vrij.`);
@@ -479,6 +494,75 @@ export function armBins(): BinsHandle {
 	if (container) {
 		new MutationObserver(decorate).observe(container, { childList: true, subtree: true });
 		decorate();
+		void adoptOrderBin();
+	}
+
+	// ---- The order's own bin ----
+	//
+	// A multi-line order sorted on the wall for the manual station arrives in
+	// its bin, which the wall has as `complete` for this reservation. Its loose
+	// items go back to the CVP in that same bin, so it is added here as soon as
+	// the page is ready -- claimed and given its parcel exactly as a scan of it
+	// would be -- and from there it is any other bin: announced under NOPRINT,
+	// its label sent to the CVP's printer on the completed screen and its
+	// tracking reported, which is what makes it ready to scan at the machine.
+	//
+	// The packer who does not want it deletes its parcel. The wall then has it
+	// `complete` again, and it is not added a second time for this order.
+	//
+	// Only the first such bin: claiming it makes the order's other wall bins
+	// extras of it. Not at all for an order collected in the store, which goes
+	// nowhere near the machine, nor for a workplace whose set-up is not complete
+	// -- a scan says what is missing, and a page that is merely opened should not.
+	async function adoptOrderBin() {
+		if (Settings.binsMissing().length > 0 || RVUtils.isStorePickup()) {
+			return;
+		}
+
+		let bins: ReservationBin[];
+
+		looking = true;
+
+		try {
+			bins = await getReservationBins(Number(reservationId));
+		} catch (error) {
+			// Not said: nothing was asked for, and a scan of the bin still
+			// works -- or says why not -- once the wall is back.
+			console.warn("Pack&Ship Extended could not ask the put wall for the order's bins.", error);
+
+			return;
+		} finally {
+			looking = false;
+		}
+
+		const current = record();
+		const known = new Set([...current.bins.map((entry) => entry.bin), ...current.declined ?? []]);
+
+		for (const entry of bins) {
+			// Claimed for this order on a parcels page, but not this one: its
+			// parcel is one this workplace has no record of, so the bin is
+			// named rather than given a second parcel.
+			if (entry.source == "packship" && entry.state == "packing" && !known.has(entry.bin)) {
+				playSound("warning");
+				toast.error(`${binLabel(entry.bin)} is al voor deze reservering geclaimd op een andere werkplek.`);
+			}
+
+			if (entry.source == "wall" && entry.state == "filling") {
+				playSound("warning");
+				toast.error(`Deze reservering wordt nog op de wand gesorteerd in ${binLabel(entry.bin)}.`);
+			}
+		}
+
+		if (current.bins.length > 0) {
+			return;
+		}
+
+		const own = bins.find((entry) => entry.source == "wall" && entry.state == "complete" && !known.has(entry.bin));
+
+		if (own) {
+			debug(`Reservation ${reservationNumber} came from the wall in ${own.bin}, adding it`);
+			await addBin(own.bin, true);
+		}
 	}
 
 	// ---- The announcement ----
@@ -524,12 +608,31 @@ export function armBins(): BinsHandle {
 			.then(() => {
 				const settled = record();
 
+				// A bin with nothing in it would go to the CVP with a label for
+				// nothing -- most likely the order's own bin, added unasked, on an
+				// order the packer boxed entirely. Said, and nothing announced.
+				const empty = settled.bins.filter((entry) => parcelHasItems(entry.parcelId) === false);
+
+				if (empty.length > 0) {
+					const names = empty.map((entry) => binLabel(entry.bin)).join(" en ");
+
+					RVUtils.setBusy(false);
+					playSound("warning");
+					toast.error(`${names} ${empty.length == 1 ? "is" : "zijn"} leeg. Scan er iets in, of verwijder het pakket.`);
+
+					return false;
+				}
+
 				settled.parcels = getRenderedParcels();
 				saveBinRecord(reservationId, settled);
 
-				return switchSessionEnvironment(Settings.noPrintEnvironmentId);
+				return switchSessionEnvironment(Settings.noPrintEnvironmentId).then(() => true);
 			})
-			.then(() => {
+			.then((go) => {
+				if (!go) {
+					return;
+				}
+
 				announcing = true;
 				announce?.click();
 			})
@@ -541,7 +644,7 @@ export function armBins(): BinsHandle {
 			});
 	}, true);
 
-	return { busy: () => adding };
+	return { busy: () => adding || looking };
 }
 
 // Opens a parcel's tab, which is what makes it the one the next scan fills: the

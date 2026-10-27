@@ -2,9 +2,9 @@ import Settings from "./settings.ts";
 import { debug } from "./logger.ts";
 import { binLabel, withBinLabels } from "./constants.ts";
 
-// The put wall service, as far as Pack&Ship needs it: handing out a bin, being
-// told the bin's label exists, and taking the bin back when the packer changes
-// their mind.
+// The put wall service, as far as Pack&Ship needs it: saying which bins an
+// order is already in, handing out a bin, being told the bin's label exists,
+// and taking the bin back when the packer changes their mind.
 //
 // The service owns the bins. A bin is a physical tote that the wall's binners
 // also scan, so whether one is free is never decided here -- a scan of a bin
@@ -29,6 +29,24 @@ export interface BinClaim {
 // packer holding a bin is not left looking at a page that is not answering.
 const TIMEOUT_MS = 8000;
 
+// A bin an order is in, as the service has it. `wall` is a bin its binners
+// filled -- `complete` once the order came to the manual station in it -- and
+// `packship` one claimed on a parcels page, this one or another workplace's.
+export interface ReservationBin {
+	bin: string;
+	state: "free" | "filling" | "complete" | "packing" | "label_making" | "label_ready" | "label_failed";
+	source: "wall" | "packship";
+}
+
+// The bins an order is in, the first one first. Empty for an order that is in
+// no bin, which is most of them.
+export async function getReservationBins(reservationId: number): Promise<ReservationBin[]> {
+	const response = await send(`reservations/${reservationId}/bins`, "GET");
+	const answer = await response.json() as { bins?: ReservationBin[] };
+
+	return answer.bins ?? [];
+}
+
 export function claimBin(bin: string, claim: BinClaim): Promise<void> {
 	return post(bin, "claim", claim);
 }
@@ -44,6 +62,14 @@ export function unclaimBin(bin: string, reservationId: number): Promise<void> {
 }
 
 async function post(bin: string, action: string, body: object): Promise<void> {
+	await send(`bins/${encodeURIComponent(bin)}/${action}`, "POST", body, binLabel(bin));
+
+	debug(`Put wall: ${action} ${bin}`, body);
+}
+
+// One call on the service's plugin routes, answered with a 2xx or thrown as the
+// sentence to show the packer.
+async function send(route: string, method: "GET" | "POST", body?: object, subject = "het verzoek"): Promise<Response> {
 	const base = Settings.putWallUrl.trim().replace(/\/+$/, "");
 
 	if (!base || !Settings.putWallToken.trim()) {
@@ -53,13 +79,13 @@ async function post(bin: string, action: string, body: object): Promise<void> {
 	let response: Response;
 
 	try {
-		response = await fetch(`${base}/api/plugin/bins/${encodeURIComponent(bin)}/${action}`, {
-			method: "POST",
+		response = await fetch(`${base}/api/plugin/${route}`, {
+			method,
 			headers: {
 				"Authorization": `Bearer ${Settings.putWallToken.trim()}`,
-				"Content-Type": "application/json",
+				...(body ? { "Content-Type": "application/json" } : {}),
 			},
-			body: JSON.stringify(body),
+			body: body ? JSON.stringify(body) : undefined,
 			signal: AbortSignal.timeout(TIMEOUT_MS),
 		});
 	} catch (error) {
@@ -69,9 +95,7 @@ async function post(bin: string, action: string, body: object): Promise<void> {
 	}
 
 	if (response.ok) {
-		debug(`Put wall: ${action} ${bin}`, body);
-
-		return;
+		return response;
 	}
 
 	// The service words its refusals for the packer ("BK0017 is in gebruik voor
@@ -81,5 +105,5 @@ async function post(bin: string, action: string, body: object): Promise<void> {
 
 	throw new PutWallError(answer?.error
 		? withBinLabels(answer.error)
-		: `De sorteerwand weigerde ${binLabel(bin)} (${response.status}).`);
+		: `De sorteerwand weigerde ${subject} (${response.status}).`);
 }
