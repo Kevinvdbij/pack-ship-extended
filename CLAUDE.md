@@ -89,7 +89,9 @@ are read from the portal's scripts (`put-wall-service/captured/portal`) and not 
   puts the workplace's environment back through `applyConfiguredEnvironment`, with nothing to remember.
 - The completed screen matches its parcel cards to parcel ids by the number in front of " / ".
 
-An order that came from the wall in its own bin (`complete` for the reservation) gets that bin added
+An order that came from the wall in its own bin (`complete` for the reservation, or still `filling`:
+a product in its own shipping box never goes in the bin, so such an order never completes on the wall)
+gets that bin added
 unasked when the parcels page arms — `adoptOrderBin()`, through the put wall's
 `GET /api/plugin/reservations/:reservationId/bins`, so the service has to be deployed with that route
 first (against an older one the lookup fails quietly and nothing changes). A bin whose parcel the packer

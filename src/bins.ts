@@ -499,8 +499,9 @@ export function armBins(): BinsHandle {
 
 	// ---- The order's own bin ----
 	//
-	// A multi-line order sorted on the wall for the manual station arrives in
-	// its bin, which the wall has as `complete` for this reservation. Its loose
+	// A multi-line order sorted on the wall arrives at the manual station in its
+	// bin, which the wall has for this reservation as `complete`, or as still
+	// `filling` when a product did not go in it. Its loose
 	// items go back to the CVP in that same bin, so it is added here as soon as
 	// the page is ready -- claimed and given its parcel exactly as a scan of it
 	// would be -- and from there it is any other bin: announced under NOPRINT,
@@ -546,18 +547,18 @@ export function armBins(): BinsHandle {
 				playSound("warning");
 				toast.error(`${binLabel(entry.bin)} is al voor deze reservering geclaimd op een andere werkplek.`);
 			}
-
-			if (entry.source == "wall" && entry.state == "filling") {
-				playSound("warning");
-				toast.error(`Deze reservering wordt nog op de wand gesorteerd in ${binLabel(entry.bin)}.`);
-			}
 		}
 
 		if (current.bins.length > 0) {
 			return;
 		}
 
-		const own = bins.find((entry) => entry.source == "wall" && entry.state == "complete" && !known.has(entry.bin));
+		// Complete, or still being filled: an order with a product in its own
+		// shipping box never completes on the wall, since that product does not go
+		// in the bin, and the bin comes here as it is. The claim closes the order
+		// to the wall.
+		const own = bins.find((entry) => entry.source == "wall" && (entry.state == "complete" || entry.state == "filling")
+			&& !known.has(entry.bin));
 
 		if (own) {
 			debug(`Reservation ${reservationNumber} came from the wall in ${own.bin}, adding it`);
