@@ -58,7 +58,19 @@ type SettingsData = {
 	// The put wall service, and its PLUGIN_TOKEN (Coolify's
 	// SERVICE_PASSWORD_64_PLUGIN), which its /api/plugin routes require.
 	putWallUrl: string,
-	putWallToken: string
+	putWallToken: string,
+	// The CVP station bridge on this machine -- see `src/cvpBridge.ts`. Only read
+	// on the CVP station, the workplace whose environment is the bridge's own
+	// (`CVP_ENVIRONMENT_NAME`), and only ever on the machine itself: the bridge
+	// listens on loopback.
+	cvpBridgeUrl: string,
+	// The most units of one product the CVP station takes as one order. One is
+	// the station as it was: anything more is refused and packed by hand. Above
+	// one, an order of more than one unit is asked about before it is touched --
+	// the operator counts them onto the belt -- since a single scan vouches for
+	// one item and the machine boxes whatever is in front of it. Per machine: it
+	// is the size of the box the machine can make.
+	cvpMaxUnits: number
 }
 
 function defaults(): SettingsData {
@@ -83,7 +95,9 @@ function defaults(): SettingsData {
 		noPrintEnvironmentId: -1,
 		binWallEnvironmentId: -1,
 		putWallUrl: "",
-		putWallToken: ""
+		putWallToken: "",
+		cvpBridgeUrl: "http://127.0.0.1:8085",
+		cvpMaxUnits: 1
 	}
 }
 
@@ -116,7 +130,9 @@ const Settings = {
 			noPrintEnvironmentId: this.noPrintEnvironmentId,
 			binWallEnvironmentId: this.binWallEnvironmentId,
 			putWallUrl: this.putWallUrl,
-			putWallToken: this.putWallToken
+			putWallToken: this.putWallToken,
+			cvpBridgeUrl: this.cvpBridgeUrl,
+			cvpMaxUnits: this.cvpMaxUnits
 		});
 	},
 

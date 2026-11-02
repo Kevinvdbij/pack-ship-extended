@@ -8,11 +8,12 @@ import CompletedPage from './vue/pages/CompletedPage.vue';
 import AddParcelsPage from './vue/pages/AddParcelsPage.vue';
 import LoginPage from './vue/pages/LoginPage.vue';
 import LogoutPage from './vue/pages/LogoutPage.vue';
+import CvpStationPage from './vue/pages/CvpStationPage.vue';
 import FooterExtension from './vue/components/Footer.vue';
 import IdleLogoutWarning from './vue/components/IdleLogoutWarning.vue';
 import HeaderExtension from './vue/components/Header.vue';
 import Settings from "./settings.ts"
-import { applyConfiguredEnvironment, getEnvironmentSelect, hideEnvironmentPicker, lockEnvironmentPicker } from './environment.ts';
+import { applyConfiguredEnvironment, getEnvironmentSelect, hideEnvironmentPicker, isCvpStation, lockEnvironmentPicker } from './environment.ts';
 import { applyDutchLanguage, hideLanguagePicker } from './language.ts';
 import { ENVIRONMENT_FORM_SELECTOR, FOOTER_SLOT_SELECTOR, MAIN_CONTENT_SELECTOR, PAGE_COLUMN_SELECTOR } from './constants.ts';
 import { armReveal, reveal } from './reveal.ts';
@@ -97,6 +98,15 @@ const searchReservationsRoute: Route = {
 	// It costs nothing: the reveal is gated on DOM-ready regardless, so
 	// nothing of the portal's version is on screen either way.
 	attach: (host) => RVUtils.getSearchBlock()?.insertAdjacentElement("afterend", host),
+};
+
+// The search screen as the CVP station has it: one scan field that finishes an
+// order or releases a bin, in the same place. Not in the list below -- it is
+// told apart from the search screen by the session's environment rather than by
+// the URL, which only a finished document can answer. See `servedRoute`.
+const cvpStationRoute: Route = {
+	...searchReservationsRoute,
+	component: CvpStationPage,
 };
 
 // First match wins, so the catch-all search page has to come last.
@@ -384,7 +394,17 @@ async function moveVendorBuildLine() {
 //
 // Decided at DOM-ready, because "no reservation on this page" is a question only
 // a finished document answers.
+//
+// The search screen of the CVP station is the station itself: a workplace on the
+// bridge's environment packs nothing but what the machine takes, and gets the
+// one field that does that instead of the search.
 function servedRoute(current: Route | undefined): Route | undefined {
+	const served = asServed(current);
+
+	return served == searchReservationsRoute && isCvpStation() ? cvpStationRoute : served;
+}
+
+function asServed(current: Route | undefined): Route | undefined {
 	if (current?.component != AddParcelsPage) {
 		return current;
 	}

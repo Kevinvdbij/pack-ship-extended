@@ -100,6 +100,35 @@ with nothing scanned into it; `parcelHasItems()` reads that off the `Items[p].It
 the pane's own index, which is the naming `getParcelItems()` already relies on but has not been watched
 on a bin parcel.
 
+## The CVP station
+
+A workplace whose session environment is `INTG_CVP_BRIDGE_IMMEDIATE` (`CVP_ENVIRONMENT_NAME` in
+`src/environment.ts`) gets `CvpStationPage.vue` in place of the search screen: one scan field. The swap is
+made in `servedRoute()` in `main.ts`, at DOM-ready, because only the finished page says which environment
+the session is on.
+
+- **A product scan finishes its order without navigating.** `src/cvpCompletion.ts` makes the requests behind
+  the search, the verification, the parcels page and the announcement itself, reading each answer with
+  `DOMParser` -- the same sequence put-wall-service runs (`server/portal/packship-driver.ts`). Only an order
+  of one product (plus `verzendkosten`) that is not *afhalen in de winkel* is taken, of at most
+  `cvpMaxUnits` units (the workplace setting *Stuks per order op de CVP*, default 1); anything else is
+  refused before the first write. The environment is checked on every page before writing: the label
+  prints under it, and on this one it goes straight to the machine.
+- **More than one unit is counted onto the belt first.** The portal's single-line group holds orders of
+  20× one product too, and a scan vouches for one item, so `confirmUnits` stops the completion before its
+  first write and the station asks the operator to type the number or scan each unit. Enter alone never
+  answers it -- the scanner sends one after every barcode. A no sets the reservation aside for the session.
+  From the list, the fewest units go first, and with a limit above 1 the valid group's one-product orders
+  (several units plus `verzendkosten`, which `retrieveModalData` leaves there) are candidates too.
+- **A `BK` scan goes to the bridge**, `POST /api/bins/{bin}/scan` on `127.0.0.1:8085`. The bridge sends no
+  CORS headers, so `src/cvpBridge.ts` uses `GM_xmlhttpRequest` and the script `@connect`s `127.0.0.1`.
+- After a delete or create on the parcels page the area is re-read with a plain GET, never `Parcels/Refresh`
+  -- the stale hidden `Items[n].*` problem below applies to these requests as much as to the page.
+- The completion has not been run against the live portal from this code: it is the put wall's measured
+  sequence ported, not something watched here. The first live order is the test. Filling a parcel with
+  more than one unit (a `VerifyProduct` per unit, or the total on `VerifyProductAmount`) is not watched on
+  the put wall either; the count of the parcel afterwards is what catches it.
+
 ## Never load the ERP's launcher or its login page
 
 `src/erpFrame.ts` drives the ERP by loading `Default.aspx?pageId=<n>` bare in a frame. Keep it that

@@ -246,6 +246,7 @@ is installed by hand from the release asset and has to be updated alongside the 
 | `src/erpKeepAlive.ts` | Touches the ERP on a schedule so its session lasts as long as the portal's |
 | `src/reservationNote.ts`, `src/parcelLabel.ts` | The two ERP screens actually driven: the reservation note and the label reprint |
 | `src/idleLogout.ts` | Signs the workplace out after a configured stretch of nobody touching it |
+| `src/cvpCompletion.ts`, `src/cvpBridge.ts` | The CVP station (`CvpStationPage.vue`): one scan finishes a one-product order over HTTP (several units after the operator counts them), a `BK` scan releases a bin at the station bridge |
 
 ## Editor setup
 

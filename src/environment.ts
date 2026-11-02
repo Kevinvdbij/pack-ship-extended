@@ -178,6 +178,40 @@ export async function switchSessionEnvironment(environmentId: number): Promise<v
 	debug(`Session environment set to (${environmentId}) for this announcement.`);
 }
 
+// The environment the CVP station packs under: its parcel printer is the
+// bridge's push port, so a label printed under it goes straight to the machine.
+// The workplace on it is the machine's operator, and gets the CVP station in
+// place of the search screen -- see `CvpStationPage.vue`.
+export const CVP_ENVIRONMENT_NAME = "INTG_CVP_BRIDGE_IMMEDIATE";
+
+// The environment this page's session is on, by name -- or about to be, where
+// one is configured: `applyConfiguredEnvironment` corrects the session to that
+// one as the page opens, and it is what every label from here prints under.
+// Where nothing is configured it is whatever the portal's own dropdown has
+// selected. Empty on a page without the dropdown.
+export function getSessionEnvironmentName(root: ParentNode = document): string {
+	if (root == document && Settings.environmentId > 0) {
+		return Settings.environmentName || getEnvironmentName(Settings.environmentId) || "";
+	}
+
+	const select = root.querySelector<HTMLSelectElement>(ENVIRONMENT_SELECT_SELECTOR);
+
+	// The `selected` attribute rather than `selectedOptions`: a page read with
+	// `DOMParser` has no selection state of its own, only the markup.
+	const option = select?.querySelector("option[selected]") ?? select?.selectedOptions?.[0];
+
+	return option?.textContent?.trim() ?? "";
+}
+
+export function isCvpEnvironment(name: string): boolean {
+	return name.trim().toUpperCase() == CVP_ENVIRONMENT_NAME;
+}
+
+// Whether this workplace is the CVP station.
+export function isCvpStation(): boolean {
+	return isCvpEnvironment(getSessionEnvironmentName());
+}
+
 // The stored name first: it is the only source available before the portal has
 // rendered its dropdown, which is the whole point of keeping it. The options are
 // the fallback for a setting saved by a version that did not store the name yet,

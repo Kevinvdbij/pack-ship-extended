@@ -387,8 +387,8 @@ export function getCurrentReservationId() {
 //
 // Empty when the block is not there or holds no such row, which the history
 // panel renders as a row without a name rather than as a row it cannot show.
-export function getCurrentCustomerName(): string {
-	const block = document.querySelector(RESERVATION_SUMMARY_SELECTOR);
+export function getCurrentCustomerName(root: ParentNode = document): string {
+	const block = root.querySelector(RESERVATION_SUMMARY_SELECTOR);
 
 	for (const row of Array.from(block?.children ?? [])) {
 		const text = row.textContent?.replace(/\s+/g, " ").trim() ?? "";
@@ -414,8 +414,8 @@ export function getCurrentCustomerName(): string {
 // correction to Dutch lands after the markup does. Empty when the block is not
 // there or carries no such row, which every caller reads as "not known" rather
 // than as a transport of its own.
-export function getCurrentTransport(): string {
-	return readTransport(document);
+export function getCurrentTransport(root: ParentNode = document): string {
+	return readTransport(root);
 }
 
 // The same row, out of a reservation page fetched rather than stood on. The

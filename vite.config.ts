@@ -52,10 +52,12 @@ export default defineConfig({
         // (see src/styles/portal.css), which only works if we are running by
         // then.
         'run-at': 'document-start',
-        // The one host we call that is not the portal or Shopware: Greasy
+        // The hosts we call that are not the portal or Shopware: Greasy
         // Fork's metadata block, read on every page to see whether this
-        // workplace is behind. See `src/update.ts`.
-        connect: ['update.greasyfork.org'],
+        // workplace is behind (`src/update.ts`), and the CVP station's bridge
+        // on the station PC itself, which sends no CORS headers
+        // (`src/cvpBridge.ts`).
+        connect: ['update.greasyfork.org', '127.0.0.1', 'localhost'],
         license: "MIT",
       },
       // Vue is bundled rather than pulled from a CDN with @require. A required
