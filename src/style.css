@@ -540,7 +540,9 @@ select.pse-dialog-input {
 	border: 1px solid var(--pse-line);
 	border-radius: 16px;
 	background-color: #ffffff;
-	box-shadow: 0 1px 2px rgba(20, 48, 33, 0.04), 0 18px 40px -30px rgba(20, 48, 33, 0.45);
+	/* Flat, unlike the other cards. The scan hint sits just below it on the
+	 * parcels page, and any drop shadow here falls across it and makes the hint
+	 * read as tucked under the table. */
 }
 
 .pse-table {
