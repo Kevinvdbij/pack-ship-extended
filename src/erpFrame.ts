@@ -1,3 +1,4 @@
+import { unsafeWindow } from "$";
 import {
 	ERP_LOGIN_MARKER, ERP_MAIN_ITEM_FUNCTION, ERP_MAIN_WINDOW_FUNCTION, ERP_URL
 } from "./constants.ts";
@@ -331,8 +332,16 @@ export function whenErpHandsBackItem(listener: (itemId: string) => void): () => 
 //
 // Never `RetailVista.aspx` itself. It frames `Login.aspx`, and loading that signs
 // the workplace out of the ERP mid-shift -- see CLAUDE.md.
+//
+// Written onto `unsafeWindow`, the page's own window, and not onto `window`. In
+// an installed build Tampermonkey runs us in a sandbox whose `window` is ours
+// alone, so a stand-in put there is invisible to the frame's `window.top` --
+// and the screen throws "window.top.getMainWindow is not a function" exactly as
+// if there were none. `npm run dev` injects the script into the page itself,
+// where the two are the same window, which is how this passed every live test
+// and failed on the stations.
 function standInForLauncher() {
-	const host = window as unknown as Record<string, unknown>;
+	const host = unsafeWindow as unknown as Record<string, unknown>;
 
 	// Somebody else's, and not ours to replace.
 	if (typeof host[ERP_MAIN_WINDOW_FUNCTION] == "function") {

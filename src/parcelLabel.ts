@@ -47,12 +47,30 @@ export async function parcelPrinterFor(environmentId: number): Promise<string> {
 	const description = await erpTask(async (page) => {
 		await page.open(`${ERP_PAGE_PATH}?pageId=${ERP_ENVIRONMENT_PAGE_ID}&itemId=${environmentId}`);
 
-		return page.find<HTMLInputElement>(ERP_ENVIRONMENT_PARCEL_PRINTER_SELECTOR)?.value.trim() ?? "";
+		const field = page.find<HTMLInputElement>(ERP_ENVIRONMENT_PARCEL_PRINTER_SELECTOR);
+
+		// No field is not the same as an empty one. The screen came back as
+		// something other than the environment record -- an account without the
+		// right to open it, a session that could not start the application -- and
+		// saying "no printer configured" about that sends someone to fix a setting
+		// that is fine. The served title is what tells the cases apart.
+		if (!field) {
+			throw new Error(
+				`The ERP did not show environment ${environmentId}'s record (served "${page.document.title.trim()}").`
+			);
+		}
+
+		return field.value.trim();
 	});
 
-	printerCache.set(environmentId, description);
-
 	debug("Parcel service printer for this environment", { environmentId, description });
+
+	// Only an answer is kept. An empty read cached here would refuse every
+	// reprint on this page until a reload, including after the setting is filled
+	// in -- which is what turned one failed read into a string of them.
+	if (description) {
+		printerCache.set(environmentId, description);
+	}
 
 	return description;
 }
