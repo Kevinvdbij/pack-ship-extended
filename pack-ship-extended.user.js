@@ -1,12 +1,14 @@
 // ==UserScript==
 // @name         Pack&Ship Extended
 // @namespace    npm/vite-plugin-monkey
-// @version      1.1.6
+// @version      1.1.7
 // @description  Extension for the RetailVista Pack&Ship application with plenty of QOL improvements.
 // @license      MIT
 // @icon         https://www.kampeerhalroden.nl/media/e9/9d/08/1703346720/favicon.ico
 // @match        https://retailvista.net/outdoor/packship*
 // @connect      update.greasyfork.org
+// @connect      127.0.0.1
+// @connect      localhost
 // @grant        GM.openInTab
 // @grant        GM_addStyle
 // @grant        GM_addValueChangeListener
@@ -16,6 +18,7 @@
 // @grant        GM_listValues
 // @grant        GM_setValue
 // @grant        GM_xmlhttpRequest
+// @grant        unsafeWindow
 // @run-at       document-start
 // ==/UserScript==
 
@@ -30,7 +33,7 @@
 			else (document.head || document.documentElement).appendChild(document.createElement("style")).append(c);
 		})(t);
 	};
-	_css(" .pse-toasts[data-v-67a06e3f]{top:calc(env(titlebar-area-height,0px) + 18px);z-index:2100;pointer-events:none;flex-direction:column;gap:10px;width:360px;max-width:calc(100vw - 36px);display:flex;position:fixed;right:18px}.pse-toast[data-v-67a06e3f]{--pse-toast-accent:var(--pse-brand-ink);--pse-toast-soft:var(--pse-brand-soft);--pse-toast-life:5s;box-sizing:border-box;border:1px solid var(--pse-line);text-align:left;width:100%;color:var(--pse-ink);pointer-events:auto;background-color:#fff;border-radius:14px;align-items:flex-start;gap:12px;padding:13px 12px 14px 14px;display:flex;position:relative;overflow:hidden;box-shadow:0 1px 2px #1430210f,0 18px 40px -22px #0b1a1280}.pse-toast.is-success[data-v-67a06e3f]{--pse-toast-life:4s}.pse-toast.is-error[data-v-67a06e3f]{--pse-toast-accent:var(--pse-alert);--pse-toast-soft:var(--pse-alert-soft);--pse-toast-life:8s}.pse-toast.is-info[data-v-67a06e3f],.pse-toast.is-pending[data-v-67a06e3f]{--pse-toast-accent:var(--pse-ink-soft);--pse-toast-soft:var(--pse-well)}.pse-toast-mark[data-v-67a06e3f]{background-color:var(--pse-toast-soft);width:28px;height:28px;color:var(--pse-toast-accent);border-radius:9px;flex:none;justify-content:center;align-items:center;display:flex}.pse-toast-spinner[data-v-67a06e3f]{box-sizing:border-box;border:2.5px solid var(--pse-brand-ring);border-top-color:var(--pse-brand);border-radius:50%;width:16px;height:16px;animation:.7s linear infinite pse-toast-spin-67a06e3f}@keyframes pse-toast-spin-67a06e3f{to{transform:rotate(360deg)}}.pse-toast-text[data-v-67a06e3f]{overflow-wrap:anywhere;flex:1;min-width:0;margin:0;padding-top:4px;font-size:13.5px;font-weight:550;line-height:1.45}.pse-toast-close[data-v-67a06e3f]{width:26px;height:26px;color:var(--pse-ink-faint);cursor:pointer;background-color:#0000;border:0;border-radius:8px;flex:none;justify-content:center;align-items:center;margin-top:1px;padding:0;transition:background-color .15s,color .15s;display:flex}.pse-toast-close[data-v-67a06e3f]:hover{background-color:var(--pse-well);color:var(--pse-ink)}.pse-toast-close[data-v-67a06e3f]:focus{outline:none}.pse-toast-close[data-v-67a06e3f]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-toast-clock[data-v-67a06e3f]{background-color:var(--pse-toast-accent);opacity:.45;transform-origin:0;width:100%;height:3px;animation:pse-toast-clock-67a06e3f var(--pse-toast-life) linear forwards;position:absolute;bottom:0;left:0}.pse-toast:hover .pse-toast-clock[data-v-67a06e3f]{animation:none}@keyframes pse-toast-clock-67a06e3f{to{transform:scaleX(0)}}.pse-toast-enter-active[data-v-67a06e3f],.pse-toast-leave-active[data-v-67a06e3f],.pse-toast-move[data-v-67a06e3f]{transition:opacity .2s,transform .25s cubic-bezier(.2,.9,.3,1)}.pse-toast-enter-from[data-v-67a06e3f],.pse-toast-leave-to[data-v-67a06e3f]{opacity:0;transform:translate(24px)}.pse-toast-leave-active[data-v-67a06e3f]{position:absolute}@media (prefers-reduced-motion:reduce){.pse-toast-enter-active[data-v-67a06e3f],.pse-toast-leave-active[data-v-67a06e3f],.pse-toast-move[data-v-67a06e3f]{transition:opacity .2s}.pse-toast-enter-from[data-v-67a06e3f],.pse-toast-leave-to[data-v-67a06e3f]{transform:none}.pse-toast-spinner[data-v-67a06e3f]{animation-duration:1.6s}.pse-toast-clock[data-v-67a06e3f]{display:none}}@media (width<=640px){.pse-toasts[data-v-67a06e3f]{max-width:calc(100vw - 24px);top:12px;right:12px}}.pse-modal[data-v-0dcd5e50]{z-index:100;background-color:var(--pse-scrim);-webkit-backdrop-filter:blur(3px);text-align:left;color:var(--pse-ink);justify-content:center;align-items:center;padding:28px 20px;display:flex;position:fixed;inset:0}.pse-modal[data-v-0dcd5e50] *{box-sizing:border-box}.is-elevated[data-v-0dcd5e50]{z-index:200}.pse-modal-panel[data-v-0dcd5e50]{box-sizing:border-box;border-radius:var(--pse-dialog-radius);width:100%;max-height:100%;box-shadow:var(--pse-dialog-shadow);background-color:#fff;flex-direction:column;display:flex}.is-bare[data-v-0dcd5e50]{background-color:#0000;overflow:hidden}.is-sm[data-v-0dcd5e50]{max-width:420px}.is-md[data-v-0dcd5e50]{max-width:560px}.is-lg[data-v-0dcd5e50]{max-width:780px}.is-xl[data-v-0dcd5e50]{max-width:1000px}.pse-modal-head[data-v-0dcd5e50]{border-bottom:1px solid var(--pse-line);flex:none;align-items:center;gap:16px;padding:17px 20px;display:flex}.pse-modal-title[data-v-0dcd5e50]{min-width:0;color:var(--pse-ink);flex:1;margin:0;font-size:16px;font-weight:650;line-height:1.3}.pse-modal-close[data-v-0dcd5e50]{width:32px;height:32px;color:var(--pse-ink-faint);cursor:pointer;background-color:#0000;border:0;border-radius:9px;flex:none;justify-content:center;align-items:center;padding:0;transition:background-color .15s,color .15s;display:flex}.pse-modal-close[data-v-0dcd5e50]:hover{background-color:var(--pse-well);color:var(--pse-ink)}.pse-modal-close[data-v-0dcd5e50]:focus{outline:none}.pse-modal-close[data-v-0dcd5e50]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-modal-body[data-v-0dcd5e50]{flex:1;min-height:0;padding:20px;font-size:14px;line-height:1.5;overflow-y:auto}.pse-modal-foot[data-v-0dcd5e50]{border-top:1px solid var(--pse-line);flex:none;justify-content:flex-end;align-items:center;gap:9px;padding:15px 20px;display:flex}@media (width<=640px){.pse-modal[data-v-0dcd5e50]{padding:16px 12px}.pse-modal-head[data-v-0dcd5e50],.pse-modal-body[data-v-0dcd5e50],.pse-modal-foot[data-v-0dcd5e50]{padding-left:16px;padding-right:16px}}.pse-note[data-v-ab3fbaa7]{text-align:left}.pse-note-alert[data-v-ab3fbaa7]{color:#8a5a10;background-color:#e2a02e1c;border:1px solid #b4761452;border-left-width:3px;border-radius:12px;align-items:flex-start;gap:9px;margin:0 0 12px;padding:11px 13px;font-size:13px;font-weight:600;line-height:1.4;animation:2.4s ease-in-out infinite pse-note-breathe-ab3fbaa7;display:flex}.pse-note-alert-icon[data-v-ab3fbaa7]{flex:none;font-size:18px;line-height:1.2}@keyframes pse-note-breathe-ab3fbaa7{50%{background-color:#e2a02e3d;border-color:#b47614bf}}.pse-note-card[data-v-ab3fbaa7]{border:1px solid var(--pse-line);background-color:#fff;border-radius:14px;overflow:hidden;box-shadow:0 1px 2px #1430210a}.pse-note-head[data-v-ab3fbaa7]{border:0;border-bottom:1px solid var(--pse-line);background-color:var(--pse-well);width:100%;font:inherit;text-align:left;cursor:pointer;align-items:center;gap:9px;padding:10px 14px;transition:background-color .15s,border-color .15s;display:flex}.pse-note-head[aria-expanded=false][data-v-ab3fbaa7]{border-bottom-color:#0000}.pse-note-head[data-v-ab3fbaa7]:hover{background-color:var(--pse-brand-soft)}.pse-note-head[data-v-ab3fbaa7]:focus{outline:none}.pse-note-head[data-v-ab3fbaa7]:focus-visible{box-shadow:inset 0 0 0 2px var(--pse-brand-ring);outline:none}.pse-note-title[data-v-ab3fbaa7]{flex:1;min-width:0}.pse-note-empty[data-v-ab3fbaa7]{color:var(--pse-ink-faint);flex:none;font-size:11.5px;font-weight:550}.pse-note-spinner[data-v-ab3fbaa7]{border:2px solid var(--pse-line);border-top-color:var(--pse-brand);border-radius:50%;flex:none;width:13px;height:13px;animation:.7s linear infinite pse-note-spin-ab3fbaa7}@keyframes pse-note-spin-ab3fbaa7{to{transform:rotate(360deg)}}.pse-note-chevron[data-v-ab3fbaa7]{color:var(--pse-ink-faint);flex:none;font-size:19px;transition:transform .28s}.pse-note-chevron.is-open[data-v-ab3fbaa7]{transform:rotate(180deg)}.pse-note-collapse[data-v-ab3fbaa7]{grid-template-rows:0fr;transition:grid-template-rows .28s cubic-bezier(.33,1,.68,1);display:grid}.pse-note-collapse.is-open[data-v-ab3fbaa7]{grid-template-rows:1fr}.pse-note-collapse-inner[data-v-ab3fbaa7]{opacity:0;min-height:0;transition:opacity .2s;overflow:hidden}.pse-note-collapse.is-open .pse-note-collapse-inner[data-v-ab3fbaa7]{opacity:1;transition-delay:60ms}.pse-note-logo[data-v-ab3fbaa7]{filter:grayscale()brightness(.72);flex:none;width:18px;height:18px}.pse-note-title[data-v-ab3fbaa7]{letter-spacing:.06em;text-transform:uppercase;color:var(--pse-ink-faint);margin:0;font-size:10.5px;font-weight:650;line-height:1.6}.pse-note-body[data-v-ab3fbaa7]{padding:12px 14px 14px}.pse-note-field[data-v-ab3fbaa7]{box-sizing:border-box;border:1px solid var(--pse-line);background-color:var(--pse-well);field-sizing:content;width:100%;min-height:76px;max-height:260px;font:inherit;color:var(--pse-ink);resize:vertical;border-radius:10px;margin:0;padding:9px 11px;font-size:14px;line-height:1.45;transition:border-color .15s,background-color .15s,box-shadow .15s;display:block}.pse-note-field[data-v-ab3fbaa7]::placeholder{color:var(--pse-ink-faint)}.pse-note-field[data-v-ab3fbaa7]:focus{border-color:var(--pse-brand);box-shadow:0 0 0 3px var(--pse-brand-ring);background-color:#fff;outline:none}.pse-note-field[data-v-ab3fbaa7]:disabled{color:var(--pse-ink-soft);cursor:default}.pse-note-field-waiting[data-v-ab3fbaa7]{resize:none;flex-direction:column;justify-content:center;gap:9px;display:flex}.pse-note-shimmer[data-v-ab3fbaa7]{background-color:var(--pse-line);border-radius:5px;height:10px;animation:1.4s ease-in-out infinite pse-note-pulse-ab3fbaa7}.pse-note-shimmer-short[data-v-ab3fbaa7]{width:62%;animation-delay:.2s}@keyframes pse-note-pulse-ab3fbaa7{50%{opacity:.45}}.pse-note-actions[data-v-ab3fbaa7]{gap:8px;margin-top:10px;display:flex}.pse-note-btn[data-v-ab3fbaa7]{background-color:var(--pse-brand-ink);min-width:0;height:36px;font:inherit;color:#fff;white-space:nowrap;text-overflow:ellipsis;cursor:pointer;border:1px solid #0000;border-radius:10px;flex:1;padding:0 12px;font-size:13px;font-weight:650;transition:background-color .15s,border-color .15s,color .15s;overflow:hidden}.pse-note-btn[data-v-ab3fbaa7]:hover:not(:disabled){background-color:var(--pse-brand-ink-strong)}.pse-note-btn[data-v-ab3fbaa7]:focus{outline:none}.pse-note-btn[data-v-ab3fbaa7]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-note-btn[data-v-ab3fbaa7]:disabled{color:#fff;cursor:not-allowed;background-color:#dfe6e2}.pse-note-btn-quiet[data-v-ab3fbaa7]{border-color:var(--pse-line);color:var(--pse-ink-soft);background-color:#fff}.pse-note-btn-quiet[data-v-ab3fbaa7]:hover:not(:disabled){border-color:var(--pse-brand);background-color:var(--pse-brand-soft);color:var(--pse-brand-ink)}.pse-note-btn-quiet[data-v-ab3fbaa7]:disabled{border-color:var(--pse-line);color:var(--pse-ink-faint);background-color:#fff}@media (prefers-reduced-motion:reduce){.pse-note-collapse[data-v-ab3fbaa7],.pse-note-collapse-inner[data-v-ab3fbaa7],.pse-note-chevron[data-v-ab3fbaa7]{transition:none}.pse-note-spinner[data-v-ab3fbaa7]{animation:1.4s ease-in-out infinite pse-note-pulse-ab3fbaa7}.pse-note-alert[data-v-ab3fbaa7]{background-color:#e2a02e3d;border-color:#b47614bf;animation:none}.pse-note-shimmer[data-v-ab3fbaa7]{animation:none}}.pse-rack-lead[data-v-76779723]{color:var(--pse-ink-soft);margin:0 0 16px;font-size:13px;line-height:1.45}.pse-rack[data-v-76779723]{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;display:grid}.pse-rack-column[data-v-76779723]{flex-direction:column;gap:7px;min-width:0;display:flex}.pse-rack-letter[data-v-76779723]{letter-spacing:.1em;text-align:center;color:var(--pse-ink-faint);font-size:11px;font-weight:700}.pse-rack-bays[data-v-76779723]{border:1px solid var(--pse-line);background-color:var(--pse-well);border-radius:14px;grid-template-rows:repeat(2,1fr);grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;height:232px;padding:7px;display:grid}.pse-rack-bays.is-rows-1 .pse-rack-bay[data-v-76779723]{grid-row:span 2}.pse-rack-bay[data-v-76779723]{border:1px solid var(--pse-line);min-width:0;font:inherit;color:var(--pse-ink-soft);cursor:pointer;background-color:#fff;border-radius:10px;flex-direction:column;justify-content:center;align-items:center;gap:3px;padding:4px;transition:border-color .15s,background-color .15s,color .15s,box-shadow .15s;display:flex}.pse-rack-bay[data-v-76779723]:hover{border-color:var(--pse-brand);background-color:var(--pse-brand-soft);color:var(--pse-brand-ink)}.pse-rack-bay[data-v-76779723]:focus{outline:none}.pse-rack-bay[data-v-76779723]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-rack-bay-label[data-v-76779723]{font-variant-numeric:tabular-nums;font-size:15px;font-weight:700;line-height:1.1}.pse-rack-bay-note[data-v-76779723]{text-align:center;opacity:.8;font-size:10px;font-weight:600;line-height:1.2}.pse-rack-bay.is-taken[data-v-76779723]{border-color:var(--pse-attention-line-soft);background-color:var(--pse-attention-soft);color:var(--pse-attention-ink)}.pse-rack-bay.is-current[data-v-76779723]{border-color:var(--pse-brand-ink);background-color:var(--pse-brand-ink);color:#fff}.pse-rack-bay.is-current[data-v-76779723]:hover{background-color:var(--pse-brand-ink-strong);color:#fff}@media (width<=720px){.pse-rack[data-v-76779723]{grid-template-columns:repeat(2,minmax(0,1fr))}}.pse-slotpanel[data-v-025f11c3]{text-align:left}.pse-slotpanel-card[data-v-025f11c3]{border:1px solid var(--pse-line);background-color:#fff;border-radius:14px;overflow:hidden;box-shadow:0 1px 2px #1430210a}.pse-slotpanel-head[data-v-025f11c3]{border:0;border-bottom:1px solid var(--pse-line);background-color:var(--pse-well);width:100%;min-height:42px;font:inherit;text-align:left;cursor:pointer;align-items:center;gap:9px;padding:7px 14px;transition:background-color .15s,border-color .15s;display:flex}.pse-slotpanel-head[aria-expanded=false][data-v-025f11c3],.pse-slotpanel-head.is-plain[data-v-025f11c3]{border-bottom-color:#0000}.pse-slotpanel-head.is-plain[data-v-025f11c3]{cursor:default}.pse-slotpanel-head[data-v-025f11c3]:not(.is-plain):hover{background-color:var(--pse-brand-soft)}.pse-slotpanel-head[data-v-025f11c3]:focus{outline:none}.pse-slotpanel-head[data-v-025f11c3]:focus-visible{box-shadow:inset 0 0 0 2px var(--pse-brand-ring);outline:none}.pse-slotpanel-icon[data-v-025f11c3]{color:var(--pse-ink-faint);flex:none;font-size:18px}.pse-slotpanel-title[data-v-025f11c3]{letter-spacing:.06em;text-transform:uppercase;min-width:0;color:var(--pse-ink-faint);flex:1;margin:0;font-size:10.5px;font-weight:650;line-height:1.6}.pse-slotpanel-summary[data-v-025f11c3]{flex-wrap:wrap;flex:none;justify-content:flex-end;gap:5px;display:flex}.pse-slotpanel-empty[data-v-025f11c3]{color:var(--pse-ink-faint);flex:none;font-size:11.5px;font-weight:550}.pse-slotpanel-spinner[data-v-025f11c3]{border:2px solid var(--pse-line);border-top-color:var(--pse-brand);border-radius:50%;flex:none;width:13px;height:13px;animation:.7s linear infinite pse-slotpanel-spin-025f11c3}@keyframes pse-slotpanel-spin-025f11c3{to{transform:rotate(360deg)}}.pse-slotpanel-chevron[data-v-025f11c3]{color:var(--pse-ink-faint);flex:none;font-size:19px;transition:transform .28s}.pse-slotpanel-chevron.is-open[data-v-025f11c3]{transform:rotate(180deg)}.pse-slotpanel-collapse[data-v-025f11c3]{grid-template-rows:0fr;transition:grid-template-rows .28s cubic-bezier(.33,1,.68,1);display:grid}.pse-slotpanel-collapse.is-open[data-v-025f11c3]{grid-template-rows:1fr}.pse-slotpanel-collapse-inner[data-v-025f11c3]{opacity:0;min-height:0;transition:opacity .2s;overflow:hidden}.pse-slotpanel-collapse.is-open .pse-slotpanel-collapse-inner[data-v-025f11c3]{opacity:1;transition-delay:60ms}.pse-slotpanel-body[data-v-025f11c3]{flex-direction:column;gap:12px;padding:12px 14px 14px;display:flex}.pse-slotpanel-block[data-v-025f11c3]{flex-direction:column;align-items:flex-start;gap:6px;display:flex}.pse-slotpanel-caption[data-v-025f11c3]{letter-spacing:.06em;text-transform:uppercase;color:var(--pse-ink-faint);font-size:10.5px;font-weight:650}.pse-slotpanel-lines[data-v-025f11c3]{flex-direction:column;gap:6px;width:100%;margin:0;padding:0;list-style:none;display:flex}.pse-slotpanel-line[data-v-025f11c3]{align-items:center;gap:12px;display:flex}.pse-slotpanel-line-name[data-v-025f11c3]{white-space:nowrap;text-overflow:ellipsis;min-width:0;color:var(--pse-ink);flex:1;font-size:13px;overflow:hidden}.pse-slotpanel-hint[data-v-025f11c3]{color:var(--pse-ink-soft);margin:0;font-size:12px;line-height:1.45}@media (prefers-reduced-motion:reduce){.pse-slotpanel-collapse[data-v-025f11c3],.pse-slotpanel-collapse-inner[data-v-025f11c3],.pse-slotpanel-chevron[data-v-025f11c3]{transition:none}.pse-slotpanel-spinner[data-v-025f11c3]{animation:none}}.pse-rescard[data-v-b187fc81]{border:1px solid var(--pse-line);background-color:#fff;border-radius:16px;transition:border-color .15s,box-shadow .15s;overflow:hidden}.pse-rescard+.pse-rescard[data-v-b187fc81]{margin-top:10px}.pse-rescard[data-v-b187fc81]:not(.is-incomplete):hover{border-color:var(--pse-brand);box-shadow:0 1px 2px #1430210a,0 14px 30px -24px #14302180}.pse-rescard-head[data-v-b187fc81]{background-color:var(--pse-well);border-bottom:1px solid var(--pse-line);align-items:center;gap:20px;padding:13px 16px;display:flex}.pse-rescard-id[data-v-b187fc81]{flex:none;min-width:108px}.pse-rescard-number[data-v-b187fc81]{font-variant-numeric:tabular-nums;color:var(--pse-ink);font-size:17px;font-weight:700;line-height:1.2;display:block}.pse-rescard-reference[data-v-b187fc81]{font-variant-numeric:tabular-nums;color:var(--pse-ink-soft);margin-top:1px;font-size:12px;display:block}.pse-rescard-facts[data-v-b187fc81]{flex:1;gap:26px;min-width:0;margin:0;display:flex}.pse-rescard-fact[data-v-b187fc81]{min-width:0}.pse-rescard-fact dt[data-v-b187fc81]{letter-spacing:.06em;text-transform:uppercase;color:var(--pse-ink-faint);margin:0;font-size:10.5px;font-weight:650}.pse-rescard-fact dd[data-v-b187fc81]{white-space:nowrap;text-overflow:ellipsis;color:var(--pse-ink);margin:2px 0 0;font-size:13.5px;font-weight:600;overflow:hidden}.pse-rescard-open[data-v-b187fc81]{background-color:var(--pse-brand-ink);height:36px;font:inherit;color:#fff;cursor:pointer;border:0;border-radius:10px;flex:none;align-items:center;gap:2px;padding:0 10px 0 15px;font-size:13.5px;font-weight:650;transition:background-color .15s;display:inline-flex}.pse-rescard-open[data-v-b187fc81]:hover{background-color:var(--pse-brand-ink-strong)}.pse-rescard-open[data-v-b187fc81]:focus{outline:none}.pse-rescard-open[data-v-b187fc81]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-rescard-open-icon[data-v-b187fc81]{font-size:18px}.pse-rescard-products[data-v-b187fc81]{overflow-x:auto}.pse-rescard-amount[data-v-b187fc81]{font-variant-numeric:tabular-nums;white-space:nowrap;border-radius:8px;padding:2px 9px;font-size:13px;font-weight:600;display:inline-block}.pse-table tbody tr.is-short td[data-v-b187fc81]{background-color:var(--pse-attention-wash-strong);border-top-color:var(--pse-attention-line-soft)}.pse-table tbody tr.is-short .pse-rescard-amount[data-v-b187fc81]{color:var(--pse-attention-ink);font-weight:700}.pse-rescard-aside[data-v-b187fc81]{border-top:1px solid var(--pse-line);flex-direction:column;gap:10px;padding:14px 16px;display:flex}@media (width<=720px){.pse-rescard-head[data-v-b187fc81]{flex-wrap:wrap;gap:12px 20px}.pse-rescard-facts[data-v-b187fc81]{flex-basis:100%;order:1;gap:18px}.pse-rescard-open[data-v-b187fc81]{margin-left:auto}}.pse-row[data-v-31ebb75c]{border-top:1px solid var(--pse-line);grid-template-columns:auto minmax(0,1.4fr) minmax(0,1fr) auto;align-items:center;gap:16px;padding:11px 16px;font-size:14px;transition:background-color .15s;display:grid}.pse-row[data-v-31ebb75c]:first-child{border-top:0}.pse-row[data-v-31ebb75c]:hover{background-color:var(--pse-well)}.pse-row-number[data-v-31ebb75c]{font-variant-numeric:tabular-nums;color:var(--pse-ink);font-weight:650}.pse-row-customer[data-v-31ebb75c],.pse-row-reference-text[data-v-31ebb75c]{white-space:nowrap;text-overflow:ellipsis;overflow:hidden}.pse-row-customer[data-v-31ebb75c]{color:var(--pse-ink)}.pse-row-reference[data-v-31ebb75c]{font-variant-numeric:tabular-nums;color:var(--pse-ink-soft);align-items:center;gap:8px;font-size:13px;display:flex}.pse-row-tag[data-v-31ebb75c]{background-color:var(--pse-attention-soft);font-variant-numeric:normal;white-space:nowrap;color:var(--pse-attention-ink);border-radius:999px;flex:none;padding:2px 8px;font-size:11.5px;font-weight:650}.pse-row-open[data-v-31ebb75c]{border:1px solid var(--pse-line);height:32px;font:inherit;color:var(--pse-ink-soft);cursor:pointer;background-color:#fff;border-radius:9px;align-items:center;gap:2px;padding:0 8px 0 12px;font-size:13px;font-weight:650;transition:border-color .15s,background-color .15s,color .15s;display:inline-flex}.pse-row:hover .pse-row-open[data-v-31ebb75c]{border-color:var(--pse-brand);background-color:var(--pse-brand-soft);color:var(--pse-brand-ink)}.pse-row-open[data-v-31ebb75c]:focus{outline:none}.pse-row-open[data-v-31ebb75c]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-row-open-icon[data-v-31ebb75c]{font-size:18px}.pse-row-state[data-v-31ebb75c]{white-space:nowrap;border-radius:999px;align-items:center;gap:7px;padding:4px 11px;font-size:12.5px;font-weight:650;display:inline-flex}.pse-row-mark[data-v-31ebb75c]{background-color:currentColor;border-radius:50%;flex:none;width:7px;height:7px}.pse-row-state.is-queued[data-v-31ebb75c]{background-color:var(--pse-well);color:var(--pse-ink-faint)}.pse-row-state.is-stopped[data-v-31ebb75c]{background-color:var(--pse-well);color:var(--pse-ink-soft)}.pse-row-state.is-busy[data-v-31ebb75c]{color:#8a5a10;background-color:#e2a02e29}.pse-row-state.is-busy .pse-row-mark[data-v-31ebb75c]{animation:1.6s ease-in-out infinite pse-row-pulse-31ebb75c}@keyframes pse-row-pulse-31ebb75c{50%{opacity:.3}}.pse-row-state.is-done[data-v-31ebb75c]{background-color:var(--pse-brand-soft);color:var(--pse-brand-ink)}.pse-row-state.is-failed[data-v-31ebb75c]{background-color:var(--pse-alert-soft);color:var(--pse-alert-ink)}.pse-row.is-failed[data-v-31ebb75c]{background-color:var(--pse-alert-wash)}@media (prefers-reduced-motion:reduce){.pse-row-state.is-busy .pse-row-mark[data-v-31ebb75c]{animation:none}}@media (width<=720px){.pse-row[data-v-31ebb75c]{grid-template-columns:auto minmax(0,1fr) auto;gap:12px}.pse-row-reference[data-v-31ebb75c]{display:none}}.pse-mc[data-v-61d631cb]{border:1px solid var(--pse-line);background-color:var(--pse-well);border-radius:14px;margin-bottom:12px;padding:15px 17px;transition:border-color .2s,background-color .2s}.pse-mc.is-running[data-v-61d631cb]{background-color:#e2a02e12;border-color:#e2a02e66}.pse-mc.is-done[data-v-61d631cb]{border-color:var(--pse-brand);background-color:var(--pse-brand-soft)}.pse-mc.is-stopped[data-v-61d631cb]{border-color:var(--pse-alert-soft);background-color:var(--pse-alert-wash)}.pse-mc.is-stopped .pse-mc-icon[data-v-61d631cb]{border-color:var(--pse-alert-soft);color:var(--pse-alert-ink)}.pse-mc.is-stopped .pse-mc-progress-fill[data-v-61d631cb]{background-color:var(--pse-alert)}.pse-mc-head[data-v-61d631cb]{align-items:center;gap:13px;display:flex}.pse-mc-icon[data-v-61d631cb]{border:1px solid var(--pse-line);width:36px;height:36px;color:var(--pse-brand-ink);background-color:#fff;border-radius:11px;flex:none;justify-content:center;align-items:center;display:flex}.pse-mc.is-running .pse-mc-icon[data-v-61d631cb]{color:#8a5a10;border-color:#e2a02e66}.pse-mc-titles[data-v-61d631cb]{flex:1;min-width:0}.pse-mc-title[data-v-61d631cb]{color:var(--pse-ink);margin:0;font-size:14.5px;font-weight:650;line-height:1.3}.pse-mc-subtitle[data-v-61d631cb]{color:var(--pse-ink-soft);margin:3px 0 0;font-size:12.5px;line-height:1.4}.pse-mc-controls[data-v-61d631cb]{flex:none;align-items:center;gap:10px;display:flex}.pse-mc-stepper[data-v-61d631cb]{border:1px solid var(--pse-line);background-color:#fff;border-radius:11px;align-items:center;height:40px;display:flex;overflow:hidden}.pse-mc-step[data-v-61d631cb]{width:34px;height:100%;font:inherit;color:var(--pse-ink-soft);cursor:pointer;background-color:#0000;border:0;padding:0;font-size:17px;line-height:1;transition:background-color .15s,color .15s}.pse-mc-step[data-v-61d631cb]:hover:not(:disabled){background-color:var(--pse-brand-soft);color:var(--pse-brand-ink)}.pse-mc-step[data-v-61d631cb]:disabled{color:var(--pse-line);cursor:not-allowed}.pse-mc-step[data-v-61d631cb]:focus{outline:none}.pse-mc-step[data-v-61d631cb]:focus-visible{box-shadow:inset 0 0 0 2px var(--pse-brand-ring);outline:none}.pse-mc-amount[data-v-61d631cb]{border:0;border-left:1px solid var(--pse-line);border-right:1px solid var(--pse-line);width:46px;height:100%;font:inherit;font-variant-numeric:tabular-nums;text-align:center;color:var(--pse-ink);background-color:#0000;padding:0;font-size:15px;font-weight:650}.pse-mc-amount[data-v-61d631cb]:focus{background-color:var(--pse-brand-soft);outline:none}.pse-mc-amount[data-v-61d631cb]::-webkit-inner-spin-button{appearance:none;margin:0}.pse-mc-amount[data-v-61d631cb]::-webkit-outer-spin-button{appearance:none;margin:0}.pse-mc-start[data-v-61d631cb]{flex:none}.pse-mc-tally[data-v-61d631cb]{flex:none;align-items:baseline;gap:6px;display:flex}.pse-mc-tally-count[data-v-61d631cb]{font-variant-numeric:tabular-nums;color:var(--pse-ink);font-size:20px;font-weight:700;line-height:1}.pse-mc-tally-of[data-v-61d631cb]{color:var(--pse-ink-faint);font-size:14px;font-weight:650}.pse-mc-tally-label[data-v-61d631cb]{color:var(--pse-ink-soft);font-size:12px}.pse-mc-progress[data-v-61d631cb]{background-color:#142b2214;border-radius:999px;height:6px;margin-top:13px;overflow:hidden}.pse-mc-progress-fill[data-v-61d631cb]{background-color:var(--pse-brand);border-radius:999px;height:100%;transition:width .4s cubic-bezier(.2,.9,.3,1)}@media (width<=720px){.pse-mc.is-stopped[data-v-61d631cb]{border-color:var(--pse-alert-soft);background-color:var(--pse-alert-wash)}.pse-mc.is-stopped .pse-mc-icon[data-v-61d631cb]{border-color:var(--pse-alert-soft);color:var(--pse-alert-ink)}.pse-mc.is-stopped .pse-mc-progress-fill[data-v-61d631cb]{background-color:var(--pse-alert)}.pse-mc-head[data-v-61d631cb]{flex-wrap:wrap}.pse-mc-titles[data-v-61d631cb]{flex-basis:100%;order:-1}.pse-mc-controls[data-v-61d631cb],.pse-mc-tally[data-v-61d631cb]{margin-left:auto}}.pse-found[data-v-120793a6]{border:1px solid var(--pse-line);background-color:var(--pse-well);border-radius:14px;align-items:center;gap:16px;margin-bottom:20px;padding:14px 16px;display:flex}.pse-found-image[data-v-120793a6]{border:1px solid var(--pse-line);background-color:#fff;border-radius:11px;flex:none;justify-content:center;align-items:center;width:58px;height:58px;display:flex;overflow:hidden}.pse-found-image img[data-v-120793a6]{object-fit:contain;max-width:100%;max-height:100%}.pse-found-text[data-v-120793a6]{flex:1;min-width:0}.pse-found-name[data-v-120793a6]{color:var(--pse-ink);margin:0;font-size:15.5px;font-weight:650;line-height:1.3}.pse-found-barcode[data-v-120793a6]{font-variant-numeric:tabular-nums;color:var(--pse-ink-soft);margin:3px 0 0;font-size:13px}.pse-found-count[data-v-120793a6]{flex:none;align-items:baseline;gap:6px;display:flex}.pse-found-count-number[data-v-120793a6]{font-variant-numeric:tabular-nums;color:var(--pse-brand-ink);font-size:22px;font-weight:700;line-height:1}.pse-found-count-label[data-v-120793a6]{color:var(--pse-ink-soft);font-size:12.5px}.pse-countdown[data-v-120793a6]{border:1px solid var(--pse-brand);background-color:var(--pse-brand-soft);color:var(--pse-brand-ink);border-radius:12px;align-items:center;gap:9px;margin:0 0 20px;padding:11px 14px;font-size:13.5px;font-weight:600;display:flex}.pse-countdown-mark[data-v-120793a6]{background-color:var(--pse-brand);border-radius:50%;flex:none;width:8px;height:8px;animation:1s ease-in-out infinite pse-countdown-tick-120793a6}@keyframes pse-countdown-tick-120793a6{50%{opacity:.25}}@media (prefers-reduced-motion:reduce){.pse-countdown-mark[data-v-120793a6]{animation:none}}.pse-group+.pse-group[data-v-120793a6]{margin-top:26px}.pse-group-head[data-v-120793a6]{margin-bottom:10px}.pse-group-title[data-v-120793a6]{letter-spacing:.02em;color:var(--pse-ink);align-items:center;gap:8px;margin:0;font-size:14px;font-weight:650;display:flex}.pse-group-count[data-v-120793a6]{background-color:var(--pse-brand-soft);font-variant-numeric:tabular-nums;min-width:22px;height:20px;color:var(--pse-brand-ink);border-radius:999px;justify-content:center;align-items:center;padding:0 7px;font-size:12px;font-weight:700;display:inline-flex}.pse-group-note[data-v-120793a6]{color:var(--pse-ink-soft);margin:4px 0 0;font-size:12.5px;line-height:1.45}.pse-rows[data-v-120793a6]{border:1px solid var(--pse-line);background-color:#fff;border-radius:14px;overflow:hidden}.pse-panel[data-v-2ad9890a]{flex-direction:column;gap:18px;min-width:0;display:flex}.pse-panel-head[data-v-2ad9890a]{align-items:center;gap:12px;display:flex}.pse-panel-icon[data-v-2ad9890a]{background-color:var(--pse-brand-soft);width:38px;height:38px;color:var(--pse-brand-ink);border-radius:11px;flex:none;justify-content:center;align-items:center;display:flex}.pse-panel-text[data-v-2ad9890a]{min-width:0}.pse-panel-title[data-v-2ad9890a]{color:var(--pse-ink);margin:0;font-size:16px;font-weight:650;line-height:1.3}.pse-panel-subtitle[data-v-2ad9890a]{color:var(--pse-ink-soft);margin:2px 0 0;font-size:12.5px;line-height:1.4}.pse-field[data-v-e35ea7a8]{cursor:text;margin:0;display:block}.pse-field-label[data-v-e35ea7a8]{letter-spacing:.07em;text-transform:uppercase;color:var(--pse-ink-soft);margin-bottom:7px;font-size:11px;font-weight:650;display:block}.pse-field-shell[data-v-e35ea7a8]{display:block}.pse-field-shell[data-v-e35ea7a8] .pse-input{box-sizing:border-box;border:1px solid var(--pse-line);background-color:var(--pse-well);width:100%;height:48px;font:inherit;color:var(--pse-ink);border-radius:12px;margin:0;padding:0 15px;font-size:15px;transition:border-color .15s,background-color .15s,box-shadow .15s;display:block}.pse-field-shell[data-v-e35ea7a8] .pse-input::placeholder{color:var(--pse-ink-faint)}.pse-field-shell[data-v-e35ea7a8] .pse-input:-webkit-autofill{-webkit-text-fill-color:var(--pse-ink);box-shadow:0 0 0 100px var(--pse-well) inset}.pse-field-shell[data-v-e35ea7a8] .pse-input:-webkit-autofill:hover{-webkit-text-fill-color:var(--pse-ink);box-shadow:0 0 0 100px var(--pse-well) inset}.pse-field-shell[data-v-e35ea7a8] .pse-input:focus{border-color:var(--pse-brand);box-shadow:0 0 0 3px var(--pse-brand-ring);background-color:#fff;outline:none}.pse-field-shell[data-v-e35ea7a8] .pse-input:-webkit-autofill:focus{box-shadow:0 0 0 100px #fff inset, 0 0 0 3px var(--pse-brand-ring)}.pse-notice[data-v-0438713d]{border:1px solid var(--pse-line);text-align:left;background-color:#fff;border-radius:14px;align-items:flex-start;gap:12px;padding:14px 16px;display:flex;box-shadow:0 1px 2px #1430210a,0 14px 30px -26px #14302173}.pse-notice-icon[data-v-0438713d]{border-radius:10px;flex:none;justify-content:center;align-items:center;width:32px;height:32px;display:flex}.pse-notice.is-notice .pse-notice-icon[data-v-0438713d]{background-color:var(--pse-attention-soft);color:var(--pse-attention-ink)}.pse-notice.is-alert .pse-notice-icon[data-v-0438713d]{background-color:var(--pse-alert-soft);color:var(--pse-alert-ink)}.pse-notice-text[data-v-0438713d]{min-width:0;padding-top:4px;display:block}.pse-notice-title[data-v-0438713d]{color:var(--pse-ink);font-size:14px;font-weight:650;line-height:1.35;display:block}.pse-notice-detail[data-v-0438713d]{color:var(--pse-ink-soft);margin-top:2px;font-size:12.5px;line-height:1.45;display:block}.pse-notice-close[data-v-0438713d]{width:28px;height:28px;color:var(--pse-ink-faint);cursor:pointer;background:0 0;border:0;border-radius:8px;flex:none;justify-content:center;align-items:center;margin-left:auto;padding:0;transition:background-color .15s,color .15s;display:flex}.pse-notice-close[data-v-0438713d]:hover{background-color:var(--pse-well);color:var(--pse-ink)}.pse-notice-close[data-v-0438713d]:focus{outline:none}.pse-notice-close[data-v-0438713d]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-resume[data-v-ead5c402]{border:1px solid var(--pse-line);width:100%;font:inherit;text-align:left;color:var(--pse-ink);cursor:pointer;background-color:#fff;border-radius:14px;align-items:center;gap:13px;margin:0;padding:13px 16px;transition:border-color .15s,box-shadow .15s,transform .15s;display:flex}.pse-resume[data-v-ead5c402]:hover:not(:disabled){border-color:var(--pse-brand);transform:translateY(-1px);box-shadow:0 6px 18px -12px #14302180}.pse-resume[data-v-ead5c402]:focus{outline:none}.pse-resume[data-v-ead5c402]:focus-visible{border-color:var(--pse-brand);box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-resume[data-v-ead5c402]:disabled{background-color:var(--pse-well);color:var(--pse-ink-faint);cursor:not-allowed}.pse-resume-icon[data-v-ead5c402]{background-color:var(--pse-brand-soft);width:34px;height:34px;color:var(--pse-brand-ink);border-radius:10px;flex:none;justify-content:center;align-items:center;display:flex}.pse-resume:disabled .pse-resume-icon[data-v-ead5c402]{color:var(--pse-ink-faint);background-color:#1430210d}.pse-resume-text[data-v-ead5c402]{flex-direction:column;gap:2px;min-width:0;margin-right:auto;display:flex}.pse-resume-label[data-v-ead5c402]{font-size:13px;font-weight:600;line-height:1.3}.pse-resume-number[data-v-ead5c402]{color:var(--pse-ink-soft);font-variant-numeric:tabular-nums;font-size:12px;line-height:1.3}.pse-resume:disabled .pse-resume-number[data-v-ead5c402]{color:var(--pse-ink-faint)}.pse-resume-chevron[data-v-ead5c402]{color:var(--pse-ink-faint);flex:none;transition:transform .15s,color .15s}.pse-resume:hover:not(:disabled) .pse-resume-chevron[data-v-ead5c402]{color:var(--pse-brand-ink);transform:translate(2px)}.pse-picker-intro[data-v-585a06fb]{color:var(--pse-ink-soft);margin:0 0 16px;font-size:13.5px;line-height:1.45}.pse-picker-list[data-v-585a06fb]{flex-direction:column;gap:8px;margin:0;padding:0;list-style:none;display:flex}.pse-picker-row[data-v-585a06fb]{border:1px solid var(--pse-line);width:100%;font:inherit;text-align:left;color:var(--pse-ink);cursor:pointer;background-color:#fff;border-radius:12px;align-items:center;gap:12px;padding:11px 13px;transition:border-color .15s,background-color .15s;display:flex}.pse-picker-row[data-v-585a06fb]:hover:not(:disabled){border-color:var(--pse-brand);background-color:var(--pse-well)}.pse-picker-row[data-v-585a06fb]:disabled{opacity:.55;cursor:default}.pse-picker-row[data-v-585a06fb]:focus{outline:none}.pse-picker-row[data-v-585a06fb]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-picker-what[data-v-585a06fb]{flex-direction:column;flex:auto;gap:2px;min-width:0;display:flex}.pse-picker-barcode[data-v-585a06fb]{font-variant-numeric:tabular-nums;text-overflow:ellipsis;white-space:nowrap;font-size:14px;font-weight:650;overflow:hidden}.pse-picker-carrier[data-v-585a06fb]{color:var(--pse-ink-faint);font-size:12px}.pse-picker-icon[data-v-585a06fb]{color:var(--pse-brand-ink);flex:none;font-size:18px}.pse-picker-spinner[data-v-585a06fb]{border:2px solid var(--pse-line);border-top-color:var(--pse-brand);border-radius:50%;flex:none;width:14px;height:14px;animation:.7s linear infinite pse-picker-spin-585a06fb}@keyframes pse-picker-spin-585a06fb{to{transform:rotate(360deg)}}.pse-history[data-v-0f4a5614]{border:1px solid var(--pse-line);background-color:var(--pse-well);border-radius:20px;flex-direction:column;align-self:start;min-width:0;max-height:460px;padding:18px 8px 8px 18px;display:flex}.pse-history-head[data-v-0f4a5614]{align-items:flex-start;gap:11px;margin-bottom:14px;padding-right:10px;display:flex}.pse-history-icon[data-v-0f4a5614]{background-color:var(--pse-brand-soft);width:32px;height:32px;color:var(--pse-brand-ink);border-radius:10px;flex:none;justify-content:center;align-items:center;display:flex}.pse-history-text[data-v-0f4a5614]{min-width:0;margin-right:auto}.pse-history-title[data-v-0f4a5614]{color:var(--pse-ink);margin:0;font-size:15px;font-weight:650;line-height:1.3}.pse-history-subtitle[data-v-0f4a5614]{color:var(--pse-ink-soft);margin:1px 0 0;font-size:12px;line-height:1.4}.pse-history-clear[data-v-0f4a5614]{font:inherit;color:var(--pse-ink-faint);cursor:pointer;background:0 0;border:0;border-radius:8px;flex:none;margin:0;padding:5px 9px;font-size:12px;font-weight:600;transition:background-color .15s,color .15s}.pse-history-clear[data-v-0f4a5614]:hover{color:var(--pse-ink-soft);background-color:#1430210d}.pse-history-clear[data-v-0f4a5614]:focus{outline:none}.pse-history-clear[data-v-0f4a5614]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-history-list[data-v-0f4a5614]{scrollbar-width:thin;scrollbar-color:var(--pse-line) transparent;flex-direction:column;gap:6px;min-height:0;margin:0;padding:4px 8px 10px 0;list-style:none;display:flex;overflow-y:auto;-webkit-mask-image:linear-gradient(#000 calc(100% - 18px),#0000);mask-image:linear-gradient(#000 calc(100% - 18px),#0000)}.pse-history-item[data-v-0f4a5614]{align-items:stretch;gap:6px;display:flex}.pse-history-print[data-v-0f4a5614]{width:38px;color:var(--pse-ink-faint);cursor:pointer;opacity:.7;background-color:#fff;border:1px solid #0000;border-radius:12px;flex:none;justify-content:center;align-items:center;transition:border-color .15s,color .15s,opacity .15s;display:flex}.pse-history-item:hover .pse-history-print[data-v-0f4a5614]{opacity:1}.pse-history-print[data-v-0f4a5614]:hover:not(:disabled){border-color:var(--pse-brand);color:var(--pse-brand-ink)}.pse-history-print[data-v-0f4a5614]:disabled{opacity:.4;cursor:default}.pse-history-print-icon[data-v-0f4a5614]{font-size:17px}.pse-history-spinner[data-v-0f4a5614]{border:2px solid var(--pse-line);border-top-color:var(--pse-brand);border-radius:50%;width:13px;height:13px;animation:.7s linear infinite pse-history-spin-0f4a5614}@keyframes pse-history-spin-0f4a5614{to{transform:rotate(360deg)}}.pse-history-row[data-v-0f4a5614]{width:100%;font:inherit;text-align:left;color:var(--pse-ink);cursor:pointer;background-color:#fff;border:1px solid #0000;border-radius:12px;align-items:center;gap:11px;margin:0;padding:9px 11px;transition:border-color .15s,box-shadow .15s,transform .15s;display:flex}.pse-history-row[data-v-0f4a5614]:hover{border-color:var(--pse-brand);transform:translateY(-1px);box-shadow:0 6px 16px -12px #14302180}.pse-history-row[data-v-0f4a5614]:focus{outline:none}.pse-history-row[data-v-0f4a5614]:focus-visible{border-color:var(--pse-brand);box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-history-marker[data-v-0f4a5614]{background-color:var(--pse-brand);border-radius:2px;flex:none;align-self:stretch;width:3px}.pse-history-row-failed .pse-history-marker[data-v-0f4a5614]{background-color:var(--pse-alert)}.pse-history-body[data-v-0f4a5614]{flex-direction:column;gap:2px;min-width:0;margin-right:auto;display:flex}.pse-history-number[data-v-0f4a5614]{font-variant-numeric:tabular-nums;font-size:13.5px;font-weight:600;line-height:1.3}.pse-history-customer[data-v-0f4a5614]{color:var(--pse-ink);white-space:nowrap;text-overflow:ellipsis;font-size:12.5px;line-height:1.35;overflow:hidden}.pse-history-meta[data-v-0f4a5614]{color:var(--pse-ink-soft);align-items:center;gap:5px;font-size:11.5px;line-height:1.4;display:flex}.pse-history-dot[data-v-0f4a5614]{color:var(--pse-ink-faint)}.pse-history-badge[data-v-0f4a5614]{background-color:var(--pse-alert-soft);letter-spacing:.01em;color:var(--pse-alert-ink);border-radius:999px;padding:1px 6px;font-size:10.5px;font-weight:650}.pse-history-add[data-v-0f4a5614]{color:var(--pse-ink-faint);opacity:.7;flex:none;transition:color .15s,opacity .15s}.pse-history-row:hover .pse-history-add[data-v-0f4a5614]{color:var(--pse-brand-ink);opacity:1}@media (width<=1120px){.pse-history[data-v-0f4a5614]{max-height:300px}}.pse-search[data-v-149f9886]{box-sizing:border-box;width:100%;color:var(--pse-ink);text-align:left;margin:28px auto 56px;padding:0 24px}.pse-search[data-v-149f9886] *{box-sizing:border-box}.pse-messages[data-v-149f9886]:empty{display:none}.pse-search[data-v-149f9886] .pse-notice{margin-bottom:18px}.pse-layout[data-v-149f9886]{max-width:980px;margin:0 auto;display:grid}.pse-layout-history[data-v-149f9886]{grid-template-columns:minmax(0,1fr) 322px;gap:20px;max-width:1300px}.pse-main[data-v-149f9886]{min-width:0}.pse-card[data-v-149f9886]{border:1px solid var(--pse-line);background-color:#fff;border-radius:20px;grid-template-columns:1fr auto 1fr;gap:34px;padding:30px 34px;display:grid;box-shadow:0 1px 2px #1430210a,0 18px 40px -28px #14302173}.pse-card-split[data-v-149f9886]{background-color:var(--pse-line);width:1px}.pse-form[data-v-149f9886]{flex-direction:column;flex:1;gap:18px;margin:0;display:flex}.pse-submit[data-v-149f9886]{background-color:var(--pse-brand-ink);width:100%;height:48px;font:inherit;color:#fff;cursor:pointer;border:0;border-radius:12px;justify-content:center;align-items:center;gap:9px;margin:0;padding:0 18px;font-size:14.5px;font-weight:650;transition:background-color .15s,box-shadow .15s,transform .15s;display:flex}.pse-submit-end[data-v-149f9886]{margin-top:auto}.pse-submit[data-v-149f9886]:hover:not(:disabled){background-color:var(--pse-brand-ink-strong);transform:translateY(-1px);box-shadow:0 10px 22px -14px #143021cc}.pse-submit[data-v-149f9886]:active:not(:disabled){box-shadow:none;transform:translateY(0)}.pse-submit[data-v-149f9886]:focus{outline:none}.pse-submit[data-v-149f9886]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-submit[data-v-149f9886]:disabled{color:#fff;cursor:not-allowed;background-color:#cfdbd4}.pse-spinner[data-v-149f9886]{border:2px solid #fff6;border-top-color:#fff;border-radius:50%;flex:none;width:15px;height:15px;animation:.7s linear infinite pse-spin-149f9886}@keyframes pse-spin-149f9886{to{transform:rotate(360deg)}}.pse-resume-row[data-v-149f9886]{grid-template-columns:1fr 1fr;gap:14px;margin-top:18px;display:grid}@media (width<=1120px){.pse-layout-history[data-v-149f9886]{grid-template-columns:minmax(0,1fr);max-width:980px}}@media (width<=860px){.pse-search[data-v-149f9886]{padding:0 16px}.pse-card[data-v-149f9886]{grid-template-columns:1fr;gap:26px;padding:26px 22px}.pse-card-split[data-v-149f9886]{width:auto;height:1px}.pse-submit-end[data-v-149f9886]{margin-top:0}.pse-resume-row[data-v-149f9886]{grid-template-columns:1fr}}.pse-loading[data-v-38d33d98]{box-sizing:border-box;min-height:calc(100vh - 200px);color:var(--pse-ink);text-align:left;justify-content:center;align-items:center;padding:48px 24px;display:flex}.pse-loading-card[data-v-38d33d98]{border:1px solid var(--pse-line);background-color:#fff;border-radius:20px;align-items:center;gap:16px;width:100%;max-width:420px;padding:24px 26px;display:flex;box-shadow:0 1px 2px #1430210a,0 18px 40px -28px #14302173}.pse-loading-spinner[data-v-38d33d98]{border:3px solid var(--pse-brand-ring);border-top-color:var(--pse-brand);border-radius:50%;flex:none;width:28px;height:28px;animation:.7s linear infinite pse-loading-spin-38d33d98}@keyframes pse-loading-spin-38d33d98{to{transform:rotate(360deg)}}.pse-loading-text[data-v-38d33d98]{min-width:0}.pse-loading-title[data-v-38d33d98]{color:var(--pse-ink);margin:0;font-size:16px;font-weight:650;line-height:1.3}.pse-loading-subtitle[data-v-38d33d98]{color:var(--pse-ink-soft);margin:3px 0 0;font-size:12.5px;line-height:1.4}@media (prefers-reduced-motion:reduce){.pse-loading-spinner[data-v-38d33d98]{animation-duration:1.6s}}@media (width<=860px){.pse-loading[data-v-38d33d98]{padding:32px 16px}}.pse-slotcard[data-v-7e6e3d84]{border:1px solid var(--pse-line);text-align:left;background-color:#fff;border-radius:14px;overflow:hidden;box-shadow:0 1px 2px #1430210a}.pse-slotcard-head[data-v-7e6e3d84]{border-bottom:1px solid var(--pse-line);background-color:var(--pse-well);align-items:center;gap:9px;padding:10px 14px;display:flex}.pse-slotcard-spinner[data-v-7e6e3d84]{border:2px solid var(--pse-line);border-top-color:var(--pse-brand);border-radius:50%;flex:none;width:13px;height:13px;margin-left:auto;animation:.7s linear infinite pse-slotcard-spin-7e6e3d84}@keyframes pse-slotcard-spin-7e6e3d84{to{transform:rotate(360deg)}}.pse-slot-chip .pse-slot-chip-empty[data-v-7e6e3d84]:only-child{opacity:.75}.pse-slotcard-icon[data-v-7e6e3d84]{color:var(--pse-ink-faint);flex:none;font-size:18px}.pse-slotcard-title[data-v-7e6e3d84]{letter-spacing:.06em;text-transform:uppercase;color:var(--pse-ink-faint);margin:0;font-size:10.5px;font-weight:650;line-height:1.6}.pse-slotcard-body[data-v-7e6e3d84]{padding:12px 14px 14px}.pse-slotcard-caption[data-v-7e6e3d84]{letter-spacing:.06em;text-transform:uppercase;color:var(--pse-ink-faint);margin-bottom:6px;font-size:10.5px;font-weight:650;line-height:1.6;display:block}.pse-slotcard-caption.is-spaced[data-v-7e6e3d84]{border-top:1px solid var(--pse-line);margin-top:14px;padding-top:12px}.pse-slotcard-list[data-v-7e6e3d84]{flex-wrap:wrap;gap:6px;display:flex}.pse-slotcard-hint[data-v-7e6e3d84]{color:var(--pse-ink-faint);margin:9px 0 0;font-size:12px;line-height:1.4}.pse-raaplijst[data-v-b128cb53]{border:1px solid var(--pse-line);width:100%;font:inherit;color:var(--pse-ink);cursor:pointer;background-color:#fff;border-radius:10px;justify-content:center;align-items:center;gap:7px;margin-top:13px;padding:9px 12px;font-size:13px;font-weight:600;line-height:1.2;transition:background-color .15s,border-color .15s;display:flex}.pse-raaplijst[data-v-b128cb53]:hover:not(:disabled){border-color:var(--pse-brand);background-color:var(--pse-well)}.pse-raaplijst[data-v-b128cb53]:disabled{opacity:.55;cursor:default}.pse-raaplijst[data-v-b128cb53]:focus{outline:none}.pse-raaplijst[data-v-b128cb53]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-raaplijst-icon[data-v-b128cb53]{color:var(--pse-brand-ink);font-size:17px}.pse-raaplijst-spinner[data-v-b128cb53]{border:2px solid var(--pse-line);border-top-color:var(--pse-brand);border-radius:50%;flex:none;width:13px;height:13px;animation:.7s linear infinite pse-raaplijst-spin-b128cb53}@keyframes pse-raaplijst-spin-b128cb53{to{transform:rotate(360deg)}}.pse-sidebar[data-v-c2a51d0e]{box-sizing:border-box;text-align:left;color:var(--pse-ink);flex-direction:column;gap:14px;display:flex}.pse-sidebar[data-v-c2a51d0e] *{box-sizing:border-box}.pse-sidebar-card[data-v-c2a51d0e]{border:1px solid var(--pse-line);background-color:#fff;border-radius:16px;padding:18px 18px 20px;box-shadow:0 1px 2px #1430210a,0 18px 40px -30px #14302173}.pse-sidebar-head[data-v-c2a51d0e]{border-bottom:1px solid var(--pse-line);margin-bottom:14px;padding-bottom:14px}.pse-sidebar-heading-row[data-v-c2a51d0e]{align-items:center;gap:4px;display:flex}.pse-sidebar-heading[data-v-c2a51d0e]{min-width:0;color:var(--pse-ink);margin:0;font-size:19px;font-weight:700;line-height:1.25}.pse-sidebar-chips[data-v-c2a51d0e]{flex-wrap:wrap;gap:6px;margin-top:10px;display:flex}.pse-sidebar-chip[data-v-c2a51d0e]{border:1px solid var(--pse-brand-ring);background-color:var(--pse-brand-soft);color:var(--pse-brand-ink);border-radius:999px;padding:3px 10px;font-size:11.5px;font-weight:650;line-height:1.5}.pse-sidebar-rows[data-v-c2a51d0e]{grid-template-columns:minmax(0,1fr);margin:0;display:grid}.pse-sidebar-label[data-v-c2a51d0e]{letter-spacing:.06em;text-transform:uppercase;color:var(--pse-ink-faint);margin:0;font-size:10.5px;font-weight:650;line-height:1.6}.pse-sidebar-value[data-v-c2a51d0e]{color:var(--pse-ink);overflow-wrap:anywhere;align-items:baseline;gap:6px;margin:2px 0 11px;font-size:13.5px;font-weight:550;line-height:1.35;display:flex}.pse-sidebar-value[data-v-c2a51d0e]:last-child{margin-bottom:0}.pse-sidebar-value-text[data-v-c2a51d0e]{overflow-wrap:anywhere;min-width:0}.pse-sidebar-address[data-v-c2a51d0e]{border-top:1px solid var(--pse-line);margin-top:16px;padding-top:14px}.pse-sidebar-address-body[data-v-c2a51d0e]{color:var(--pse-ink);flex-direction:column;margin:7px 0 0;font-size:13.5px;font-weight:550;line-height:1.45;display:flex}.pse-image[data-v-367f2428]{border:1px solid var(--pse-line);background-color:#fff;border-radius:14px;justify-content:center;align-items:center;padding:24px;display:flex}.pse-image-photo[data-v-367f2428]{object-fit:contain;width:100%;max-width:460px;height:46vh;min-height:260px;display:block}.pse-products[data-v-f8cac056]{box-sizing:border-box;color:var(--pse-ink);text-align:left;margin-bottom:26px}.pse-products[data-v-f8cac056] *{box-sizing:border-box}.pse-count[data-v-f8cac056]{font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--pse-ink);border-radius:8px;padding:3px 9px;font-size:13px;font-weight:600;display:inline-block}.pse-count-warn[data-v-f8cac056],.pse-count-alert[data-v-f8cac056]{animation:2.4s ease-in-out infinite pse-count-breathe-f8cac056}.pse-count-warn[data-v-f8cac056]{color:#8a5a10;background-color:#e2a02e2e}.pse-count-alert[data-v-f8cac056]{color:#a3372c;background-color:#b03a2e1f}@keyframes pse-count-breathe-f8cac056{50%{background-color:#e2a02e6b}}.pse-count-alert[data-v-f8cac056]{animation-name:pse-count-breathe-alert-f8cac056}@keyframes pse-count-breathe-alert-f8cac056{50%{background-color:#b03a2e4d}}.pse-count-resolved[data-v-f8cac056]{background-color:var(--pse-brand-soft);color:var(--pse-brand-ink)}.pse-mark[data-v-f8cac056]{vertical-align:middle;font-size:21px}.pse-mark-done[data-v-f8cac056]{color:var(--pse-brand)}.pse-mark-open[data-v-f8cac056]{color:var(--pse-ink-faint)}.pse-skeleton-row td[data-v-f8cac056]{height:58px}.pse-skeleton-cell[data-v-f8cac056]{background-color:var(--pse-line);border-radius:6px;height:12px;animation:1.4s ease-in-out infinite pse-products-pulse-f8cac056;display:block}@keyframes pse-products-pulse-f8cac056{50%{opacity:.45}}.pse-products-hint[data-v-f8cac056]{border:1px solid var(--pse-brand-ring);background-color:var(--pse-brand-soft);color:var(--pse-brand-ink);border-radius:12px;align-items:center;gap:8px;margin:12px 0 0;padding:10px 13px;font-size:13px;font-weight:550;line-height:1.4;display:flex}.pse-products-hint-icon[data-v-f8cac056]{flex:none;font-size:18px}@media (prefers-reduced-motion:reduce){.pse-skeleton-cell[data-v-f8cac056],.pse-count-warn[data-v-f8cac056],.pse-count-alert[data-v-f8cac056]{animation:none}}.pse-pickup-lead[data-v-095d747a]{text-align:left;margin:0 0 .9rem;font-size:1rem;line-height:1.45}.pse-pickup-facts[data-v-095d747a]{text-align:left;grid-template-columns:auto minmax(0,1fr);gap:.25rem .9rem;margin:0;font-size:.9rem;display:grid}.pse-pickup-facts dt[data-v-095d747a]{color:var(--pse-ink-soft)}.pse-pickup-facts dd[data-v-095d747a]{margin:0;font-weight:600}.pse-done[data-v-c8d78d22]{box-sizing:border-box;min-height:calc(100vh - 260px);color:var(--pse-ink);text-align:left;justify-content:center;align-items:center;padding:48px 24px;display:flex}.pse-done[data-v-c8d78d22] *{box-sizing:border-box}.pse-done-card[data-v-c8d78d22]{border:1px solid var(--pse-line);text-align:center;background-color:#fff;border-radius:20px;flex-direction:column;align-items:center;width:100%;max-width:460px;padding:34px 34px 30px;display:flex;box-shadow:0 1px 2px #1430210a,0 18px 40px -28px #14302173}.pse-done-mark[data-v-c8d78d22]{background-color:var(--pse-brand-soft);width:62px;height:62px;color:var(--pse-brand-ink);border-radius:50%;justify-content:center;align-items:center;margin-bottom:18px;display:flex}.pse-done.is-detailed[data-v-c8d78d22]{align-items:flex-start;min-height:0;padding-top:32px}.pse-done-layout[data-v-c8d78d22]{justify-content:center;align-items:flex-start;gap:20px;width:100%;display:flex}.pse-done-side[data-v-c8d78d22],.pse-done-parcels-column[data-v-c8d78d22]{text-align:left;flex-direction:column;flex:0 340px;gap:14px;min-width:0;display:flex}.pse-done-layout>.pse-done-card[data-v-c8d78d22]{flex:460px}.pse-done-side[data-v-c8d78d22] .pse-sidebar{width:100%}.pse-done-parcels[data-v-c8d78d22]{border:1px solid var(--pse-line);background-color:#fff;border-radius:20px;padding:18px 20px 20px;box-shadow:0 1px 2px #1430210a,0 18px 40px -28px #14302173}.pse-done-parcels-title[data-v-c8d78d22]{letter-spacing:.06em;text-transform:uppercase;color:var(--pse-ink-soft);margin:0 0 12px;font-size:12px;font-weight:700}.pse-done-parcel+.pse-done-parcel[data-v-c8d78d22]{border-top:1px solid var(--pse-line);margin-top:14px;padding-top:14px}.pse-done-parcel-name[data-v-c8d78d22]{color:var(--pse-ink);margin:0;font-size:14.5px;font-weight:700}.pse-done-parcel-fields[data-v-c8d78d22]{grid-template-columns:auto minmax(0,1fr);gap:2px 10px;margin:10px 0 0;font-size:12.5px;line-height:1.45;display:grid}.pse-done-parcel-fields dt[data-v-c8d78d22]{color:var(--pse-ink-faint)}.pse-done-parcel-fields dd[data-v-c8d78d22]{color:var(--pse-ink);overflow-wrap:anywhere;margin:0}.pse-done-parcel-lines[data-v-c8d78d22]{margin:12px 0 0;padding:0;list-style:none}.pse-done-parcel-lines li[data-v-c8d78d22]{background-color:var(--pse-well);border-radius:10px;gap:10px;padding:8px 10px;font-size:12.5px;line-height:1.4;display:flex}.pse-done-parcel-lines li+li[data-v-c8d78d22]{margin-top:6px}.pse-done-parcel-amount[data-v-c8d78d22]{font-variant-numeric:tabular-nums;color:var(--pse-brand-ink);flex:none;font-weight:700}.pse-done-parcel-product[data-v-c8d78d22]{flex-direction:column;min-width:0;display:flex}.pse-done-parcel-product-name[data-v-c8d78d22]{color:var(--pse-ink);overflow-wrap:anywhere}.pse-done-parcel-barcode[data-v-c8d78d22]{font-variant-numeric:tabular-nums;color:var(--pse-ink-faint);font-size:12px}.pse-done-card.is-failed[data-v-c8d78d22]{border-color:var(--pse-alert-soft)}.pse-done-mark.is-failed[data-v-c8d78d22]{background-color:var(--pse-alert-soft);color:var(--pse-alert-ink)}.pse-done-card.is-failed[data-v-c8d78d22]{max-width:560px}.pse-done-card.is-failed .pse-done-number[data-v-c8d78d22]{color:var(--pse-alert-ink)}.pse-done-card.is-failed .pse-done-text[data-v-c8d78d22]{max-width:46ch}.pse-done-failures[data-v-c8d78d22]{text-align:left;width:100%;margin:18px 0 0;padding:0;list-style:none}.pse-done-failure[data-v-c8d78d22]{border:1px solid var(--pse-alert-soft);border-left:3px solid var(--pse-alert);background-color:var(--pse-alert-wash);border-radius:12px;padding:12px 14px}.pse-done-failure+.pse-done-failure[data-v-c8d78d22]{margin-top:8px}.pse-done-failure-step[data-v-c8d78d22]{color:var(--pse-alert-ink);font-size:13.5px;font-weight:650;line-height:1.35;display:block}.pse-done-failure-detail[data-v-c8d78d22]{color:var(--pse-ink-soft);overflow-wrap:anywhere;margin-top:4px;font-size:13px;line-height:1.5;display:block}.pse-done-actions[data-v-c8d78d22]{gap:10px;width:100%;margin-top:22px;display:flex}.pse-done-actions .pse-done-button[data-v-c8d78d22]{margin-top:0}.pse-done-button.is-quiet[data-v-c8d78d22]{border:1px solid var(--pse-line);color:var(--pse-ink-soft);background-color:#fff}.pse-done-button.is-quiet[data-v-c8d78d22]:hover{border-color:var(--pse-ink-faint);background-color:var(--pse-well);color:var(--pse-ink);box-shadow:none}.pse-done-mark.is-working[data-v-c8d78d22]{background-color:var(--pse-well)}.pse-done-spinner[data-v-c8d78d22]{border:3px solid var(--pse-brand-ring);border-top-color:var(--pse-brand);border-radius:50%;width:26px;height:26px;animation:.7s linear infinite pse-done-spin-c8d78d22}@keyframes pse-done-spin-c8d78d22{to{transform:rotate(360deg)}}.pse-done-title[data-v-c8d78d22]{color:var(--pse-ink);margin:0;font-size:20px;font-weight:700;line-height:1.25}.pse-done-number[data-v-c8d78d22]{font-variant-numeric:tabular-nums;letter-spacing:.01em;color:var(--pse-brand-ink);justify-content:center;margin:8px 0 0;font-size:26px;font-weight:700;line-height:1.1}.pse-done-text[data-v-c8d78d22]{max-width:34ch;color:var(--pse-ink-soft);margin:12px 0 0;font-size:13.5px;line-height:1.5}.pse-done-flyer[data-v-c8d78d22]{background-color:var(--pse-attention-soft);text-align:center;color:var(--pse-attention-ink);border-radius:12px;margin:16px 0 0;padding:11px 14px;font-size:14.5px;font-weight:650;line-height:1.4}.pse-done-button[data-v-c8d78d22]{background-color:var(--pse-brand-ink);width:100%;height:48px;font:inherit;color:#fff;cursor:pointer;border:0;border-radius:12px;margin-top:22px;padding:0 18px;font-size:14.5px;font-weight:650;transition:background-color .15s,box-shadow .15s,transform .15s}.pse-done-button[data-v-c8d78d22]:hover{background-color:var(--pse-brand-ink-strong);transform:translateY(-1px);box-shadow:0 10px 22px -14px #143021cc}.pse-done-button[data-v-c8d78d22]:active{box-shadow:none;transform:translateY(0)}.pse-done-button[data-v-c8d78d22]:focus{outline:none}.pse-done-button[data-v-c8d78d22]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}@media (prefers-reduced-motion:reduce){.pse-done-spinner[data-v-c8d78d22]{animation-duration:1.6s}}@media (width<=1200px){.pse-done-layout[data-v-c8d78d22]{flex-direction:column;align-items:center}.pse-done-layout>.pse-done-card[data-v-c8d78d22]{flex:none;order:-1;width:100%}.pse-done-side[data-v-c8d78d22],.pse-done-parcels-column[data-v-c8d78d22]{flex:none;width:100%;max-width:560px}}@media (width<=860px){.pse-done[data-v-c8d78d22]{padding:32px 16px}.pse-done-actions[data-v-c8d78d22]{flex-direction:column}.pse-done-card[data-v-c8d78d22]{padding:28px 22px 24px}}.pse-products[data-v-77facacc]{box-sizing:border-box;color:var(--pse-ink);text-align:left;margin-bottom:26px}.pse-products[data-v-77facacc] *{box-sizing:border-box}.pse-products-note[data-v-77facacc]{color:var(--pse-ink-faint);flex:none;font-size:12px}.pse-cell-quantity[data-v-77facacc]{font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:600}.pse-back-row[data-v-29aa4ab2]{text-align:left;justify-content:flex-end;margin-bottom:10px;display:flex}.pse-reprint[data-v-7ce2449e]{border:1px solid var(--pse-line);font:inherit;color:var(--pse-ink);cursor:pointer;background-color:#fff;border-radius:9px;align-items:center;gap:6px;padding:5px 11px;font-size:12.5px;font-weight:600;line-height:1.2;transition:background-color .15s,border-color .15s;display:inline-flex}.pse-reprint[data-v-7ce2449e]:hover:not(:disabled){border-color:var(--pse-brand);background-color:var(--pse-well)}.pse-reprint[data-v-7ce2449e]:disabled{opacity:.55;cursor:default}.pse-reprint[data-v-7ce2449e]:focus{outline:none}.pse-reprint[data-v-7ce2449e]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-reprint-icon[data-v-7ce2449e]{color:var(--pse-brand-ink);font-size:16px}.pse-reprint-spinner[data-v-7ce2449e]{border:2px solid var(--pse-line);border-top-color:var(--pse-brand);border-radius:50%;flex:none;width:12px;height:12px;animation:.7s linear infinite pse-reprint-spin-7ce2449e}@keyframes pse-reprint-spin-7ce2449e{to{transform:rotate(360deg)}}.pse-header[data-v-895c5c8c]{box-sizing:border-box;text-align:left;border-bottom:1px solid var(--pse-line);background-color:#fff;width:100%}@media (display-mode:window-controls-overlay){.pse-header[data-v-895c5c8c]{-webkit-app-region:drag;app-region:drag}.pse-header-inner[data-v-895c5c8c]{min-height:env(titlebar-area-height,0px);padding-top:4px;padding-bottom:4px}.pse-header-logo[data-v-895c5c8c]{height:24px}.pse-header-link[data-v-895c5c8c],.pse-header-logo[data-v-895c5c8c]{-webkit-app-region:no-drag;app-region:no-drag}}.pse-header-inner[data-v-895c5c8c]{box-sizing:border-box;align-items:center;max-width:980px;margin:0 auto;padding:16px 24px;display:flex}.pse-header-link[data-v-895c5c8c]{border-radius:10px;margin:-6px -8px;padding:6px 8px;display:inline-flex}.pse-header-link[data-v-895c5c8c]:focus{outline:none}.pse-header-link[data-v-895c5c8c]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-header-logo[data-v-895c5c8c]{width:auto;height:34px;display:block}@media (width<=860px){.pse-header-inner[data-v-895c5c8c]{padding:14px 16px}.pse-header-logo[data-v-895c5c8c]{height:28px}}.pse-settings-update[data-v-42ef061e],.pse-settings-update[data-v-42ef061e]:hover,.pse-settings-update[data-v-42ef061e]:focus,.pse-settings-update[data-v-42ef061e]:active,.pse-settings-update[data-v-42ef061e]:visited{color:#fff;align-items:center;gap:8px;margin-bottom:9px;text-decoration:none;display:inline-flex}.pse-settings-update-icon[data-v-42ef061e]{font-size:18px}.pse-settings-update-status[data-v-42ef061e]{color:var(--pse-ink);margin-top:7px;font-weight:600;display:block}.pse-settings-switch[data-v-42ef061e]{border:1px solid var(--pse-line);background-color:var(--pse-well);cursor:pointer;border-radius:13px;align-items:flex-start;gap:11px;padding:13px 14px;display:flex;margin:0 0 34px!important}.pse-settings-checkbox[data-v-42ef061e]{width:17px;height:17px;accent-color:var(--pse-brand-ink);cursor:pointer;flex:none;margin:1px 0 0}.pse-settings-switch-text[data-v-42ef061e]{min-width:0}.pse-settings-switch-title[data-v-42ef061e]{color:var(--pse-ink);font-size:14px;font-weight:650;line-height:1.3;display:block}.pse-settings-sound[data-v-42ef061e]{align-items:stretch;gap:8px;margin-bottom:8px;display:flex}.pse-settings-sound[data-v-42ef061e]:last-child{margin-bottom:0}.pse-settings-switch-compact[data-v-42ef061e]{flex:auto;min-width:0;margin:0!important}.pse-settings-listen[data-v-42ef061e]{border-radius:13px;flex:none;align-items:center;gap:6px;min-width:0;height:auto;padding:0 14px;display:inline-flex}.pse-settings-listen-icon[data-v-42ef061e]{font-size:18px}.pse-settings-field[data-v-42ef061e]{margin-bottom:16px}.pse-settings-field[data-v-42ef061e]:last-child{margin-bottom:0}.pse-settings-group[data-v-42ef061e]{border-top:1px solid var(--pse-line);margin-top:20px;padding-top:18px}.pse-settings-group-title[data-v-42ef061e]{color:var(--pse-ink);margin:0 0 14px;font-size:13px;font-weight:650}.pse-settings-masked[data-v-42ef061e]{-webkit-text-security:disc;text-security:disc}.pse-credentials-intro[data-v-a3fdb084]{align-items:flex-start;gap:13px;margin-bottom:20px;display:flex}.pse-credentials-logo[data-v-a3fdb084]{flex:none;margin-top:1px}.pse-credentials-subtitle[data-v-a3fdb084]{color:var(--pse-ink-soft);margin:0;font-size:13.5px;line-height:1.45}.pse-credentials-field[data-v-a3fdb084]{margin-bottom:16px}.pse-credentials-error[data-v-a3fdb084]{color:#a3372c;background-color:#b03a2e0f;border:1px solid #b03a2e47;border-radius:12px;margin:0 0 14px;padding:11px 13px;font-size:13px;line-height:1.45}.pse-credentials-error-enter-active[data-v-a3fdb084],.pse-credentials-error-leave-active[data-v-a3fdb084]{transition:opacity .15s}.pse-credentials-error-enter-from[data-v-a3fdb084],.pse-credentials-error-leave-to[data-v-a3fdb084]{opacity:0}.pse-credentials-footnote[data-v-a3fdb084]{color:var(--pse-ink-faint);margin:0;font-size:12.5px;line-height:1.4}.pse-credentials-masked[data-v-a3fdb084]{-webkit-text-security:disc;text-security:disc}.pse-credentials-spinner[data-v-a3fdb084]{border:2px solid #fff6;border-top-color:#fff;border-radius:50%;flex:none;width:14px;height:14px;animation:.7s linear infinite pse-credentials-spin-a3fdb084}@keyframes pse-credentials-spin-a3fdb084{to{transform:rotate(360deg)}}.pse-erp-subtitle[data-v-ebdfaa5a]{color:var(--pse-ink-soft);margin:0 0 20px;font-size:13.5px;line-height:1.45}.pse-erp-field[data-v-ebdfaa5a]{margin-bottom:16px}.pse-erp-error[data-v-ebdfaa5a]{color:#a3372c;background-color:#b03a2e0f;border:1px solid #b03a2e47;border-radius:12px;margin:0 0 14px;padding:11px 13px;font-size:13px;line-height:1.45}.pse-erp-error-enter-active[data-v-ebdfaa5a],.pse-erp-error-leave-active[data-v-ebdfaa5a]{transition:opacity .15s}.pse-erp-error-enter-from[data-v-ebdfaa5a],.pse-erp-error-leave-to[data-v-ebdfaa5a]{opacity:0}.pse-erp-spinner[data-v-ebdfaa5a]{border:2px solid #fff6;border-top-color:#fff;border-radius:50%;flex:none;width:14px;height:14px;animation:.7s linear infinite pse-erp-spin-ebdfaa5a}@keyframes pse-erp-spin-ebdfaa5a{to{transform:rotate(360deg)}}.pse-sheet[data-v-7a94320f]{background-color:#1a5c32;flex-direction:column;min-height:0;display:flex;position:relative}.pse-sheet-leaves[data-v-7a94320f]{pointer-events:none;position:absolute;inset:0;overflow:hidden}.pse-sheet-leaf[data-v-7a94320f]{height:auto;display:block;position:absolute}.pse-sheet-leaf.is-frond[data-v-7a94320f]{width:50%}.pse-sheet-leaf.is-fan[data-v-7a94320f]{width:60%}.pse-sheet-leaf.is-frond.is-top[data-v-7a94320f]{top:-12px;left:-22px}.pse-sheet-leaf.is-fan.is-top[data-v-7a94320f]{top:0;right:0;transform:rotate(180deg)}.pse-sheet-leaf.is-fan.is-bottom[data-v-7a94320f]{bottom:0;left:0}.pse-sheet-leaf.is-frond.is-bottom[data-v-7a94320f]{bottom:-12px;right:-22px;transform:rotate(180deg)}.pse-sheet-scroll[data-v-7a94320f]{flex:1;min-height:0;padding:38px 36px;position:relative;overflow-y:auto}.pse-sheet-card[data-v-7a94320f]{text-align:left;color:#26402d;background-color:#ffffffdb;border-radius:22px;padding:34px 32px 24px;position:relative}.pse-sheet-close[data-v-7a94320f]{color:#5b7262;cursor:pointer;background-color:#0000;border:0;border-radius:9px;justify-content:center;align-items:center;width:32px;height:32px;padding:0;transition:background-color .15s,color .15s;display:flex;position:absolute;top:12px;right:12px}.pse-sheet-close[data-v-7a94320f]:hover{color:#26402d;background-color:#1a5c321a}.pse-sheet-close[data-v-7a94320f]:focus{outline:none}.pse-sheet-close[data-v-7a94320f]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-sheet-title[data-v-7a94320f]{letter-spacing:.01em;text-align:center;color:#2f5a36;background-color:#edf6ee;width:fit-content;max-width:100%;margin:0 auto 28px;padding:13px 34px;font-size:25px;font-weight:700;line-height:1.2;box-shadow:4px 4px #2f4a36}.pse-instructions[data-v-7a94320f]{flex-direction:column;gap:17px;margin:0;padding:0;list-style:none;display:flex}.pse-instruction[data-v-7a94320f]{align-items:flex-start;gap:14px;display:flex}.pse-instruction-mark[data-v-7a94320f]{background-color:var(--pse-brand);color:#fff;border-radius:4px;flex:none;justify-content:center;align-items:center;width:34px;height:34px;display:flex}.pse-instruction-text[data-v-7a94320f]{margin:0;padding-top:6px;font-size:14.5px;line-height:1.5}.pse-instruction-title[data-v-7a94320f]{font-weight:700;display:block}.pse-sheet-foot[data-v-7a94320f]{border-top:1px solid #1a5c3229;justify-content:space-between;align-items:center;gap:16px;margin-top:28px;padding-top:20px;display:flex}.pse-sheet-logo[data-v-7a94320f]{width:auto;height:34px;display:block}@media (width<=640px){.pse-sheet-scroll[data-v-7a94320f]{padding:20px 16px}.pse-sheet-card[data-v-7a94320f]{padding:30px 20px 20px}.pse-sheet-title[data-v-7a94320f]{padding:11px 22px;font-size:21px}.pse-sheet-logo[data-v-7a94320f]{height:28px}}.pse-bar[data-v-13beeac1]{--pse-on:#a8dcab;--pse-off:#f5bd74;--pse-ink:#ffffffb8;--pse-ink-strong:#fff;--pse-ink-soft:#ffffff73;--pse-well:#ffffff14;background-color:var(--pse-well);color:var(--pse-ink);white-space:nowrap;vertical-align:middle;border-radius:999px;align-items:center;gap:2px;margin-top:-5px;margin-bottom:-5px;padding:2px;font-family:inherit;font-size:12.5px;line-height:1;display:inline-flex}.pse-bar.is-minimal[data-v-13beeac1]{background-color:#0000;margin:0;padding:0}.pse-bar[data-v-13beeac1],.pse-bar[data-v-13beeac1] *{box-sizing:border-box;line-height:1}.pse-pill[data-v-13beeac1]{font:inherit;color:inherit;cursor:pointer;background-color:#0000;border:0;border-radius:999px;align-items:center;gap:7px;margin:0;padding:5px 11px;font-weight:600;transition:background-color .15s,color .15s;display:inline-flex}.pse-toggle-label[data-v-13beeac1]{text-align:left;min-width:74px;display:inline-block}.pse-pill[data-v-13beeac1]:focus,.pse-pill[data-v-13beeac1]:active{box-shadow:none;outline:none}.pse-pill[data-v-13beeac1]:focus-visible{outline-offset:2px;outline:2px solid}.pse-icon[data-v-13beeac1]{flex:none;width:15px;height:15px}.pse-toggle.is-on[data-v-13beeac1]{color:var(--pse-on);background-color:#a8dcab29}.pse-toggle.is-on[data-v-13beeac1]:hover{background-color:#a8dcab47}.pse-toggle.is-on .pse-icon[data-v-13beeac1]{filter:brightness(0)invert(88%)sepia(19%)saturate(505%)hue-rotate(72deg)brightness(97%)contrast(90%)}.pse-toggle.is-off[data-v-13beeac1]{color:var(--pse-off);background-color:#f5bd7429}.pse-toggle.is-off[data-v-13beeac1]:hover{background-color:#f5bd7447}.pse-toggle.is-off .pse-icon[data-v-13beeac1]{filter:brightness(0)invert(84%)sepia(29%)saturate(958%)hue-rotate(324deg)brightness(101%)contrast(92%)}.pse-install[data-v-13beeac1]{color:var(--pse-ink-strong);background-color:#ffffff24}.pse-install[data-v-13beeac1]:hover{background-color:#ffffff3d}.pse-install .pse-icon[data-v-13beeac1]{filter:brightness(0)invert()}.pse-help[data-v-13beeac1],.pse-settings[data-v-13beeac1]{color:var(--pse-ink)}.pse-help[data-v-13beeac1]:hover,.pse-settings[data-v-13beeac1]:hover{color:var(--pse-ink-strong);background-color:#ffffff24}.pse-help .pse-icon[data-v-13beeac1],.pse-settings .pse-icon[data-v-13beeac1]{filter:brightness(0)invert();opacity:.72;transition:transform .3s,opacity .15s}.pse-help:hover .pse-icon[data-v-13beeac1],.pse-settings:hover .pse-icon[data-v-13beeac1]{opacity:1}.pse-settings:hover .pse-icon[data-v-13beeac1]{transform:rotate(60deg)}.pse-divider[data-v-13beeac1]{opacity:.18;background-color:currentColor;width:1px;height:15px;margin:0 4px}.pse-user[data-v-13beeac1]{align-items:center;gap:6px;padding:0 6px;display:inline-flex}.pse-user-name[data-v-13beeac1]{color:var(--pse-ink-strong);font-weight:600}.pse-dot[data-v-13beeac1]{background-color:var(--pse-on);border-radius:50%;flex:none;width:6px;height:6px;animation:2.6s ease-out infinite pse-dot-pulse-13beeac1}@keyframes pse-dot-pulse-13beeac1{0%{box-shadow:0 0 #a8dcab80}70%{box-shadow:0 0 0 7px #a8dcab00}to{box-shadow:0 0 #a8dcab00}}@media (prefers-reduced-motion:reduce){.pse-dot[data-v-13beeac1]{animation:none;box-shadow:0 0 0 3px #a8dcab33}}.pse-version[data-v-13beeac1]{color:var(--pse-ink-soft);letter-spacing:.04em;text-transform:uppercase;align-items:baseline;gap:5px;padding:0 6px;font-size:10.5px;display:inline-flex}.pse-bar.is-minimal .pse-version[data-v-13beeac1]{padding-left:0}.pse-version-number[data-v-13beeac1]{font-variant-numeric:tabular-nums;letter-spacing:.02em}.pse-update[data-v-13beeac1]{letter-spacing:.04em;color:var(--pse-off);white-space:nowrap;background-color:#f5bd742e;border-radius:999px;align-self:center;align-items:center;gap:5px;padding:2px 8px;font-size:10px;font-weight:700;text-decoration:none;transition:background-color .15s,color .15s;display:inline-flex}.pse-update[data-v-13beeac1]:hover{color:#ffe1bb;background-color:#f5bd744d}.pse-update[data-v-13beeac1]:focus{outline:none}.pse-update[data-v-13beeac1]:focus-visible{outline:none;box-shadow:0 0 0 2px #f5bd7499}.pse-update-dot[data-v-13beeac1]{background-color:currentColor;border-radius:50%;flex:none;width:5px;height:5px}@media (width<=991px){.pse-bar:not(.is-minimal) .pse-brand[data-v-13beeac1]{display:none}}@media (width<=767px){.pse-help-label[data-v-13beeac1],.pse-settings-label[data-v-13beeac1]{display:none}.pse-install-label[data-v-13beeac1]{font-size:0}.pse-install-label[data-v-13beeac1]:after{content:\"App\";font-size:12.5px}}.pse-login[data-v-9fa45462]{box-sizing:border-box;min-height:calc(100vh - 200px);color:var(--pse-ink);text-align:left;justify-content:center;align-items:center;padding:48px 24px;display:flex}.pse-login[data-v-9fa45462] *{box-sizing:border-box}.pse-login-card[data-v-9fa45462]{border:1px solid var(--pse-line);background-color:#fff;border-radius:20px;width:100%;max-width:420px;padding:30px 34px;box-shadow:0 1px 2px #1430210a,0 18px 40px -28px #14302173}.pse-login-errors[data-v-9fa45462]:not(:has(.validation-summary-errors)){display:none}.pse-login-errors[data-v-9fa45462] ul{color:#a3372c;background-color:#b03a2e0f;border:1px solid #b03a2e47;border-radius:12px;margin:0;padding:12px 14px;font-size:13px;line-height:1.45;list-style:none}.pse-login[data-v-9fa45462] input[type=number]{appearance:textfield}.pse-login[data-v-9fa45462] input[type=number]::-webkit-outer-spin-button{appearance:none;margin:0}.pse-login[data-v-9fa45462] input[type=number]::-webkit-inner-spin-button{appearance:none;margin:0}.pse-submit[data-v-9fa45462]{background-color:var(--pse-brand-ink);width:100%;height:48px;font:inherit;color:#fff;cursor:pointer;border:0;border-radius:12px;justify-content:center;align-items:center;margin:4px 0 0;padding:0 18px;font-size:14.5px;font-weight:650;transition:background-color .15s,box-shadow .15s,transform .15s;display:flex}.pse-submit[data-v-9fa45462]:hover{background-color:var(--pse-brand-ink-strong);transform:translateY(-1px);box-shadow:0 10px 22px -14px #143021cc}.pse-submit[data-v-9fa45462]:active{box-shadow:none;transform:translateY(0)}.pse-submit[data-v-9fa45462]:focus{outline:none}.pse-submit[data-v-9fa45462]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}@media (width<=860px){.pse-login[data-v-9fa45462]{padding:32px 16px}.pse-login-card[data-v-9fa45462]{padding:26px 22px}}.pse-idle-lead[data-v-86dcdcbd]{color:var(--pse-ink);margin:0 0 8px;font-size:14px;line-height:1.5}.pse-idle-count[data-v-86dcdcbd]{font-variant-numeric:tabular-nums;color:var(--pse-attention-ink)}.pse-idle-hint[data-v-86dcdcbd]{color:var(--pse-ink-soft);margin:0;font-size:13px;line-height:1.45}\n/*$vite$:1*/ ");
+	_css(" .pse-toasts[data-v-67a06e3f]{top:calc(env(titlebar-area-height,0px) + 18px);z-index:2100;pointer-events:none;flex-direction:column;gap:10px;width:360px;max-width:calc(100vw - 36px);display:flex;position:fixed;right:18px}.pse-toast[data-v-67a06e3f]{--pse-toast-accent:var(--pse-brand-ink);--pse-toast-soft:var(--pse-brand-soft);--pse-toast-life:5s;box-sizing:border-box;border:1px solid var(--pse-line);text-align:left;width:100%;color:var(--pse-ink);pointer-events:auto;background-color:#fff;border-radius:14px;align-items:flex-start;gap:12px;padding:13px 12px 14px 14px;display:flex;position:relative;overflow:hidden;box-shadow:0 1px 2px #1430210f,0 18px 40px -22px #0b1a1280}.pse-toast.is-success[data-v-67a06e3f]{--pse-toast-life:4s}.pse-toast.is-error[data-v-67a06e3f]{--pse-toast-accent:var(--pse-alert);--pse-toast-soft:var(--pse-alert-soft);--pse-toast-life:8s}.pse-toast.is-info[data-v-67a06e3f],.pse-toast.is-pending[data-v-67a06e3f]{--pse-toast-accent:var(--pse-ink-soft);--pse-toast-soft:var(--pse-well)}.pse-toast-mark[data-v-67a06e3f]{background-color:var(--pse-toast-soft);width:28px;height:28px;color:var(--pse-toast-accent);border-radius:9px;flex:none;justify-content:center;align-items:center;display:flex}.pse-toast-spinner[data-v-67a06e3f]{box-sizing:border-box;border:2.5px solid var(--pse-brand-ring);border-top-color:var(--pse-brand);border-radius:50%;width:16px;height:16px;animation:.7s linear infinite pse-toast-spin-67a06e3f}@keyframes pse-toast-spin-67a06e3f{to{transform:rotate(360deg)}}.pse-toast-text[data-v-67a06e3f]{overflow-wrap:anywhere;flex:1;min-width:0;margin:0;padding-top:4px;font-size:13.5px;font-weight:550;line-height:1.45}.pse-toast-close[data-v-67a06e3f]{width:26px;height:26px;color:var(--pse-ink-faint);cursor:pointer;background-color:#0000;border:0;border-radius:8px;flex:none;justify-content:center;align-items:center;margin-top:1px;padding:0;transition:background-color .15s,color .15s;display:flex}.pse-toast-close[data-v-67a06e3f]:hover{background-color:var(--pse-well);color:var(--pse-ink)}.pse-toast-close[data-v-67a06e3f]:focus{outline:none}.pse-toast-close[data-v-67a06e3f]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-toast-clock[data-v-67a06e3f]{background-color:var(--pse-toast-accent);opacity:.45;transform-origin:0;width:100%;height:3px;animation:pse-toast-clock-67a06e3f var(--pse-toast-life) linear forwards;position:absolute;bottom:0;left:0}.pse-toast:hover .pse-toast-clock[data-v-67a06e3f]{animation:none}@keyframes pse-toast-clock-67a06e3f{to{transform:scaleX(0)}}.pse-toast-enter-active[data-v-67a06e3f],.pse-toast-leave-active[data-v-67a06e3f],.pse-toast-move[data-v-67a06e3f]{transition:opacity .2s,transform .25s cubic-bezier(.2,.9,.3,1)}.pse-toast-enter-from[data-v-67a06e3f],.pse-toast-leave-to[data-v-67a06e3f]{opacity:0;transform:translate(24px)}.pse-toast-leave-active[data-v-67a06e3f]{position:absolute}@media (prefers-reduced-motion:reduce){.pse-toast-enter-active[data-v-67a06e3f],.pse-toast-leave-active[data-v-67a06e3f],.pse-toast-move[data-v-67a06e3f]{transition:opacity .2s}.pse-toast-enter-from[data-v-67a06e3f],.pse-toast-leave-to[data-v-67a06e3f]{transform:none}.pse-toast-spinner[data-v-67a06e3f]{animation-duration:1.6s}.pse-toast-clock[data-v-67a06e3f]{display:none}}@media (width<=640px){.pse-toasts[data-v-67a06e3f]{max-width:calc(100vw - 24px);top:12px;right:12px}}.pse-modal[data-v-0dcd5e50]{z-index:100;background-color:var(--pse-scrim);-webkit-backdrop-filter:blur(3px);text-align:left;color:var(--pse-ink);justify-content:center;align-items:center;padding:28px 20px;display:flex;position:fixed;inset:0}.pse-modal[data-v-0dcd5e50] *{box-sizing:border-box}.is-elevated[data-v-0dcd5e50]{z-index:200}.pse-modal-panel[data-v-0dcd5e50]{box-sizing:border-box;border-radius:var(--pse-dialog-radius);width:100%;max-height:100%;box-shadow:var(--pse-dialog-shadow);background-color:#fff;flex-direction:column;display:flex}.is-bare[data-v-0dcd5e50]{background-color:#0000;overflow:hidden}.is-sm[data-v-0dcd5e50]{max-width:420px}.is-md[data-v-0dcd5e50]{max-width:560px}.is-lg[data-v-0dcd5e50]{max-width:780px}.is-xl[data-v-0dcd5e50]{max-width:1000px}.pse-modal-head[data-v-0dcd5e50]{border-bottom:1px solid var(--pse-line);flex:none;align-items:center;gap:16px;padding:17px 20px;display:flex}.pse-modal-title[data-v-0dcd5e50]{min-width:0;color:var(--pse-ink);flex:1;margin:0;font-size:16px;font-weight:650;line-height:1.3}.pse-modal-close[data-v-0dcd5e50]{width:32px;height:32px;color:var(--pse-ink-faint);cursor:pointer;background-color:#0000;border:0;border-radius:9px;flex:none;justify-content:center;align-items:center;padding:0;transition:background-color .15s,color .15s;display:flex}.pse-modal-close[data-v-0dcd5e50]:hover{background-color:var(--pse-well);color:var(--pse-ink)}.pse-modal-close[data-v-0dcd5e50]:focus{outline:none}.pse-modal-close[data-v-0dcd5e50]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-modal-body[data-v-0dcd5e50]{flex:1;min-height:0;padding:20px;font-size:14px;line-height:1.5;overflow-y:auto}.pse-modal-foot[data-v-0dcd5e50]{border-top:1px solid var(--pse-line);flex:none;justify-content:flex-end;align-items:center;gap:9px;padding:15px 20px;display:flex}@media (width<=640px){.pse-modal[data-v-0dcd5e50]{padding:16px 12px}.pse-modal-head[data-v-0dcd5e50],.pse-modal-body[data-v-0dcd5e50],.pse-modal-foot[data-v-0dcd5e50]{padding-left:16px;padding-right:16px}}.pse-note[data-v-ab3fbaa7]{text-align:left}.pse-note-alert[data-v-ab3fbaa7]{color:#8a5a10;background-color:#e2a02e1c;border:1px solid #b4761452;border-left-width:3px;border-radius:12px;align-items:flex-start;gap:9px;margin:0 0 12px;padding:11px 13px;font-size:13px;font-weight:600;line-height:1.4;animation:2.4s ease-in-out infinite pse-note-breathe-ab3fbaa7;display:flex}.pse-note-alert-icon[data-v-ab3fbaa7]{flex:none;font-size:18px;line-height:1.2}@keyframes pse-note-breathe-ab3fbaa7{50%{background-color:#e2a02e3d;border-color:#b47614bf}}.pse-note-card[data-v-ab3fbaa7]{border:1px solid var(--pse-line);background-color:#fff;border-radius:14px;overflow:hidden;box-shadow:0 1px 2px #1430210a}.pse-note-head[data-v-ab3fbaa7]{border:0;border-bottom:1px solid var(--pse-line);background-color:var(--pse-well);width:100%;font:inherit;text-align:left;cursor:pointer;align-items:center;gap:9px;padding:10px 14px;transition:background-color .15s,border-color .15s;display:flex}.pse-note-head[aria-expanded=false][data-v-ab3fbaa7]{border-bottom-color:#0000}.pse-note-head[data-v-ab3fbaa7]:hover{background-color:var(--pse-brand-soft)}.pse-note-head[data-v-ab3fbaa7]:focus{outline:none}.pse-note-head[data-v-ab3fbaa7]:focus-visible{box-shadow:inset 0 0 0 2px var(--pse-brand-ring);outline:none}.pse-note-title[data-v-ab3fbaa7]{flex:1;min-width:0}.pse-note-empty[data-v-ab3fbaa7]{color:var(--pse-ink-faint);flex:none;font-size:11.5px;font-weight:550}.pse-note-spinner[data-v-ab3fbaa7]{border:2px solid var(--pse-line);border-top-color:var(--pse-brand);border-radius:50%;flex:none;width:13px;height:13px;animation:.7s linear infinite pse-note-spin-ab3fbaa7}@keyframes pse-note-spin-ab3fbaa7{to{transform:rotate(360deg)}}.pse-note-chevron[data-v-ab3fbaa7]{color:var(--pse-ink-faint);flex:none;font-size:19px;transition:transform .28s}.pse-note-chevron.is-open[data-v-ab3fbaa7]{transform:rotate(180deg)}.pse-note-collapse[data-v-ab3fbaa7]{grid-template-rows:0fr;transition:grid-template-rows .28s cubic-bezier(.33,1,.68,1);display:grid}.pse-note-collapse.is-open[data-v-ab3fbaa7]{grid-template-rows:1fr}.pse-note-collapse-inner[data-v-ab3fbaa7]{opacity:0;min-height:0;transition:opacity .2s;overflow:hidden}.pse-note-collapse.is-open .pse-note-collapse-inner[data-v-ab3fbaa7]{opacity:1;transition-delay:60ms}.pse-note-logo[data-v-ab3fbaa7]{filter:grayscale()brightness(.72);flex:none;width:18px;height:18px}.pse-note-title[data-v-ab3fbaa7]{letter-spacing:.06em;text-transform:uppercase;color:var(--pse-ink-faint);margin:0;font-size:10.5px;font-weight:650;line-height:1.6}.pse-note-body[data-v-ab3fbaa7]{padding:12px 14px 14px}.pse-note-field[data-v-ab3fbaa7]{box-sizing:border-box;border:1px solid var(--pse-line);background-color:var(--pse-well);field-sizing:content;width:100%;min-height:76px;max-height:260px;font:inherit;color:var(--pse-ink);resize:vertical;border-radius:10px;margin:0;padding:9px 11px;font-size:14px;line-height:1.45;transition:border-color .15s,background-color .15s,box-shadow .15s;display:block}.pse-note-field[data-v-ab3fbaa7]::placeholder{color:var(--pse-ink-faint)}.pse-note-field[data-v-ab3fbaa7]:focus{border-color:var(--pse-brand);box-shadow:0 0 0 3px var(--pse-brand-ring);background-color:#fff;outline:none}.pse-note-field[data-v-ab3fbaa7]:disabled{color:var(--pse-ink-soft);cursor:default}.pse-note-field-waiting[data-v-ab3fbaa7]{resize:none;flex-direction:column;justify-content:center;gap:9px;display:flex}.pse-note-shimmer[data-v-ab3fbaa7]{background-color:var(--pse-line);border-radius:5px;height:10px;animation:1.4s ease-in-out infinite pse-note-pulse-ab3fbaa7}.pse-note-shimmer-short[data-v-ab3fbaa7]{width:62%;animation-delay:.2s}@keyframes pse-note-pulse-ab3fbaa7{50%{opacity:.45}}.pse-note-actions[data-v-ab3fbaa7]{gap:8px;margin-top:10px;display:flex}.pse-note-btn[data-v-ab3fbaa7]{background-color:var(--pse-brand-ink);min-width:0;height:36px;font:inherit;color:#fff;white-space:nowrap;text-overflow:ellipsis;cursor:pointer;border:1px solid #0000;border-radius:10px;flex:1;padding:0 12px;font-size:13px;font-weight:650;transition:background-color .15s,border-color .15s,color .15s;overflow:hidden}.pse-note-btn[data-v-ab3fbaa7]:hover:not(:disabled){background-color:var(--pse-brand-ink-strong)}.pse-note-btn[data-v-ab3fbaa7]:focus{outline:none}.pse-note-btn[data-v-ab3fbaa7]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-note-btn[data-v-ab3fbaa7]:disabled{color:#fff;cursor:not-allowed;background-color:#dfe6e2}.pse-note-btn-quiet[data-v-ab3fbaa7]{border-color:var(--pse-line);color:var(--pse-ink-soft);background-color:#fff}.pse-note-btn-quiet[data-v-ab3fbaa7]:hover:not(:disabled){border-color:var(--pse-brand);background-color:var(--pse-brand-soft);color:var(--pse-brand-ink)}.pse-note-btn-quiet[data-v-ab3fbaa7]:disabled{border-color:var(--pse-line);color:var(--pse-ink-faint);background-color:#fff}@media (prefers-reduced-motion:reduce){.pse-note-collapse[data-v-ab3fbaa7],.pse-note-collapse-inner[data-v-ab3fbaa7],.pse-note-chevron[data-v-ab3fbaa7]{transition:none}.pse-note-spinner[data-v-ab3fbaa7]{animation:1.4s ease-in-out infinite pse-note-pulse-ab3fbaa7}.pse-note-alert[data-v-ab3fbaa7]{background-color:#e2a02e3d;border-color:#b47614bf;animation:none}.pse-note-shimmer[data-v-ab3fbaa7]{animation:none}}.pse-rack-lead[data-v-76779723]{color:var(--pse-ink-soft);margin:0 0 16px;font-size:13px;line-height:1.45}.pse-rack[data-v-76779723]{grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;display:grid}.pse-rack-column[data-v-76779723]{flex-direction:column;gap:7px;min-width:0;display:flex}.pse-rack-letter[data-v-76779723]{letter-spacing:.1em;text-align:center;color:var(--pse-ink-faint);font-size:11px;font-weight:700}.pse-rack-bays[data-v-76779723]{border:1px solid var(--pse-line);background-color:var(--pse-well);border-radius:14px;grid-template-rows:repeat(2,1fr);grid-template-columns:repeat(3,minmax(0,1fr));gap:6px;height:232px;padding:7px;display:grid}.pse-rack-bays.is-rows-1 .pse-rack-bay[data-v-76779723]{grid-row:span 2}.pse-rack-bay[data-v-76779723]{border:1px solid var(--pse-line);min-width:0;font:inherit;color:var(--pse-ink-soft);cursor:pointer;background-color:#fff;border-radius:10px;flex-direction:column;justify-content:center;align-items:center;gap:3px;padding:4px;transition:border-color .15s,background-color .15s,color .15s,box-shadow .15s;display:flex}.pse-rack-bay[data-v-76779723]:hover{border-color:var(--pse-brand);background-color:var(--pse-brand-soft);color:var(--pse-brand-ink)}.pse-rack-bay[data-v-76779723]:focus{outline:none}.pse-rack-bay[data-v-76779723]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-rack-bay-label[data-v-76779723]{font-variant-numeric:tabular-nums;font-size:15px;font-weight:700;line-height:1.1}.pse-rack-bay-note[data-v-76779723]{text-align:center;opacity:.8;font-size:10px;font-weight:600;line-height:1.2}.pse-rack-bay.is-taken[data-v-76779723]{border-color:var(--pse-attention-line-soft);background-color:var(--pse-attention-soft);color:var(--pse-attention-ink)}.pse-rack-bay.is-current[data-v-76779723]{border-color:var(--pse-brand-ink);background-color:var(--pse-brand-ink);color:#fff}.pse-rack-bay.is-current[data-v-76779723]:hover{background-color:var(--pse-brand-ink-strong);color:#fff}@media (width<=720px){.pse-rack[data-v-76779723]{grid-template-columns:repeat(2,minmax(0,1fr))}}.pse-slotpanel[data-v-025f11c3]{text-align:left}.pse-slotpanel-card[data-v-025f11c3]{border:1px solid var(--pse-line);background-color:#fff;border-radius:14px;overflow:hidden;box-shadow:0 1px 2px #1430210a}.pse-slotpanel-head[data-v-025f11c3]{border:0;border-bottom:1px solid var(--pse-line);background-color:var(--pse-well);width:100%;min-height:42px;font:inherit;text-align:left;cursor:pointer;align-items:center;gap:9px;padding:7px 14px;transition:background-color .15s,border-color .15s;display:flex}.pse-slotpanel-head[aria-expanded=false][data-v-025f11c3],.pse-slotpanel-head.is-plain[data-v-025f11c3]{border-bottom-color:#0000}.pse-slotpanel-head.is-plain[data-v-025f11c3]{cursor:default}.pse-slotpanel-head[data-v-025f11c3]:not(.is-plain):hover{background-color:var(--pse-brand-soft)}.pse-slotpanel-head[data-v-025f11c3]:focus{outline:none}.pse-slotpanel-head[data-v-025f11c3]:focus-visible{box-shadow:inset 0 0 0 2px var(--pse-brand-ring);outline:none}.pse-slotpanel-icon[data-v-025f11c3]{color:var(--pse-ink-faint);flex:none;font-size:18px}.pse-slotpanel-title[data-v-025f11c3]{letter-spacing:.06em;text-transform:uppercase;min-width:0;color:var(--pse-ink-faint);flex:1;margin:0;font-size:10.5px;font-weight:650;line-height:1.6}.pse-slotpanel-summary[data-v-025f11c3]{flex-wrap:wrap;flex:none;justify-content:flex-end;gap:5px;display:flex}.pse-slotpanel-empty[data-v-025f11c3]{color:var(--pse-ink-faint);flex:none;font-size:11.5px;font-weight:550}.pse-slotpanel-spinner[data-v-025f11c3]{border:2px solid var(--pse-line);border-top-color:var(--pse-brand);border-radius:50%;flex:none;width:13px;height:13px;animation:.7s linear infinite pse-slotpanel-spin-025f11c3}@keyframes pse-slotpanel-spin-025f11c3{to{transform:rotate(360deg)}}.pse-slotpanel-chevron[data-v-025f11c3]{color:var(--pse-ink-faint);flex:none;font-size:19px;transition:transform .28s}.pse-slotpanel-chevron.is-open[data-v-025f11c3]{transform:rotate(180deg)}.pse-slotpanel-collapse[data-v-025f11c3]{grid-template-rows:0fr;transition:grid-template-rows .28s cubic-bezier(.33,1,.68,1);display:grid}.pse-slotpanel-collapse.is-open[data-v-025f11c3]{grid-template-rows:1fr}.pse-slotpanel-collapse-inner[data-v-025f11c3]{opacity:0;min-height:0;transition:opacity .2s;overflow:hidden}.pse-slotpanel-collapse.is-open .pse-slotpanel-collapse-inner[data-v-025f11c3]{opacity:1;transition-delay:60ms}.pse-slotpanel-body[data-v-025f11c3]{flex-direction:column;gap:12px;padding:12px 14px 14px;display:flex}.pse-slotpanel-block[data-v-025f11c3]{flex-direction:column;align-items:flex-start;gap:6px;display:flex}.pse-slotpanel-caption[data-v-025f11c3]{letter-spacing:.06em;text-transform:uppercase;color:var(--pse-ink-faint);font-size:10.5px;font-weight:650}.pse-slotpanel-lines[data-v-025f11c3]{flex-direction:column;gap:6px;width:100%;margin:0;padding:0;list-style:none;display:flex}.pse-slotpanel-line[data-v-025f11c3]{align-items:center;gap:12px;display:flex}.pse-slotpanel-line-name[data-v-025f11c3]{white-space:nowrap;text-overflow:ellipsis;min-width:0;color:var(--pse-ink);flex:1;font-size:13px;overflow:hidden}.pse-slotpanel-hint[data-v-025f11c3]{color:var(--pse-ink-soft);margin:0;font-size:12px;line-height:1.45}@media (prefers-reduced-motion:reduce){.pse-slotpanel-collapse[data-v-025f11c3],.pse-slotpanel-collapse-inner[data-v-025f11c3],.pse-slotpanel-chevron[data-v-025f11c3]{transition:none}.pse-slotpanel-spinner[data-v-025f11c3]{animation:none}}.pse-rescard[data-v-b187fc81]{border:1px solid var(--pse-line);background-color:#fff;border-radius:16px;transition:border-color .15s,box-shadow .15s;overflow:hidden}.pse-rescard+.pse-rescard[data-v-b187fc81]{margin-top:10px}.pse-rescard[data-v-b187fc81]:not(.is-incomplete):hover{border-color:var(--pse-brand);box-shadow:0 1px 2px #1430210a,0 14px 30px -24px #14302180}.pse-rescard-head[data-v-b187fc81]{background-color:var(--pse-well);border-bottom:1px solid var(--pse-line);align-items:center;gap:20px;padding:13px 16px;display:flex}.pse-rescard-id[data-v-b187fc81]{flex:none;min-width:108px}.pse-rescard-number[data-v-b187fc81]{font-variant-numeric:tabular-nums;color:var(--pse-ink);font-size:17px;font-weight:700;line-height:1.2;display:block}.pse-rescard-reference[data-v-b187fc81]{font-variant-numeric:tabular-nums;color:var(--pse-ink-soft);margin-top:1px;font-size:12px;display:block}.pse-rescard-facts[data-v-b187fc81]{flex:1;gap:26px;min-width:0;margin:0;display:flex}.pse-rescard-fact[data-v-b187fc81]{min-width:0}.pse-rescard-fact dt[data-v-b187fc81]{letter-spacing:.06em;text-transform:uppercase;color:var(--pse-ink-faint);margin:0;font-size:10.5px;font-weight:650}.pse-rescard-fact dd[data-v-b187fc81]{white-space:nowrap;text-overflow:ellipsis;color:var(--pse-ink);margin:2px 0 0;font-size:13.5px;font-weight:600;overflow:hidden}.pse-rescard-open[data-v-b187fc81]{background-color:var(--pse-brand-ink);height:36px;font:inherit;color:#fff;cursor:pointer;border:0;border-radius:10px;flex:none;align-items:center;gap:2px;padding:0 10px 0 15px;font-size:13.5px;font-weight:650;transition:background-color .15s;display:inline-flex}.pse-rescard-open[data-v-b187fc81]:hover{background-color:var(--pse-brand-ink-strong)}.pse-rescard-open[data-v-b187fc81]:focus{outline:none}.pse-rescard-open[data-v-b187fc81]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-rescard-open-icon[data-v-b187fc81]{font-size:18px}.pse-rescard-products[data-v-b187fc81]{overflow-x:auto}.pse-rescard-amount[data-v-b187fc81]{font-variant-numeric:tabular-nums;white-space:nowrap;border-radius:8px;padding:2px 9px;font-size:13px;font-weight:600;display:inline-block}.pse-table tbody tr.is-short td[data-v-b187fc81]{background-color:var(--pse-attention-wash-strong);border-top-color:var(--pse-attention-line-soft)}.pse-table tbody tr.is-short .pse-rescard-amount[data-v-b187fc81]{color:var(--pse-attention-ink);font-weight:700}.pse-rescard-aside[data-v-b187fc81]{border-top:1px solid var(--pse-line);flex-direction:column;gap:10px;padding:14px 16px;display:flex}@media (width<=720px){.pse-rescard-head[data-v-b187fc81]{flex-wrap:wrap;gap:12px 20px}.pse-rescard-facts[data-v-b187fc81]{flex-basis:100%;order:1;gap:18px}.pse-rescard-open[data-v-b187fc81]{margin-left:auto}}.pse-row[data-v-31ebb75c]{border-top:1px solid var(--pse-line);grid-template-columns:auto minmax(0,1.4fr) minmax(0,1fr) auto;align-items:center;gap:16px;padding:11px 16px;font-size:14px;transition:background-color .15s;display:grid}.pse-row[data-v-31ebb75c]:first-child{border-top:0}.pse-row[data-v-31ebb75c]:hover{background-color:var(--pse-well)}.pse-row-number[data-v-31ebb75c]{font-variant-numeric:tabular-nums;color:var(--pse-ink);font-weight:650}.pse-row-customer[data-v-31ebb75c],.pse-row-reference-text[data-v-31ebb75c]{white-space:nowrap;text-overflow:ellipsis;overflow:hidden}.pse-row-customer[data-v-31ebb75c]{color:var(--pse-ink)}.pse-row-reference[data-v-31ebb75c]{font-variant-numeric:tabular-nums;color:var(--pse-ink-soft);align-items:center;gap:8px;font-size:13px;display:flex}.pse-row-tag[data-v-31ebb75c]{background-color:var(--pse-attention-soft);font-variant-numeric:normal;white-space:nowrap;color:var(--pse-attention-ink);border-radius:999px;flex:none;padding:2px 8px;font-size:11.5px;font-weight:650}.pse-row-open[data-v-31ebb75c]{border:1px solid var(--pse-line);height:32px;font:inherit;color:var(--pse-ink-soft);cursor:pointer;background-color:#fff;border-radius:9px;align-items:center;gap:2px;padding:0 8px 0 12px;font-size:13px;font-weight:650;transition:border-color .15s,background-color .15s,color .15s;display:inline-flex}.pse-row:hover .pse-row-open[data-v-31ebb75c]{border-color:var(--pse-brand);background-color:var(--pse-brand-soft);color:var(--pse-brand-ink)}.pse-row-open[data-v-31ebb75c]:focus{outline:none}.pse-row-open[data-v-31ebb75c]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-row-open-icon[data-v-31ebb75c]{font-size:18px}.pse-row-state[data-v-31ebb75c]{white-space:nowrap;border-radius:999px;align-items:center;gap:7px;padding:4px 11px;font-size:12.5px;font-weight:650;display:inline-flex}.pse-row-mark[data-v-31ebb75c]{background-color:currentColor;border-radius:50%;flex:none;width:7px;height:7px}.pse-row-state.is-queued[data-v-31ebb75c]{background-color:var(--pse-well);color:var(--pse-ink-faint)}.pse-row-state.is-stopped[data-v-31ebb75c]{background-color:var(--pse-well);color:var(--pse-ink-soft)}.pse-row-state.is-busy[data-v-31ebb75c]{color:#8a5a10;background-color:#e2a02e29}.pse-row-state.is-busy .pse-row-mark[data-v-31ebb75c]{animation:1.6s ease-in-out infinite pse-row-pulse-31ebb75c}@keyframes pse-row-pulse-31ebb75c{50%{opacity:.3}}.pse-row-state.is-done[data-v-31ebb75c]{background-color:var(--pse-brand-soft);color:var(--pse-brand-ink)}.pse-row-state.is-failed[data-v-31ebb75c]{background-color:var(--pse-alert-soft);color:var(--pse-alert-ink)}.pse-row.is-failed[data-v-31ebb75c]{background-color:var(--pse-alert-wash)}@media (prefers-reduced-motion:reduce){.pse-row-state.is-busy .pse-row-mark[data-v-31ebb75c]{animation:none}}@media (width<=720px){.pse-row[data-v-31ebb75c]{grid-template-columns:auto minmax(0,1fr) auto;gap:12px}.pse-row-reference[data-v-31ebb75c]{display:none}}.pse-mc[data-v-61d631cb]{border:1px solid var(--pse-line);background-color:var(--pse-well);border-radius:14px;margin-bottom:12px;padding:15px 17px;transition:border-color .2s,background-color .2s}.pse-mc.is-running[data-v-61d631cb]{background-color:#e2a02e12;border-color:#e2a02e66}.pse-mc.is-done[data-v-61d631cb]{border-color:var(--pse-brand);background-color:var(--pse-brand-soft)}.pse-mc.is-stopped[data-v-61d631cb]{border-color:var(--pse-alert-soft);background-color:var(--pse-alert-wash)}.pse-mc.is-stopped .pse-mc-icon[data-v-61d631cb]{border-color:var(--pse-alert-soft);color:var(--pse-alert-ink)}.pse-mc.is-stopped .pse-mc-progress-fill[data-v-61d631cb]{background-color:var(--pse-alert)}.pse-mc-head[data-v-61d631cb]{align-items:center;gap:13px;display:flex}.pse-mc-icon[data-v-61d631cb]{border:1px solid var(--pse-line);width:36px;height:36px;color:var(--pse-brand-ink);background-color:#fff;border-radius:11px;flex:none;justify-content:center;align-items:center;display:flex}.pse-mc.is-running .pse-mc-icon[data-v-61d631cb]{color:#8a5a10;border-color:#e2a02e66}.pse-mc-titles[data-v-61d631cb]{flex:1;min-width:0}.pse-mc-title[data-v-61d631cb]{color:var(--pse-ink);margin:0;font-size:14.5px;font-weight:650;line-height:1.3}.pse-mc-subtitle[data-v-61d631cb]{color:var(--pse-ink-soft);margin:3px 0 0;font-size:12.5px;line-height:1.4}.pse-mc-controls[data-v-61d631cb]{flex:none;align-items:center;gap:10px;display:flex}.pse-mc-stepper[data-v-61d631cb]{border:1px solid var(--pse-line);background-color:#fff;border-radius:11px;align-items:center;height:40px;display:flex;overflow:hidden}.pse-mc-step[data-v-61d631cb]{width:34px;height:100%;font:inherit;color:var(--pse-ink-soft);cursor:pointer;background-color:#0000;border:0;padding:0;font-size:17px;line-height:1;transition:background-color .15s,color .15s}.pse-mc-step[data-v-61d631cb]:hover:not(:disabled){background-color:var(--pse-brand-soft);color:var(--pse-brand-ink)}.pse-mc-step[data-v-61d631cb]:disabled{color:var(--pse-line);cursor:not-allowed}.pse-mc-step[data-v-61d631cb]:focus{outline:none}.pse-mc-step[data-v-61d631cb]:focus-visible{box-shadow:inset 0 0 0 2px var(--pse-brand-ring);outline:none}.pse-mc-amount[data-v-61d631cb]{border:0;border-left:1px solid var(--pse-line);border-right:1px solid var(--pse-line);width:46px;height:100%;font:inherit;font-variant-numeric:tabular-nums;text-align:center;color:var(--pse-ink);background-color:#0000;padding:0;font-size:15px;font-weight:650}.pse-mc-amount[data-v-61d631cb]:focus{background-color:var(--pse-brand-soft);outline:none}.pse-mc-amount[data-v-61d631cb]::-webkit-inner-spin-button{appearance:none;margin:0}.pse-mc-amount[data-v-61d631cb]::-webkit-outer-spin-button{appearance:none;margin:0}.pse-mc-start[data-v-61d631cb]{flex:none}.pse-mc-tally[data-v-61d631cb]{flex:none;align-items:baseline;gap:6px;display:flex}.pse-mc-tally-count[data-v-61d631cb]{font-variant-numeric:tabular-nums;color:var(--pse-ink);font-size:20px;font-weight:700;line-height:1}.pse-mc-tally-of[data-v-61d631cb]{color:var(--pse-ink-faint);font-size:14px;font-weight:650}.pse-mc-tally-label[data-v-61d631cb]{color:var(--pse-ink-soft);font-size:12px}.pse-mc-progress[data-v-61d631cb]{background-color:#142b2214;border-radius:999px;height:6px;margin-top:13px;overflow:hidden}.pse-mc-progress-fill[data-v-61d631cb]{background-color:var(--pse-brand);border-radius:999px;height:100%;transition:width .4s cubic-bezier(.2,.9,.3,1)}@media (width<=720px){.pse-mc.is-stopped[data-v-61d631cb]{border-color:var(--pse-alert-soft);background-color:var(--pse-alert-wash)}.pse-mc.is-stopped .pse-mc-icon[data-v-61d631cb]{border-color:var(--pse-alert-soft);color:var(--pse-alert-ink)}.pse-mc.is-stopped .pse-mc-progress-fill[data-v-61d631cb]{background-color:var(--pse-alert)}.pse-mc-head[data-v-61d631cb]{flex-wrap:wrap}.pse-mc-titles[data-v-61d631cb]{flex-basis:100%;order:-1}.pse-mc-controls[data-v-61d631cb],.pse-mc-tally[data-v-61d631cb]{margin-left:auto}}.pse-found[data-v-120793a6]{border:1px solid var(--pse-line);background-color:var(--pse-well);border-radius:14px;align-items:center;gap:16px;margin-bottom:20px;padding:14px 16px;display:flex}.pse-found-image[data-v-120793a6]{border:1px solid var(--pse-line);background-color:#fff;border-radius:11px;flex:none;justify-content:center;align-items:center;width:58px;height:58px;display:flex;overflow:hidden}.pse-found-image img[data-v-120793a6]{object-fit:contain;max-width:100%;max-height:100%}.pse-found-text[data-v-120793a6]{flex:1;min-width:0}.pse-found-name[data-v-120793a6]{color:var(--pse-ink);margin:0;font-size:15.5px;font-weight:650;line-height:1.3}.pse-found-barcode[data-v-120793a6]{font-variant-numeric:tabular-nums;color:var(--pse-ink-soft);margin:3px 0 0;font-size:13px}.pse-found-count[data-v-120793a6]{flex:none;align-items:baseline;gap:6px;display:flex}.pse-found-count-number[data-v-120793a6]{font-variant-numeric:tabular-nums;color:var(--pse-brand-ink);font-size:22px;font-weight:700;line-height:1}.pse-found-count-label[data-v-120793a6]{color:var(--pse-ink-soft);font-size:12.5px}.pse-countdown[data-v-120793a6]{border:1px solid var(--pse-brand);background-color:var(--pse-brand-soft);color:var(--pse-brand-ink);border-radius:12px;align-items:center;gap:9px;margin:0 0 20px;padding:11px 14px;font-size:13.5px;font-weight:600;display:flex}.pse-countdown-mark[data-v-120793a6]{background-color:var(--pse-brand);border-radius:50%;flex:none;width:8px;height:8px;animation:1s ease-in-out infinite pse-countdown-tick-120793a6}@keyframes pse-countdown-tick-120793a6{50%{opacity:.25}}@media (prefers-reduced-motion:reduce){.pse-countdown-mark[data-v-120793a6]{animation:none}}.pse-group+.pse-group[data-v-120793a6]{margin-top:26px}.pse-group-head[data-v-120793a6]{margin-bottom:10px}.pse-group-title[data-v-120793a6]{letter-spacing:.02em;color:var(--pse-ink);align-items:center;gap:8px;margin:0;font-size:14px;font-weight:650;display:flex}.pse-group-count[data-v-120793a6]{background-color:var(--pse-brand-soft);font-variant-numeric:tabular-nums;min-width:22px;height:20px;color:var(--pse-brand-ink);border-radius:999px;justify-content:center;align-items:center;padding:0 7px;font-size:12px;font-weight:700;display:inline-flex}.pse-group-note[data-v-120793a6]{color:var(--pse-ink-soft);margin:4px 0 0;font-size:12.5px;line-height:1.45}.pse-rows[data-v-120793a6]{border:1px solid var(--pse-line);background-color:#fff;border-radius:14px;overflow:hidden}.pse-panel[data-v-2ad9890a]{flex-direction:column;gap:18px;min-width:0;display:flex}.pse-panel-head[data-v-2ad9890a]{align-items:center;gap:12px;display:flex}.pse-panel-icon[data-v-2ad9890a]{background-color:var(--pse-brand-soft);width:38px;height:38px;color:var(--pse-brand-ink);border-radius:11px;flex:none;justify-content:center;align-items:center;display:flex}.pse-panel-text[data-v-2ad9890a]{min-width:0}.pse-panel-title[data-v-2ad9890a]{color:var(--pse-ink);margin:0;font-size:16px;font-weight:650;line-height:1.3}.pse-panel-subtitle[data-v-2ad9890a]{color:var(--pse-ink-soft);margin:2px 0 0;font-size:12.5px;line-height:1.4}.pse-field[data-v-e35ea7a8]{cursor:text;margin:0;display:block}.pse-field-label[data-v-e35ea7a8]{letter-spacing:.07em;text-transform:uppercase;color:var(--pse-ink-soft);margin-bottom:7px;font-size:11px;font-weight:650;display:block}.pse-field-shell[data-v-e35ea7a8]{display:block}.pse-field-shell[data-v-e35ea7a8] .pse-input{box-sizing:border-box;border:1px solid var(--pse-line);background-color:var(--pse-well);width:100%;height:48px;font:inherit;color:var(--pse-ink);border-radius:12px;margin:0;padding:0 15px;font-size:15px;transition:border-color .15s,background-color .15s,box-shadow .15s;display:block}.pse-field-shell[data-v-e35ea7a8] .pse-input::placeholder{color:var(--pse-ink-faint)}.pse-field-shell[data-v-e35ea7a8] .pse-input:-webkit-autofill{-webkit-text-fill-color:var(--pse-ink);box-shadow:0 0 0 100px var(--pse-well) inset}.pse-field-shell[data-v-e35ea7a8] .pse-input:-webkit-autofill:hover{-webkit-text-fill-color:var(--pse-ink);box-shadow:0 0 0 100px var(--pse-well) inset}.pse-field-shell[data-v-e35ea7a8] .pse-input:focus{border-color:var(--pse-brand);box-shadow:0 0 0 3px var(--pse-brand-ring);background-color:#fff;outline:none}.pse-field-shell[data-v-e35ea7a8] .pse-input:-webkit-autofill:focus{box-shadow:0 0 0 100px #fff inset, 0 0 0 3px var(--pse-brand-ring)}.pse-notice[data-v-0438713d]{border:1px solid var(--pse-line);text-align:left;background-color:#fff;border-radius:14px;align-items:flex-start;gap:12px;padding:14px 16px;display:flex;box-shadow:0 1px 2px #1430210a,0 14px 30px -26px #14302173}.pse-notice-icon[data-v-0438713d]{border-radius:10px;flex:none;justify-content:center;align-items:center;width:32px;height:32px;display:flex}.pse-notice.is-notice .pse-notice-icon[data-v-0438713d]{background-color:var(--pse-attention-soft);color:var(--pse-attention-ink)}.pse-notice.is-alert .pse-notice-icon[data-v-0438713d]{background-color:var(--pse-alert-soft);color:var(--pse-alert-ink)}.pse-notice-text[data-v-0438713d]{min-width:0;padding-top:4px;display:block}.pse-notice-title[data-v-0438713d]{color:var(--pse-ink);font-size:14px;font-weight:650;line-height:1.35;display:block}.pse-notice-detail[data-v-0438713d]{color:var(--pse-ink-soft);margin-top:2px;font-size:12.5px;line-height:1.45;display:block}.pse-notice-close[data-v-0438713d]{width:28px;height:28px;color:var(--pse-ink-faint);cursor:pointer;background:0 0;border:0;border-radius:8px;flex:none;justify-content:center;align-items:center;margin-left:auto;padding:0;transition:background-color .15s,color .15s;display:flex}.pse-notice-close[data-v-0438713d]:hover{background-color:var(--pse-well);color:var(--pse-ink)}.pse-notice-close[data-v-0438713d]:focus{outline:none}.pse-notice-close[data-v-0438713d]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-resume[data-v-ead5c402]{border:1px solid var(--pse-line);width:100%;font:inherit;text-align:left;color:var(--pse-ink);cursor:pointer;background-color:#fff;border-radius:14px;align-items:center;gap:13px;margin:0;padding:13px 16px;transition:border-color .15s,box-shadow .15s,transform .15s;display:flex}.pse-resume[data-v-ead5c402]:hover:not(:disabled){border-color:var(--pse-brand);transform:translateY(-1px);box-shadow:0 6px 18px -12px #14302180}.pse-resume[data-v-ead5c402]:focus{outline:none}.pse-resume[data-v-ead5c402]:focus-visible{border-color:var(--pse-brand);box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-resume[data-v-ead5c402]:disabled{background-color:var(--pse-well);color:var(--pse-ink-faint);cursor:not-allowed}.pse-resume-icon[data-v-ead5c402]{background-color:var(--pse-brand-soft);width:34px;height:34px;color:var(--pse-brand-ink);border-radius:10px;flex:none;justify-content:center;align-items:center;display:flex}.pse-resume:disabled .pse-resume-icon[data-v-ead5c402]{color:var(--pse-ink-faint);background-color:#1430210d}.pse-resume-text[data-v-ead5c402]{flex-direction:column;gap:2px;min-width:0;margin-right:auto;display:flex}.pse-resume-label[data-v-ead5c402]{font-size:13px;font-weight:600;line-height:1.3}.pse-resume-number[data-v-ead5c402]{color:var(--pse-ink-soft);font-variant-numeric:tabular-nums;font-size:12px;line-height:1.3}.pse-resume:disabled .pse-resume-number[data-v-ead5c402]{color:var(--pse-ink-faint)}.pse-resume-chevron[data-v-ead5c402]{color:var(--pse-ink-faint);flex:none;transition:transform .15s,color .15s}.pse-resume:hover:not(:disabled) .pse-resume-chevron[data-v-ead5c402]{color:var(--pse-brand-ink);transform:translate(2px)}.pse-picker-intro[data-v-585a06fb]{color:var(--pse-ink-soft);margin:0 0 16px;font-size:13.5px;line-height:1.45}.pse-picker-list[data-v-585a06fb]{flex-direction:column;gap:8px;margin:0;padding:0;list-style:none;display:flex}.pse-picker-row[data-v-585a06fb]{border:1px solid var(--pse-line);width:100%;font:inherit;text-align:left;color:var(--pse-ink);cursor:pointer;background-color:#fff;border-radius:12px;align-items:center;gap:12px;padding:11px 13px;transition:border-color .15s,background-color .15s;display:flex}.pse-picker-row[data-v-585a06fb]:hover:not(:disabled){border-color:var(--pse-brand);background-color:var(--pse-well)}.pse-picker-row[data-v-585a06fb]:disabled{opacity:.55;cursor:default}.pse-picker-row[data-v-585a06fb]:focus{outline:none}.pse-picker-row[data-v-585a06fb]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-picker-what[data-v-585a06fb]{flex-direction:column;flex:auto;gap:2px;min-width:0;display:flex}.pse-picker-barcode[data-v-585a06fb]{font-variant-numeric:tabular-nums;text-overflow:ellipsis;white-space:nowrap;font-size:14px;font-weight:650;overflow:hidden}.pse-picker-carrier[data-v-585a06fb]{color:var(--pse-ink-faint);font-size:12px}.pse-picker-icon[data-v-585a06fb]{color:var(--pse-brand-ink);flex:none;font-size:18px}.pse-picker-spinner[data-v-585a06fb]{border:2px solid var(--pse-line);border-top-color:var(--pse-brand);border-radius:50%;flex:none;width:14px;height:14px;animation:.7s linear infinite pse-picker-spin-585a06fb}@keyframes pse-picker-spin-585a06fb{to{transform:rotate(360deg)}}.pse-history[data-v-0f4a5614]{border:1px solid var(--pse-line);background-color:var(--pse-well);border-radius:20px;flex-direction:column;align-self:start;min-width:0;max-height:460px;padding:18px 8px 8px 18px;display:flex}.pse-history-head[data-v-0f4a5614]{align-items:flex-start;gap:11px;margin-bottom:14px;padding-right:10px;display:flex}.pse-history-icon[data-v-0f4a5614]{background-color:var(--pse-brand-soft);width:32px;height:32px;color:var(--pse-brand-ink);border-radius:10px;flex:none;justify-content:center;align-items:center;display:flex}.pse-history-text[data-v-0f4a5614]{min-width:0;margin-right:auto}.pse-history-title[data-v-0f4a5614]{color:var(--pse-ink);margin:0;font-size:15px;font-weight:650;line-height:1.3}.pse-history-subtitle[data-v-0f4a5614]{color:var(--pse-ink-soft);margin:1px 0 0;font-size:12px;line-height:1.4}.pse-history-clear[data-v-0f4a5614]{font:inherit;color:var(--pse-ink-faint);cursor:pointer;background:0 0;border:0;border-radius:8px;flex:none;margin:0;padding:5px 9px;font-size:12px;font-weight:600;transition:background-color .15s,color .15s}.pse-history-clear[data-v-0f4a5614]:hover{color:var(--pse-ink-soft);background-color:#1430210d}.pse-history-clear[data-v-0f4a5614]:focus{outline:none}.pse-history-clear[data-v-0f4a5614]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-history-list[data-v-0f4a5614]{scrollbar-width:thin;scrollbar-color:var(--pse-line) transparent;flex-direction:column;gap:6px;min-height:0;margin:0;padding:4px 8px 10px 0;list-style:none;display:flex;overflow-y:auto;-webkit-mask-image:linear-gradient(#000 calc(100% - 18px),#0000);mask-image:linear-gradient(#000 calc(100% - 18px),#0000)}.pse-history-item[data-v-0f4a5614]{align-items:stretch;gap:6px;display:flex}.pse-history-print[data-v-0f4a5614]{width:38px;color:var(--pse-ink-faint);cursor:pointer;opacity:.7;background-color:#fff;border:1px solid #0000;border-radius:12px;flex:none;justify-content:center;align-items:center;transition:border-color .15s,color .15s,opacity .15s;display:flex}.pse-history-item:hover .pse-history-print[data-v-0f4a5614]{opacity:1}.pse-history-print[data-v-0f4a5614]:hover:not(:disabled){border-color:var(--pse-brand);color:var(--pse-brand-ink)}.pse-history-print[data-v-0f4a5614]:disabled{opacity:.4;cursor:default}.pse-history-print-icon[data-v-0f4a5614]{font-size:17px}.pse-history-spinner[data-v-0f4a5614]{border:2px solid var(--pse-line);border-top-color:var(--pse-brand);border-radius:50%;width:13px;height:13px;animation:.7s linear infinite pse-history-spin-0f4a5614}@keyframes pse-history-spin-0f4a5614{to{transform:rotate(360deg)}}.pse-history-row[data-v-0f4a5614]{width:100%;font:inherit;text-align:left;color:var(--pse-ink);cursor:pointer;background-color:#fff;border:1px solid #0000;border-radius:12px;align-items:center;gap:11px;margin:0;padding:9px 11px;transition:border-color .15s,box-shadow .15s,transform .15s;display:flex}.pse-history-row[data-v-0f4a5614]:hover{border-color:var(--pse-brand);transform:translateY(-1px);box-shadow:0 6px 16px -12px #14302180}.pse-history-row[data-v-0f4a5614]:focus{outline:none}.pse-history-row[data-v-0f4a5614]:focus-visible{border-color:var(--pse-brand);box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-history-marker[data-v-0f4a5614]{background-color:var(--pse-brand);border-radius:2px;flex:none;align-self:stretch;width:3px}.pse-history-row-failed .pse-history-marker[data-v-0f4a5614]{background-color:var(--pse-alert)}.pse-history-body[data-v-0f4a5614]{flex-direction:column;gap:2px;min-width:0;margin-right:auto;display:flex}.pse-history-number[data-v-0f4a5614]{font-variant-numeric:tabular-nums;font-size:13.5px;font-weight:600;line-height:1.3}.pse-history-customer[data-v-0f4a5614]{color:var(--pse-ink);white-space:nowrap;text-overflow:ellipsis;font-size:12.5px;line-height:1.35;overflow:hidden}.pse-history-meta[data-v-0f4a5614]{color:var(--pse-ink-soft);align-items:center;gap:5px;font-size:11.5px;line-height:1.4;display:flex}.pse-history-dot[data-v-0f4a5614]{color:var(--pse-ink-faint)}.pse-history-badge[data-v-0f4a5614]{background-color:var(--pse-alert-soft);letter-spacing:.01em;color:var(--pse-alert-ink);border-radius:999px;padding:1px 6px;font-size:10.5px;font-weight:650}.pse-history-add[data-v-0f4a5614]{color:var(--pse-ink-faint);opacity:.7;flex:none;transition:color .15s,opacity .15s}.pse-history-row:hover .pse-history-add[data-v-0f4a5614]{color:var(--pse-brand-ink);opacity:1}@media (width<=1120px){.pse-history[data-v-0f4a5614]{max-height:300px}}.pse-search[data-v-149f9886]{box-sizing:border-box;width:100%;color:var(--pse-ink);text-align:left;margin:28px auto 56px;padding:0 24px}.pse-search[data-v-149f9886] *{box-sizing:border-box}.pse-messages[data-v-149f9886]:empty{display:none}.pse-search[data-v-149f9886] .pse-notice{margin-bottom:18px}.pse-layout[data-v-149f9886]{max-width:980px;margin:0 auto;display:grid}.pse-layout-history[data-v-149f9886]{grid-template-columns:minmax(0,1fr) 322px;gap:20px;max-width:1300px}.pse-main[data-v-149f9886]{min-width:0}.pse-card[data-v-149f9886]{border:1px solid var(--pse-line);background-color:#fff;border-radius:20px;grid-template-columns:1fr auto 1fr;gap:34px;padding:30px 34px;display:grid;box-shadow:0 1px 2px #1430210a,0 18px 40px -28px #14302173}.pse-card-split[data-v-149f9886]{background-color:var(--pse-line);width:1px}.pse-form[data-v-149f9886]{flex-direction:column;flex:1;gap:18px;margin:0;display:flex}.pse-submit[data-v-149f9886]{background-color:var(--pse-brand-ink);width:100%;height:48px;font:inherit;color:#fff;cursor:pointer;border:0;border-radius:12px;justify-content:center;align-items:center;gap:9px;margin:0;padding:0 18px;font-size:14.5px;font-weight:650;transition:background-color .15s,box-shadow .15s,transform .15s;display:flex}.pse-submit-end[data-v-149f9886]{margin-top:auto}.pse-submit[data-v-149f9886]:hover:not(:disabled){background-color:var(--pse-brand-ink-strong);transform:translateY(-1px);box-shadow:0 10px 22px -14px #143021cc}.pse-submit[data-v-149f9886]:active:not(:disabled){box-shadow:none;transform:translateY(0)}.pse-submit[data-v-149f9886]:focus{outline:none}.pse-submit[data-v-149f9886]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-submit[data-v-149f9886]:disabled{color:#fff;cursor:not-allowed;background-color:#cfdbd4}.pse-spinner[data-v-149f9886]{border:2px solid #fff6;border-top-color:#fff;border-radius:50%;flex:none;width:15px;height:15px;animation:.7s linear infinite pse-spin-149f9886}@keyframes pse-spin-149f9886{to{transform:rotate(360deg)}}.pse-resume-row[data-v-149f9886]{grid-template-columns:1fr 1fr;gap:14px;margin-top:18px;display:grid}@media (width<=1120px){.pse-layout-history[data-v-149f9886]{grid-template-columns:minmax(0,1fr);max-width:980px}}@media (width<=860px){.pse-search[data-v-149f9886]{padding:0 16px}.pse-card[data-v-149f9886]{grid-template-columns:1fr;gap:26px;padding:26px 22px}.pse-card-split[data-v-149f9886]{width:auto;height:1px}.pse-submit-end[data-v-149f9886]{margin-top:0}.pse-resume-row[data-v-149f9886]{grid-template-columns:1fr}}.pse-loading[data-v-38d33d98]{box-sizing:border-box;min-height:calc(100vh - 200px);color:var(--pse-ink);text-align:left;justify-content:center;align-items:center;padding:48px 24px;display:flex}.pse-loading-card[data-v-38d33d98]{border:1px solid var(--pse-line);background-color:#fff;border-radius:20px;align-items:center;gap:16px;width:100%;max-width:420px;padding:24px 26px;display:flex;box-shadow:0 1px 2px #1430210a,0 18px 40px -28px #14302173}.pse-loading-spinner[data-v-38d33d98]{border:3px solid var(--pse-brand-ring);border-top-color:var(--pse-brand);border-radius:50%;flex:none;width:28px;height:28px;animation:.7s linear infinite pse-loading-spin-38d33d98}@keyframes pse-loading-spin-38d33d98{to{transform:rotate(360deg)}}.pse-loading-text[data-v-38d33d98]{min-width:0}.pse-loading-title[data-v-38d33d98]{color:var(--pse-ink);margin:0;font-size:16px;font-weight:650;line-height:1.3}.pse-loading-subtitle[data-v-38d33d98]{color:var(--pse-ink-soft);margin:3px 0 0;font-size:12.5px;line-height:1.4}@media (prefers-reduced-motion:reduce){.pse-loading-spinner[data-v-38d33d98]{animation-duration:1.6s}}@media (width<=860px){.pse-loading[data-v-38d33d98]{padding:32px 16px}}.pse-slotcard[data-v-7e6e3d84]{border:1px solid var(--pse-line);text-align:left;background-color:#fff;border-radius:14px;overflow:hidden;box-shadow:0 1px 2px #1430210a}.pse-slotcard-head[data-v-7e6e3d84]{border-bottom:1px solid var(--pse-line);background-color:var(--pse-well);align-items:center;gap:9px;padding:10px 14px;display:flex}.pse-slotcard-spinner[data-v-7e6e3d84]{border:2px solid var(--pse-line);border-top-color:var(--pse-brand);border-radius:50%;flex:none;width:13px;height:13px;margin-left:auto;animation:.7s linear infinite pse-slotcard-spin-7e6e3d84}@keyframes pse-slotcard-spin-7e6e3d84{to{transform:rotate(360deg)}}.pse-slot-chip .pse-slot-chip-empty[data-v-7e6e3d84]:only-child{opacity:.75}.pse-slotcard-icon[data-v-7e6e3d84]{color:var(--pse-ink-faint);flex:none;font-size:18px}.pse-slotcard-title[data-v-7e6e3d84]{letter-spacing:.06em;text-transform:uppercase;color:var(--pse-ink-faint);margin:0;font-size:10.5px;font-weight:650;line-height:1.6}.pse-slotcard-body[data-v-7e6e3d84]{padding:12px 14px 14px}.pse-slotcard-caption[data-v-7e6e3d84]{letter-spacing:.06em;text-transform:uppercase;color:var(--pse-ink-faint);margin-bottom:6px;font-size:10.5px;font-weight:650;line-height:1.6;display:block}.pse-slotcard-caption.is-spaced[data-v-7e6e3d84]{border-top:1px solid var(--pse-line);margin-top:14px;padding-top:12px}.pse-slotcard-list[data-v-7e6e3d84]{flex-wrap:wrap;gap:6px;display:flex}.pse-slotcard-hint[data-v-7e6e3d84]{color:var(--pse-ink-faint);margin:9px 0 0;font-size:12px;line-height:1.4}.pse-raaplijst[data-v-b128cb53]{border:1px solid var(--pse-line);width:100%;font:inherit;color:var(--pse-ink);cursor:pointer;background-color:#fff;border-radius:10px;justify-content:center;align-items:center;gap:7px;margin-top:13px;padding:9px 12px;font-size:13px;font-weight:600;line-height:1.2;transition:background-color .15s,border-color .15s;display:flex}.pse-raaplijst[data-v-b128cb53]:hover:not(:disabled){border-color:var(--pse-brand);background-color:var(--pse-well)}.pse-raaplijst[data-v-b128cb53]:disabled{opacity:.55;cursor:default}.pse-raaplijst[data-v-b128cb53]:focus{outline:none}.pse-raaplijst[data-v-b128cb53]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-raaplijst-icon[data-v-b128cb53]{color:var(--pse-brand-ink);font-size:17px}.pse-raaplijst-spinner[data-v-b128cb53]{border:2px solid var(--pse-line);border-top-color:var(--pse-brand);border-radius:50%;flex:none;width:13px;height:13px;animation:.7s linear infinite pse-raaplijst-spin-b128cb53}@keyframes pse-raaplijst-spin-b128cb53{to{transform:rotate(360deg)}}.pse-sidebar[data-v-c2a51d0e]{box-sizing:border-box;text-align:left;color:var(--pse-ink);flex-direction:column;gap:14px;display:flex}.pse-sidebar[data-v-c2a51d0e] *{box-sizing:border-box}.pse-sidebar-card[data-v-c2a51d0e]{border:1px solid var(--pse-line);background-color:#fff;border-radius:16px;padding:18px 18px 20px;box-shadow:0 1px 2px #1430210a,0 18px 40px -30px #14302173}.pse-sidebar-head[data-v-c2a51d0e]{border-bottom:1px solid var(--pse-line);margin-bottom:14px;padding-bottom:14px}.pse-sidebar-heading-row[data-v-c2a51d0e]{align-items:center;gap:4px;display:flex}.pse-sidebar-heading[data-v-c2a51d0e]{min-width:0;color:var(--pse-ink);margin:0;font-size:19px;font-weight:700;line-height:1.25}.pse-sidebar-chips[data-v-c2a51d0e]{flex-wrap:wrap;gap:6px;margin-top:10px;display:flex}.pse-sidebar-chip[data-v-c2a51d0e]{border:1px solid var(--pse-brand-ring);background-color:var(--pse-brand-soft);color:var(--pse-brand-ink);border-radius:999px;padding:3px 10px;font-size:11.5px;font-weight:650;line-height:1.5}.pse-sidebar-rows[data-v-c2a51d0e]{grid-template-columns:minmax(0,1fr);margin:0;display:grid}.pse-sidebar-label[data-v-c2a51d0e]{letter-spacing:.06em;text-transform:uppercase;color:var(--pse-ink-faint);margin:0;font-size:10.5px;font-weight:650;line-height:1.6}.pse-sidebar-value[data-v-c2a51d0e]{color:var(--pse-ink);overflow-wrap:anywhere;align-items:baseline;gap:6px;margin:2px 0 11px;font-size:13.5px;font-weight:550;line-height:1.35;display:flex}.pse-sidebar-value[data-v-c2a51d0e]:last-child{margin-bottom:0}.pse-sidebar-value-text[data-v-c2a51d0e]{overflow-wrap:anywhere;min-width:0}.pse-sidebar-address[data-v-c2a51d0e]{border-top:1px solid var(--pse-line);margin-top:16px;padding-top:14px}.pse-sidebar-address-body[data-v-c2a51d0e]{color:var(--pse-ink);flex-direction:column;margin:7px 0 0;font-size:13.5px;font-weight:550;line-height:1.45;display:flex}.pse-image[data-v-367f2428]{border:1px solid var(--pse-line);background-color:#fff;border-radius:14px;justify-content:center;align-items:center;padding:24px;display:flex}.pse-image-photo[data-v-367f2428]{object-fit:contain;width:100%;max-width:460px;height:46vh;min-height:260px;display:block}.pse-products[data-v-9fcbe33c]{box-sizing:border-box;color:var(--pse-ink);text-align:left;margin-bottom:26px}.pse-products[data-v-9fcbe33c] *{box-sizing:border-box}.pse-count[data-v-9fcbe33c]{font-variant-numeric:tabular-nums;white-space:nowrap;color:var(--pse-ink);border-radius:8px;padding:3px 9px;font-size:13px;font-weight:600;display:inline-block}.pse-count-warn[data-v-9fcbe33c],.pse-count-alert[data-v-9fcbe33c]{animation:2.4s ease-in-out infinite pse-count-breathe-9fcbe33c}.pse-count-warn[data-v-9fcbe33c]{color:#8a5a10;background-color:#e2a02e2e}.pse-count-alert[data-v-9fcbe33c]{color:#a3372c;background-color:#b03a2e1f}@keyframes pse-count-breathe-9fcbe33c{50%{background-color:#e2a02e6b}}.pse-count-alert[data-v-9fcbe33c]{animation-name:pse-count-breathe-alert-9fcbe33c}@keyframes pse-count-breathe-alert-9fcbe33c{50%{background-color:#b03a2e4d}}.pse-count-resolved[data-v-9fcbe33c]{background-color:var(--pse-brand-soft);color:var(--pse-brand-ink)}.pse-mark[data-v-9fcbe33c]{vertical-align:middle;font-size:21px}.pse-mark-done[data-v-9fcbe33c]{color:var(--pse-brand)}.pse-mark-open[data-v-9fcbe33c]{color:var(--pse-ink-faint)}.pse-skeleton-row td[data-v-9fcbe33c]{height:58px}.pse-skeleton-cell[data-v-9fcbe33c]{background-color:var(--pse-line);border-radius:6px;height:12px;animation:1.4s ease-in-out infinite pse-products-pulse-9fcbe33c;display:block}@keyframes pse-products-pulse-9fcbe33c{50%{opacity:.45}}.pse-products-hint[data-v-9fcbe33c]{border:1px solid var(--pse-brand-ring);background-color:var(--pse-brand-soft);color:var(--pse-brand-ink);border-radius:12px;align-items:center;gap:8px;margin:12px 0 0;padding:10px 13px;font-size:13px;font-weight:550;line-height:1.4;display:flex}.pse-products-hint-icon[data-v-9fcbe33c]{flex:none;font-size:18px}@media (prefers-reduced-motion:reduce){.pse-skeleton-cell[data-v-9fcbe33c],.pse-count-warn[data-v-9fcbe33c],.pse-count-alert[data-v-9fcbe33c]{animation:none}}.pse-pickup-lead[data-v-095d747a]{text-align:left;margin:0 0 .9rem;font-size:1rem;line-height:1.45}.pse-pickup-facts[data-v-095d747a]{text-align:left;grid-template-columns:auto minmax(0,1fr);gap:.25rem .9rem;margin:0;font-size:.9rem;display:grid}.pse-pickup-facts dt[data-v-095d747a]{color:var(--pse-ink-soft)}.pse-pickup-facts dd[data-v-095d747a]{margin:0;font-weight:600}.pse-bin-labels[data-v-d83aa205]{text-align:left;width:100%;margin:18px 0 4px}.pse-bin-labels-title[data-v-d83aa205]{letter-spacing:.06em;text-transform:uppercase;color:var(--pse-ink-faint);margin:0 0 8px;font-size:11px;font-weight:650}.pse-bin-labels-list[data-v-d83aa205]{margin:0 0 14px;padding:0;list-style:none}.pse-bin-labels-line[data-v-d83aa205]{border-top:1px solid var(--pse-line);align-items:flex-start;gap:10px;padding:9px 0;display:flex}.pse-bin-labels-icon[data-v-d83aa205]{color:var(--pse-ink-faint);flex:none;font-size:20px}.pse-bin-labels-line.is-done .pse-bin-labels-icon[data-v-d83aa205]{color:var(--pse-brand)}.pse-bin-labels-line.is-failed .pse-bin-labels-icon[data-v-d83aa205],.pse-bin-labels-line.is-failed .pse-bin-labels-status[data-v-d83aa205]{color:var(--pse-alert-ink)}.pse-bin-labels-text[data-v-d83aa205]{flex-direction:column;gap:1px;min-width:0;display:flex}.pse-bin-labels-name[data-v-d83aa205]{color:var(--pse-ink);font-size:14px;font-weight:650}.pse-bin-labels-status[data-v-d83aa205]{color:var(--pse-ink-soft);font-size:12.5px;line-height:1.4}.pse-done[data-v-2834e9d3]{box-sizing:border-box;min-height:calc(100vh - 260px);color:var(--pse-ink);text-align:left;justify-content:center;align-items:center;padding:48px 24px;display:flex}.pse-done[data-v-2834e9d3] *{box-sizing:border-box}.pse-done-card[data-v-2834e9d3]{border:1px solid var(--pse-line);text-align:center;background-color:#fff;border-radius:20px;flex-direction:column;align-items:center;width:100%;max-width:460px;padding:34px 34px 30px;display:flex;box-shadow:0 1px 2px #1430210a,0 18px 40px -28px #14302173}.pse-done-mark[data-v-2834e9d3]{background-color:var(--pse-brand-soft);width:62px;height:62px;color:var(--pse-brand-ink);border-radius:50%;justify-content:center;align-items:center;margin-bottom:18px;display:flex}.pse-done.is-detailed[data-v-2834e9d3]{align-items:flex-start;min-height:0;padding-top:32px}.pse-done-layout[data-v-2834e9d3]{justify-content:center;align-items:flex-start;gap:20px;width:100%;display:flex}.pse-done-side[data-v-2834e9d3],.pse-done-parcels-column[data-v-2834e9d3]{text-align:left;flex-direction:column;flex:0 340px;gap:14px;min-width:0;display:flex}.pse-done-layout>.pse-done-card[data-v-2834e9d3]{flex:460px}.pse-done-side[data-v-2834e9d3] .pse-sidebar{width:100%}.pse-done-parcels[data-v-2834e9d3]{border:1px solid var(--pse-line);background-color:#fff;border-radius:20px;padding:18px 20px 20px;box-shadow:0 1px 2px #1430210a,0 18px 40px -28px #14302173}.pse-done-parcels-title[data-v-2834e9d3]{letter-spacing:.06em;text-transform:uppercase;color:var(--pse-ink-soft);margin:0 0 12px;font-size:12px;font-weight:700}.pse-done-parcel+.pse-done-parcel[data-v-2834e9d3]{border-top:1px solid var(--pse-line);margin-top:14px;padding-top:14px}.pse-done-parcel-name[data-v-2834e9d3]{color:var(--pse-ink);margin:0;font-size:14.5px;font-weight:700}.pse-done-parcel-fields[data-v-2834e9d3]{grid-template-columns:auto minmax(0,1fr);gap:2px 10px;margin:10px 0 0;font-size:12.5px;line-height:1.45;display:grid}.pse-done-parcel-fields dt[data-v-2834e9d3]{color:var(--pse-ink-faint)}.pse-done-parcel-fields dd[data-v-2834e9d3]{color:var(--pse-ink);overflow-wrap:anywhere;margin:0}.pse-done-parcel-lines[data-v-2834e9d3]{margin:12px 0 0;padding:0;list-style:none}.pse-done-parcel-lines li[data-v-2834e9d3]{background-color:var(--pse-well);border-radius:10px;gap:10px;padding:8px 10px;font-size:12.5px;line-height:1.4;display:flex}.pse-done-parcel-lines li+li[data-v-2834e9d3]{margin-top:6px}.pse-done-parcel-amount[data-v-2834e9d3]{font-variant-numeric:tabular-nums;color:var(--pse-brand-ink);flex:none;font-weight:700}.pse-done-parcel-product[data-v-2834e9d3]{flex-direction:column;min-width:0;display:flex}.pse-done-parcel-product-name[data-v-2834e9d3]{color:var(--pse-ink);overflow-wrap:anywhere}.pse-done-parcel-barcode[data-v-2834e9d3]{font-variant-numeric:tabular-nums;color:var(--pse-ink-faint);font-size:12px}.pse-done-card.is-failed[data-v-2834e9d3]{border-color:var(--pse-alert-soft)}.pse-done-mark.is-failed[data-v-2834e9d3]{background-color:var(--pse-alert-soft);color:var(--pse-alert-ink)}.pse-done-card.is-failed[data-v-2834e9d3]{max-width:560px}.pse-done-card.is-failed .pse-done-number[data-v-2834e9d3]{color:var(--pse-alert-ink)}.pse-done-card.is-failed .pse-done-text[data-v-2834e9d3]{max-width:46ch}.pse-done-failures[data-v-2834e9d3]{text-align:left;width:100%;margin:18px 0 0;padding:0;list-style:none}.pse-done-failure[data-v-2834e9d3]{border:1px solid var(--pse-alert-soft);border-left:3px solid var(--pse-alert);background-color:var(--pse-alert-wash);border-radius:12px;padding:12px 14px}.pse-done-failure+.pse-done-failure[data-v-2834e9d3]{margin-top:8px}.pse-done-failure-step[data-v-2834e9d3]{color:var(--pse-alert-ink);font-size:13.5px;font-weight:650;line-height:1.35;display:block}.pse-done-failure-detail[data-v-2834e9d3]{color:var(--pse-ink-soft);overflow-wrap:anywhere;margin-top:4px;font-size:13px;line-height:1.5;display:block}.pse-done-actions[data-v-2834e9d3]{gap:10px;width:100%;margin-top:22px;display:flex}.pse-done-actions .pse-done-button[data-v-2834e9d3]{margin-top:0}.pse-done-button.is-quiet[data-v-2834e9d3]{border:1px solid var(--pse-line);color:var(--pse-ink-soft);background-color:#fff}.pse-done-button.is-quiet[data-v-2834e9d3]:hover{border-color:var(--pse-ink-faint);background-color:var(--pse-well);color:var(--pse-ink);box-shadow:none}.pse-done-mark.is-working[data-v-2834e9d3]{background-color:var(--pse-well)}.pse-done-spinner[data-v-2834e9d3]{border:3px solid var(--pse-brand-ring);border-top-color:var(--pse-brand);border-radius:50%;width:26px;height:26px;animation:.7s linear infinite pse-done-spin-2834e9d3}@keyframes pse-done-spin-2834e9d3{to{transform:rotate(360deg)}}.pse-done-title[data-v-2834e9d3]{color:var(--pse-ink);margin:0;font-size:20px;font-weight:700;line-height:1.25}.pse-done-number[data-v-2834e9d3]{font-variant-numeric:tabular-nums;letter-spacing:.01em;color:var(--pse-brand-ink);justify-content:center;margin:8px 0 0;font-size:26px;font-weight:700;line-height:1.1}.pse-done-text[data-v-2834e9d3]{max-width:34ch;color:var(--pse-ink-soft);margin:12px 0 0;font-size:13.5px;line-height:1.5}.pse-done-flyer[data-v-2834e9d3]{background-color:var(--pse-attention-soft);text-align:center;color:var(--pse-attention-ink);border-radius:12px;margin:16px 0 0;padding:11px 14px;font-size:14.5px;font-weight:650;line-height:1.4}.pse-done-button[data-v-2834e9d3]{background-color:var(--pse-brand-ink);width:100%;height:48px;font:inherit;color:#fff;cursor:pointer;border:0;border-radius:12px;margin-top:22px;padding:0 18px;font-size:14.5px;font-weight:650;transition:background-color .15s,box-shadow .15s,transform .15s}.pse-done-button[data-v-2834e9d3]:hover{background-color:var(--pse-brand-ink-strong);transform:translateY(-1px);box-shadow:0 10px 22px -14px #143021cc}.pse-done-button[data-v-2834e9d3]:active{box-shadow:none;transform:translateY(0)}.pse-done-button[data-v-2834e9d3]:focus{outline:none}.pse-done-button[data-v-2834e9d3]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}@media (prefers-reduced-motion:reduce){.pse-done-spinner[data-v-2834e9d3]{animation-duration:1.6s}}@media (width<=1200px){.pse-done-layout[data-v-2834e9d3]{flex-direction:column;align-items:center}.pse-done-layout>.pse-done-card[data-v-2834e9d3]{flex:none;order:-1;width:100%}.pse-done-side[data-v-2834e9d3],.pse-done-parcels-column[data-v-2834e9d3]{flex:none;width:100%;max-width:560px}}@media (width<=860px){.pse-done[data-v-2834e9d3]{padding:32px 16px}.pse-done-actions[data-v-2834e9d3]{flex-direction:column}.pse-done-card[data-v-2834e9d3]{padding:28px 22px 24px}}.pse-products[data-v-77facacc]{box-sizing:border-box;color:var(--pse-ink);text-align:left;margin-bottom:26px}.pse-products[data-v-77facacc] *{box-sizing:border-box}.pse-products-note[data-v-77facacc]{color:var(--pse-ink-faint);flex:none;font-size:12px}.pse-cell-quantity[data-v-77facacc]{font-variant-numeric:tabular-nums;white-space:nowrap;font-weight:600}.pse-back-row[data-v-29aa4ab2]{text-align:left;justify-content:flex-end;margin-bottom:10px;display:flex}.pse-reprint[data-v-7ce2449e]{border:1px solid var(--pse-line);font:inherit;color:var(--pse-ink);cursor:pointer;background-color:#fff;border-radius:9px;align-items:center;gap:6px;padding:5px 11px;font-size:12.5px;font-weight:600;line-height:1.2;transition:background-color .15s,border-color .15s;display:inline-flex}.pse-reprint[data-v-7ce2449e]:hover:not(:disabled){border-color:var(--pse-brand);background-color:var(--pse-well)}.pse-reprint[data-v-7ce2449e]:disabled{opacity:.55;cursor:default}.pse-reprint[data-v-7ce2449e]:focus{outline:none}.pse-reprint[data-v-7ce2449e]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-reprint-icon[data-v-7ce2449e]{color:var(--pse-brand-ink);font-size:16px}.pse-reprint-spinner[data-v-7ce2449e]{border:2px solid var(--pse-line);border-top-color:var(--pse-brand);border-radius:50%;flex:none;width:12px;height:12px;animation:.7s linear infinite pse-reprint-spin-7ce2449e}@keyframes pse-reprint-spin-7ce2449e{to{transform:rotate(360deg)}}.pse-header[data-v-895c5c8c]{box-sizing:border-box;text-align:left;border-bottom:1px solid var(--pse-line);background-color:#fff;width:100%}@media (display-mode:window-controls-overlay){.pse-header[data-v-895c5c8c]{-webkit-app-region:drag;app-region:drag}.pse-header-inner[data-v-895c5c8c]{min-height:env(titlebar-area-height,0px);padding-top:4px;padding-bottom:4px}.pse-header-logo[data-v-895c5c8c]{height:24px}.pse-header-link[data-v-895c5c8c],.pse-header-logo[data-v-895c5c8c]{-webkit-app-region:no-drag;app-region:no-drag}}.pse-header-inner[data-v-895c5c8c]{box-sizing:border-box;align-items:center;max-width:980px;margin:0 auto;padding:16px 24px;display:flex}.pse-header-link[data-v-895c5c8c]{border-radius:10px;margin:-6px -8px;padding:6px 8px;display:inline-flex}.pse-header-link[data-v-895c5c8c]:focus{outline:none}.pse-header-link[data-v-895c5c8c]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-header-logo[data-v-895c5c8c]{width:auto;height:34px;display:block}@media (width<=860px){.pse-header-inner[data-v-895c5c8c]{padding:14px 16px}.pse-header-logo[data-v-895c5c8c]{height:28px}}.pse-settings-update[data-v-3e8af50e],.pse-settings-update[data-v-3e8af50e]:hover,.pse-settings-update[data-v-3e8af50e]:focus,.pse-settings-update[data-v-3e8af50e]:active,.pse-settings-update[data-v-3e8af50e]:visited{color:#fff;align-items:center;gap:8px;margin-bottom:9px;text-decoration:none;display:inline-flex}.pse-settings-update-icon[data-v-3e8af50e]{font-size:18px}.pse-settings-update-status[data-v-3e8af50e]{color:var(--pse-ink);margin-top:7px;font-weight:600;display:block}.pse-settings-switch[data-v-3e8af50e]{border:1px solid var(--pse-line);background-color:var(--pse-well);cursor:pointer;border-radius:13px;align-items:flex-start;gap:11px;padding:13px 14px;display:flex;margin:0 0 34px!important}.pse-settings-checkbox[data-v-3e8af50e]{width:17px;height:17px;accent-color:var(--pse-brand-ink);cursor:pointer;flex:none;margin:1px 0 0}.pse-settings-switch-text[data-v-3e8af50e]{min-width:0}.pse-settings-switch-title[data-v-3e8af50e]{color:var(--pse-ink);font-size:14px;font-weight:650;line-height:1.3;display:block}.pse-settings-sound[data-v-3e8af50e]{align-items:stretch;gap:8px;margin-bottom:8px;display:flex}.pse-settings-sound[data-v-3e8af50e]:last-child{margin-bottom:0}.pse-settings-switch-compact[data-v-3e8af50e]{flex:auto;min-width:0;margin:0!important}.pse-settings-listen[data-v-3e8af50e]{border-radius:13px;flex:none;align-items:center;gap:6px;min-width:0;height:auto;padding:0 14px;display:inline-flex}.pse-settings-listen-icon[data-v-3e8af50e]{font-size:18px}.pse-settings-field[data-v-3e8af50e]{margin-bottom:16px}.pse-settings-field[data-v-3e8af50e]:last-child{margin-bottom:0}.pse-settings-group[data-v-3e8af50e]{border-top:1px solid var(--pse-line);margin-top:20px;padding-top:18px}.pse-settings-group-title[data-v-3e8af50e]{color:var(--pse-ink);margin:0 0 14px;font-size:13px;font-weight:650}.pse-settings-masked[data-v-3e8af50e]{-webkit-text-security:disc;text-security:disc}.pse-credentials-intro[data-v-a3fdb084]{align-items:flex-start;gap:13px;margin-bottom:20px;display:flex}.pse-credentials-logo[data-v-a3fdb084]{flex:none;margin-top:1px}.pse-credentials-subtitle[data-v-a3fdb084]{color:var(--pse-ink-soft);margin:0;font-size:13.5px;line-height:1.45}.pse-credentials-field[data-v-a3fdb084]{margin-bottom:16px}.pse-credentials-error[data-v-a3fdb084]{color:#a3372c;background-color:#b03a2e0f;border:1px solid #b03a2e47;border-radius:12px;margin:0 0 14px;padding:11px 13px;font-size:13px;line-height:1.45}.pse-credentials-error-enter-active[data-v-a3fdb084],.pse-credentials-error-leave-active[data-v-a3fdb084]{transition:opacity .15s}.pse-credentials-error-enter-from[data-v-a3fdb084],.pse-credentials-error-leave-to[data-v-a3fdb084]{opacity:0}.pse-credentials-footnote[data-v-a3fdb084]{color:var(--pse-ink-faint);margin:0;font-size:12.5px;line-height:1.4}.pse-credentials-masked[data-v-a3fdb084]{-webkit-text-security:disc;text-security:disc}.pse-credentials-spinner[data-v-a3fdb084]{border:2px solid #fff6;border-top-color:#fff;border-radius:50%;flex:none;width:14px;height:14px;animation:.7s linear infinite pse-credentials-spin-a3fdb084}@keyframes pse-credentials-spin-a3fdb084{to{transform:rotate(360deg)}}.pse-erp-subtitle[data-v-ebdfaa5a]{color:var(--pse-ink-soft);margin:0 0 20px;font-size:13.5px;line-height:1.45}.pse-erp-field[data-v-ebdfaa5a]{margin-bottom:16px}.pse-erp-error[data-v-ebdfaa5a]{color:#a3372c;background-color:#b03a2e0f;border:1px solid #b03a2e47;border-radius:12px;margin:0 0 14px;padding:11px 13px;font-size:13px;line-height:1.45}.pse-erp-error-enter-active[data-v-ebdfaa5a],.pse-erp-error-leave-active[data-v-ebdfaa5a]{transition:opacity .15s}.pse-erp-error-enter-from[data-v-ebdfaa5a],.pse-erp-error-leave-to[data-v-ebdfaa5a]{opacity:0}.pse-erp-spinner[data-v-ebdfaa5a]{border:2px solid #fff6;border-top-color:#fff;border-radius:50%;flex:none;width:14px;height:14px;animation:.7s linear infinite pse-erp-spin-ebdfaa5a}@keyframes pse-erp-spin-ebdfaa5a{to{transform:rotate(360deg)}}.pse-sheet[data-v-7a94320f]{background-color:#1a5c32;flex-direction:column;min-height:0;display:flex;position:relative}.pse-sheet-leaves[data-v-7a94320f]{pointer-events:none;position:absolute;inset:0;overflow:hidden}.pse-sheet-leaf[data-v-7a94320f]{height:auto;display:block;position:absolute}.pse-sheet-leaf.is-frond[data-v-7a94320f]{width:50%}.pse-sheet-leaf.is-fan[data-v-7a94320f]{width:60%}.pse-sheet-leaf.is-frond.is-top[data-v-7a94320f]{top:-12px;left:-22px}.pse-sheet-leaf.is-fan.is-top[data-v-7a94320f]{top:0;right:0;transform:rotate(180deg)}.pse-sheet-leaf.is-fan.is-bottom[data-v-7a94320f]{bottom:0;left:0}.pse-sheet-leaf.is-frond.is-bottom[data-v-7a94320f]{bottom:-12px;right:-22px;transform:rotate(180deg)}.pse-sheet-scroll[data-v-7a94320f]{flex:1;min-height:0;padding:38px 36px;position:relative;overflow-y:auto}.pse-sheet-card[data-v-7a94320f]{text-align:left;color:#26402d;background-color:#ffffffdb;border-radius:22px;padding:34px 32px 24px;position:relative}.pse-sheet-close[data-v-7a94320f]{color:#5b7262;cursor:pointer;background-color:#0000;border:0;border-radius:9px;justify-content:center;align-items:center;width:32px;height:32px;padding:0;transition:background-color .15s,color .15s;display:flex;position:absolute;top:12px;right:12px}.pse-sheet-close[data-v-7a94320f]:hover{color:#26402d;background-color:#1a5c321a}.pse-sheet-close[data-v-7a94320f]:focus{outline:none}.pse-sheet-close[data-v-7a94320f]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-sheet-title[data-v-7a94320f]{letter-spacing:.01em;text-align:center;color:#2f5a36;background-color:#edf6ee;width:fit-content;max-width:100%;margin:0 auto 28px;padding:13px 34px;font-size:25px;font-weight:700;line-height:1.2;box-shadow:4px 4px #2f4a36}.pse-instructions[data-v-7a94320f]{flex-direction:column;gap:17px;margin:0;padding:0;list-style:none;display:flex}.pse-instruction[data-v-7a94320f]{align-items:flex-start;gap:14px;display:flex}.pse-instruction-mark[data-v-7a94320f]{background-color:var(--pse-brand);color:#fff;border-radius:4px;flex:none;justify-content:center;align-items:center;width:34px;height:34px;display:flex}.pse-instruction-text[data-v-7a94320f]{margin:0;padding-top:6px;font-size:14.5px;line-height:1.5}.pse-instruction-title[data-v-7a94320f]{font-weight:700;display:block}.pse-sheet-foot[data-v-7a94320f]{border-top:1px solid #1a5c3229;justify-content:space-between;align-items:center;gap:16px;margin-top:28px;padding-top:20px;display:flex}.pse-sheet-logo[data-v-7a94320f]{width:auto;height:34px;display:block}@media (width<=640px){.pse-sheet-scroll[data-v-7a94320f]{padding:20px 16px}.pse-sheet-card[data-v-7a94320f]{padding:30px 20px 20px}.pse-sheet-title[data-v-7a94320f]{padding:11px 22px;font-size:21px}.pse-sheet-logo[data-v-7a94320f]{height:28px}}.pse-bar[data-v-13beeac1]{--pse-on:#a8dcab;--pse-off:#f5bd74;--pse-ink:#ffffffb8;--pse-ink-strong:#fff;--pse-ink-soft:#ffffff73;--pse-well:#ffffff14;background-color:var(--pse-well);color:var(--pse-ink);white-space:nowrap;vertical-align:middle;border-radius:999px;align-items:center;gap:2px;margin-top:-5px;margin-bottom:-5px;padding:2px;font-family:inherit;font-size:12.5px;line-height:1;display:inline-flex}.pse-bar.is-minimal[data-v-13beeac1]{background-color:#0000;margin:0;padding:0}.pse-bar[data-v-13beeac1],.pse-bar[data-v-13beeac1] *{box-sizing:border-box;line-height:1}.pse-pill[data-v-13beeac1]{font:inherit;color:inherit;cursor:pointer;background-color:#0000;border:0;border-radius:999px;align-items:center;gap:7px;margin:0;padding:5px 11px;font-weight:600;transition:background-color .15s,color .15s;display:inline-flex}.pse-toggle-label[data-v-13beeac1]{text-align:left;min-width:74px;display:inline-block}.pse-pill[data-v-13beeac1]:focus,.pse-pill[data-v-13beeac1]:active{box-shadow:none;outline:none}.pse-pill[data-v-13beeac1]:focus-visible{outline-offset:2px;outline:2px solid}.pse-icon[data-v-13beeac1]{flex:none;width:15px;height:15px}.pse-toggle.is-on[data-v-13beeac1]{color:var(--pse-on);background-color:#a8dcab29}.pse-toggle.is-on[data-v-13beeac1]:hover{background-color:#a8dcab47}.pse-toggle.is-on .pse-icon[data-v-13beeac1]{filter:brightness(0)invert(88%)sepia(19%)saturate(505%)hue-rotate(72deg)brightness(97%)contrast(90%)}.pse-toggle.is-off[data-v-13beeac1]{color:var(--pse-off);background-color:#f5bd7429}.pse-toggle.is-off[data-v-13beeac1]:hover{background-color:#f5bd7447}.pse-toggle.is-off .pse-icon[data-v-13beeac1]{filter:brightness(0)invert(84%)sepia(29%)saturate(958%)hue-rotate(324deg)brightness(101%)contrast(92%)}.pse-install[data-v-13beeac1]{color:var(--pse-ink-strong);background-color:#ffffff24}.pse-install[data-v-13beeac1]:hover{background-color:#ffffff3d}.pse-install .pse-icon[data-v-13beeac1]{filter:brightness(0)invert()}.pse-help[data-v-13beeac1],.pse-settings[data-v-13beeac1]{color:var(--pse-ink)}.pse-help[data-v-13beeac1]:hover,.pse-settings[data-v-13beeac1]:hover{color:var(--pse-ink-strong);background-color:#ffffff24}.pse-help .pse-icon[data-v-13beeac1],.pse-settings .pse-icon[data-v-13beeac1]{filter:brightness(0)invert();opacity:.72;transition:transform .3s,opacity .15s}.pse-help:hover .pse-icon[data-v-13beeac1],.pse-settings:hover .pse-icon[data-v-13beeac1]{opacity:1}.pse-settings:hover .pse-icon[data-v-13beeac1]{transform:rotate(60deg)}.pse-divider[data-v-13beeac1]{opacity:.18;background-color:currentColor;width:1px;height:15px;margin:0 4px}.pse-user[data-v-13beeac1]{align-items:center;gap:6px;padding:0 6px;display:inline-flex}.pse-user-name[data-v-13beeac1]{color:var(--pse-ink-strong);font-weight:600}.pse-dot[data-v-13beeac1]{background-color:var(--pse-on);border-radius:50%;flex:none;width:6px;height:6px;animation:2.6s ease-out infinite pse-dot-pulse-13beeac1}@keyframes pse-dot-pulse-13beeac1{0%{box-shadow:0 0 #a8dcab80}70%{box-shadow:0 0 0 7px #a8dcab00}to{box-shadow:0 0 #a8dcab00}}@media (prefers-reduced-motion:reduce){.pse-dot[data-v-13beeac1]{animation:none;box-shadow:0 0 0 3px #a8dcab33}}.pse-version[data-v-13beeac1]{color:var(--pse-ink-soft);letter-spacing:.04em;text-transform:uppercase;align-items:baseline;gap:5px;padding:0 6px;font-size:10.5px;display:inline-flex}.pse-bar.is-minimal .pse-version[data-v-13beeac1]{padding-left:0}.pse-version-number[data-v-13beeac1]{font-variant-numeric:tabular-nums;letter-spacing:.02em}.pse-update[data-v-13beeac1]{letter-spacing:.04em;color:var(--pse-off);white-space:nowrap;background-color:#f5bd742e;border-radius:999px;align-self:center;align-items:center;gap:5px;padding:2px 8px;font-size:10px;font-weight:700;text-decoration:none;transition:background-color .15s,color .15s;display:inline-flex}.pse-update[data-v-13beeac1]:hover{color:#ffe1bb;background-color:#f5bd744d}.pse-update[data-v-13beeac1]:focus{outline:none}.pse-update[data-v-13beeac1]:focus-visible{outline:none;box-shadow:0 0 0 2px #f5bd7499}.pse-update-dot[data-v-13beeac1]{background-color:currentColor;border-radius:50%;flex:none;width:5px;height:5px}@media (width<=991px){.pse-bar:not(.is-minimal) .pse-brand[data-v-13beeac1]{display:none}}@media (width<=767px){.pse-help-label[data-v-13beeac1],.pse-settings-label[data-v-13beeac1]{display:none}.pse-install-label[data-v-13beeac1]{font-size:0}.pse-install-label[data-v-13beeac1]:after{content:\"App\";font-size:12.5px}}.pse-login[data-v-9fa45462]{box-sizing:border-box;min-height:calc(100vh - 200px);color:var(--pse-ink);text-align:left;justify-content:center;align-items:center;padding:48px 24px;display:flex}.pse-login[data-v-9fa45462] *{box-sizing:border-box}.pse-login-card[data-v-9fa45462]{border:1px solid var(--pse-line);background-color:#fff;border-radius:20px;width:100%;max-width:420px;padding:30px 34px;box-shadow:0 1px 2px #1430210a,0 18px 40px -28px #14302173}.pse-login-errors[data-v-9fa45462]:not(:has(.validation-summary-errors)){display:none}.pse-login-errors[data-v-9fa45462] ul{color:#a3372c;background-color:#b03a2e0f;border:1px solid #b03a2e47;border-radius:12px;margin:0;padding:12px 14px;font-size:13px;line-height:1.45;list-style:none}.pse-login[data-v-9fa45462] input[type=number]{appearance:textfield}.pse-login[data-v-9fa45462] input[type=number]::-webkit-outer-spin-button{appearance:none;margin:0}.pse-login[data-v-9fa45462] input[type=number]::-webkit-inner-spin-button{appearance:none;margin:0}.pse-submit[data-v-9fa45462]{background-color:var(--pse-brand-ink);width:100%;height:48px;font:inherit;color:#fff;cursor:pointer;border:0;border-radius:12px;justify-content:center;align-items:center;margin:4px 0 0;padding:0 18px;font-size:14.5px;font-weight:650;transition:background-color .15s,box-shadow .15s,transform .15s;display:flex}.pse-submit[data-v-9fa45462]:hover{background-color:var(--pse-brand-ink-strong);transform:translateY(-1px);box-shadow:0 10px 22px -14px #143021cc}.pse-submit[data-v-9fa45462]:active{box-shadow:none;transform:translateY(0)}.pse-submit[data-v-9fa45462]:focus{outline:none}.pse-submit[data-v-9fa45462]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}@media (width<=860px){.pse-login[data-v-9fa45462]{padding:32px 16px}.pse-login-card[data-v-9fa45462]{padding:26px 22px}}.pse-cvp-status[data-v-c2a17cf7]{--tone:var(--pse-ink-faint);--tone-wash:var(--pse-well);border:1px solid var(--pse-line);text-align:left;background-color:#fff;border-radius:18px;padding:18px 20px}.pse-cvp-status.is-ok[data-v-c2a17cf7]{--tone:var(--pse-brand);--tone-wash:var(--pse-brand-soft)}.pse-cvp-status.is-wait[data-v-c2a17cf7]{--tone:#d99a2b;--tone-wash:var(--pse-attention-soft)}.pse-cvp-status.is-bad[data-v-c2a17cf7]{--tone:var(--pse-alert);--tone-wash:var(--pse-alert-soft)}.pse-cvp-status-head[data-v-c2a17cf7]{background-color:var(--tone-wash);border-radius:13px;align-items:center;gap:12px;padding:12px 14px;display:flex}.pse-cvp-status-dot[data-v-c2a17cf7]{background-color:var(--tone);border-radius:50%;flex:none;width:14px;height:14px;box-shadow:0 0 0 4px #fff}.pse-cvp-status-titles[data-v-c2a17cf7]{flex-direction:column;min-width:0;display:flex}.pse-cvp-status-kicker[data-v-c2a17cf7]{letter-spacing:.07em;text-transform:uppercase;color:var(--pse-ink-soft);font-size:11px;font-weight:650}.pse-cvp-status-machine[data-v-c2a17cf7]{color:var(--pse-ink);font-size:19px;font-weight:700;line-height:1.25}.pse-cvp-status-note[data-v-c2a17cf7]{color:var(--pse-alert-ink);margin:12px 0 0;font-size:13px;line-height:1.45}.pse-cvp-status-rows[data-v-c2a17cf7]{grid-template-columns:auto 1fr;gap:9px 14px;margin:16px 0 0;font-size:13.5px;display:grid}.pse-cvp-status-rows dt[data-v-c2a17cf7]{color:var(--pse-ink-soft);font-weight:500}.pse-cvp-status-rows dd[data-v-c2a17cf7]{text-align:right;color:var(--pse-ink);margin:0;font-weight:600}.pse-cvp-status-rows dd.is-wait[data-v-c2a17cf7]{color:var(--pse-attention-ink)}.pse-cvp-status-rows dd.is-bad[data-v-c2a17cf7]{color:var(--pse-alert-ink)}.pse-cvp-status-foot[data-v-c2a17cf7]{border-top:1px solid var(--pse-line);color:var(--pse-ink-faint);justify-content:space-between;gap:10px;margin-top:16px;padding-top:12px;font-size:11.5px;display:flex}.pse-cvp[data-v-c91be66e]{box-sizing:border-box;width:100%;color:var(--pse-ink);text-align:left;margin:28px auto 56px;padding:0 24px}.pse-cvp[data-v-c91be66e] *{box-sizing:border-box}.pse-cvp-layout[data-v-c91be66e]{grid-template-columns:minmax(0,1fr) 300px;align-items:start;gap:20px;max-width:1180px;margin:0 auto;display:grid}.pse-cvp-main[data-v-c91be66e]{flex-direction:column;gap:16px;min-width:0;display:flex}.pse-cvp-card[data-v-c91be66e]{border:1px solid var(--pse-line);background-color:#fff;border-radius:20px;padding:28px 30px;box-shadow:0 1px 2px #1430210a,0 18px 40px -28px #14302173}.pse-cvp-head[data-v-c91be66e]{align-items:center;gap:14px;margin-bottom:22px;display:flex}.pse-cvp-icon[data-v-c91be66e]{background-color:var(--pse-brand-soft);width:44px;height:44px;color:var(--pse-brand-ink);border-radius:13px;flex:none;justify-content:center;align-items:center;display:flex}.pse-cvp-title[data-v-c91be66e]{color:var(--pse-ink);margin:0;font-size:20px;font-weight:700;line-height:1.25}.pse-cvp-subtitle[data-v-c91be66e]{color:var(--pse-ink-soft);margin:3px 0 0;font-size:13.5px;line-height:1.45}.pse-cvp-field[data-v-c91be66e]{cursor:text;margin:0;display:block}.pse-cvp-field-label[data-v-c91be66e]{letter-spacing:.07em;text-transform:uppercase;color:var(--pse-ink-soft);margin-bottom:8px;font-size:11px;font-weight:650;display:block}.pse-cvp-input[data-v-c91be66e]{border:1px solid var(--pse-line);background-color:var(--pse-well);width:100%;height:64px;font:inherit;letter-spacing:.02em;color:var(--pse-ink);border-radius:14px;margin:0;padding:0 20px;font-size:22px;font-weight:600;transition:border-color .15s,background-color .15s,box-shadow .15s;display:block}.pse-cvp-input[data-v-c91be66e]::placeholder{color:var(--pse-ink-faint);font-weight:500}.pse-cvp-input[data-v-c91be66e]:focus{border-color:var(--pse-brand);box-shadow:0 0 0 4px var(--pse-brand-ring);background-color:#fff;outline:none}.pse-cvp-input[data-v-c91be66e]:disabled{opacity:.55;cursor:not-allowed}.pse-cvp-queue[data-v-c91be66e]{color:var(--pse-attention-ink);margin:12px 0 0;font-size:13px}.pse-cvp-result[data-v-c91be66e]{--tone:var(--pse-ink-faint);--tone-wash:var(--pse-well);--tone-ink:var(--pse-ink);border:1px solid var(--pse-line);border-left:6px solid var(--tone);background-color:#fff;border-radius:18px;padding:22px 26px}.pse-cvp-result.is-busy[data-v-c91be66e]{--tone:#d99a2b;--tone-ink:var(--pse-attention-ink)}.pse-cvp-result.is-ok[data-v-c91be66e]{--tone:var(--pse-brand);--tone-wash:var(--pse-brand-soft);--tone-ink:var(--pse-brand-ink-strong);background-color:var(--pse-brand-soft)}.pse-cvp-result.is-wait[data-v-c91be66e]{--tone:#d99a2b;--tone-ink:var(--pse-attention-ink);background-color:var(--pse-attention-soft)}.pse-cvp-result.is-bad[data-v-c91be66e]{--tone:var(--pse-alert);--tone-ink:var(--pse-alert-ink);background-color:var(--pse-alert-wash)}.pse-cvp-result-head[data-v-c91be66e]{letter-spacing:.04em;text-transform:uppercase;color:var(--pse-ink-soft);justify-content:space-between;gap:12px;font-size:12px;font-weight:600;display:flex}.pse-cvp-result-title[data-v-c91be66e]{color:var(--tone-ink);align-items:center;gap:12px;margin:8px 0 0;font-size:26px;font-weight:700;line-height:1.25;display:flex}.pse-cvp-spinner[data-v-c91be66e]{border:3px solid #d99a2b4d;border-top-color:#d99a2b;border-radius:50%;flex:none;width:22px;height:22px;animation:.7s linear infinite pse-cvp-spin-c91be66e}@keyframes pse-cvp-spin-c91be66e{to{transform:rotate(360deg)}}.pse-cvp-steps[data-v-c91be66e]{gap:6px;margin:18px 0 0;padding:0;list-style:none;display:flex}.pse-cvp-steps li[data-v-c91be66e]{border-top:4px solid var(--pse-line);color:var(--pse-ink-faint);flex:1;padding-top:9px;font-size:12px;font-weight:600}.pse-cvp-steps li.is-done[data-v-c91be66e]{border-top-color:var(--pse-brand);color:var(--pse-brand-ink)}.pse-cvp-steps li.is-active[data-v-c91be66e]{color:var(--pse-attention-ink);border-top-color:#d99a2b}.pse-cvp-facts[data-v-c91be66e]{grid-template-columns:auto 1fr;gap:7px 18px;margin:18px 0 0;font-size:15px;display:grid}.pse-cvp-facts dt[data-v-c91be66e]{color:var(--pse-ink-soft);font-weight:500}.pse-cvp-facts dd[data-v-c91be66e]{color:var(--pse-ink);overflow-wrap:anywhere;margin:0;font-weight:600}.pse-cvp-mono[data-v-c91be66e]{font-variant-numeric:tabular-nums;letter-spacing:.03em}.pse-cvp-label[data-v-c91be66e]{color:var(--pse-attention-ink);background-color:#fff;border-radius:12px;align-items:center;gap:10px;margin:18px 0 0;padding:11px 14px;font-size:15px;font-weight:650;display:flex}.pse-cvp-label.is-ok[data-v-c91be66e]{color:var(--pse-brand-ink-strong)}.pse-cvp-label.is-bad[data-v-c91be66e]{color:var(--pse-alert-ink)}.pse-cvp-label-dot[data-v-c91be66e]{background-color:currentColor;border-radius:50%;flex:none;width:10px;height:10px}.pse-cvp-detail[data-v-c91be66e]{color:var(--tone-ink);margin:14px 0 0;font-size:15px;font-weight:600}.pse-cvp-held[data-v-c91be66e]{border:1px solid var(--pse-line);background-color:#fff;border-radius:14px;margin-top:18px;padding:16px 18px}.pse-cvp-held-title[data-v-c91be66e]{letter-spacing:.04em;text-transform:uppercase;color:var(--pse-ink-soft);margin:0 0 10px;font-size:13px;font-weight:650}.pse-cvp-held-note[data-v-c91be66e]{color:var(--pse-ink-soft);margin:0;font-size:14px}.pse-cvp-held-list[data-v-c91be66e]{margin:0;padding:0;list-style:none}.pse-cvp-held-list li[data-v-c91be66e]{flex-wrap:wrap;justify-content:space-between;align-items:center;gap:10px;padding:10px 0;display:flex}.pse-cvp-held-list li+li[data-v-c91be66e]{border-top:1px solid var(--pse-line)}.pse-cvp-held-text[data-v-c91be66e]{min-width:0;color:var(--pse-ink);flex-direction:column;gap:2px;font-size:14px;display:flex}.pse-cvp-held-age[data-v-c91be66e]{color:var(--pse-ink-faint);font-size:12.5px}.pse-cvp-held-buttons[data-v-c91be66e]{gap:8px;display:flex}.pse-cvp-held-result[data-v-c91be66e]{margin:12px 0 0;font-size:14px;font-weight:600}.pse-cvp-held-result.is-ok[data-v-c91be66e]{color:var(--pse-brand-ink-strong)}.pse-cvp-held-result.is-bad[data-v-c91be66e]{color:var(--pse-alert-ink)}.pse-cvp-actions[data-v-c91be66e]{flex-wrap:wrap;gap:10px;margin-top:18px;display:flex}.pse-cvp-button[data-v-c91be66e]{background-color:var(--pse-brand-ink);height:44px;font:inherit;color:#fff;cursor:pointer;border:0;border-radius:12px;padding:0 18px;font-size:14px;font-weight:650}.pse-cvp-button[data-v-c91be66e]:hover:not(:disabled){background-color:var(--pse-brand-ink-strong)}.pse-cvp-button[data-v-c91be66e]:disabled{cursor:not-allowed;background-color:#cfdbd4}.pse-cvp-button.is-quiet[data-v-c91be66e]{border:1px solid var(--pse-line);color:var(--pse-ink);background-color:#fff}.pse-cvp-button.is-quiet[data-v-c91be66e]:hover{background-color:var(--pse-well)}.pse-cvp-button[data-v-c91be66e]:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-cvp-empty[data-v-c91be66e]{border:1px dashed var(--pse-line);color:var(--pse-ink-faint);border-radius:18px;padding:22px 26px;font-size:14px}.pse-cvp-history[data-v-c91be66e]{border:1px solid var(--pse-line);background-color:#fff;border-radius:16px;margin:0;padding:6px 0;list-style:none}.pse-cvp-history li[data-v-c91be66e]{--tone:var(--pse-ink-faint);grid-template-columns:auto auto minmax(0,1fr) auto;align-items:center;gap:12px;padding:9px 18px;font-size:13.5px;display:grid}.pse-cvp-history li+li[data-v-c91be66e]{border-top:1px solid var(--pse-line)}.pse-cvp-history li.is-ok[data-v-c91be66e]{--tone:var(--pse-brand)}.pse-cvp-history li.is-wait[data-v-c91be66e],.pse-cvp-history li.is-busy[data-v-c91be66e]{--tone:#d99a2b}.pse-cvp-history li.is-bad[data-v-c91be66e]{--tone:var(--pse-alert)}.pse-cvp-history-dot[data-v-c91be66e]{background-color:var(--tone);border-radius:50%;width:9px;height:9px}.pse-cvp-history-code[data-v-c91be66e]{font-variant-numeric:tabular-nums;color:var(--pse-ink);font-weight:650}.pse-cvp-history-text[data-v-c91be66e]{white-space:nowrap;text-overflow:ellipsis;color:var(--pse-ink-soft);overflow:hidden}.pse-cvp-history-time[data-v-c91be66e]{font-variant-numeric:tabular-nums;color:var(--pse-ink-faint)}.pse-cvp-count-units[data-v-c91be66e]{color:var(--pse-ink);align-items:baseline;gap:12px;margin:0;font-size:18px;font-weight:600;line-height:1.3;display:flex}.pse-cvp-count-units strong[data-v-c91be66e]{font-variant-numeric:tabular-nums;color:var(--pse-brand-ink);flex:none;font-size:44px;font-weight:750;line-height:1}.pse-cvp-count-order[data-v-c91be66e]{color:var(--pse-ink-soft);margin:6px 0 0;font-size:13.5px}.pse-cvp-count-lead[data-v-c91be66e]{color:var(--pse-ink);margin:16px 0 0;font-size:14.5px;line-height:1.45}.pse-cvp-count-scanned[data-v-c91be66e]{color:var(--pse-ink-soft);margin:10px 0 0;font-size:14px}.pse-cvp-count-scanned strong[data-v-c91be66e]{font-variant-numeric:tabular-nums;color:var(--pse-ink)}.pse-cvp-count-input[data-v-c91be66e]{height:52px;margin-top:12px;font-size:20px;font-weight:600}.pse-cvp-count-problem[data-v-c91be66e]{background-color:var(--pse-attention-soft);color:var(--pse-attention-ink);border-radius:10px;margin:10px 0 0;padding:10px 12px;font-size:13.5px;font-weight:600}@media (width<=960px){.pse-cvp[data-v-c91be66e]{padding:0 16px}.pse-cvp-layout[data-v-c91be66e]{grid-template-columns:minmax(0,1fr)}.pse-cvp-side[data-v-c91be66e]{order:-1}}.pse-idle-lead[data-v-86dcdcbd]{color:var(--pse-ink);margin:0 0 8px;font-size:14px;line-height:1.5}.pse-idle-count[data-v-86dcdcbd]{font-variant-numeric:tabular-nums;color:var(--pse-attention-ink)}.pse-idle-hint[data-v-86dcdcbd]{color:var(--pse-ink-soft);margin:0;font-size:13px;line-height:1.45}\n/*$vite$:1*/ ");
 	function makeMap(str) {
 		const map = Object.create(null);
 		for (const key of str.split(",")) map[key] = 1;
@@ -5266,6 +5269,7 @@
 	var _GM_listValues = typeof GM_listValues != "undefined" ? GM_listValues : void 0;
 	var _GM_setValue = typeof GM_setValue != "undefined" ? GM_setValue : void 0;
 	var _GM_xmlhttpRequest = typeof GM_xmlhttpRequest != "undefined" ? GM_xmlhttpRequest : void 0;
+	var _unsafeWindow = typeof unsafeWindow != "undefined" ? unsafeWindow : void 0;
 	var ReservationSearchResponseType = function(ReservationSearchResponseType) {
 		ReservationSearchResponseType[ReservationSearchResponseType["ContinueVerification"] = 1] = "ContinueVerification";
 		ReservationSearchResponseType[ReservationSearchResponseType["RefreshMain"] = 2] = "RefreshMain";
@@ -5310,6 +5314,7 @@
 	var ERP_REPORT_OK_SELECTOR = "[id$=\"cmdOk\"]";
 	var ERP_REPORT_CONTENT_FRAME_SELECTOR = "[id$=\"ReportViewer1_ContentFrame\"]";
 	var ERP_ENVIRONMENT_PAGE_ID = 1993;
+	var ERP_ENVIRONMENT_PARCEL_PRINTER_SELECTOR = "[id$=\"rvcParcelServicePrinterId_Textbox\"]";
 	var ENVIRONMENT_FORM_SELECTOR = "form#selectEnviroment";
 	var ENVIRONMENT_SELECT_SELECTOR = "select#EnviromentId";
 	var LANGUAGE_FORM_SELECTOR = "form#selectLanguage";
@@ -5331,10 +5336,12 @@
 	var MAIN_CONTENT_SELECTOR = "div.col-12.mainContent";
 	var COMPLETED_CONTAINER_SELECTOR = "#ReservationContainer";
 	var PARCELS_RETURN_HASH = "#pse-return";
+	var PARCELS_ANNOUNCE_BUTTON_SELECTOR = "div > div:nth-child(4) > div > button";
 	var COMPLETED_STEP_SELECTOR = "#ReservationContainer li.list-group-item";
 	var COMPLETED_PARCEL_SELECTOR = "#ReservationContainer .parcels .card, #ReservationContainer .container .card";
 	var COMPLETED_PARCEL_TITLE_SELECTOR = ".card-title";
 	var COMPLETED_PARCEL_FIELD_SELECTOR = ".card-text div:not(:has(div))";
+	var COMPLETED_STEP_ERROR_SELECTOR = ".material-icons.text-error";
 	var COMPLETED_STEP_DETAIL_SELECTOR = ".pl-2";
 	var VENDOR_BAND_LOGO_SELECTOR = "img.nfLogoSmall";
 	var SETTINGS_SAVED_EVENT = "pse:settings-saved";
@@ -5355,13 +5362,25 @@
 		erpKeepAlive: "PSE_Erp_KeepAlive",
 		swClientId: "PSE_Shopware_Client_Id",
 		swClientSecret: "PSE_Shopware_Client_Secret",
-		massCompleteEntryPrefix: "PSE_MCEntry_"
+		massCompleteEntryPrefix: "PSE_MCEntry_",
+		binParcelsPrefix: "PSE_Bins_"
 	};
 	function completedEntryKey(reservationNumber) {
 		return `${STORAGE_KEYS.completedEntryPrefix}${reservationNumber}`;
 	}
 	function massCompleteEntryKey(reservationNumber) {
 		return `${STORAGE_KEYS.massCompleteEntryPrefix}${reservationNumber}`;
+	}
+	function binParcelsKey(reservationId) {
+		return `${STORAGE_KEYS.binParcelsPrefix}${reservationId}`;
+	}
+	var BIN_CODE_PATTERN = /^BK\d{4}$/;
+	function binLabel(code) {
+		const number = Number(code.replace(/^BK/i, ""));
+		return Number.isFinite(number) ? `Bak ${number}` : code;
+	}
+	function withBinLabels(text) {
+		return text.replace(/\bBK\d{4}\b/g, (code) => binLabel(code));
 	}
 	var enabled$1 = _GM_getValue("PSE_Debug", false);
 	function debug(...args) {
@@ -5584,8 +5603,8 @@
 	function getCurrentReservationId() {
 		return getReservationId(document.body);
 	}
-	function getCurrentCustomerName() {
-		const block = document.querySelector(RESERVATION_SUMMARY_SELECTOR);
+	function getCurrentCustomerName(root = document) {
+		const block = root.querySelector(RESERVATION_SUMMARY_SELECTOR);
 		for (const row of Array.from(block?.children ?? [])) {
 			const text = row.textContent?.replace(/\s+/g, " ").trim() ?? "";
 			const separator = text.indexOf(":");
@@ -5594,8 +5613,8 @@
 		}
 		return "";
 	}
-	function getCurrentTransport() {
-		return readTransport(document);
+	function getCurrentTransport(root = document) {
+		return readTransport(root);
 	}
 	async function fetchReservationTransport(url) {
 		try {
@@ -6024,20 +6043,20 @@
 		if (!entry || entry.kind == "pending") return;
 		timers.set(id, setTimeout(() => dismissToast(id), LIFETIME_MS[entry.kind]));
 	}
-	var _hoisted_1$35 = [
+	var _hoisted_1$38 = [
 		"role",
 		"onMouseenter",
 		"onMouseleave"
 	];
-	var _hoisted_2$34 = {
+	var _hoisted_2$37 = {
 		class: "pse-toast-mark",
 		"aria-hidden": "true"
 	};
-	var _hoisted_3$29 = {
+	var _hoisted_3$32 = {
 		key: 0,
 		class: "pse-toast-spinner"
 	};
-	var _hoisted_4$25 = {
+	var _hoisted_4$28 = {
 		key: 1,
 		viewBox: "0 0 24 24",
 		width: "16",
@@ -6048,20 +6067,20 @@
 		"stroke-linecap": "round",
 		"stroke-linejoin": "round"
 	};
-	var _hoisted_5$25 = {
+	var _hoisted_5$28 = {
 		key: 0,
 		d: "M5 12.5l4.5 4.5L19 7.5"
 	};
-	var _hoisted_6$21 = {
+	var _hoisted_6$24 = {
 		key: 1,
 		d: "M12 6.5v7M12 17.4v.1"
 	};
-	var _hoisted_7$18 = {
+	var _hoisted_7$20 = {
 		key: 2,
 		d: "M12 11v6.5M12 6.6v.1"
 	};
-	var _hoisted_8$17 = { class: "pse-toast-text" };
-	var _hoisted_9$16 = ["onClick"];
+	var _hoisted_8$18 = { class: "pse-toast-text" };
+	var _hoisted_9$17 = ["onClick"];
 	var ToastStack_vue_vue_type_script_setup_true_lang_default = defineComponent({
 		__name: "ToastStack",
 		setup(__props) {
@@ -6080,8 +6099,8 @@
 							onMouseenter: ($event) => unref(pauseToast)(entry.id),
 							onMouseleave: ($event) => unref(resumeToast)(entry.id)
 						}, [
-							createBaseVNode("span", _hoisted_2$34, [entry.kind == "pending" ? (openBlock(), createElementBlock("span", _hoisted_3$29)) : (openBlock(), createElementBlock("svg", _hoisted_4$25, [entry.kind == "success" ? (openBlock(), createElementBlock("path", _hoisted_5$25)) : entry.kind == "error" ? (openBlock(), createElementBlock("path", _hoisted_6$21)) : (openBlock(), createElementBlock("path", _hoisted_7$18))]))]),
-							createBaseVNode("p", _hoisted_8$17, toDisplayString(entry.message), 1),
+							createBaseVNode("span", _hoisted_2$37, [entry.kind == "pending" ? (openBlock(), createElementBlock("span", _hoisted_3$32)) : (openBlock(), createElementBlock("svg", _hoisted_4$28, [entry.kind == "success" ? (openBlock(), createElementBlock("path", _hoisted_5$28)) : entry.kind == "error" ? (openBlock(), createElementBlock("path", _hoisted_6$24)) : (openBlock(), createElementBlock("path", _hoisted_7$20))]))]),
+							createBaseVNode("p", _hoisted_8$18, toDisplayString(entry.message), 1),
 							createBaseVNode("button", {
 								type: "button",
 								class: "pse-toast-close",
@@ -6096,13 +6115,13 @@
 								"stroke-width": "2.4",
 								"stroke-linecap": "round",
 								"aria-hidden": "true"
-							}, [createBaseVNode("path", { d: "M6 6l12 12M18 6L6 18" })], -1)])], 8, _hoisted_9$16),
+							}, [createBaseVNode("path", { d: "M6 6l12 12M18 6L6 18" })], -1)])], 8, _hoisted_9$17),
 							entry.kind != "pending" ? (openBlock(), createElementBlock("span", {
 								key: entry.kind,
 								class: "pse-toast-clock",
 								"aria-hidden": "true"
 							})) : createCommentVNode("", true)
-						], 42, _hoisted_1$35);
+						], 42, _hoisted_1$38);
 					}), 128))]),
 					_: 1
 				});
@@ -6151,7 +6170,14 @@
 			idleLogoutSeconds: 900,
 			soundSuccess: true,
 			soundWarning: true,
-			soundError: true
+			soundError: true,
+			binsEnabled: false,
+			noPrintEnvironmentId: -1,
+			binWallEnvironmentId: -1,
+			putWallUrl: "",
+			putWallToken: "",
+			cvpBridgeUrl: "http://127.0.0.1:8085",
+			cvpMaxUnits: 1
 		};
 	}
 	var Settings = {
@@ -6172,8 +6198,27 @@
 				idleLogoutSeconds: this.idleLogoutSeconds,
 				soundSuccess: this.soundSuccess,
 				soundWarning: this.soundWarning,
-				soundError: this.soundError
+				soundError: this.soundError,
+				binsEnabled: this.binsEnabled,
+				noPrintEnvironmentId: this.noPrintEnvironmentId,
+				binWallEnvironmentId: this.binWallEnvironmentId,
+				putWallUrl: this.putWallUrl,
+				putWallToken: this.putWallToken,
+				cvpBridgeUrl: this.cvpBridgeUrl,
+				cvpMaxUnits: this.cvpMaxUnits
 			});
+		},
+		binsMissing() {
+			const missing = [];
+			if (!(this.environmentId > 0)) missing.push("de omgeving van deze werkplek");
+			if (!(this.noPrintEnvironmentId > 0)) missing.push("de omgeving zonder printer");
+			if (!(this.binWallEnvironmentId > 0)) missing.push("de omgeving van de sorteerwand");
+			if (!this.putWallUrl.trim()) missing.push("het adres van de sorteerwand");
+			if (!this.putWallToken.trim()) missing.push("de plugin-sleutel van de sorteerwand");
+			return missing;
+		},
+		binsReady() {
+			return this.binsEnabled && this.binsMissing().length == 0;
 		}
 	};
 	function enabled(kind) {
@@ -6440,7 +6485,7 @@
 		};
 	}
 	function standInForLauncher() {
-		const host = window;
+		const host = _unsafeWindow;
 		if (typeof host["getMainWindow"] == "function") return;
 		host[ERP_MAIN_ITEM_FUNCTION] = (_source, itemId) => {
 			mainItemListener?.(String(itemId ?? "").trim());
@@ -7032,11 +7077,11 @@
 			}
 		};
 	}
-	var _hoisted_1$34 = ["aria-label"];
-	var _hoisted_2$33 = { class: "pse-modal-head" };
-	var _hoisted_3$28 = { class: "pse-modal-title" };
-	var _hoisted_4$24 = { class: "pse-modal-body" };
-	var _hoisted_5$24 = {
+	var _hoisted_1$37 = ["aria-label"];
+	var _hoisted_2$36 = { class: "pse-modal-head" };
+	var _hoisted_3$31 = { class: "pse-modal-title" };
+	var _hoisted_4$27 = { class: "pse-modal-body" };
+	var _hoisted_5$27 = {
 		key: 0,
 		class: "pse-modal-foot"
 	};
@@ -7084,7 +7129,7 @@
 					key: 1,
 					class: normalizeClass(["pse-modal-panel", `is-${__props.size}`])
 				}, [
-					createBaseVNode("header", _hoisted_2$33, [createBaseVNode("h2", _hoisted_3$28, toDisplayString(__props.title), 1), createBaseVNode("button", {
+					createBaseVNode("header", _hoisted_2$36, [createBaseVNode("h2", _hoisted_3$31, toDisplayString(__props.title), 1), createBaseVNode("button", {
 						type: "button",
 						class: "pse-modal-close",
 						"aria-label": "Sluiten",
@@ -7099,42 +7144,42 @@
 						"stroke-linecap": "round",
 						"aria-hidden": "true"
 					}, [createBaseVNode("path", { d: "M6 6l12 12M18 6L6 18" })], -1)])])]),
-					createBaseVNode("div", _hoisted_4$24, [renderSlot(_ctx.$slots, "default", {}, void 0, true)]),
-					_ctx.$slots.footer ? (openBlock(), createElementBlock("footer", _hoisted_5$24, [renderSlot(_ctx.$slots, "footer", {}, void 0, true)])) : createCommentVNode("", true)
-				], 2))], 42, _hoisted_1$34);
+					createBaseVNode("div", _hoisted_4$27, [renderSlot(_ctx.$slots, "default", {}, void 0, true)]),
+					_ctx.$slots.footer ? (openBlock(), createElementBlock("footer", _hoisted_5$27, [renderSlot(_ctx.$slots, "footer", {}, void 0, true)])) : createCommentVNode("", true)
+				], 2))], 42, _hoisted_1$37);
 			};
 		}
 	}), [["__scopeId", "data-v-0dcd5e50"]]);
 	var shopware_default = "data:image/svg+xml,%3csvg%20width='34'%20height='34'%20xmlns='http://www.w3.org/2000/svg'%20xmlns:xlink='http://www.w3.org/1999/xlink'%3e%3cdefs%3e%3cpath%20d='M26.927%2030.07a.244.244%200%2001-.002.39%2016.76%2016.76%200%2001-10.04%203.307c-4.51%200-8.75-1.756-11.94-4.944A16.772%2016.772%200%20010%2016.884c0-4.51%201.756-8.75%204.945-11.939A16.775%2016.775%200%200116.885%200c4.173%200%208.18%201.535%2011.28%204.323a.243.243%200%2001-.195.42%2028.559%2028.559%200%2000-3.86-.248c-4.918%200-8.911%201.096-11.548%203.172-2.35%201.85-3.593%204.41-3.593%207.404%200%203.338%201.277%205.976%203.905%208.067%202.319%201.846%205.408%203.044%208.133%204.1%202.29.889%204.453%201.727%205.92%202.832zm6.77-14.746c.046.537.07%201.062.07%201.56%200%202.12-.389%204.19-1.155%206.154a.244.244%200%2001-.344.124c-2.008-1.114-4.195-1.93-6.31-2.718-4.104-1.53-7.647-2.852-7.647-5.752%200-1.035.433-1.917%201.252-2.55.946-.73%202.363-1.101%204.21-1.101%203.463%200%206.313%201.192%209.837%204.117.05.041.08.102.086.166z'%20id='a'/%3e%3c/defs%3e%3cuse%20fill='%23FFF'%20xlink:href='%23a'%20fill-rule='evenodd'/%3e%3c/svg%3e";
-	var _hoisted_1$33 = { class: "pse-note" };
-	var _hoisted_2$32 = {
+	var _hoisted_1$36 = { class: "pse-note" };
+	var _hoisted_2$35 = {
 		key: 0,
 		class: "pse-note-alert"
 	};
-	var _hoisted_3$27 = { class: "pse-note-card" };
-	var _hoisted_4$23 = ["aria-expanded", "title"];
-	var _hoisted_5$23 = ["src"];
-	var _hoisted_6$20 = {
+	var _hoisted_3$30 = { class: "pse-note-card" };
+	var _hoisted_4$26 = ["aria-expanded", "title"];
+	var _hoisted_5$26 = ["src"];
+	var _hoisted_6$23 = {
 		key: 0,
 		class: "pse-note-spinner",
 		role: "status",
 		"aria-label": "Notitie wordt opgehaald"
 	};
-	var _hoisted_7$17 = {
+	var _hoisted_7$19 = {
 		key: 1,
 		class: "pse-note-empty"
 	};
-	var _hoisted_8$16 = { class: "pse-note-collapse-inner" };
-	var _hoisted_9$15 = { class: "pse-note-body" };
-	var _hoisted_10$15 = ["disabled", "placeholder"];
-	var _hoisted_11$13 = {
+	var _hoisted_8$17 = { class: "pse-note-collapse-inner" };
+	var _hoisted_9$16 = { class: "pse-note-body" };
+	var _hoisted_10$16 = ["disabled", "placeholder"];
+	var _hoisted_11$14 = {
 		key: 1,
 		class: "pse-note-field pse-note-field-waiting",
 		"aria-hidden": "true"
 	};
-	var _hoisted_12$12 = { class: "pse-note-actions" };
-	var _hoisted_13$12 = ["disabled"];
-	var _hoisted_14$11 = ["disabled"];
+	var _hoisted_12$13 = { class: "pse-note-actions" };
+	var _hoisted_13$13 = ["disabled"];
+	var _hoisted_14$12 = ["disabled"];
 	var ShopwareNote_default = _plugin_vue_export_helper_default(defineComponent({
 		__name: "ShopwareNote",
 		props: {
@@ -7160,13 +7205,13 @@
 				if (order) open.value = hasNote.value;
 			}, { immediate: true });
 			return (_ctx, _cache) => {
-				return openBlock(), createElementBlock("section", _hoisted_1$33, [createVNode(Transition, null, {
-					default: withCtx(() => [__props.showAlert && hasNote.value ? (openBlock(), createElementBlock("p", _hoisted_2$32, [..._cache[4] || (_cache[4] = [createBaseVNode("span", {
+				return openBlock(), createElementBlock("section", _hoisted_1$36, [createVNode(Transition, null, {
+					default: withCtx(() => [__props.showAlert && hasNote.value ? (openBlock(), createElementBlock("p", _hoisted_2$35, [..._cache[4] || (_cache[4] = [createBaseVNode("span", {
 						class: "material-icons pse-note-alert-icon",
 						"aria-hidden": "true"
 					}, "error_outline", -1), createTextVNode(" Let op — er is een notitie bij deze order. ", -1)])])) : createCommentVNode("", true)]),
 					_: 1
-				}), createBaseVNode("div", _hoisted_3$27, [createBaseVNode("button", {
+				}), createBaseVNode("div", _hoisted_3$30, [createBaseVNode("button", {
 					type: "button",
 					class: "pse-note-head",
 					"aria-expanded": open.value,
@@ -7177,31 +7222,31 @@
 						class: "pse-note-logo",
 						src: unref(shopware_default),
 						alt: ""
-					}, null, 8, _hoisted_5$23),
+					}, null, 8, _hoisted_5$26),
 					_cache[5] || (_cache[5] = createBaseVNode("h3", { class: "pse-note-title" }, "Shopware notitie", -1)),
-					loading.value ? (openBlock(), createElementBlock("span", _hoisted_6$20)) : !open.value && !hasNote.value ? (openBlock(), createElementBlock("span", _hoisted_7$17, "Geen notitie")) : createCommentVNode("", true),
+					loading.value ? (openBlock(), createElementBlock("span", _hoisted_6$23)) : !open.value && !hasNote.value ? (openBlock(), createElementBlock("span", _hoisted_7$19, "Geen notitie")) : createCommentVNode("", true),
 					createBaseVNode("span", {
 						class: normalizeClass(["material-icons pse-note-chevron", { "is-open": open.value }]),
 						"aria-hidden": "true"
 					}, "expand_more", 2)
-				], 8, _hoisted_4$23), createBaseVNode("div", { class: normalizeClass(["pse-note-collapse", { "is-open": open.value }]) }, [createBaseVNode("div", _hoisted_8$16, [createBaseVNode("div", _hoisted_9$15, [__props.orderData ? withDirectives((openBlock(), createElementBlock("textarea", {
+				], 8, _hoisted_4$26), createBaseVNode("div", { class: normalizeClass(["pse-note-collapse", { "is-open": open.value }]) }, [createBaseVNode("div", _hoisted_8$17, [createBaseVNode("div", _hoisted_9$16, [__props.orderData ? withDirectives((openBlock(), createElementBlock("textarea", {
 					key: 0,
 					class: "pse-note-field",
 					"onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => note.value = $event),
 					disabled: !ready.value,
 					placeholder: ready.value ? "Nog geen notitie..." : ""
-				}, null, 8, _hoisted_10$15)), [[vModelText, note.value]]) : (openBlock(), createElementBlock("div", _hoisted_11$13, [..._cache[6] || (_cache[6] = [createBaseVNode("span", { class: "pse-note-shimmer" }, null, -1), createBaseVNode("span", { class: "pse-note-shimmer pse-note-shimmer-short" }, null, -1)])])), createBaseVNode("div", _hoisted_12$12, [__props.showOpen ? (openBlock(), createElementBlock("button", {
+				}, null, 8, _hoisted_10$16)), [[vModelText, note.value]]) : (openBlock(), createElementBlock("div", _hoisted_11$14, [..._cache[6] || (_cache[6] = [createBaseVNode("span", { class: "pse-note-shimmer" }, null, -1), createBaseVNode("span", { class: "pse-note-shimmer pse-note-shimmer-short" }, null, -1)])])), createBaseVNode("div", _hoisted_12$13, [__props.showOpen ? (openBlock(), createElementBlock("button", {
 					key: 0,
 					type: "button",
 					class: "pse-note-btn pse-note-btn-quiet",
 					disabled: !ready.value,
 					onClick: _cache[2] || (_cache[2] = ($event) => _ctx.$emit("open"))
-				}, " Open in Shopware ", 8, _hoisted_13$12)) : createCommentVNode("", true), createBaseVNode("button", {
+				}, " Open in Shopware ", 8, _hoisted_13$13)) : createCommentVNode("", true), createBaseVNode("button", {
 					type: "button",
 					class: "pse-note-btn",
 					disabled: !ready.value,
 					onClick: _cache[3] || (_cache[3] = ($event) => _ctx.$emit("save"))
-				}, " Opslaan ", 8, _hoisted_14$11)])])])], 2)])]);
+				}, " Opslaan ", 8, _hoisted_14$12)])])])], 2)])]);
 			};
 		}
 	}), [["__scopeId", "data-v-ab3fbaa7"]]);
@@ -7215,15 +7260,15 @@
 		Settings.load();
 		settingsVersion.value++;
 	});
-	var _hoisted_1$32 = { class: "pse-rack" };
-	var _hoisted_2$31 = { class: "pse-rack-letter" };
-	var _hoisted_3$26 = ["title", "onClick"];
-	var _hoisted_4$22 = { class: "pse-rack-bay-label" };
-	var _hoisted_5$22 = {
+	var _hoisted_1$35 = { class: "pse-rack" };
+	var _hoisted_2$34 = { class: "pse-rack-letter" };
+	var _hoisted_3$29 = ["title", "onClick"];
+	var _hoisted_4$25 = { class: "pse-rack-bay-label" };
+	var _hoisted_5$25 = {
 		key: 0,
 		class: "pse-rack-bay-note"
 	};
-	var _hoisted_6$19 = {
+	var _hoisted_6$22 = {
 		key: 1,
 		class: "pse-rack-bay-note"
 	};
@@ -7260,11 +7305,11 @@
 						class: "pse-dialog-btn pse-dialog-btn-quiet",
 						onClick: _cache[1] || (_cache[1] = ($event) => emit("close"))
 					}, " Annuleren ")]),
-					default: withCtx(() => [_cache[3] || (_cache[3] = createBaseVNode("p", { class: "pse-rack-lead" }, " Kies het vak waar dit blijft staan. Nog een keer op het huidige vak drukken maakt het weer leeg. ", -1)), createBaseVNode("div", _hoisted_1$32, [(openBlock(true), createElementBlock(Fragment, null, renderList(unref(RACK), (column) => {
+					default: withCtx(() => [_cache[3] || (_cache[3] = createBaseVNode("p", { class: "pse-rack-lead" }, " Kies het vak waar dit blijft staan. Nog een keer op het huidige vak drukken maakt het weer leeg. ", -1)), createBaseVNode("div", _hoisted_1$35, [(openBlock(true), createElementBlock(Fragment, null, renderList(unref(RACK), (column) => {
 						return openBlock(), createElementBlock("div", {
 							key: column.letter,
 							class: "pse-rack-column"
-						}, [createBaseVNode("span", _hoisted_2$31, toDisplayString(column.letter), 1), createBaseVNode("div", { class: normalizeClass(["pse-rack-bays", `is-rows-${column.rows.length}`]) }, [(openBlock(true), createElementBlock(Fragment, null, renderList(column.rows.flat(), (bay) => {
+						}, [createBaseVNode("span", _hoisted_2$34, toDisplayString(column.letter), 1), createBaseVNode("div", { class: normalizeClass(["pse-rack-bays", `is-rows-${column.rows.length}`]) }, [(openBlock(true), createElementBlock(Fragment, null, renderList(column.rows.flat(), (bay) => {
 							return openBlock(), createElementBlock("button", {
 								key: bay,
 								type: "button",
@@ -7274,7 +7319,7 @@
 								}]),
 								title: occupants(label(column.letter, bay)).length ? `Vak ${label(column.letter, bay)} — al in gebruik voor deze order` : `Vak ${label(column.letter, bay)}`,
 								onClick: ($event) => emit("pick", label(column.letter, bay))
-							}, [createBaseVNode("span", _hoisted_4$22, toDisplayString(label(column.letter, bay)), 1), occupants(label(column.letter, bay)).length ? (openBlock(), createElementBlock("span", _hoisted_5$22, toDisplayString(occupants(label(column.letter, bay)).length) + " regel" + toDisplayString(occupants(label(column.letter, bay)).length > 1 ? "s" : ""), 1)) : __props.current == label(column.letter, bay) ? (openBlock(), createElementBlock("span", _hoisted_6$19, " Huidig ")) : createCommentVNode("", true)], 10, _hoisted_3$26);
+							}, [createBaseVNode("span", _hoisted_4$25, toDisplayString(label(column.letter, bay)), 1), occupants(label(column.letter, bay)).length ? (openBlock(), createElementBlock("span", _hoisted_5$25, toDisplayString(occupants(label(column.letter, bay)).length) + " regel" + toDisplayString(occupants(label(column.letter, bay)).length > 1 ? "s" : ""), 1)) : __props.current == label(column.letter, bay) ? (openBlock(), createElementBlock("span", _hoisted_6$22, " Huidig ")) : createCommentVNode("", true)], 10, _hoisted_3$29);
 						}), 128))], 2)]);
 					}), 128))])]),
 					_: 1
@@ -7282,77 +7327,77 @@
 			};
 		}
 	}), [["__scopeId", "data-v-76779723"]]);
-	var _hoisted_1$31 = { class: "pse-slotpanel" };
-	var _hoisted_2$30 = { class: "pse-slotpanel-card" };
-	var _hoisted_3$25 = { class: "pse-slotpanel-title" };
-	var _hoisted_4$21 = {
+	var _hoisted_1$34 = { class: "pse-slotpanel" };
+	var _hoisted_2$33 = { class: "pse-slotpanel-card" };
+	var _hoisted_3$28 = { class: "pse-slotpanel-title" };
+	var _hoisted_4$24 = {
 		key: 0,
 		class: "pse-slotpanel-spinner",
 		role: "status",
 		"aria-label": "Vak wordt opgehaald"
 	};
-	var _hoisted_5$21 = ["disabled", "title"];
-	var _hoisted_6$18 = {
+	var _hoisted_5$24 = ["disabled", "title"];
+	var _hoisted_6$21 = {
 		key: 0,
 		class: "pse-slot-chip-label"
 	};
-	var _hoisted_7$16 = {
+	var _hoisted_7$18 = {
 		key: 1,
 		class: "pse-slot-chip-empty"
 	};
-	var _hoisted_8$15 = {
+	var _hoisted_8$16 = {
 		key: 2,
 		class: "pse-slot-chip-empty"
 	};
-	var _hoisted_9$14 = {
+	var _hoisted_9$15 = {
 		key: 2,
 		class: "pse-slotpanel-summary"
 	};
-	var _hoisted_10$14 = { class: "pse-slot-chip-label" };
-	var _hoisted_11$12 = {
+	var _hoisted_10$15 = { class: "pse-slot-chip-label" };
+	var _hoisted_11$13 = {
 		key: 3,
 		class: "pse-slotpanel-empty"
 	};
-	var _hoisted_12$11 = {
+	var _hoisted_12$12 = {
 		key: 4,
 		class: "pse-slotpanel-empty"
 	};
-	var _hoisted_13$11 = { class: "pse-slotpanel-collapse-inner" };
-	var _hoisted_14$10 = { class: "pse-slotpanel-body" };
-	var _hoisted_15$8 = {
+	var _hoisted_13$12 = { class: "pse-slotpanel-collapse-inner" };
+	var _hoisted_14$11 = { class: "pse-slotpanel-body" };
+	var _hoisted_15$9 = {
 		key: 0,
 		class: "pse-slotpanel-block"
 	};
-	var _hoisted_16$7 = ["disabled", "title"];
-	var _hoisted_17$6 = {
+	var _hoisted_16$8 = ["disabled", "title"];
+	var _hoisted_17$7 = {
 		key: 0,
 		class: "pse-slot-chip-label"
 	};
-	var _hoisted_18$5 = {
+	var _hoisted_18$6 = {
 		key: 1,
 		class: "pse-slot-chip-empty"
 	};
-	var _hoisted_19$5 = { class: "pse-slotpanel-block" };
-	var _hoisted_20$5 = {
+	var _hoisted_19$6 = { class: "pse-slotpanel-block" };
+	var _hoisted_20$6 = {
 		key: 0,
 		class: "pse-slotpanel-caption"
 	};
-	var _hoisted_21$5 = { class: "pse-slotpanel-lines" };
-	var _hoisted_22$4 = ["title"];
-	var _hoisted_23$3 = [
+	var _hoisted_21$6 = { class: "pse-slotpanel-lines" };
+	var _hoisted_22$5 = ["title"];
+	var _hoisted_23$4 = [
 		"disabled",
 		"title",
 		"onClick"
 	];
-	var _hoisted_24$2 = {
+	var _hoisted_24$4 = {
 		key: 0,
 		class: "pse-slot-chip-label"
 	};
-	var _hoisted_25$1 = {
+	var _hoisted_25$3 = {
 		key: 1,
 		class: "pse-slot-chip-empty"
 	};
-	var _hoisted_26$1 = {
+	var _hoisted_26$3 = {
 		key: 1,
 		class: "pse-slotpanel-hint"
 	};
@@ -7405,7 +7450,7 @@
 						"taken"
 					])) : createCommentVNode("", true)]),
 					_: 1
-				})])), createBaseVNode("section", _hoisted_1$31, [createBaseVNode("div", _hoisted_2$30, [(openBlock(), createBlock(resolveDynamicComponent(foldable.value ? "button" : "div"), {
+				})])), createBaseVNode("section", _hoisted_1$34, [createBaseVNode("div", _hoisted_2$33, [(openBlock(), createBlock(resolveDynamicComponent(foldable.value ? "button" : "div"), {
 					class: normalizeClass(["pse-slotpanel-head", { "is-plain": !foldable.value }]),
 					type: foldable.value ? "button" : void 0,
 					"aria-expanded": foldable.value ? open.value : void 0,
@@ -7417,23 +7462,23 @@
 							class: "material-icons pse-slotpanel-icon",
 							"aria-hidden": "true"
 						}, "inventory_2", -1)),
-						createBaseVNode("h4", _hoisted_3$25, toDisplayString(foldable.value ? "Vakken" : "Vak"), 1),
-						__props.handle.loading.value ? (openBlock(), createElementBlock("span", _hoisted_4$21)) : !foldable.value ? (openBlock(), createElementBlock("button", {
+						createBaseVNode("h4", _hoisted_3$28, toDisplayString(foldable.value ? "Vakken" : "Vak"), 1),
+						__props.handle.loading.value ? (openBlock(), createElementBlock("span", _hoisted_4$24)) : !foldable.value ? (openBlock(), createElementBlock("button", {
 							key: 1,
 							type: "button",
 							class: normalizeClass(["pse-slot-chip", { "is-empty": !orderSlot.value }]),
 							disabled: !__props.handle.ready.value || __props.handle.saving.value,
 							title: orderSlot.value ? `Deze order staat in vak ${orderSlot.value}` : "Kies een vak voor deze order",
 							onClick: _cache[1] || (_cache[1] = ($event) => picking.value = { subject: `Reservering ${__props.handle.reservationNumber.value}` })
-						}, [orderSlot.value ? (openBlock(), createElementBlock("span", _hoisted_6$18, toDisplayString(orderSlot.value), 1)) : unavailable.value ? (openBlock(), createElementBlock("span", _hoisted_7$16, "Niet beschikbaar")) : (openBlock(), createElementBlock("span", _hoisted_8$15, [..._cache[4] || (_cache[4] = [createBaseVNode("span", {
+						}, [orderSlot.value ? (openBlock(), createElementBlock("span", _hoisted_6$21, toDisplayString(orderSlot.value), 1)) : unavailable.value ? (openBlock(), createElementBlock("span", _hoisted_7$18, "Niet beschikbaar")) : (openBlock(), createElementBlock("span", _hoisted_8$16, [..._cache[4] || (_cache[4] = [createBaseVNode("span", {
 							class: "material-icons pse-slot-chip-empty-icon",
 							"aria-hidden": "true"
-						}, "add", -1), createTextVNode(" Vak kiezen ", -1)])]))], 10, _hoisted_5$21)) : !open.value && usedSlots.value.length ? (openBlock(), createElementBlock("span", _hoisted_9$14, [(openBlock(true), createElementBlock(Fragment, null, renderList(usedSlots.value, (used) => {
+						}, "add", -1), createTextVNode(" Vak kiezen ", -1)])]))], 10, _hoisted_5$24)) : !open.value && usedSlots.value.length ? (openBlock(), createElementBlock("span", _hoisted_9$15, [(openBlock(true), createElementBlock(Fragment, null, renderList(usedSlots.value, (used) => {
 							return openBlock(), createElementBlock("span", {
 								key: used,
 								class: "pse-slot-chip is-static"
-							}, [createBaseVNode("span", _hoisted_10$14, toDisplayString(used), 1)]);
-						}), 128))])) : !open.value && unavailable.value ? (openBlock(), createElementBlock("span", _hoisted_11$12, "Niet beschikbaar")) : !open.value ? (openBlock(), createElementBlock("span", _hoisted_12$11, "Geen vak")) : createCommentVNode("", true),
+							}, [createBaseVNode("span", _hoisted_10$15, toDisplayString(used), 1)]);
+						}), 128))])) : !open.value && unavailable.value ? (openBlock(), createElementBlock("span", _hoisted_11$13, "Niet beschikbaar")) : !open.value ? (openBlock(), createElementBlock("span", _hoisted_12$12, "Geen vak")) : createCommentVNode("", true),
 						foldable.value ? (openBlock(), createElementBlock("span", {
 							key: 5,
 							class: normalizeClass(["material-icons pse-slotpanel-chevron", { "is-open": open.value }]),
@@ -7449,25 +7494,25 @@
 				])), foldable.value ? (openBlock(), createElementBlock("div", {
 					key: 0,
 					class: normalizeClass(["pse-slotpanel-collapse", { "is-open": open.value }])
-				}, [createBaseVNode("div", _hoisted_13$11, [createBaseVNode("div", _hoisted_14$10, [
-					showOrderSlot.value ? (openBlock(), createElementBlock("div", _hoisted_15$8, [_cache[7] || (_cache[7] = createBaseVNode("span", { class: "pse-slotpanel-caption" }, "Hele order", -1)), createBaseVNode("button", {
+				}, [createBaseVNode("div", _hoisted_13$12, [createBaseVNode("div", _hoisted_14$11, [
+					showOrderSlot.value ? (openBlock(), createElementBlock("div", _hoisted_15$9, [_cache[7] || (_cache[7] = createBaseVNode("span", { class: "pse-slotpanel-caption" }, "Hele order", -1)), createBaseVNode("button", {
 						type: "button",
 						class: normalizeClass(["pse-slot-chip", { "is-empty": !orderSlot.value }]),
 						disabled: !__props.handle.ready.value || __props.handle.saving.value,
 						title: orderSlot.value ? `Deze order staat in vak ${orderSlot.value}` : "Kies een vak voor deze order",
 						onClick: _cache[3] || (_cache[3] = ($event) => picking.value = { subject: `Reservering ${__props.handle.reservationNumber.value}` })
-					}, [orderSlot.value ? (openBlock(), createElementBlock("span", _hoisted_17$6, toDisplayString(orderSlot.value), 1)) : (openBlock(), createElementBlock("span", _hoisted_18$5, [..._cache[6] || (_cache[6] = [createBaseVNode("span", {
+					}, [orderSlot.value ? (openBlock(), createElementBlock("span", _hoisted_17$7, toDisplayString(orderSlot.value), 1)) : (openBlock(), createElementBlock("span", _hoisted_18$6, [..._cache[6] || (_cache[6] = [createBaseVNode("span", {
 						class: "material-icons pse-slot-chip-empty-icon",
 						"aria-hidden": "true"
-					}, "add", -1), createTextVNode(" Vak kiezen ", -1)])]))], 10, _hoisted_16$7)])) : createCommentVNode("", true),
-					createBaseVNode("div", _hoisted_19$5, [showOrderSlot.value ? (openBlock(), createElementBlock("span", _hoisted_20$5, "Losse regels")) : createCommentVNode("", true), createBaseVNode("ul", _hoisted_21$5, [(openBlock(true), createElementBlock(Fragment, null, renderList(__props.products, (product) => {
+					}, "add", -1), createTextVNode(" Vak kiezen ", -1)])]))], 10, _hoisted_16$8)])) : createCommentVNode("", true),
+					createBaseVNode("div", _hoisted_19$6, [showOrderSlot.value ? (openBlock(), createElementBlock("span", _hoisted_20$6, "Losse regels")) : createCommentVNode("", true), createBaseVNode("ul", _hoisted_21$6, [(openBlock(true), createElementBlock(Fragment, null, renderList(__props.products, (product) => {
 						return openBlock(), createElementBlock("li", {
 							key: product.barcode,
 							class: "pse-slotpanel-line"
 						}, [createBaseVNode("span", {
 							class: "pse-slotpanel-line-name",
 							title: product.description
-						}, toDisplayString(product.description), 9, _hoisted_22$4), createBaseVNode("button", {
+						}, toDisplayString(product.description), 9, _hoisted_22$5), createBaseVNode("button", {
 							type: "button",
 							class: normalizeClass(["pse-slot-chip", { "is-empty": !__props.handle.lineSlot(product.barcode) }]),
 							disabled: lineChipDisabled(product.barcode),
@@ -7476,12 +7521,12 @@
 								barcode: product.barcode,
 								subject: product.description
 							}
-						}, [__props.handle.lineSlot(product.barcode) ? (openBlock(), createElementBlock("span", _hoisted_24$2, toDisplayString(__props.handle.lineSlot(product.barcode)), 1)) : (openBlock(), createElementBlock("span", _hoisted_25$1, [..._cache[8] || (_cache[8] = [createBaseVNode("span", {
+						}, [__props.handle.lineSlot(product.barcode) ? (openBlock(), createElementBlock("span", _hoisted_24$4, toDisplayString(__props.handle.lineSlot(product.barcode)), 1)) : (openBlock(), createElementBlock("span", _hoisted_25$3, [..._cache[8] || (_cache[8] = [createBaseVNode("span", {
 							class: "material-icons pse-slot-chip-empty-icon",
 							"aria-hidden": "true"
-						}, "add", -1), createTextVNode(" Vak ", -1)])]))], 10, _hoisted_23$3)]);
+						}, "add", -1), createTextVNode(" Vak ", -1)])]))], 10, _hoisted_23$4)]);
 					}), 128))])]),
-					unavailable.value ? (openBlock(), createElementBlock("p", _hoisted_26$1, " Geen verbinding met RetailVista, dus het vak van deze order is niet bekend. ")) : createCommentVNode("", true)
+					unavailable.value ? (openBlock(), createElementBlock("p", _hoisted_26$3, " Geen verbinding met RetailVista, dus het vak van deze order is niet bekend. ")) : createCommentVNode("", true)
 				])])], 2)) : createCommentVNode("", true)])])], 64);
 			};
 		}
@@ -7509,8 +7554,8 @@
 		field.remove();
 		return copied;
 	}
-	var _hoisted_1$30 = ["title"];
-	var _hoisted_2$29 = {
+	var _hoisted_1$33 = ["title"];
+	var _hoisted_2$32 = {
 		class: "material-icons pse-copy-icon",
 		"aria-hidden": "true"
 	};
@@ -7541,30 +7586,30 @@
 					}]),
 					title: `${__props.label} kopiëren`,
 					onClick: _cache[0] || (_cache[0] = withModifiers(($event) => copy(), ["stop"]))
-				}, [createBaseVNode("span", _hoisted_2$29, toDisplayString(icon.value), 1)], 10, _hoisted_1$30);
+				}, [createBaseVNode("span", _hoisted_2$32, toDisplayString(icon.value), 1)], 10, _hoisted_1$33);
 			};
 		}
 	});
-	var _hoisted_1$29 = { class: "pse-rescard-head" };
-	var _hoisted_2$28 = { class: "pse-rescard-id" };
-	var _hoisted_3$24 = { class: "pse-rescard-number" };
-	var _hoisted_4$20 = { class: "pse-rescard-reference" };
-	var _hoisted_5$20 = { class: "pse-rescard-facts" };
-	var _hoisted_6$17 = { class: "pse-rescard-fact" };
-	var _hoisted_7$15 = { class: "pse-rescard-fact" };
-	var _hoisted_8$14 = { class: "pse-rescard-fact" };
-	var _hoisted_9$13 = {
+	var _hoisted_1$32 = { class: "pse-rescard-head" };
+	var _hoisted_2$31 = { class: "pse-rescard-id" };
+	var _hoisted_3$27 = { class: "pse-rescard-number" };
+	var _hoisted_4$23 = { class: "pse-rescard-reference" };
+	var _hoisted_5$23 = { class: "pse-rescard-facts" };
+	var _hoisted_6$20 = { class: "pse-rescard-fact" };
+	var _hoisted_7$17 = { class: "pse-rescard-fact" };
+	var _hoisted_8$15 = { class: "pse-rescard-fact" };
+	var _hoisted_9$14 = {
 		key: 0,
 		class: "pse-rescard-products"
 	};
-	var _hoisted_10$13 = { class: "pse-table" };
-	var _hoisted_11$11 = { class: "pse-cell-barcode" };
-	var _hoisted_12$10 = { class: "pse-cell-description" };
-	var _hoisted_13$10 = { class: "pse-cell-barcode" };
-	var _hoisted_14$9 = { class: "pse-copy-cell" };
-	var _hoisted_15$7 = { class: "pse-table-right" };
-	var _hoisted_16$6 = { class: "pse-rescard-amount" };
-	var _hoisted_17$5 = {
+	var _hoisted_10$14 = { class: "pse-table" };
+	var _hoisted_11$12 = { class: "pse-cell-barcode" };
+	var _hoisted_12$11 = { class: "pse-cell-description" };
+	var _hoisted_13$11 = { class: "pse-cell-barcode" };
+	var _hoisted_14$10 = { class: "pse-copy-cell" };
+	var _hoisted_15$8 = { class: "pse-table-right" };
+	var _hoisted_16$7 = { class: "pse-rescard-amount" };
+	var _hoisted_17$6 = {
 		key: 1,
 		class: "pse-rescard-aside"
 	};
@@ -7590,12 +7635,12 @@
 			}
 			return (_ctx, _cache) => {
 				return openBlock(), createElementBlock("article", { class: normalizeClass(["pse-rescard", { "is-incomplete": __props.highlightIncomplete }]) }, [
-					createBaseVNode("header", _hoisted_1$29, [
-						createBaseVNode("div", _hoisted_2$28, [createBaseVNode("span", _hoisted_3$24, toDisplayString(__props.reservation.reservationNumber), 1), createBaseVNode("span", _hoisted_4$20, toDisplayString(__props.reservation.saleOrderReference), 1)]),
-						createBaseVNode("dl", _hoisted_5$20, [
-							createBaseVNode("div", _hoisted_6$17, [_cache[2] || (_cache[2] = createBaseVNode("dt", null, "Klant", -1)), createBaseVNode("dd", null, toDisplayString(__props.reservation.customer), 1)]),
-							createBaseVNode("div", _hoisted_7$15, [_cache[3] || (_cache[3] = createBaseVNode("dt", null, "Status", -1)), createBaseVNode("dd", null, toDisplayString(__props.reservation.status), 1)]),
-							createBaseVNode("div", _hoisted_8$14, [_cache[4] || (_cache[4] = createBaseVNode("dt", null, "Logistiek", -1)), createBaseVNode("dd", null, toDisplayString(__props.reservation.deliveryStatus), 1)])
+					createBaseVNode("header", _hoisted_1$32, [
+						createBaseVNode("div", _hoisted_2$31, [createBaseVNode("span", _hoisted_3$27, toDisplayString(__props.reservation.reservationNumber), 1), createBaseVNode("span", _hoisted_4$23, toDisplayString(__props.reservation.saleOrderReference), 1)]),
+						createBaseVNode("dl", _hoisted_5$23, [
+							createBaseVNode("div", _hoisted_6$20, [_cache[2] || (_cache[2] = createBaseVNode("dt", null, "Klant", -1)), createBaseVNode("dd", null, toDisplayString(__props.reservation.customer), 1)]),
+							createBaseVNode("div", _hoisted_7$17, [_cache[3] || (_cache[3] = createBaseVNode("dt", null, "Status", -1)), createBaseVNode("dd", null, toDisplayString(__props.reservation.status), 1)]),
+							createBaseVNode("div", _hoisted_8$15, [_cache[4] || (_cache[4] = createBaseVNode("dt", null, "Logistiek", -1)), createBaseVNode("dd", null, toDisplayString(__props.reservation.deliveryStatus), 1)])
 						]),
 						createVNode(Transition, null, {
 							default: withCtx(() => [__props.showOpenButton ? (openBlock(), createElementBlock("button", {
@@ -7610,7 +7655,7 @@
 							_: 1
 						})
 					]),
-					__props.showProducts ? (openBlock(), createElementBlock("div", _hoisted_9$13, [createBaseVNode("table", _hoisted_10$13, [_cache[6] || (_cache[6] = createBaseVNode("thead", null, [createBaseVNode("tr", null, [
+					__props.showProducts ? (openBlock(), createElementBlock("div", _hoisted_9$14, [createBaseVNode("table", _hoisted_10$14, [_cache[6] || (_cache[6] = createBaseVNode("thead", null, [createBaseVNode("tr", null, [
 						createBaseVNode("th", null, "Artikel nr"),
 						createBaseVNode("th", null, "Omschrijving"),
 						createBaseVNode("th", null, "Hoofd barcode"),
@@ -7620,16 +7665,16 @@
 							key: index,
 							class: normalizeClass({ "is-short": isShort(product.amount) })
 						}, [
-							createBaseVNode("td", _hoisted_11$11, toDisplayString(product.number), 1),
-							createBaseVNode("td", _hoisted_12$10, toDisplayString(product.description), 1),
-							createBaseVNode("td", _hoisted_13$10, [createBaseVNode("span", _hoisted_14$9, [createTextVNode(toDisplayString(product.barcode) + " ", 1), createVNode(CopyButton_default, {
+							createBaseVNode("td", _hoisted_11$12, toDisplayString(product.number), 1),
+							createBaseVNode("td", _hoisted_12$11, toDisplayString(product.description), 1),
+							createBaseVNode("td", _hoisted_13$11, [createBaseVNode("span", _hoisted_14$10, [createTextVNode(toDisplayString(product.barcode) + " ", 1), createVNode(CopyButton_default, {
 								value: product.barcode,
 								label: "Barcode"
 							}, null, 8, ["value"])])]),
-							createBaseVNode("td", _hoisted_15$7, [createBaseVNode("span", _hoisted_16$6, toDisplayString(product.amount), 1)])
+							createBaseVNode("td", _hoisted_15$8, [createBaseVNode("span", _hoisted_16$7, toDisplayString(product.amount), 1)])
 						], 2);
 					}), 128))])])])) : createCommentVNode("", true),
-					__props.showNote && hasShopwareNote() || __props.slotHandle ? (openBlock(), createElementBlock("div", _hoisted_17$5, [__props.slotHandle ? (openBlock(), createBlock(ReservationSlotPanel_default, {
+					__props.showNote && hasShopwareNote() || __props.slotHandle ? (openBlock(), createElementBlock("div", _hoisted_17$6, [__props.slotHandle ? (openBlock(), createBlock(ReservationSlotPanel_default, {
 						key: 0,
 						handle: __props.slotHandle,
 						products: __props.reservation.products
@@ -7643,15 +7688,15 @@
 			};
 		}
 	}), [["__scopeId", "data-v-b187fc81"]]);
-	var _hoisted_1$28 = { class: "pse-row-number" };
-	var _hoisted_2$27 = { class: "pse-row-customer" };
-	var _hoisted_3$23 = { class: "pse-row-reference" };
-	var _hoisted_4$19 = { class: "pse-row-reference-text" };
-	var _hoisted_5$19 = {
+	var _hoisted_1$31 = { class: "pse-row-number" };
+	var _hoisted_2$30 = { class: "pse-row-customer" };
+	var _hoisted_3$26 = { class: "pse-row-reference" };
+	var _hoisted_4$22 = { class: "pse-row-reference-text" };
+	var _hoisted_5$22 = {
 		key: 0,
 		class: "pse-row-tag"
 	};
-	var _hoisted_6$16 = { key: 2 };
+	var _hoisted_6$19 = { key: 2 };
 	var ReservationRow_default = _plugin_vue_export_helper_default(defineComponent({
 		__name: "ReservationRow",
 		props: {
@@ -7688,9 +7733,9 @@
 			const state = computed(() => props.status == void 0 ? void 0 : STATES[props.status] ?? STATES[MassCompleteStatus.failed]);
 			return (_ctx, _cache) => {
 				return openBlock(), createElementBlock("div", { class: normalizeClass(["pse-row", state.value?.modifier]) }, [
-					createBaseVNode("span", _hoisted_1$28, toDisplayString(__props.reservation.reservationNumber), 1),
-					createBaseVNode("span", _hoisted_2$27, toDisplayString(__props.reservation.customer), 1),
-					createBaseVNode("span", _hoisted_3$23, [createBaseVNode("span", _hoisted_4$19, toDisplayString(__props.reservation.saleOrderReference), 1), __props.pickup ? (openBlock(), createElementBlock("span", _hoisted_5$19, "Afhalen in de winkel")) : createCommentVNode("", true)]),
+					createBaseVNode("span", _hoisted_1$31, toDisplayString(__props.reservation.reservationNumber), 1),
+					createBaseVNode("span", _hoisted_2$30, toDisplayString(__props.reservation.customer), 1),
+					createBaseVNode("span", _hoisted_3$26, [createBaseVNode("span", _hoisted_4$22, toDisplayString(__props.reservation.saleOrderReference), 1), __props.pickup ? (openBlock(), createElementBlock("span", _hoisted_5$22, "Afhalen in de winkel")) : createCommentVNode("", true)]),
 					state.value ? (openBlock(), createElementBlock("span", {
 						key: 0,
 						class: normalizeClass(["pse-row-state", state.value.modifier])
@@ -7705,62 +7750,62 @@
 					}, [..._cache[2] || (_cache[2] = [createTextVNode(" Open ", -1), createBaseVNode("span", {
 						class: "material-icons pse-row-open-icon",
 						"aria-hidden": "true"
-					}, "chevron_right", -1)])])) : (openBlock(), createElementBlock("span", _hoisted_6$16))
+					}, "chevron_right", -1)])])) : (openBlock(), createElementBlock("span", _hoisted_6$19))
 				], 2);
 			};
 		}
 	}), [["__scopeId", "data-v-31ebb75c"]]);
-	var _hoisted_1$27 = { class: "pse-mc-head" };
-	var _hoisted_2$26 = { class: "pse-mc-titles" };
-	var _hoisted_3$22 = {
+	var _hoisted_1$30 = { class: "pse-mc-head" };
+	var _hoisted_2$29 = { class: "pse-mc-titles" };
+	var _hoisted_3$25 = {
 		key: 0,
 		class: "pse-mc-subtitle"
 	};
-	var _hoisted_4$18 = {
+	var _hoisted_4$21 = {
 		key: 1,
 		class: "pse-mc-subtitle"
 	};
-	var _hoisted_5$18 = {
+	var _hoisted_5$21 = {
 		key: 2,
 		class: "pse-mc-subtitle"
 	};
-	var _hoisted_6$15 = {
+	var _hoisted_6$18 = {
 		key: 3,
 		class: "pse-mc-subtitle"
 	};
-	var _hoisted_7$14 = {
+	var _hoisted_7$16 = {
 		key: 4,
 		class: "pse-mc-subtitle"
 	};
-	var _hoisted_8$13 = {
+	var _hoisted_8$14 = {
 		key: 5,
 		class: "pse-mc-subtitle"
 	};
-	var _hoisted_9$12 = {
+	var _hoisted_9$13 = {
 		key: 6,
 		class: "pse-mc-subtitle"
 	};
-	var _hoisted_10$12 = {
+	var _hoisted_10$13 = {
 		key: 7,
 		class: "pse-mc-subtitle"
 	};
-	var _hoisted_11$10 = {
+	var _hoisted_11$11 = {
 		key: 0,
 		class: "pse-mc-controls"
 	};
-	var _hoisted_12$9 = { class: "pse-mc-stepper" };
-	var _hoisted_13$9 = ["disabled"];
-	var _hoisted_14$8 = ["value"];
-	var _hoisted_15$6 = ["disabled"];
-	var _hoisted_16$5 = ["disabled"];
-	var _hoisted_17$4 = {
+	var _hoisted_12$10 = { class: "pse-mc-stepper" };
+	var _hoisted_13$10 = ["disabled"];
+	var _hoisted_14$9 = ["value"];
+	var _hoisted_15$7 = ["disabled"];
+	var _hoisted_16$6 = ["disabled"];
+	var _hoisted_17$5 = {
 		key: 1,
 		class: "pse-mc-tally"
 	};
-	var _hoisted_18$4 = { class: "pse-mc-tally-count" };
-	var _hoisted_19$4 = { class: "pse-mc-tally-of" };
-	var _hoisted_20$4 = { class: "pse-mc-tally-label" };
-	var _hoisted_21$4 = {
+	var _hoisted_18$5 = { class: "pse-mc-tally-count" };
+	var _hoisted_19$5 = { class: "pse-mc-tally-of" };
+	var _hoisted_20$5 = { class: "pse-mc-tally-label" };
+	var _hoisted_21$5 = {
 		key: 0,
 		class: "pse-mc-progress"
 	};
@@ -7797,7 +7842,7 @@
 					"is-running": __props.started && !done.value,
 					"is-done": done.value,
 					"is-stopped": __props.stopped
-				}]) }, [createBaseVNode("div", _hoisted_1$27, [
+				}]) }, [createBaseVNode("div", _hoisted_1$30, [
 					_cache[6] || (_cache[6] = createBaseVNode("span", {
 						class: "pse-mc-icon",
 						"aria-hidden": "true"
@@ -7811,15 +7856,15 @@
 						"stroke-linecap": "round",
 						"stroke-linejoin": "round"
 					}, [createBaseVNode("path", { d: "M4 7h16M4 12h16M4 17h9" }), createBaseVNode("path", { d: "M15.5 18.5l2 2 4-4.5" })])], -1)),
-					createBaseVNode("div", _hoisted_2$26, [_cache[5] || (_cache[5] = createBaseVNode("h3", { class: "pse-mc-title" }, "Massa voltooien", -1)), !__props.started && !__props.ready ? (openBlock(), createElementBlock("p", _hoisted_3$22, " Transport wordt gecontroleerd... ")) : !__props.started && tooFew.value ? (openBlock(), createElementBlock("p", _hoisted_4$18, " Overgeslagen: " + toDisplayString(excludedLabel.value) + ". Er blijft niets over om massaal af te ronden. ", 1)) : !__props.started && excluded.value > 0 ? (openBlock(), createElementBlock("p", _hoisted_5$18, " Opent " + toDisplayString(__props.amount) + " van de " + toDisplayString(__props.total) + " reserveringen in de achtergrond en rondt ze af. Overgeslagen: " + toDisplayString(excludedLabel.value) + ". ", 1)) : !__props.started ? (openBlock(), createElementBlock("p", _hoisted_6$15, " Opent " + toDisplayString(__props.amount) + " van de " + toDisplayString(__props.total) + " reserveringen in de achtergrond en rondt ze af. ", 1)) : !done.value ? (openBlock(), createElementBlock("p", _hoisted_7$14, toDisplayString(settled.value) + " van " + toDisplayString(__props.amount) + " afgerond — laat dit scherm openstaan. ", 1)) : __props.stopped ? (openBlock(), createElementBlock("p", _hoisted_8$13, " Gestopt na een mislukte reservering. " + toDisplayString(__props.finished) + " afgerond, de rest is niet geprobeerd — het tabblad met de fout staat nog open. ", 1)) : __props.failed > 0 ? (openBlock(), createElementBlock("p", _hoisted_9$12, toDisplayString(__props.finished) + " afgerond, " + toDisplayString(__props.failed) + " mislukt. Mislukte reserveringen staan hieronder. ", 1)) : (openBlock(), createElementBlock("p", _hoisted_10$12, " Alle " + toDisplayString(__props.finished) + " reserveringen zijn afgerond. ", 1))]),
-					!__props.started && !tooFew.value ? (openBlock(), createElementBlock("div", _hoisted_11$10, [createBaseVNode("div", _hoisted_12$9, [
+					createBaseVNode("div", _hoisted_2$29, [_cache[5] || (_cache[5] = createBaseVNode("h3", { class: "pse-mc-title" }, "Massa voltooien", -1)), !__props.started && !__props.ready ? (openBlock(), createElementBlock("p", _hoisted_3$25, " Transport wordt gecontroleerd... ")) : !__props.started && tooFew.value ? (openBlock(), createElementBlock("p", _hoisted_4$21, " Overgeslagen: " + toDisplayString(excludedLabel.value) + ". Er blijft niets over om massaal af te ronden. ", 1)) : !__props.started && excluded.value > 0 ? (openBlock(), createElementBlock("p", _hoisted_5$21, " Opent " + toDisplayString(__props.amount) + " van de " + toDisplayString(__props.total) + " reserveringen in de achtergrond en rondt ze af. Overgeslagen: " + toDisplayString(excludedLabel.value) + ". ", 1)) : !__props.started ? (openBlock(), createElementBlock("p", _hoisted_6$18, " Opent " + toDisplayString(__props.amount) + " van de " + toDisplayString(__props.total) + " reserveringen in de achtergrond en rondt ze af. ", 1)) : !done.value ? (openBlock(), createElementBlock("p", _hoisted_7$16, toDisplayString(settled.value) + " van " + toDisplayString(__props.amount) + " afgerond — laat dit scherm openstaan. ", 1)) : __props.stopped ? (openBlock(), createElementBlock("p", _hoisted_8$14, " Gestopt na een mislukte reservering. " + toDisplayString(__props.finished) + " afgerond, de rest is niet geprobeerd — het tabblad met de fout staat nog open. ", 1)) : __props.failed > 0 ? (openBlock(), createElementBlock("p", _hoisted_9$13, toDisplayString(__props.finished) + " afgerond, " + toDisplayString(__props.failed) + " mislukt. Mislukte reserveringen staan hieronder. ", 1)) : (openBlock(), createElementBlock("p", _hoisted_10$13, " Alle " + toDisplayString(__props.finished) + " reserveringen zijn afgerond. ", 1))]),
+					!__props.started && !tooFew.value ? (openBlock(), createElementBlock("div", _hoisted_11$11, [createBaseVNode("div", _hoisted_12$10, [
 						createBaseVNode("button", {
 							type: "button",
 							class: "pse-mc-step",
 							"aria-label": "Eén minder",
 							disabled: !canStart.value || __props.amount <= 2,
 							onClick: _cache[0] || (_cache[0] = ($event) => step(-1))
-						}, "−", 8, _hoisted_13$9),
+						}, "−", 8, _hoisted_13$10),
 						createBaseVNode("input", {
 							type: "number",
 							class: "pse-mc-amount",
@@ -7828,61 +7873,61 @@
 							"aria-label": "Aantal reserveringen",
 							onInput: _cache[1] || (_cache[1] = ($event) => emit("update:amount", Number($event.target.value))),
 							onFocusout: _cache[2] || (_cache[2] = ($event) => emit("update:amount", __props.amount))
-						}, null, 40, _hoisted_14$8),
+						}, null, 40, _hoisted_14$9),
 						createBaseVNode("button", {
 							type: "button",
 							class: "pse-mc-step",
 							"aria-label": "Eén meer",
 							disabled: !canStart.value || __props.amount >= Math.min(__props.max, __props.total),
 							onClick: _cache[3] || (_cache[3] = ($event) => step(1))
-						}, "+", 8, _hoisted_15$6)
+						}, "+", 8, _hoisted_15$7)
 					]), createBaseVNode("button", {
 						type: "button",
 						class: "pse-dialog-btn pse-mc-start",
 						disabled: !canStart.value,
 						onClick: _cache[4] || (_cache[4] = ($event) => emit("start"))
-					}, " Start voltooien ", 8, _hoisted_16$5)])) : __props.started ? (openBlock(), createElementBlock("div", _hoisted_17$4, [createBaseVNode("span", _hoisted_18$4, [createTextVNode(toDisplayString(settled.value), 1), createBaseVNode("span", _hoisted_19$4, "/" + toDisplayString(__props.amount), 1)]), createBaseVNode("span", _hoisted_20$4, toDisplayString(__props.stopped ? "gestopt" : done.value ? "klaar" : "afgerond"), 1)])) : createCommentVNode("", true)
-				]), __props.started ? (openBlock(), createElementBlock("div", _hoisted_21$4, [createBaseVNode("div", {
+					}, " Start voltooien ", 8, _hoisted_16$6)])) : __props.started ? (openBlock(), createElementBlock("div", _hoisted_17$5, [createBaseVNode("span", _hoisted_18$5, [createTextVNode(toDisplayString(settled.value), 1), createBaseVNode("span", _hoisted_19$5, "/" + toDisplayString(__props.amount), 1)]), createBaseVNode("span", _hoisted_20$5, toDisplayString(__props.stopped ? "gestopt" : done.value ? "klaar" : "afgerond"), 1)])) : createCommentVNode("", true)
+				]), __props.started ? (openBlock(), createElementBlock("div", _hoisted_21$5, [createBaseVNode("div", {
 					class: "pse-mc-progress-fill",
 					style: normalizeStyle({ width: `${progress.value}%` })
 				}, null, 4)])) : createCommentVNode("", true)], 2);
 			};
 		}
 	}), [["__scopeId", "data-v-61d631cb"]]);
-	var _hoisted_1$26 = { class: "pse-found" };
-	var _hoisted_2$25 = { class: "pse-found-image" };
-	var _hoisted_3$21 = ["src"];
-	var _hoisted_4$17 = { class: "pse-found-text" };
-	var _hoisted_5$17 = { class: "pse-found-name" };
-	var _hoisted_6$14 = { class: "pse-found-barcode pse-copy-cell" };
-	var _hoisted_7$13 = { class: "pse-found-count" };
-	var _hoisted_8$12 = { class: "pse-found-count-number" };
-	var _hoisted_9$11 = {
+	var _hoisted_1$29 = { class: "pse-found" };
+	var _hoisted_2$28 = { class: "pse-found-image" };
+	var _hoisted_3$24 = ["src"];
+	var _hoisted_4$20 = { class: "pse-found-text" };
+	var _hoisted_5$20 = { class: "pse-found-name" };
+	var _hoisted_6$17 = { class: "pse-found-barcode pse-copy-cell" };
+	var _hoisted_7$15 = { class: "pse-found-count" };
+	var _hoisted_8$13 = { class: "pse-found-count-number" };
+	var _hoisted_9$12 = {
 		key: 0,
 		class: "pse-countdown"
 	};
-	var _hoisted_10$11 = {
+	var _hoisted_10$12 = {
 		key: 0,
 		class: "pse-group"
 	};
-	var _hoisted_11$9 = { class: "pse-group-head" };
-	var _hoisted_12$8 = { class: "pse-group-title" };
-	var _hoisted_13$8 = { class: "pse-group-count" };
-	var _hoisted_14$7 = { class: "pse-rows" };
-	var _hoisted_15$5 = {
+	var _hoisted_11$10 = { class: "pse-group-head" };
+	var _hoisted_12$9 = { class: "pse-group-title" };
+	var _hoisted_13$9 = { class: "pse-group-count" };
+	var _hoisted_14$8 = { class: "pse-rows" };
+	var _hoisted_15$6 = {
 		key: 1,
 		class: "pse-group"
 	};
-	var _hoisted_16$4 = { class: "pse-group-head" };
-	var _hoisted_17$3 = { class: "pse-group-title" };
-	var _hoisted_18$3 = { class: "pse-group-count" };
-	var _hoisted_19$3 = {
+	var _hoisted_16$5 = { class: "pse-group-head" };
+	var _hoisted_17$4 = { class: "pse-group-title" };
+	var _hoisted_18$4 = { class: "pse-group-count" };
+	var _hoisted_19$4 = {
 		key: 2,
 		class: "pse-group"
 	};
-	var _hoisted_20$3 = { class: "pse-group-head" };
-	var _hoisted_21$3 = { class: "pse-group-title" };
-	var _hoisted_22$3 = { class: "pse-group-count" };
+	var _hoisted_20$4 = { class: "pse-group-head" };
+	var _hoisted_21$4 = { class: "pse-group-title" };
+	var _hoisted_22$4 = { class: "pse-group-count" };
 	var massCompleteMax = 50;
 	var massCompleteThreshold = 2;
 	var ReservationSelectionModal_default = _plugin_vue_export_helper_default(defineComponent({
@@ -8074,28 +8119,28 @@
 						onClick: _cache[3] || (_cache[3] = ($event) => emit("close"))
 					}, " Sluiten ")]),
 					default: withCtx(() => [
-						createBaseVNode("section", _hoisted_1$26, [
-							createBaseVNode("div", _hoisted_2$25, [__props.modalData.searchProductImageUrl ? (openBlock(), createElementBlock("img", {
+						createBaseVNode("section", _hoisted_1$29, [
+							createBaseVNode("div", _hoisted_2$28, [__props.modalData.searchProductImageUrl ? (openBlock(), createElementBlock("img", {
 								key: 0,
 								src: __props.modalData.searchProductImageUrl,
 								alt: "",
 								loading: "lazy"
-							}, null, 8, _hoisted_3$21)) : createCommentVNode("", true)]),
-							createBaseVNode("div", _hoisted_4$17, [createBaseVNode("h3", _hoisted_5$17, toDisplayString(__props.modalData.searchProductName), 1), createBaseVNode("p", _hoisted_6$14, [createTextVNode(toDisplayString(__props.modalData.searchProductBarcode) + " ", 1), createVNode(CopyButton_default, {
+							}, null, 8, _hoisted_3$24)) : createCommentVNode("", true)]),
+							createBaseVNode("div", _hoisted_4$20, [createBaseVNode("h3", _hoisted_5$20, toDisplayString(__props.modalData.searchProductName), 1), createBaseVNode("p", _hoisted_6$17, [createTextVNode(toDisplayString(__props.modalData.searchProductBarcode) + " ", 1), createVNode(CopyButton_default, {
 								value: __props.modalData.searchProductBarcode,
 								label: "Barcode"
 							}, null, 8, ["value"])])]),
-							createBaseVNode("div", _hoisted_7$13, [createBaseVNode("span", _hoisted_8$12, toDisplayString(__props.modalData.searchProductAmount), 1), _cache[5] || (_cache[5] = createBaseVNode("span", { class: "pse-found-count-label" }, "reserveringen", -1))])
+							createBaseVNode("div", _hoisted_7$15, [createBaseVNode("span", _hoisted_8$13, toDisplayString(__props.modalData.searchProductAmount), 1), _cache[5] || (_cache[5] = createBaseVNode("span", { class: "pse-found-count-label" }, "reserveringen", -1))])
 						]),
 						createVNode(Transition, null, {
-							default: withCtx(() => [canAutoProceed() ? (openBlock(), createElementBlock("p", _hoisted_9$11, [_cache[6] || (_cache[6] = createBaseVNode("span", {
+							default: withCtx(() => [canAutoProceed() ? (openBlock(), createElementBlock("p", _hoisted_9$12, [_cache[6] || (_cache[6] = createBaseVNode("span", {
 								class: "pse-countdown-mark",
 								"aria-hidden": "true"
 							}, null, -1)), createTextVNode(" Gaat automatisch verder over " + toDisplayString(countdown.value) + " seconden... ", 1)])) : createCommentVNode("", true)]),
 							_: 1
 						}),
-						__props.modalData.singleLineReservations.length > 0 ? (openBlock(), createElementBlock("section", _hoisted_10$11, [
-							createBaseVNode("header", _hoisted_11$9, [createBaseVNode("h3", _hoisted_12$8, [_cache[7] || (_cache[7] = createTextVNode(" Singleline ", -1)), createBaseVNode("span", _hoisted_13$8, toDisplayString(__props.modalData.singleLineReservations.length), 1)]), _cache[8] || (_cache[8] = createBaseVNode("p", { class: "pse-group-note" }, "Deze reserveringen bevatten 1 stuk van het product.", -1))]),
+						__props.modalData.singleLineReservations.length > 0 ? (openBlock(), createElementBlock("section", _hoisted_10$12, [
+							createBaseVNode("header", _hoisted_11$10, [createBaseVNode("h3", _hoisted_12$9, [_cache[7] || (_cache[7] = createTextVNode(" Singleline ", -1)), createBaseVNode("span", _hoisted_13$9, toDisplayString(__props.modalData.singleLineReservations.length), 1)]), _cache[8] || (_cache[8] = createBaseVNode("p", { class: "pse-group-note" }, "Deze reserveringen bevatten 1 stuk van het product.", -1))]),
 							massCompleteShowDialog.value ? (openBlock(), createBlock(MassCompletePanel_default, {
 								key: 0,
 								total: massCompleteCandidates.value.length,
@@ -8121,7 +8166,7 @@
 								"pickups",
 								"unknown"
 							])) : createCommentVNode("", true),
-							createBaseVNode("div", _hoisted_14$7, [(openBlock(true), createElementBlock(Fragment, null, renderList(__props.modalData.singleLineReservations, (reservation) => {
+							createBaseVNode("div", _hoisted_14$8, [(openBlock(true), createElementBlock(Fragment, null, renderList(__props.modalData.singleLineReservations, (reservation) => {
 								return openBlock(), createBlock(ReservationRow_default, {
 									key: reservation.reservationNumber,
 									reservation,
@@ -8137,7 +8182,7 @@
 								]);
 							}), 128))])
 						])) : createCommentVNode("", true),
-						__props.modalData.validReservations.length > 0 ? (openBlock(), createElementBlock("section", _hoisted_15$5, [createBaseVNode("header", _hoisted_16$4, [createBaseVNode("h3", _hoisted_17$3, [_cache[9] || (_cache[9] = createTextVNode(" Reserveringen ", -1)), createBaseVNode("span", _hoisted_18$3, toDisplayString(__props.modalData.validReservations.length), 1)]), _cache[10] || (_cache[10] = createBaseVNode("p", { class: "pse-group-note" }, "Klaar om verwerkt te worden.", -1))]), (openBlock(true), createElementBlock(Fragment, null, renderList(__props.modalData.validReservations, (reservation) => {
+						__props.modalData.validReservations.length > 0 ? (openBlock(), createElementBlock("section", _hoisted_15$6, [createBaseVNode("header", _hoisted_16$5, [createBaseVNode("h3", _hoisted_17$4, [_cache[9] || (_cache[9] = createTextVNode(" Reserveringen ", -1)), createBaseVNode("span", _hoisted_18$4, toDisplayString(__props.modalData.validReservations.length), 1)]), _cache[10] || (_cache[10] = createBaseVNode("p", { class: "pse-group-note" }, "Klaar om verwerkt te worden.", -1))]), (openBlock(true), createElementBlock(Fragment, null, renderList(__props.modalData.validReservations, (reservation) => {
 							return openBlock(), createBlock(ReservationCard_default, {
 								key: reservation.reservationNumber,
 								reservation,
@@ -8156,7 +8201,7 @@
 								"onSaveNote"
 							]);
 						}), 128))])) : createCommentVNode("", true),
-						__props.modalData.invalidReservations.length > 0 ? (openBlock(), createElementBlock("section", _hoisted_19$3, [createBaseVNode("header", _hoisted_20$3, [createBaseVNode("h3", _hoisted_21$3, [_cache[11] || (_cache[11] = createTextVNode(" Nog niet volledig geraapt ", -1)), createBaseVNode("span", _hoisted_22$3, toDisplayString(__props.modalData.invalidReservations.length), 1)]), _cache[12] || (_cache[12] = createBaseVNode("p", { class: "pse-group-note" }, " Deze reserveringen bevatten het product, maar hebben niet de juiste logistieke status of zijn nog niet volledig geraapt. Ze kunnen hier niet geopend worden. ", -1))]), (openBlock(true), createElementBlock(Fragment, null, renderList(__props.modalData.invalidReservations, (reservation) => {
+						__props.modalData.invalidReservations.length > 0 ? (openBlock(), createElementBlock("section", _hoisted_19$4, [createBaseVNode("header", _hoisted_20$4, [createBaseVNode("h3", _hoisted_21$4, [_cache[11] || (_cache[11] = createTextVNode(" Nog niet volledig geraapt ", -1)), createBaseVNode("span", _hoisted_22$4, toDisplayString(__props.modalData.invalidReservations.length), 1)]), _cache[12] || (_cache[12] = createBaseVNode("p", { class: "pse-group-note" }, " Deze reserveringen bevatten het product, maar hebben niet de juiste logistieke status of zijn nog niet volledig geraapt. Ze kunnen hier niet geopend worden. ", -1))]), (openBlock(true), createElementBlock(Fragment, null, renderList(__props.modalData.invalidReservations, (reservation) => {
 							return openBlock(), createBlock(ReservationCard_default, {
 								key: reservation.reservationNumber,
 								reservation,
@@ -8179,15 +8224,15 @@
 			};
 		}
 	}), [["__scopeId", "data-v-120793a6"]]);
-	var _hoisted_1$25 = { class: "pse-panel" };
-	var _hoisted_2$24 = { class: "pse-panel-head" };
-	var _hoisted_3$20 = {
+	var _hoisted_1$28 = { class: "pse-panel" };
+	var _hoisted_2$27 = { class: "pse-panel-head" };
+	var _hoisted_3$23 = {
 		class: "pse-panel-icon",
 		"aria-hidden": "true"
 	};
-	var _hoisted_4$16 = { class: "pse-panel-text" };
-	var _hoisted_5$16 = { class: "pse-panel-title" };
-	var _hoisted_6$13 = { class: "pse-panel-subtitle" };
+	var _hoisted_4$19 = { class: "pse-panel-text" };
+	var _hoisted_5$19 = { class: "pse-panel-title" };
+	var _hoisted_6$16 = { class: "pse-panel-subtitle" };
 	var SearchPanel_default = _plugin_vue_export_helper_default(defineComponent({
 		__name: "SearchPanel",
 		props: {
@@ -8196,13 +8241,13 @@
 		},
 		setup(__props) {
 			return (_ctx, _cache) => {
-				return openBlock(), createElementBlock("section", _hoisted_1$25, [createBaseVNode("header", _hoisted_2$24, [createBaseVNode("span", _hoisted_3$20, [renderSlot(_ctx.$slots, "icon", {}, void 0, true)]), createBaseVNode("span", _hoisted_4$16, [createBaseVNode("h2", _hoisted_5$16, toDisplayString(__props.title), 1), createBaseVNode("p", _hoisted_6$13, toDisplayString(__props.subtitle), 1)])]), renderSlot(_ctx.$slots, "default", {}, void 0, true)]);
+				return openBlock(), createElementBlock("section", _hoisted_1$28, [createBaseVNode("header", _hoisted_2$27, [createBaseVNode("span", _hoisted_3$23, [renderSlot(_ctx.$slots, "icon", {}, void 0, true)]), createBaseVNode("span", _hoisted_4$19, [createBaseVNode("h2", _hoisted_5$19, toDisplayString(__props.title), 1), createBaseVNode("p", _hoisted_6$16, toDisplayString(__props.subtitle), 1)])]), renderSlot(_ctx.$slots, "default", {}, void 0, true)]);
 			};
 		}
 	}), [["__scopeId", "data-v-2ad9890a"]]);
-	var _hoisted_1$24 = { class: "pse-field" };
-	var _hoisted_2$23 = { class: "pse-field-label" };
-	var _hoisted_3$19 = ["placeholder"];
+	var _hoisted_1$27 = { class: "pse-field" };
+	var _hoisted_2$26 = { class: "pse-field-label" };
+	var _hoisted_3$22 = ["placeholder"];
 	var SearchField_default = _plugin_vue_export_helper_default(defineComponent({
 		__name: "SearchField",
 		props: mergeModels({
@@ -8223,7 +8268,7 @@
 				adoptElement(shell.value, document.querySelector(props.adopt), "pse-input");
 			});
 			return (_ctx, _cache) => {
-				return openBlock(), createElementBlock("label", _hoisted_1$24, [createBaseVNode("span", _hoisted_2$23, toDisplayString(__props.label), 1), createBaseVNode("span", {
+				return openBlock(), createElementBlock("label", _hoisted_1$27, [createBaseVNode("span", _hoisted_2$26, toDisplayString(__props.label), 1), createBaseVNode("span", {
 					class: "pse-field-shell",
 					ref_key: "shell",
 					ref: shell
@@ -8234,13 +8279,13 @@
 					autocomplete: "off",
 					placeholder: __props.placeholder,
 					"onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => model.value = $event)
-				}, null, 8, _hoisted_3$19)), [[vModelText, model.value]]) : createCommentVNode("", true)], 512)]);
+				}, null, 8, _hoisted_3$22)), [[vModelText, model.value]]) : createCommentVNode("", true)], 512)]);
 			};
 		}
 	}), [["__scopeId", "data-v-e35ea7a8"]]);
-	var _hoisted_1$23 = { class: "pse-notice-text" };
-	var _hoisted_2$22 = { class: "pse-notice-title" };
-	var _hoisted_3$18 = {
+	var _hoisted_1$26 = { class: "pse-notice-text" };
+	var _hoisted_2$25 = { class: "pse-notice-title" };
+	var _hoisted_3$21 = {
 		key: 0,
 		class: "pse-notice-detail"
 	};
@@ -8259,7 +8304,7 @@
 					role: "status"
 				}, [
 					_cache[2] || (_cache[2] = createStaticVNode("<span class=\"pse-notice-icon\" aria-hidden=\"true\" data-v-0438713d><svg viewBox=\"0 0 24 24\" width=\"20\" height=\"20\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" data-v-0438713d><circle cx=\"12\" cy=\"12\" r=\"8.5\" data-v-0438713d></circle><path d=\"M12 8v5\" data-v-0438713d></path><path d=\"M12 16.2v.1\" data-v-0438713d></path></svg></span>", 1)),
-					createBaseVNode("span", _hoisted_1$23, [createBaseVNode("span", _hoisted_2$22, toDisplayString(__props.title), 1), __props.detail ? (openBlock(), createElementBlock("span", _hoisted_3$18, toDisplayString(__props.detail), 1)) : createCommentVNode("", true)]),
+					createBaseVNode("span", _hoisted_1$26, [createBaseVNode("span", _hoisted_2$25, toDisplayString(__props.title), 1), __props.detail ? (openBlock(), createElementBlock("span", _hoisted_3$21, toDisplayString(__props.detail), 1)) : createCommentVNode("", true)]),
 					createBaseVNode("button", {
 						type: "button",
 						class: "pse-notice-close",
@@ -8278,14 +8323,14 @@
 			};
 		}
 	}), [["__scopeId", "data-v-0438713d"]]);
-	var _hoisted_1$22 = ["disabled"];
-	var _hoisted_2$21 = {
+	var _hoisted_1$25 = ["disabled"];
+	var _hoisted_2$24 = {
 		class: "pse-resume-icon",
 		"aria-hidden": "true"
 	};
-	var _hoisted_3$17 = { class: "pse-resume-text" };
-	var _hoisted_4$15 = { class: "pse-resume-label" };
-	var _hoisted_5$15 = { class: "pse-resume-number" };
+	var _hoisted_3$20 = { class: "pse-resume-text" };
+	var _hoisted_4$18 = { class: "pse-resume-label" };
+	var _hoisted_5$18 = { class: "pse-resume-number" };
 	var ResumeButton_default = _plugin_vue_export_helper_default(defineComponent({
 		__name: "ResumeButton",
 		props: {
@@ -8302,8 +8347,8 @@
 					disabled: __props.disabled,
 					onClick: _cache[0] || (_cache[0] = ($event) => _ctx.$emit("click"))
 				}, [
-					createBaseVNode("span", _hoisted_2$21, [renderSlot(_ctx.$slots, "icon", {}, void 0, true)]),
-					createBaseVNode("span", _hoisted_3$17, [createBaseVNode("span", _hoisted_4$15, toDisplayString(__props.label), 1), createBaseVNode("span", _hoisted_5$15, toDisplayString(__props.reservationNumber || "Nog geen"), 1)]),
+					createBaseVNode("span", _hoisted_2$24, [renderSlot(_ctx.$slots, "icon", {}, void 0, true)]),
+					createBaseVNode("span", _hoisted_3$20, [createBaseVNode("span", _hoisted_4$18, toDisplayString(__props.label), 1), createBaseVNode("span", _hoisted_5$18, toDisplayString(__props.reservationNumber || "Nog geen"), 1)]),
 					_cache[1] || (_cache[1] = createBaseVNode("svg", {
 						class: "pse-resume-chevron",
 						viewBox: "0 0 24 24",
@@ -8316,7 +8361,7 @@
 						"stroke-linejoin": "round",
 						"aria-hidden": "true"
 					}, [createBaseVNode("path", { d: "M9 6l6 6-6 6" })], -1))
-				], 8, _hoisted_1$22);
+				], 8, _hoisted_1$25);
 			};
 		}
 	}), [["__scopeId", "data-v-ead5c402"]]);
@@ -8326,13 +8371,15 @@
 		if (known != void 0) return known;
 		const description = await erpTask(async (page) => {
 			await page.open(`${ERP_PAGE_PATH}?pageId=${ERP_ENVIRONMENT_PAGE_ID}&itemId=${environmentId}`);
-			return page.find("[id$=\"rvcParcelServicePrinterId_Textbox\"]")?.value.trim() ?? "";
+			const field = page.find(ERP_ENVIRONMENT_PARCEL_PRINTER_SELECTOR);
+			if (!field) throw new Error(`The ERP did not show environment ${environmentId}'s record (served "${page.document.title.trim()}").`);
+			return field.value.trim();
 		});
-		printerCache.set(environmentId, description);
 		debug("Parcel service printer for this environment", {
 			environmentId,
 			description
 		});
+		if (description) printerCache.set(environmentId, description);
 		return description;
 	}
 	async function printParcelLabel(reservationId, parcelId, environmentId) {
@@ -8395,22 +8442,22 @@
 			return false;
 		}
 	}
-	var _hoisted_1$21 = { class: "pse-picker-intro" };
-	var _hoisted_2$20 = { class: "pse-picker-list" };
-	var _hoisted_3$16 = [
+	var _hoisted_1$24 = { class: "pse-picker-intro" };
+	var _hoisted_2$23 = { class: "pse-picker-list" };
+	var _hoisted_3$19 = [
 		"disabled",
 		"title",
 		"onClick"
 	];
-	var _hoisted_4$14 = { class: "pse-picker-what" };
-	var _hoisted_5$14 = { class: "pse-picker-barcode" };
-	var _hoisted_6$12 = { class: "pse-picker-carrier" };
-	var _hoisted_7$12 = {
+	var _hoisted_4$17 = { class: "pse-picker-what" };
+	var _hoisted_5$17 = { class: "pse-picker-barcode" };
+	var _hoisted_6$15 = { class: "pse-picker-carrier" };
+	var _hoisted_7$14 = {
 		key: 0,
 		class: "pse-picker-spinner",
 		"aria-hidden": "true"
 	};
-	var _hoisted_8$11 = {
+	var _hoisted_8$12 = {
 		key: 1,
 		class: "material-icons pse-picker-icon",
 		"aria-hidden": "true"
@@ -8441,49 +8488,49 @@
 					elevated: "",
 					onClose: _cache[0] || (_cache[0] = ($event) => emit("close"))
 				}, {
-					default: withCtx(() => [createBaseVNode("p", _hoisted_1$21, " Deze reservering heeft " + toDisplayString(__props.parcels.length) + " etiketten. Kies welk etiket opnieuw geprint moet worden. ", 1), createBaseVNode("ul", _hoisted_2$20, [(openBlock(true), createElementBlock(Fragment, null, renderList(__props.parcels, (parcel) => {
+					default: withCtx(() => [createBaseVNode("p", _hoisted_1$24, " Deze reservering heeft " + toDisplayString(__props.parcels.length) + " etiketten. Kies welk etiket opnieuw geprint moet worden. ", 1), createBaseVNode("ul", _hoisted_2$23, [(openBlock(true), createElementBlock(Fragment, null, renderList(__props.parcels, (parcel) => {
 						return openBlock(), createElementBlock("li", { key: parcel.id }, [createBaseVNode("button", {
 							type: "button",
 							class: "pse-picker-row",
 							disabled: Boolean(printing.value),
 							title: `Print het etiket van pakket ${parcel.barcode} opnieuw`,
 							onClick: ($event) => pick(parcel)
-						}, [createBaseVNode("span", _hoisted_4$14, [createBaseVNode("span", _hoisted_5$14, toDisplayString(parcel.barcode), 1), createBaseVNode("span", _hoisted_6$12, toDisplayString([parcel.number, parcel.carrier || parcel.service].filter(Boolean).join(" - ")), 1)]), printing.value == parcel.id ? (openBlock(), createElementBlock("span", _hoisted_7$12)) : (openBlock(), createElementBlock("span", _hoisted_8$11, "print"))], 8, _hoisted_3$16)]);
+						}, [createBaseVNode("span", _hoisted_4$17, [createBaseVNode("span", _hoisted_5$17, toDisplayString(parcel.barcode), 1), createBaseVNode("span", _hoisted_6$15, toDisplayString([parcel.number, parcel.carrier || parcel.service].filter(Boolean).join(" - ")), 1)]), printing.value == parcel.id ? (openBlock(), createElementBlock("span", _hoisted_7$14)) : (openBlock(), createElementBlock("span", _hoisted_8$12, "print"))], 8, _hoisted_3$19)]);
 					}), 128))])]),
 					_: 1
 				}, 8, ["title"]);
 			};
 		}
 	}), [["__scopeId", "data-v-585a06fb"]]);
-	var _hoisted_1$20 = { class: "pse-history" };
-	var _hoisted_2$19 = { class: "pse-history-head" };
-	var _hoisted_3$15 = { class: "pse-history-text" };
-	var _hoisted_4$13 = { class: "pse-history-subtitle" };
-	var _hoisted_5$13 = { class: "pse-history-list" };
-	var _hoisted_6$11 = ["title", "onClick"];
-	var _hoisted_7$11 = { class: "pse-history-body" };
-	var _hoisted_8$10 = { class: "pse-history-number" };
-	var _hoisted_9$10 = {
+	var _hoisted_1$23 = { class: "pse-history" };
+	var _hoisted_2$22 = { class: "pse-history-head" };
+	var _hoisted_3$18 = { class: "pse-history-text" };
+	var _hoisted_4$16 = { class: "pse-history-subtitle" };
+	var _hoisted_5$16 = { class: "pse-history-list" };
+	var _hoisted_6$14 = ["title", "onClick"];
+	var _hoisted_7$13 = { class: "pse-history-body" };
+	var _hoisted_8$11 = { class: "pse-history-number" };
+	var _hoisted_9$11 = {
 		key: 0,
 		class: "pse-history-customer"
 	};
-	var _hoisted_10$10 = { class: "pse-history-meta" };
-	var _hoisted_11$8 = {
+	var _hoisted_10$11 = { class: "pse-history-meta" };
+	var _hoisted_11$9 = {
 		key: 0,
 		class: "pse-history-badge"
 	};
-	var _hoisted_12$7 = { key: 1 };
-	var _hoisted_13$7 = [
+	var _hoisted_12$8 = { key: 1 };
+	var _hoisted_13$8 = [
 		"disabled",
 		"title",
 		"onClick"
 	];
-	var _hoisted_14$6 = {
+	var _hoisted_14$7 = {
 		key: 0,
 		class: "pse-history-spinner",
 		"aria-hidden": "true"
 	};
-	var _hoisted_15$4 = {
+	var _hoisted_15$5 = {
 		key: 1,
 		class: "material-icons pse-history-print-icon",
 		"aria-hidden": "true"
@@ -8552,8 +8599,8 @@
 				return count == 1 ? "1 pakket" : `${count} pakketten`;
 			}
 			return (_ctx, _cache) => {
-				return openBlock(), createElementBlock("aside", _hoisted_1$20, [
-					createBaseVNode("header", _hoisted_2$19, [
+				return openBlock(), createElementBlock("aside", _hoisted_1$23, [
+					createBaseVNode("header", _hoisted_2$22, [
 						_cache[3] || (_cache[3] = createBaseVNode("span", {
 							class: "pse-history-icon",
 							"aria-hidden": "true"
@@ -8571,14 +8618,14 @@
 							cy: "12",
 							r: "8.5"
 						}), createBaseVNode("path", { d: "M12 7.5V12l3 2" })])], -1)),
-						createBaseVNode("span", _hoisted_3$15, [_cache[2] || (_cache[2] = createBaseVNode("h2", { class: "pse-history-title" }, "Afgerond", -1)), createBaseVNode("p", _hoisted_4$13, [createTextVNode(toDisplayString(__props.entries.length) + " " + toDisplayString(__props.entries.length == 1 ? "reservering" : "reserveringen"), 1), failedCount.value ? (openBlock(), createElementBlock(Fragment, { key: 0 }, [createTextVNode(", " + toDisplayString(failedCount.value) + " geweigerd", 1)], 64)) : createCommentVNode("", true)])]),
+						createBaseVNode("span", _hoisted_3$18, [_cache[2] || (_cache[2] = createBaseVNode("h2", { class: "pse-history-title" }, "Afgerond", -1)), createBaseVNode("p", _hoisted_4$16, [createTextVNode(toDisplayString(__props.entries.length) + " " + toDisplayString(__props.entries.length == 1 ? "reservering" : "reserveringen"), 1), failedCount.value ? (openBlock(), createElementBlock(Fragment, { key: 0 }, [createTextVNode(", " + toDisplayString(failedCount.value) + " geweigerd", 1)], 64)) : createCommentVNode("", true)])]),
 						createBaseVNode("button", {
 							type: "button",
 							class: "pse-history-clear",
 							onClick: _cache[0] || (_cache[0] = ($event) => _ctx.$emit("clear"))
 						}, "Wissen")
 					]),
-					createBaseVNode("ol", _hoisted_5$13, [(openBlock(true), createElementBlock(Fragment, null, renderList(__props.entries, (entry) => {
+					createBaseVNode("ol", _hoisted_5$16, [(openBlock(true), createElementBlock(Fragment, null, renderList(__props.entries, (entry) => {
 						return openBlock(), createElementBlock("li", {
 							key: entry.number,
 							class: "pse-history-item"
@@ -8592,11 +8639,11 @@
 								class: "pse-history-marker",
 								"aria-hidden": "true"
 							}, null, -1)),
-							createBaseVNode("span", _hoisted_7$11, [
-								createBaseVNode("span", _hoisted_8$10, toDisplayString(entry.number), 1),
-								entry.customer ? (openBlock(), createElementBlock("span", _hoisted_9$10, toDisplayString(entry.customer), 1)) : createCommentVNode("", true),
-								createBaseVNode("span", _hoisted_10$10, [
-									entry.failed ? (openBlock(), createElementBlock("span", _hoisted_11$8, "Geweigerd")) : (openBlock(), createElementBlock("span", _hoisted_12$7, toDisplayString(parcelLabel(entry.parcels)), 1)),
+							createBaseVNode("span", _hoisted_7$13, [
+								createBaseVNode("span", _hoisted_8$11, toDisplayString(entry.number), 1),
+								entry.customer ? (openBlock(), createElementBlock("span", _hoisted_9$11, toDisplayString(entry.customer), 1)) : createCommentVNode("", true),
+								createBaseVNode("span", _hoisted_10$11, [
+									entry.failed ? (openBlock(), createElementBlock("span", _hoisted_11$9, "Geweigerd")) : (openBlock(), createElementBlock("span", _hoisted_12$8, toDisplayString(parcelLabel(entry.parcels)), 1)),
 									_cache[4] || (_cache[4] = createBaseVNode("span", {
 										class: "pse-history-dot",
 										"aria-hidden": "true"
@@ -8620,14 +8667,14 @@
 								createBaseVNode("path", { d: "M4 7.5l8 4.5 8-4.5" }),
 								createBaseVNode("path", { d: "M12 12v9" })
 							], -1))
-						], 10, _hoisted_6$11), !entry.failed && entry.parcels > 0 ? (openBlock(), createElementBlock("button", {
+						], 10, _hoisted_6$14), !entry.failed && entry.parcels > 0 ? (openBlock(), createElementBlock("button", {
 							key: 0,
 							type: "button",
 							class: "pse-history-print",
 							disabled: Boolean(printing.value),
 							title: `Print het etiket van reservering ${entry.number} opnieuw`,
 							onClick: ($event) => reprint(entry)
-						}, [printing.value == entry.number ? (openBlock(), createElementBlock("span", _hoisted_14$6)) : (openBlock(), createElementBlock("span", _hoisted_15$4, "print"))], 8, _hoisted_13$7)) : createCommentVNode("", true)]);
+						}, [printing.value == entry.number ? (openBlock(), createElementBlock("span", _hoisted_14$7)) : (openBlock(), createElementBlock("span", _hoisted_15$5, "print"))], 8, _hoisted_13$8)) : createCommentVNode("", true)]);
 					}), 128))]),
 					(openBlock(), createBlock(Teleport, { to: "body" }, [createVNode(Transition, { name: "modal" }, {
 						default: withCtx(() => [choice.value ? (openBlock(), createBlock(ParcelPicker_default, {
@@ -8647,17 +8694,17 @@
 			};
 		}
 	}), [["__scopeId", "data-v-0f4a5614"]]);
-	var _hoisted_1$19 = { class: "pse-search" };
-	var _hoisted_2$18 = { class: "pse-main" };
-	var _hoisted_3$14 = { class: "pse-card" };
-	var _hoisted_4$12 = ["disabled"];
-	var _hoisted_5$12 = {
+	var _hoisted_1$22 = { class: "pse-search" };
+	var _hoisted_2$21 = { class: "pse-main" };
+	var _hoisted_3$17 = { class: "pse-card" };
+	var _hoisted_4$15 = ["disabled"];
+	var _hoisted_5$15 = {
 		key: 0,
 		class: "pse-spinner",
 		"aria-hidden": "true"
 	};
-	var _hoisted_6$10 = ["disabled"];
-	var _hoisted_7$10 = { class: "pse-resume-row" };
+	var _hoisted_6$13 = ["disabled"];
+	var _hoisted_7$12 = { class: "pse-resume-row" };
 	var RESERVATION_FORM_ID = "frmReservations";
 	var RESERVATION_NUMBER_INPUT = "#ReservationNumber";
 	var BARCODE_INPUT = "#Productbarcode";
@@ -8888,7 +8935,7 @@
 						onOpen: _cache[1] || (_cache[1] = (reservationId) => openReservation(reservationId))
 					}, null, 8, ["modal-data"])) : createCommentVNode("", true)]),
 					_: 1
-				})])), createBaseVNode("div", _hoisted_1$19, [
+				})])), createBaseVNode("div", _hoisted_1$22, [
 					createBaseVNode("div", {
 						class: "pse-messages",
 						ref_key: "messages",
@@ -8905,7 +8952,7 @@
 						"detail",
 						"tone"
 					])) : createCommentVNode("", true),
-					createBaseVNode("div", { class: normalizeClass(["pse-layout", { "pse-layout-history": hasHistory.value }]) }, [createBaseVNode("div", _hoisted_2$18, [createBaseVNode("div", _hoisted_3$14, [
+					createBaseVNode("div", { class: normalizeClass(["pse-layout", { "pse-layout-history": hasHistory.value }]) }, [createBaseVNode("div", _hoisted_2$21, [createBaseVNode("div", _hoisted_3$17, [
 						createVNode(SearchPanel_default, {
 							title: "Zoek reservering",
 							subtitle: "Scan een product of vul een reserveringsnummer in."
@@ -8941,7 +8988,7 @@
 									class: "pse-submit pse-submit-end",
 									disabled: searching.value,
 									onClick: _cache[5] || (_cache[5] = ($event) => onSearchReservation())
-								}, [searching.value ? (openBlock(), createElementBlock("span", _hoisted_5$12)) : createCommentVNode("", true), createTextVNode(" " + toDisplayString(searching.value ? "Bezig met zoeken" : "Zoek"), 1)], 8, _hoisted_4$12)
+								}, [searching.value ? (openBlock(), createElementBlock("span", _hoisted_5$15)) : createCommentVNode("", true), createTextVNode(" " + toDisplayString(searching.value ? "Bezig met zoeken" : "Zoek"), 1)], 8, _hoisted_4$15)
 							]),
 							_: 1
 						}),
@@ -8979,10 +9026,10 @@
 								type: "submit",
 								class: "pse-submit pse-submit-end",
 								disabled: !addParcelsNumber.value
-							}, " Zoek ", 8, _hoisted_6$10)], 32)]),
+							}, " Zoek ", 8, _hoisted_6$13)], 32)]),
 							_: 1
 						})
-					]), createBaseVNode("div", _hoisted_7$10, [createVNode(ResumeButton_default, {
+					]), createBaseVNode("div", _hoisted_7$12, [createVNode(ResumeButton_default, {
 						label: "Laatst geopende reservering",
 						"reservation-number": lastOpenReservation.value?.number,
 						disabled: !canReopen.value,
@@ -9030,11 +9077,11 @@
 			};
 		}
 	}), [["__scopeId", "data-v-149f9886"]]);
-	var _hoisted_1$18 = { class: "pse-loading" };
-	var _hoisted_2$17 = { class: "pse-loading-card" };
-	var _hoisted_3$13 = { class: "pse-loading-text" };
-	var _hoisted_4$11 = { class: "pse-loading-title" };
-	var _hoisted_5$11 = {
+	var _hoisted_1$21 = { class: "pse-loading" };
+	var _hoisted_2$20 = { class: "pse-loading-card" };
+	var _hoisted_3$16 = { class: "pse-loading-text" };
+	var _hoisted_4$14 = { class: "pse-loading-title" };
+	var _hoisted_5$14 = {
 		key: 0,
 		class: "pse-loading-subtitle"
 	};
@@ -9046,10 +9093,10 @@
 		},
 		setup(__props) {
 			return (_ctx, _cache) => {
-				return openBlock(), createElementBlock("div", _hoisted_1$18, [createBaseVNode("div", _hoisted_2$17, [_cache[0] || (_cache[0] = createBaseVNode("span", {
+				return openBlock(), createElementBlock("div", _hoisted_1$21, [createBaseVNode("div", _hoisted_2$20, [_cache[0] || (_cache[0] = createBaseVNode("span", {
 					class: "pse-loading-spinner",
 					"aria-hidden": "true"
-				}, null, -1)), createBaseVNode("div", _hoisted_3$13, [createBaseVNode("h2", _hoisted_4$11, toDisplayString(__props.title), 1), __props.subtitle ? (openBlock(), createElementBlock("p", _hoisted_5$11, toDisplayString(__props.subtitle), 1)) : createCommentVNode("", true)])])]);
+				}, null, -1)), createBaseVNode("div", _hoisted_3$16, [createBaseVNode("h2", _hoisted_4$14, toDisplayString(__props.title), 1), __props.subtitle ? (openBlock(), createElementBlock("p", _hoisted_5$14, toDisplayString(__props.subtitle), 1)) : createCommentVNode("", true)])])]);
 			};
 		}
 	}), [["__scopeId", "data-v-38d33d98"]]);
@@ -9113,51 +9160,51 @@
 		lineSlot: handle.lineSlot,
 		takenBy: handle.takenBy
 	};
-	var _hoisted_1$17 = { class: "pse-slotcard" };
-	var _hoisted_2$16 = { class: "pse-slotcard-head" };
-	var _hoisted_3$12 = { class: "pse-slotcard-title" };
-	var _hoisted_4$10 = {
+	var _hoisted_1$20 = { class: "pse-slotcard" };
+	var _hoisted_2$19 = { class: "pse-slotcard-head" };
+	var _hoisted_3$15 = { class: "pse-slotcard-title" };
+	var _hoisted_4$13 = {
 		key: 0,
 		class: "pse-slotcard-spinner",
 		role: "status",
 		"aria-label": "Vak wordt opgehaald"
 	};
-	var _hoisted_5$10 = { class: "pse-slotcard-body" };
-	var _hoisted_6$9 = {
+	var _hoisted_5$13 = { class: "pse-slotcard-body" };
+	var _hoisted_6$12 = {
 		key: 0,
 		class: "pse-slotcard-caption"
 	};
-	var _hoisted_7$9 = ["disabled", "title"];
-	var _hoisted_8$9 = {
+	var _hoisted_7$11 = ["disabled", "title"];
+	var _hoisted_8$10 = {
 		key: 0,
 		class: "pse-slot-chip-label"
 	};
-	var _hoisted_9$9 = {
+	var _hoisted_9$10 = {
 		key: 1,
 		class: "pse-slot-chip-empty"
 	};
-	var _hoisted_10$9 = {
+	var _hoisted_10$10 = {
 		key: 2,
 		class: "pse-slot-chip-empty"
 	};
-	var _hoisted_11$7 = {
+	var _hoisted_11$8 = {
 		key: 3,
 		class: "pse-slot-chip-empty"
 	};
-	var _hoisted_12$6 = {
+	var _hoisted_12$7 = {
 		key: 1,
 		class: "pse-slotcard-hint"
 	};
-	var _hoisted_13$6 = {
+	var _hoisted_13$7 = {
 		key: 0,
 		class: "pse-slotcard-caption is-spaced"
 	};
-	var _hoisted_14$5 = {
+	var _hoisted_14$6 = {
 		key: 1,
 		class: "pse-slotcard-list"
 	};
-	var _hoisted_15$3 = { class: "pse-slot-chip-label" };
-	var _hoisted_16$3 = {
+	var _hoisted_15$4 = { class: "pse-slot-chip-label" };
+	var _hoisted_16$4 = {
 		key: 2,
 		class: "pse-slotcard-hint"
 	};
@@ -9189,35 +9236,35 @@
 						onClose: _cache[0] || (_cache[0] = ($event) => showPicker.value = false)
 					}, null, 8, ["subject", "current"])) : createCommentVNode("", true)]),
 					_: 1
-				})])), createBaseVNode("section", _hoisted_1$17, [createBaseVNode("header", _hoisted_2$16, [
+				})])), createBaseVNode("section", _hoisted_1$20, [createBaseVNode("header", _hoisted_2$19, [
 					_cache[2] || (_cache[2] = createBaseVNode("span", {
 						class: "material-icons pse-slotcard-icon",
 						"aria-hidden": "true"
 					}, "inventory_2", -1)),
-					createBaseVNode("h3", _hoisted_3$12, toDisplayString(showLineSlots.value ? "Vakken" : "Vak"), 1),
-					loading.value ? (openBlock(), createElementBlock("span", _hoisted_4$10)) : createCommentVNode("", true)
-				]), createBaseVNode("div", _hoisted_5$10, [showOrderSlot.value ? (openBlock(), createElementBlock(Fragment, { key: 0 }, [
-					showBoth.value ? (openBlock(), createElementBlock("span", _hoisted_6$9, "Hele order")) : createCommentVNode("", true),
+					createBaseVNode("h3", _hoisted_3$15, toDisplayString(showLineSlots.value ? "Vakken" : "Vak"), 1),
+					loading.value ? (openBlock(), createElementBlock("span", _hoisted_4$13)) : createCommentVNode("", true)
+				]), createBaseVNode("div", _hoisted_5$13, [showOrderSlot.value ? (openBlock(), createElementBlock(Fragment, { key: 0 }, [
+					showBoth.value ? (openBlock(), createElementBlock("span", _hoisted_6$12, "Hele order")) : createCommentVNode("", true),
 					createBaseVNode("button", {
 						type: "button",
 						class: normalizeClass(["pse-slot-chip is-large", { "is-empty": !slot.value }]),
 						disabled: !unref(slotStore).ready.value || unref(slotStore).saving.value,
 						title: slot.value ? `Deze order staat in vak ${slot.value}` : "Kies een vak voor deze order",
 						onClick: _cache[1] || (_cache[1] = ($event) => showPicker.value = true)
-					}, [slot.value ? (openBlock(), createElementBlock("span", _hoisted_8$9, toDisplayString(slot.value), 1)) : loading.value ? (openBlock(), createElementBlock("span", _hoisted_9$9, "Ophalen...")) : unavailable.value ? (openBlock(), createElementBlock("span", _hoisted_10$9, "Niet beschikbaar")) : (openBlock(), createElementBlock("span", _hoisted_11$7, [..._cache[3] || (_cache[3] = [createBaseVNode("span", {
+					}, [slot.value ? (openBlock(), createElementBlock("span", _hoisted_8$10, toDisplayString(slot.value), 1)) : loading.value ? (openBlock(), createElementBlock("span", _hoisted_9$10, "Ophalen...")) : unavailable.value ? (openBlock(), createElementBlock("span", _hoisted_10$10, "Niet beschikbaar")) : (openBlock(), createElementBlock("span", _hoisted_11$8, [..._cache[3] || (_cache[3] = [createBaseVNode("span", {
 						class: "material-icons pse-slot-chip-empty-icon",
 						"aria-hidden": "true"
-					}, "add", -1), createTextVNode(" Vak kiezen ", -1)])]))], 10, _hoisted_7$9),
-					!showBoth.value && !loading.value ? (openBlock(), createElementBlock("p", _hoisted_12$6, toDisplayString(unavailable.value ? "Geen verbinding met RetailVista, dus het vak van deze order is niet bekend." : slot.value ? "Alles van deze order staat hier tot de rest binnen is." : "Kies een vak zodra je deze order wegzet."), 1)) : createCommentVNode("", true)
+					}, "add", -1), createTextVNode(" Vak kiezen ", -1)])]))], 10, _hoisted_7$11),
+					!showBoth.value && !loading.value ? (openBlock(), createElementBlock("p", _hoisted_12$7, toDisplayString(unavailable.value ? "Geen verbinding met RetailVista, dus het vak van deze order is niet bekend." : slot.value ? "Alles van deze order staat hier tot de rest binnen is." : "Kies een vak zodra je deze order wegzet."), 1)) : createCommentVNode("", true)
 				], 64)) : createCommentVNode("", true), showLineSlots.value ? (openBlock(), createElementBlock(Fragment, { key: 1 }, [
-					showBoth.value ? (openBlock(), createElementBlock("span", _hoisted_13$6, "Losse regels")) : createCommentVNode("", true),
-					lineSlots.value.length ? (openBlock(), createElementBlock("div", _hoisted_14$5, [(openBlock(true), createElementBlock(Fragment, null, renderList(lineSlots.value, (used) => {
+					showBoth.value ? (openBlock(), createElementBlock("span", _hoisted_13$7, "Losse regels")) : createCommentVNode("", true),
+					lineSlots.value.length ? (openBlock(), createElementBlock("div", _hoisted_14$6, [(openBlock(true), createElementBlock(Fragment, null, renderList(lineSlots.value, (used) => {
 						return openBlock(), createElementBlock("span", {
 							key: used,
 							class: "pse-slot-chip is-static"
-						}, [createBaseVNode("span", _hoisted_15$3, toDisplayString(used), 1)]);
+						}, [createBaseVNode("span", _hoisted_15$4, toDisplayString(used), 1)]);
 					}), 128))])) : createCommentVNode("", true),
-					!loading.value && !unavailable.value ? (openBlock(), createElementBlock("p", _hoisted_16$3, toDisplayString(canAssignLines.value ? lineSlots.value.length ? "Vakken waar losse producten van deze order staan. Kies ze per regel in de productlijst." : "Kies per regel in de productlijst een vak zodra je iets wegzet." : "Losse regels van deze order zijn elders per regel weggezet. Deze werkplek zet één vak per order."), 1)) : createCommentVNode("", true)
+					!loading.value && !unavailable.value ? (openBlock(), createElementBlock("p", _hoisted_16$4, toDisplayString(canAssignLines.value ? lineSlots.value.length ? "Vakken waar losse producten van deze order staan. Kies ze per regel in de productlijst." : "Kies per regel in de productlijst een vak zodra je iets wegzet." : "Losse regels van deze order zijn elders per regel weggezet. Deze werkplek zet één vak per order."), 1)) : createCommentVNode("", true)
 				], 64)) : createCommentVNode("", true)])])], 64);
 			};
 		}
@@ -9292,13 +9339,13 @@
 			setTimeout(done, 3e3);
 		});
 	}
-	var _hoisted_1$16 = ["disabled"];
-	var _hoisted_2$15 = {
+	var _hoisted_1$19 = ["disabled"];
+	var _hoisted_2$18 = {
 		key: 0,
 		class: "pse-raaplijst-spinner",
 		"aria-hidden": "true"
 	};
-	var _hoisted_3$11 = {
+	var _hoisted_3$14 = {
 		key: 1,
 		class: "material-icons pse-raaplijst-icon",
 		"aria-hidden": "true"
@@ -9330,30 +9377,30 @@
 					disabled: printing.value,
 					title: "Print raaplijst 110.1 van deze reservering",
 					onClick: _cache[0] || (_cache[0] = ($event) => print())
-				}, [printing.value ? (openBlock(), createElementBlock("span", _hoisted_2$15)) : (openBlock(), createElementBlock("span", _hoisted_3$11, "print")), createTextVNode(" " + toDisplayString(printing.value ? "Raaplijst wordt opgehaald..." : "Raaplijst printen"), 1)], 8, _hoisted_1$16);
+				}, [printing.value ? (openBlock(), createElementBlock("span", _hoisted_2$18)) : (openBlock(), createElementBlock("span", _hoisted_3$14, "print")), createTextVNode(" " + toDisplayString(printing.value ? "Raaplijst wordt opgehaald..." : "Raaplijst printen"), 1)], 8, _hoisted_1$19);
 			};
 		}
 	}), [["__scopeId", "data-v-b128cb53"]]);
-	var _hoisted_1$15 = { class: "pse-sidebar" };
-	var _hoisted_2$14 = { class: "pse-sidebar-card" };
-	var _hoisted_3$10 = { class: "pse-sidebar-head" };
-	var _hoisted_4$9 = { class: "pse-sidebar-heading-row" };
-	var _hoisted_5$9 = { class: "pse-sidebar-heading" };
-	var _hoisted_6$8 = {
+	var _hoisted_1$18 = { class: "pse-sidebar" };
+	var _hoisted_2$17 = { class: "pse-sidebar-card" };
+	var _hoisted_3$13 = { class: "pse-sidebar-head" };
+	var _hoisted_4$12 = { class: "pse-sidebar-heading-row" };
+	var _hoisted_5$12 = { class: "pse-sidebar-heading" };
+	var _hoisted_6$11 = {
 		key: 0,
 		class: "pse-sidebar-chips"
 	};
-	var _hoisted_7$8 = ["title"];
-	var _hoisted_8$8 = { class: "pse-sidebar-rows" };
-	var _hoisted_9$8 = { class: "pse-sidebar-label" };
-	var _hoisted_10$8 = { class: "pse-sidebar-value" };
-	var _hoisted_11$6 = { class: "pse-sidebar-value-text" };
-	var _hoisted_12$5 = {
+	var _hoisted_7$10 = ["title"];
+	var _hoisted_8$9 = { class: "pse-sidebar-rows" };
+	var _hoisted_9$9 = { class: "pse-sidebar-label" };
+	var _hoisted_10$9 = { class: "pse-sidebar-value" };
+	var _hoisted_11$7 = { class: "pse-sidebar-value-text" };
+	var _hoisted_12$6 = {
 		key: 0,
 		class: "pse-sidebar-address"
 	};
-	var _hoisted_13$5 = { class: "pse-sidebar-label" };
-	var _hoisted_14$4 = { class: "pse-sidebar-address-body" };
+	var _hoisted_13$6 = { class: "pse-sidebar-label" };
+	var _hoisted_14$5 = { class: "pse-sidebar-address-body" };
 	var ReservationSidebar_default = _plugin_vue_export_helper_default(defineComponent({
 		__name: "ReservationSidebar",
 		props: { showRaaplijst: { type: Boolean } },
@@ -9463,7 +9510,7 @@
 				window.open(`${SHOPWARE_URL}/admin#/sw/order/detail/${orderEntry.value.id}/general`, "_blank")?.focus();
 			}
 			return (_ctx, _cache) => {
-				return openBlock(), createElementBlock("aside", _hoisted_1$15, [
+				return openBlock(), createElementBlock("aside", _hoisted_1$18, [
 					unref(hasShopwareOrder) ? (openBlock(), createBlock(ShopwareNote_default, {
 						key: 0,
 						"order-data": orderEntry.value,
@@ -9474,26 +9521,26 @@
 						onOpen
 					}, null, 8, ["order-data", "enabled"])) : createCommentVNode("", true),
 					unref(slotStore).showSlots.value ? (openBlock(), createBlock(SlotCard_default, { key: 1 })) : createCommentVNode("", true),
-					createBaseVNode("div", _hoisted_2$14, [
-						createBaseVNode("header", _hoisted_3$10, [createBaseVNode("div", _hoisted_4$9, [createBaseVNode("h2", _hoisted_5$9, toDisplayString(heading.value), 1), reservationNumber.value ? (openBlock(), createBlock(CopyButton_default, {
+					createBaseVNode("div", _hoisted_2$17, [
+						createBaseVNode("header", _hoisted_3$13, [createBaseVNode("div", _hoisted_4$12, [createBaseVNode("h2", _hoisted_5$12, toDisplayString(heading.value), 1), reservationNumber.value ? (openBlock(), createBlock(CopyButton_default, {
 							key: 0,
 							value: reservationNumber.value,
 							label: `Reserveringsnummer ${reservationNumber.value}`
-						}, null, 8, ["value", "label"])) : createCommentVNode("", true)]), chips.value.length ? (openBlock(), createElementBlock("div", _hoisted_6$8, [(openBlock(true), createElementBlock(Fragment, null, renderList(chips.value, (chip) => {
+						}, null, 8, ["value", "label"])) : createCommentVNode("", true)]), chips.value.length ? (openBlock(), createElementBlock("div", _hoisted_6$11, [(openBlock(true), createElementBlock(Fragment, null, renderList(chips.value, (chip) => {
 							return openBlock(), createElementBlock("span", {
 								key: chip.label,
 								class: "pse-sidebar-chip",
 								title: `${chip.label}: ${chip.value}`
-							}, toDisplayString(chip.value), 9, _hoisted_7$8);
+							}, toDisplayString(chip.value), 9, _hoisted_7$10);
 						}), 128))])) : createCommentVNode("", true)]),
-						createBaseVNode("dl", _hoisted_8$8, [(openBlock(true), createElementBlock(Fragment, null, renderList(rows.value, (row) => {
-							return openBlock(), createElementBlock(Fragment, { key: row.label }, [createBaseVNode("dt", _hoisted_9$8, toDisplayString(row.label), 1), createBaseVNode("dd", _hoisted_10$8, [createBaseVNode("span", _hoisted_11$6, toDisplayString(row.value), 1), isCopyable(row.label) ? (openBlock(), createBlock(CopyButton_default, {
+						createBaseVNode("dl", _hoisted_8$9, [(openBlock(true), createElementBlock(Fragment, null, renderList(rows.value, (row) => {
+							return openBlock(), createElementBlock(Fragment, { key: row.label }, [createBaseVNode("dt", _hoisted_9$9, toDisplayString(row.label), 1), createBaseVNode("dd", _hoisted_10$9, [createBaseVNode("span", _hoisted_11$7, toDisplayString(row.value), 1), isCopyable(row.label) ? (openBlock(), createBlock(CopyButton_default, {
 								key: 0,
 								value: row.value,
 								label: row.label
 							}, null, 8, ["value", "label"])) : createCommentVNode("", true)])], 64);
 						}), 128))]),
-						address.value.length ? (openBlock(), createElementBlock("div", _hoisted_12$5, [createBaseVNode("span", _hoisted_13$5, toDisplayString(addressLabel.value), 1), createBaseVNode("p", _hoisted_14$4, [(openBlock(true), createElementBlock(Fragment, null, renderList(address.value, (line, index) => {
+						address.value.length ? (openBlock(), createElementBlock("div", _hoisted_12$6, [createBaseVNode("span", _hoisted_13$6, toDisplayString(addressLabel.value), 1), createBaseVNode("p", _hoisted_14$5, [(openBlock(true), createElementBlock(Fragment, null, renderList(address.value, (line, index) => {
 							return openBlock(), createElementBlock("span", { key: index }, toDisplayString(line), 1);
 						}), 128))])])) : createCommentVNode("", true),
 						props.showRaaplijst && unref(reservationId) ? (openBlock(), createBlock(RaaplijstButton_default, {
@@ -9506,8 +9553,8 @@
 			};
 		}
 	}), [["__scopeId", "data-v-c2a51d0e"]]);
-	var _hoisted_1$14 = { class: "pse-image" };
-	var _hoisted_2$13 = ["src"];
+	var _hoisted_1$17 = { class: "pse-image" };
+	var _hoisted_2$16 = ["src"];
 	var ImageModal_default = _plugin_vue_export_helper_default(defineComponent({
 		__name: "ImageModal",
 		props: { imageUrl: {} },
@@ -9524,11 +9571,11 @@
 						class: "pse-dialog-btn pse-dialog-btn-quiet",
 						onClick: _cache[0] || (_cache[0] = ($event) => _ctx.$emit("close"))
 					}, " Sluiten ")]),
-					default: withCtx(() => [createBaseVNode("div", _hoisted_1$14, [createBaseVNode("img", {
+					default: withCtx(() => [createBaseVNode("div", _hoisted_1$17, [createBaseVNode("img", {
 						class: "pse-image-photo",
 						src: __props.imageUrl,
 						alt: ""
-					}, null, 8, _hoisted_2$13)])]),
+					}, null, 8, _hoisted_2$16)])]),
 					_: 1
 				});
 			};
@@ -9558,59 +9605,645 @@
 		const loggedInAt = getCurrentUser()?.loggedInAt;
 		if (loggedInAt !== void 0) _GM_setValue(STORAGE_KEYS.instructionsSeen, loggedInAt);
 	}
-	var _hoisted_1$13 = { class: "pse-products" };
-	var _hoisted_2$12 = { class: "pse-products-head" };
-	var _hoisted_3$9 = ["href"];
-	var _hoisted_4$8 = { class: "pse-products-card" };
-	var _hoisted_5$8 = { class: "pse-table" };
-	var _hoisted_6$7 = {
+	var PutWallError = class extends Error {};
+	var TIMEOUT_MS$1 = 8e3;
+	async function getReservationBins(reservationId) {
+		return (await (await send(`reservations/${reservationId}/bins`, "GET")).json()).bins ?? [];
+	}
+	function claimBin(bin, claim) {
+		return post(bin, "claim", claim);
+	}
+	function reportBinTracking(bin, reservationId, tracking, itemCount) {
+		return post(bin, "tracking", {
+			reservationId,
+			tracking,
+			itemCount
+		});
+	}
+	function unclaimBin(bin, reservationId) {
+		return post(bin, "unclaim", { reservationId });
+	}
+	async function post(bin, action, body) {
+		await send(`bins/${encodeURIComponent(bin)}/${action}`, "POST", body, binLabel(bin));
+		debug(`Put wall: ${action} ${bin}`, body);
+	}
+	async function send(route, method, body, subject = "het verzoek") {
+		const base = Settings.putWallUrl.trim().replace(/\/+$/, "");
+		if (!base || !Settings.putWallToken.trim()) throw new PutWallError("De sorteerwand is niet ingesteld op deze werkplek.");
+		let response;
+		try {
+			response = await fetch(`${base}/api/plugin/${route}`, {
+				method,
+				headers: {
+					"Authorization": `Bearer ${Settings.putWallToken.trim()}`,
+					...body ? { "Content-Type": "application/json" } : {}
+				},
+				body: body ? JSON.stringify(body) : void 0,
+				signal: AbortSignal.timeout(TIMEOUT_MS$1)
+			});
+		} catch (error) {
+			console.error("Pack&Ship Extended could not reach the put wall.", error);
+			throw new PutWallError("De sorteerwand is niet bereikbaar.");
+		}
+		if (response.ok) return response;
+		const answer = await response.json().catch(() => null);
+		throw new PutWallError(answer?.error ? withBinLabels(answer.error) : `De sorteerwand weigerde ${subject} (${response.status}).`);
+	}
+	var pickerStyle$1;
+	function hideEnvironmentPicker() {
+		setPickerStyle(`${ENVIRONMENT_SELECT_SELECTOR} { display: none !important; }`);
+	}
+	function setPickerStyle(rule) {
+		if (!pickerStyle$1) {
+			pickerStyle$1 = document.createElement("style");
+			document.documentElement.append(pickerStyle$1);
+		}
+		pickerStyle$1.textContent = rule;
+	}
+	function showEnvironmentPicker() {
+		setPickerStyle(`${ENVIRONMENT_SELECT_SELECTOR} { display: inline-block !important; }`);
+	}
+	function getEnvironmentSelect() {
+		return document.querySelector(ENVIRONMENT_SELECT_SELECTOR);
+	}
+	function getEnvironmentOptions() {
+		const select = getEnvironmentSelect();
+		if (!select) return [];
+		return Array.from(select.options).map((option) => ({
+			id: Number(option.value),
+			name: option.text.trim()
+		})).filter((option) => option.id > 0 && option.name.length > 0);
+	}
+	function getEnvironmentName(environmentId) {
+		return getEnvironmentOptions().find((option) => option.id == environmentId)?.name;
+	}
+	function lockEnvironmentPicker() {
+		const select = getEnvironmentSelect();
+		if (select) syncEnvironmentPicker(select, Settings.environmentId);
+	}
+	function applyConfiguredEnvironment() {
+		const select = getEnvironmentSelect();
+		if (!select) return;
+		const configured = Settings.environmentId;
+		syncEnvironmentPicker(select, configured);
+		if (!(configured > 0)) return;
+		if (Number(select.value) == configured) return;
+		if (!Array.from(select.options).some((option) => Number(option.value) == configured)) {
+			console.warn(`Configured environment (${configured}) is not offered by the portal, leaving the session as it is.`);
+			return;
+		}
+		debug(`Applying configured environment (${configured}), was (${select.value}).`);
+		select.value = String(configured);
+		$(select).trigger("change");
+	}
+	async function switchSessionEnvironment(environmentId) {
+		const form = document.querySelector(ENVIRONMENT_FORM_SELECTOR);
+		if (!form) throw new Error("This page has no environment form to post.");
+		const body = new URLSearchParams();
+		for (const [name, value] of new FormData(form)) body.append(name, String(value));
+		body.set("EnviromentId", String(environmentId));
+		const response = await fetch(`${PACKING_PORTAL_URL}/Home/SetEnviroment`, {
+			method: "POST",
+			body
+		});
+		if (!response.ok) throw new Error(`The portal refused environment ${environmentId} (${response.status}).`);
+		debug(`Session environment set to (${environmentId}) for this announcement.`);
+	}
+	var CVP_ENVIRONMENT_NAME = "INTG_CVP_BRIDGE_IMMEDIATE";
+	function getSessionEnvironmentName(root = document) {
+		if (root == document && Settings.environmentId > 0) return Settings.environmentName || getEnvironmentName(Settings.environmentId) || "";
+		const select = root.querySelector(ENVIRONMENT_SELECT_SELECTOR);
+		return (select?.querySelector("option[selected]") ?? select?.selectedOptions?.[0])?.textContent?.trim() ?? "";
+	}
+	function isCvpEnvironment(name) {
+		return name.trim().toUpperCase() == CVP_ENVIRONMENT_NAME;
+	}
+	function isCvpStation() {
+		return isCvpEnvironment(getSessionEnvironmentName());
+	}
+	function environmentLabel(environmentId) {
+		if (Settings.environmentName) return Settings.environmentName;
+		const name = getEnvironmentName(environmentId);
+		if (name) {
+			Settings.environmentName = name;
+			Settings.save();
+		}
+		return name ?? `#${environmentId}`;
+	}
+	function syncEnvironmentPicker(select, environmentId) {
+		const container = select.closest("form#selectEnviroment") ?? select.parentElement;
+		if (!container) return;
+		let label = container.querySelector(".pse-environment-locked");
+		if (!(environmentId > 0)) {
+			showEnvironmentPicker();
+			label?.remove();
+			return;
+		}
+		hideEnvironmentPicker();
+		if (!label) {
+			label = document.createElement("span");
+			label.className = "pse-environment-locked";
+			label.title = "Vastgezet in de Pack&Ship Extended instellingen";
+			select.insertAdjacentElement("afterend", label);
+		}
+		label.textContent = environmentLabel(environmentId);
+	}
+	function getRenderedParcels(target = document) {
+		return Array.from(target.querySelectorAll(PARCEL_PANE_SELECTOR)).map((pane) => ({
+			id: pane.id.slice(PARCEL_PANE_PREFIX.length),
+			number: (pane.querySelector(".card-title")?.textContent ?? "").split("/")[0].trim()
+		}));
+	}
+	function isParcelFormStale(target = document) {
+		return Array.from(target.querySelectorAll(PARCEL_PANE_SELECTOR)).some((pane) => {
+			const own = pane.querySelector("input[name^='Items['][name$='.ItemId']");
+			return own != null && own.value != pane.id.slice(16);
+		});
+	}
+	async function reloadParcelArea() {
+		const container = document.querySelector(PARCEL_CONTAINER_SELECTOR);
+		if (!container) return;
+		const response = await fetch(window.location.pathname + window.location.search, { cache: "no-store" });
+		if (!response.ok) throw new Error(`The parcels page answered ${response.status}.`);
+		const holder = document.createElement("div");
+		holder.innerHTML = await response.text();
+		const fresh = holder.querySelector(PARCEL_CONTAINER_SELECTOR);
+		if (!fresh) throw new Error("The parcels page came back without its parcel area.");
+		container.innerHTML = fresh.innerHTML;
+		location.href = "javascript:void(init());";
+	}
+	async function parcelExists(parcelId) {
+		try {
+			const response = await fetch(`${PACKING_PORTAL_URL}/Parcels/Edit?itemid=${encodeURIComponent(parcelId)}&cashOnDelivery=false`, { cache: "no-store" });
+			if (response.ok) return (await response.text()).includes("parcelForm");
+			return response.status >= 500 ? false : void 0;
+		} catch {
+			return;
+		}
+	}
+	function parcelHasItems(parcelId) {
+		const index = Array.from(document.querySelectorAll(`#${PARCEL_PANE_PREFIX}${parcelId} input[name^='Items['][name$='.ItemId']`)).map((input) => input.name.match(/^Items\[(\d+)\]\.ItemId$/)?.[1]).find((found) => found !== void 0);
+		if (index === void 0) return;
+		return Array.from(document.querySelectorAll(`input[name^='Items[${index}].Items['][name$='].Amount']`)).some((input) => (Number(input.value.split(",").shift()) || 0) > 0);
+	}
+	var repairing = null;
+	var gaveUp = false;
+	function isRepairingParcelArea() {
+		return repairing != null;
+	}
+	function keepParcelFormInStep() {
+		const container = document.querySelector(PARCEL_CONTAINER_SELECTOR);
+		if (!container) return;
+		let queued = false;
+		const check = () => {
+			queued = false;
+			if (repairing) return;
+			if (!isParcelFormStale()) {
+				gaveUp = false;
+				return;
+			}
+			if (gaveUp) return;
+			debug("The parcel form is out of step with its parcels, reloading the parcel area");
+			repairing = reloadParcelArea().catch((error) => console.error("Pack&Ship Extended could not reload the parcel area.", error)).finally(() => {
+				repairing = null;
+				if (isParcelFormStale()) {
+					gaveUp = true;
+					console.error("Pack&Ship Extended: the parcel area is still out of step after reloading it.");
+				}
+			});
+		};
+		new MutationObserver(() => {
+			if (!queued) {
+				queued = true;
+				setTimeout(check, 0);
+			}
+		}).observe(container, {
+			childList: true,
+			subtree: true
+		});
+		check();
+	}
+	async function parcelAreaSettled() {
+		while (repairing) await repairing;
+	}
+	function getBinRecord(reservationId) {
+		return _GM_getValue(binParcelsKey(reservationId), void 0);
+	}
+	function saveBinRecord(reservationId, record) {
+		_GM_setValue(binParcelsKey(reservationId), record);
+	}
+	function clearBinRecord(reservationId) {
+		_GM_deleteValue(binParcelsKey(reservationId));
+	}
+	function emptyRecord(reservationNumber) {
+		return {
+			reservationNumber,
+			bins: [],
+			parcels: [],
+			printed: [],
+			reported: [],
+			declined: []
+		};
+	}
+	var SCAN_INPUT$1 = "#productBarcode";
+	var SCAN_BUTTON = "#verifyProduct";
+	var BIN_TAB_CLASS = "pse-bin-tab";
+	var BIN_CODE_CLASS = "pse-bin-code";
+	var BIN_DIVIDER_CLASS = "pse-bin-divider";
+	var BIN_HINT_CLASS = "pse-bin-hint";
+	var SCAN_PLACEHOLDER = "Scan een artikel of bak";
+	var BIN_CARD_CLASS = "pse-bin-card";
+	var BIN_NOTE_CLASS = "pse-bin-note";
+	var NEW_PARCEL_TIMEOUT_MS = 1e4;
+	var HAND_BACK_RETRY_MS = 3e4;
+	var RECHECK_PAUSE_MS = 250;
+	var RECHECK_LIMIT = 20;
+	function armBins() {
+		if (!Settings.binsEnabled) return { busy: () => false };
+		const reservationId = getCurrentReservationId();
+		const reservationNumber = getCurrentReservationNumber();
+		if (!reservationId || isMassCompleteReservation(reservationNumber)) return { busy: () => false };
+		let adding = false;
+		let looking = false;
+		let announcing = false;
+		const handingBack = new Map();
+		const handBackFailedAt = new Map();
+		let recheckQueued = false;
+		let rechecks = 0;
+		const record = () => getBinRecord(reservationId) ?? emptyRecord(reservationNumber);
+		const takeBinScan = (event) => {
+			const input = document.querySelector(SCAN_INPUT$1);
+			const code = input?.value.trim().toUpperCase() ?? "";
+			if (!BIN_CODE_PATTERN.test(code)) return;
+			event.preventDefault();
+			event.stopImmediatePropagation();
+			input.value = "";
+			addBin(code);
+		};
+		document.addEventListener("keypress", (event) => {
+			if (event.key == "Enter" && event.target == document.querySelector(SCAN_INPUT$1)) takeBinScan(event);
+		}, true);
+		document.addEventListener("click", (event) => {
+			if (event.target?.closest?.(SCAN_BUTTON)) takeBinScan(event);
+		}, true);
+		function readyForBins() {
+			const missing = Settings.binsMissing();
+			if (missing.length == 0) return true;
+			playSound("warning");
+			toast.error(`Bakken zijn nog niet ingesteld. Vul in bij Instellingen: ${missing.join(", ")}.`);
+			return false;
+		}
+		async function addBin(code, automatic = false) {
+			if (!readyForBins()) return;
+			if (adding) {
+				toast.info("Er wordt al een bak toegevoegd.");
+				return;
+			}
+			await parcelAreaSettled();
+			const existing = record().bins.find((entry) => entry.bin == code);
+			if (existing) {
+				if (getRenderedParcels().some((parcel) => parcel.id == existing.parcelId)) {
+					showParcel(existing.parcelId);
+					return;
+				}
+				await handBack(existing);
+				if (record().bins.some((entry) => entry.bin == code)) {
+					toast.error(`${binLabel(code)} hoort nog bij een pakket dat niet meer te zien is. Laad de pagina opnieuw.`);
+					return;
+				}
+			}
+			adding = true;
+			setBusy(true);
+			try {
+				await claimBin(code, {
+					reservationId: Number(reservationId),
+					reservationNumber: Number(reservationNumber),
+					orderReference: getCurrentOrderNumber() ?? "",
+					customer: getCurrentCustomerName()
+				});
+			} catch (error) {
+				adding = false;
+				setBusy(false);
+				playSound("warning");
+				toast.error(error.message);
+				return;
+			}
+			try {
+				const parcelId = await createParcel();
+				const current = record();
+				current.bins.push({
+					bin: code,
+					parcelId
+				});
+				saveBinRecord(reservationId, current);
+				debug(`Bin ${code} is parcel ${parcelId}`);
+				decorate();
+				showParcel(parcelId);
+				playSound("success");
+				toast.success(automatic ? `${binLabel(code)} hoort bij deze reservering en is toegevoegd. Scan wat erin gaat naar de CVP.` : `${binLabel(code)} toegevoegd. Scan wat erin gaat.`);
+			} catch (error) {
+				console.error("Pack&Ship Extended could not add a parcel for the bin.", error);
+				playSound("error");
+				toast.error(`Er kon geen pakket voor ${binLabel(code)} gemaakt worden.`);
+				unclaimBin(code, Number(reservationId)).catch((unclaimError) => console.error("Pack&Ship Extended could not hand the bin back.", unclaimError));
+			} finally {
+				adding = false;
+				setBusy(false);
+				focusBarcodeInput(SCAN_INPUT$1);
+			}
+		}
+		function decorate() {
+			const tabs = document.querySelector(PARCEL_TABS_SELECTOR);
+			if (!tabs || tabs.childElementCount == 0) return;
+			const current = record();
+			lookForDeletedBins(current);
+			let divider = tabs.querySelector(`.${BIN_DIVIDER_CLASS}`);
+			if (!divider) {
+				divider = document.createElement("li");
+				divider.className = `nav-item ${BIN_DIVIDER_CLASS}`;
+				divider.setAttribute("role", "presentation");
+				divider.textContent = "Bakken";
+			}
+			let hint = tabs.querySelector(`.${BIN_HINT_CLASS}`);
+			if (!hint) {
+				hint = document.createElement("li");
+				hint.className = `nav-item ${BIN_HINT_CLASS}`;
+				hint.setAttribute("role", "presentation");
+				hint.innerHTML = "<span class=\"material-icons\" aria-hidden=\"true\">qr_code_scanner</span>Scan een bak om hem toe te voegen";
+			}
+			const input = document.querySelector(SCAN_INPUT$1);
+			if (input && input.placeholder != SCAN_PLACEHOLDER) input.placeholder = SCAN_PLACEHOLDER;
+			const binItems = current.bins.map((entry) => markBinTab(entry)).filter((item) => Boolean(item));
+			const wanted = [
+				divider,
+				...binItems,
+				hint
+			];
+			const tail = Array.from(tabs.children).slice(-wanted.length);
+			if (wanted.some((item, index) => tail[index] != item)) tabs.append(...wanted);
+			for (const entry of current.bins) markBinCard(entry);
+		}
+		function markBinTab(entry) {
+			const tab = document.querySelector(`#parcel-nav-${entry.parcelId}`);
+			if (!tab) return null;
+			if (!tab.classList.contains(BIN_TAB_CLASS)) tab.classList.add(BIN_TAB_CLASS);
+			if (!tab.querySelector(`.${BIN_CODE_CLASS}`)) {
+				const code = document.createElement("span");
+				code.className = BIN_CODE_CLASS;
+				code.textContent = binLabel(entry.bin);
+				tab.append(code);
+			}
+			return tab.closest("li");
+		}
+		function markBinCard(entry) {
+			const card = document.querySelector(`#parcels-content-${entry.parcelId}`)?.querySelector(".card");
+			const title = card?.querySelector(".card-header .card-title");
+			if (!card || !title) return;
+			if (!card.classList.contains(BIN_CARD_CLASS)) card.classList.add(BIN_CARD_CLASS);
+			if (!card.querySelector(`.${BIN_NOTE_CLASS}`)) {
+				const note = document.createElement("div");
+				note.className = `card-text ${BIN_NOTE_CLASS}`;
+				note.textContent = `${binLabel(entry.bin)} · label naar de CVP`;
+				title.insertAdjacentElement("afterend", note);
+			}
+		}
+		function lookForDeletedBins(current) {
+			if (isRepairingParcelArea() || isParcelFormStale()) {
+				if (!recheckQueued && rechecks < RECHECK_LIMIT) {
+					recheckQueued = true;
+					rechecks++;
+					parcelAreaSettled().then(() => new Promise((resolve) => setTimeout(resolve, RECHECK_PAUSE_MS))).then(() => {
+						recheckQueued = false;
+						decorate();
+					});
+				}
+				return;
+			}
+			rechecks = 0;
+			const present = new Set(getRenderedParcels().map((parcel) => parcel.id));
+			const now = performance.now();
+			for (const entry of current.bins) {
+				if (present.has(entry.parcelId) || handingBack.has(entry.bin)) continue;
+				if (now - (handBackFailedAt.get(entry.bin) ?? -Infinity) < HAND_BACK_RETRY_MS) continue;
+				handBack(entry);
+			}
+		}
+		function handBack(entry) {
+			const running = handingBack.get(entry.bin);
+			if (running) return running;
+			const work = (async () => {
+				if (await parcelExists(entry.parcelId) !== false) return;
+				debug(`Bin ${entry.bin} lost its parcel ${entry.parcelId}, handing it back`);
+				try {
+					await unclaimBin(entry.bin, Number(reservationId));
+				} catch (error) {
+					handBackFailedAt.set(entry.bin, performance.now());
+					toast.error(`${binLabel(entry.bin)} kon niet vrijgegeven worden: ${error.message}`);
+					return;
+				}
+				handBackFailedAt.delete(entry.bin);
+				const current = record();
+				current.bins = current.bins.filter((candidate) => candidate.bin != entry.bin);
+				current.declined = [...new Set([...current.declined ?? [], entry.bin])];
+				saveBinRecord(reservationId, current);
+				toast.info(`${binLabel(entry.bin)} is weer vrij.`);
+				decorate();
+			})().finally(() => handingBack.delete(entry.bin));
+			handingBack.set(entry.bin, work);
+			return work;
+		}
+		const container = document.querySelector(PARCEL_CONTAINER_SELECTOR);
+		if (container) {
+			new MutationObserver(decorate).observe(container, {
+				childList: true,
+				subtree: true
+			});
+			decorate();
+			adoptOrderBin();
+		}
+		async function adoptOrderBin() {
+			if (Settings.binsMissing().length > 0 || isStorePickup()) return;
+			let bins;
+			looking = true;
+			try {
+				bins = await getReservationBins(Number(reservationId));
+			} catch (error) {
+				console.warn("Pack&Ship Extended could not ask the put wall for the order's bins.", error);
+				return;
+			} finally {
+				looking = false;
+			}
+			const current = record();
+			const known = new Set([...current.bins.map((entry) => entry.bin), ...current.declined ?? []]);
+			for (const entry of bins) if (entry.source == "packship" && entry.state == "packing" && !known.has(entry.bin)) {
+				playSound("warning");
+				toast.error(`${binLabel(entry.bin)} is al voor deze reservering geclaimd op een andere werkplek.`);
+			}
+			if (current.bins.length > 0) return;
+			const own = bins.find((entry) => entry.source == "wall" && (entry.state == "complete" || entry.state == "filling") && !known.has(entry.bin));
+			if (own) {
+				debug(`Reservation ${reservationNumber} came from the wall in ${own.bin}, adding it`);
+				await addBin(own.bin, true);
+			}
+		}
+		document.addEventListener("click", (event) => {
+			const button = event.target?.closest?.("button");
+			const announce = document.querySelector(PARCEL_CONTAINER_SELECTOR)?.querySelector(PARCELS_ANNOUNCE_BUTTON_SELECTOR);
+			if (!button || button != announce || announcing) return;
+			if (record().bins.length == 0) return;
+			event.preventDefault();
+			event.stopImmediatePropagation();
+			if (!readyForBins()) return;
+			setBusy(true);
+			parcelAreaSettled().then(() => {
+				const settled = record();
+				const empty = settled.bins.filter((entry) => parcelHasItems(entry.parcelId) === false);
+				if (empty.length > 0) {
+					const names = empty.map((entry) => binLabel(entry.bin)).join(" en ");
+					setBusy(false);
+					playSound("warning");
+					toast.error(`${names} ${empty.length == 1 ? "is" : "zijn"} leeg. Scan er iets in, of verwijder het pakket.`);
+					return false;
+				}
+				settled.parcels = getRenderedParcels();
+				saveBinRecord(reservationId, settled);
+				return switchSessionEnvironment(Settings.noPrintEnvironmentId).then(() => true);
+			}).then((go) => {
+				if (!go) return;
+				announcing = true;
+				announce?.click();
+			}).catch((error) => {
+				console.error("Pack&Ship Extended could not switch to the NOPRINT environment.", error);
+				setBusy(false);
+				playSound("error");
+				toast.error("Aanmelden is gestopt: de omgeving zonder printer kon niet gekozen worden.");
+			});
+		}, true);
+		return { busy: () => adding || looking };
+	}
+	function showParcel(parcelId) {
+		document.querySelector(`#parcel-nav-${parcelId}`)?.click();
+	}
+	async function createParcel() {
+		await parcelAreaSettled();
+		const before = new Set(getRenderedParcels().map((parcel) => parcel.id));
+		const args = newParcelArguments();
+		if (!args) throw new Error("The portal's add-parcel button is not on this page.");
+		const query = new URLSearchParams({
+			reservationId: args.reservationId,
+			parcelServiceId: args.parcelServiceId,
+			parcelServiceCarrierId: args.parcelServiceCarrierId,
+			cashOnDelivery: args.cashOnDelivery
+		});
+		const created = await fetch(`${PACKING_PORTAL_URL}/Parcels/Create?${query}`);
+		if (!created.ok) throw new Error(`Parcels/Create answered ${created.status}.`);
+		const holder = document.createElement("div");
+		holder.innerHTML = await created.text();
+		const form = holder.querySelector("#parcelForm");
+		if (!form) throw new Error("Parcels/Create served no parcel form.");
+		const body = new URLSearchParams();
+		for (const [name, value] of new FormData(form)) body.append(name, String(value));
+		if (!body.get("GrossWeightGrams")) {
+			const known = document.querySelector("input[name$='.GrossWeightGrams']")?.value;
+			body.set("GrossWeightGrams", known || "1000");
+		}
+		const saved = await fetch(`${PACKING_PORTAL_URL}/Parcels/Edit`, {
+			method: "POST",
+			body
+		});
+		if (!saved.ok) throw new Error(`Parcels/Edit answered ${saved.status}.`);
+		const appeared = waitForNewParcel(before);
+		location.href = "javascript:void(refresh());";
+		return appeared;
+	}
+	function waitForNewParcel(before) {
+		const container = document.querySelector(PARCEL_CONTAINER_SELECTOR);
+		return new Promise((resolve, reject) => {
+			if (!container) {
+				reject(new Error("There is no parcel area on this page."));
+				return;
+			}
+			const observer = new MutationObserver(() => {
+				const added = getRenderedParcels().find((parcel) => !before.has(parcel.id));
+				if (added) {
+					observer.disconnect();
+					clearTimeout(timer);
+					resolve(added.id);
+				}
+			});
+			const timer = setTimeout(() => {
+				observer.disconnect();
+				reject(new Error("The new parcel did not appear."));
+			}, NEW_PARCEL_TIMEOUT_MS);
+			observer.observe(container, {
+				childList: true,
+				subtree: true
+			});
+		});
+	}
+	function newParcelArguments() {
+		const match = (document.querySelector("#add-parcel")?.getAttribute("href") ?? "").match(/newParcel\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(\w+)\s*\)/);
+		if (!match) return null;
+		return {
+			reservationId: match[1],
+			parcelServiceId: match[2],
+			parcelServiceCarrierId: match[3],
+			cashOnDelivery: match[4]
+		};
+	}
+	var _hoisted_1$16 = { class: "pse-products" };
+	var _hoisted_2$15 = { class: "pse-products-head" };
+	var _hoisted_3$12 = ["href"];
+	var _hoisted_4$11 = { class: "pse-products-card" };
+	var _hoisted_5$11 = { class: "pse-table" };
+	var _hoisted_6$10 = {
 		key: 0,
 		class: "pse-table-centre"
 	};
-	var _hoisted_7$7 = { key: 0 };
-	var _hoisted_8$7 = { class: "pse-cell-description" };
-	var _hoisted_9$7 = { class: "pse-cell-barcode" };
-	var _hoisted_10$7 = { class: "pse-copy-cell" };
-	var _hoisted_11$5 = { class: "pse-table-centre" };
-	var _hoisted_12$4 = {
+	var _hoisted_7$9 = { key: 0 };
+	var _hoisted_8$8 = { class: "pse-cell-description" };
+	var _hoisted_9$8 = { class: "pse-cell-barcode" };
+	var _hoisted_10$8 = { class: "pse-copy-cell" };
+	var _hoisted_11$6 = { class: "pse-table-centre" };
+	var _hoisted_12$5 = {
 		key: 0,
 		class: "material-icons pse-mark pse-mark-done"
 	};
-	var _hoisted_13$4 = {
+	var _hoisted_13$5 = {
 		key: 1,
 		class: "material-icons pse-mark pse-mark-open"
 	};
-	var _hoisted_14$3 = {
+	var _hoisted_14$4 = {
 		key: 0,
 		class: "pse-table-centre"
 	};
-	var _hoisted_15$2 = [
+	var _hoisted_15$3 = [
 		"disabled",
 		"title",
 		"onClick"
 	];
-	var _hoisted_16$2 = {
+	var _hoisted_16$3 = {
 		key: 0,
 		class: "pse-slot-chip-label"
 	};
-	var _hoisted_17$2 = {
+	var _hoisted_17$3 = {
 		key: 1,
 		class: "pse-slot-chip-empty"
 	};
-	var _hoisted_18$2 = { class: "pse-table-right" };
-	var _hoisted_19$2 = { class: "pse-actions" };
-	var _hoisted_20$2 = ["disabled", "onClick"];
-	var _hoisted_21$2 = ["src"];
-	var _hoisted_22$2 = ["onClick"];
-	var _hoisted_23$2 = ["src"];
-	var _hoisted_24$1 = {
+	var _hoisted_18$3 = { class: "pse-table-right" };
+	var _hoisted_19$3 = { class: "pse-actions" };
+	var _hoisted_20$3 = ["disabled", "onClick"];
+	var _hoisted_21$3 = ["src"];
+	var _hoisted_22$3 = ["onClick"];
+	var _hoisted_23$3 = ["src"];
+	var _hoisted_24$3 = {
 		key: 1,
 		"aria-hidden": "true"
 	};
 	var SCAN_INPUT = "#productBarcode";
 	var SOUND_TAIL_MS = 150;
-	var ANNOUNCE_BUTTON = "div > div:nth-child(4) > div > button";
 	var ANNOUNCING_CLASS = "pse-announcing";
+	var BIN_HOLD_MS = 400;
 	var CreateParcelsPage_default = _plugin_vue_export_helper_default(defineComponent({
 		__name: "CreateParcelsPage",
 		setup(__props) {
@@ -9652,7 +10285,9 @@
 					focusBarcodeInput(SCAN_INPUT);
 					processAutoComplete();
 					observeParcelContainer();
+					keepParcelFormInStep();
 					armFlyerReminder();
+					bins = armBins();
 				});
 				setupSidebar();
 				markParcelsLoading();
@@ -9765,7 +10400,7 @@
 				document.addEventListener("click", (event) => {
 					const button = event.target?.closest?.("button");
 					const container = document.querySelector(PARCEL_CONTAINER_SELECTOR);
-					if (button && button == container?.querySelector(ANNOUNCE_BUTTON)) {
+					if (button && button == container?.querySelector("div > div:nth-child(4) > div > button")) {
 						setBusyNote(FLYER_REMINDER);
 						document.body.classList.add(ANNOUNCING_CLASS);
 					}
@@ -9781,10 +10416,11 @@
 				});
 			}
 			let announceTimer;
+			let bins = { busy: () => false };
 			function autoAnnounceParcels(parcelContainerElement) {
 				if (returning) return;
 				if (!Settings.autoMasterSwitch && !isMassCompleteReservation(getCurrentReservationNumber())) return;
-				const hold = soundHoldMs();
+				const hold = Math.max(soundHoldMs(), bins.busy() ? BIN_HOLD_MS : 0);
 				if (hold > 0) {
 					if (announceTimer === void 0) announceTimer = setTimeout(() => {
 						announceTimer = void 0;
@@ -9792,7 +10428,7 @@
 					}, hold);
 					return;
 				}
-				const announceButton = parcelContainerElement?.querySelector(ANNOUNCE_BUTTON);
+				const announceButton = parcelContainerElement?.querySelector(PARCELS_ANNOUNCE_BUTTON_SELECTOR);
 				if (!announceButton?.hasAttribute("disabled")) {
 					announceButton?.click();
 					debug("Announcing labels");
@@ -9864,31 +10500,31 @@
 						])) : createCommentVNode("", true)]),
 						_: 1
 					})])),
-					createBaseVNode("section", _hoisted_1$13, [
-						createBaseVNode("header", _hoisted_2$12, [_cache[3] || (_cache[3] = createBaseVNode("h2", { class: "pse-products-title" }, "Producten", -1)), createBaseVNode("a", {
+					createBaseVNode("section", _hoisted_1$16, [
+						createBaseVNode("header", _hoisted_2$15, [_cache[3] || (_cache[3] = createBaseVNode("h2", { class: "pse-products-title" }, "Producten", -1)), createBaseVNode("a", {
 							class: "pse-back",
 							href: unref(PACKING_PORTAL_URL)
 						}, [..._cache[2] || (_cache[2] = [createBaseVNode("span", {
 							class: "material-icons pse-back-icon",
 							"aria-hidden": "true"
-						}, "chevron_left", -1), createTextVNode(" Nieuwe zoekopdracht ", -1)])], 8, _hoisted_3$9)]),
-						createBaseVNode("div", _hoisted_4$8, [createBaseVNode("table", _hoisted_5$8, [createBaseVNode("thead", null, [createBaseVNode("tr", null, [
+						}, "chevron_left", -1), createTextVNode(" Nieuwe zoekopdracht ", -1)])], 8, _hoisted_3$12)]),
+						createBaseVNode("div", _hoisted_4$11, [createBaseVNode("table", _hoisted_5$11, [createBaseVNode("thead", null, [createBaseVNode("tr", null, [
 							_cache[4] || (_cache[4] = createBaseVNode("th", null, "Omschrijving", -1)),
 							_cache[5] || (_cache[5] = createBaseVNode("th", null, "Hoofd barcode", -1)),
 							_cache[6] || (_cache[6] = createBaseVNode("th", null, "Gescand", -1)),
 							_cache[7] || (_cache[7] = createBaseVNode("th", { class: "pse-table-centre" }, "Verzameld", -1)),
-							perLineSlots.value ? (openBlock(), createElementBlock("th", _hoisted_6$7, "Vak")) : createCommentVNode("", true),
+							perLineSlots.value ? (openBlock(), createElementBlock("th", _hoisted_6$10, "Vak")) : createCommentVNode("", true),
 							_cache[8] || (_cache[8] = createBaseVNode("th", { class: "pse-table-right" }, "Actie", -1))
-						])]), showRows.value ? (openBlock(), createElementBlock("tbody", _hoisted_7$7, [(openBlock(true), createElementBlock(Fragment, null, renderList(lines.value, (product) => {
+						])]), showRows.value ? (openBlock(), createElementBlock("tbody", _hoisted_7$9, [(openBlock(true), createElementBlock(Fragment, null, renderList(lines.value, (product) => {
 							return openBlock(), createElementBlock("tr", { key: product.key }, [
-								createBaseVNode("td", _hoisted_8$7, toDisplayString(product.description), 1),
-								createBaseVNode("td", _hoisted_9$7, [createBaseVNode("span", _hoisted_10$7, [createTextVNode(toDisplayString(product.mainBarcode) + " ", 1), createVNode(CopyButton_default, {
+								createBaseVNode("td", _hoisted_8$8, toDisplayString(product.description), 1),
+								createBaseVNode("td", _hoisted_9$8, [createBaseVNode("span", _hoisted_10$8, [createTextVNode(toDisplayString(product.mainBarcode) + " ", 1), createVNode(CopyButton_default, {
 									value: product.mainBarcode,
 									label: "Barcode"
 								}, null, 8, ["value"])])]),
 								createBaseVNode("td", null, [createBaseVNode("span", { class: normalizeClass(countClass(product.requiredQuantity, product.verifiedQuantity)) }, toDisplayString(product.verifiedQuantity) + " van " + toDisplayString(product.requiredQuantity), 3)]),
-								createBaseVNode("td", _hoisted_11$5, [product.verifiedQuantity >= product.requiredQuantity ? (openBlock(), createElementBlock("span", _hoisted_12$4, "check_circle")) : (openBlock(), createElementBlock("span", _hoisted_13$4, "radio_button_unchecked"))]),
-								perLineSlots.value ? (openBlock(), createElementBlock("td", _hoisted_14$3, [createBaseVNode("button", {
+								createBaseVNode("td", _hoisted_11$6, [product.verifiedQuantity >= product.requiredQuantity ? (openBlock(), createElementBlock("span", _hoisted_12$5, "check_circle")) : (openBlock(), createElementBlock("span", _hoisted_13$5, "radio_button_unchecked"))]),
+								perLineSlots.value ? (openBlock(), createElementBlock("td", _hoisted_14$4, [createBaseVNode("button", {
 									type: "button",
 									class: normalizeClass(["pse-slot-chip", { "is-empty": !unref(slotStore).lineSlot(product.mainBarcode) }]),
 									disabled: lineChipDisabled(product.mainBarcode),
@@ -9897,11 +10533,11 @@
 										barcode: product.mainBarcode,
 										description: product.description
 									}
-								}, [unref(slotStore).lineSlot(product.mainBarcode) ? (openBlock(), createElementBlock("span", _hoisted_16$2, toDisplayString(unref(slotStore).lineSlot(product.mainBarcode)), 1)) : (openBlock(), createElementBlock("span", _hoisted_17$2, [..._cache[9] || (_cache[9] = [createBaseVNode("span", {
+								}, [unref(slotStore).lineSlot(product.mainBarcode) ? (openBlock(), createElementBlock("span", _hoisted_16$3, toDisplayString(unref(slotStore).lineSlot(product.mainBarcode)), 1)) : (openBlock(), createElementBlock("span", _hoisted_17$3, [..._cache[9] || (_cache[9] = [createBaseVNode("span", {
 									class: "material-icons pse-slot-chip-empty-icon",
 									"aria-hidden": "true"
-								}, "add", -1), createTextVNode(" Vak ", -1)])]))], 10, _hoisted_15$2)])) : createCommentVNode("", true),
-								createBaseVNode("td", _hoisted_18$2, [createBaseVNode("div", _hoisted_19$2, [createBaseVNode("button", {
+								}, "add", -1), createTextVNode(" Vak ", -1)])]))], 10, _hoisted_15$3)])) : createCommentVNode("", true),
+								createBaseVNode("td", _hoisted_18$3, [createBaseVNode("div", _hoisted_19$3, [createBaseVNode("button", {
 									type: "button",
 									class: "pse-action",
 									title: "Product toevoegen",
@@ -9912,7 +10548,7 @@
 									width: "18",
 									height: "18",
 									alt: "Toevoegen"
-								}, null, 8, _hoisted_21$2)], 8, _hoisted_20$2), createBaseVNode("button", {
+								}, null, 8, _hoisted_21$3)], 8, _hoisted_20$3), createBaseVNode("button", {
 									type: "button",
 									class: "pse-action pse-action-quiet",
 									title: "Afbeelding tonen",
@@ -9922,9 +10558,9 @@
 									width: "18",
 									height: "18",
 									alt: "Afbeelding"
-								}, null, 8, _hoisted_23$2)], 8, _hoisted_22$2)])])
+								}, null, 8, _hoisted_23$3)], 8, _hoisted_22$3)])])
 							]);
-						}), 128))])) : (openBlock(), createElementBlock("tbody", _hoisted_24$1, [(openBlock(true), createElementBlock(Fragment, null, renderList(lines.value, (line) => {
+						}), 128))])) : (openBlock(), createElementBlock("tbody", _hoisted_24$3, [(openBlock(true), createElementBlock(Fragment, null, renderList(lines.value, (line) => {
 							return openBlock(), createElementBlock("tr", {
 								key: line.key,
 								class: "pse-skeleton-row"
@@ -9940,7 +10576,7 @@
 				], 64);
 			};
 		}
-	}), [["__scopeId", "data-v-f8cac056"]]);
+	}), [["__scopeId", "data-v-9fcbe33c"]]);
 	function standInForPortalPage(block) {
 		const main = block.closest(MAIN_CONTENT_SELECTOR);
 		if (!main) return () => {};
@@ -9954,7 +10590,7 @@
 			for (const element of hidden) element.classList.remove("pse-portal-replaced");
 		};
 	}
-	var _hoisted_1$12 = { class: "pse-pickup-facts" };
+	var _hoisted_1$15 = { class: "pse-pickup-facts" };
 	var PickupNotice_default = _plugin_vue_export_helper_default(defineComponent({
 		__name: "PickupNotice",
 		props: {
@@ -9982,7 +10618,7 @@
 						createTextVNode(". Zet de pakketten in het vak "),
 						createBaseVNode("strong", null, "Afhalen in de winkel"),
 						createTextVNode(". ")
-					], -1)), createBaseVNode("dl", _hoisted_1$12, [
+					], -1)), createBaseVNode("dl", _hoisted_1$15, [
 						__props.reservationNumber ? (openBlock(), createElementBlock(Fragment, { key: 0 }, [_cache[1] || (_cache[1] = createBaseVNode("dt", null, "Reservering", -1)), createBaseVNode("dd", null, toDisplayString(__props.reservationNumber), 1)], 64)) : createCommentVNode("", true),
 						__props.customer ? (openBlock(), createElementBlock(Fragment, { key: 1 }, [_cache[2] || (_cache[2] = createBaseVNode("dt", null, "Klant", -1)), createBaseVNode("dd", null, toDisplayString(__props.customer), 1)], 64)) : createCommentVNode("", true),
 						__props.transport ? (openBlock(), createElementBlock(Fragment, { key: 2 }, [_cache[3] || (_cache[3] = createBaseVNode("dt", null, "Transport", -1)), createBaseVNode("dd", null, toDisplayString(__props.transport), 1)], 64)) : createCommentVNode("", true)
@@ -9992,12 +10628,134 @@
 			};
 		}
 	}), [["__scopeId", "data-v-095d747a"]]);
-	var _hoisted_1$11 = { class: "pse-done-layout" };
-	var _hoisted_2$11 = {
+	var _hoisted_1$14 = { class: "pse-bin-labels" };
+	var _hoisted_2$14 = { class: "pse-bin-labels-list" };
+	var _hoisted_3$11 = {
+		class: "material-icons pse-bin-labels-icon",
+		"aria-hidden": "true"
+	};
+	var _hoisted_4$10 = { class: "pse-bin-labels-text" };
+	var _hoisted_5$10 = { class: "pse-bin-labels-name" };
+	var _hoisted_6$9 = { class: "pse-bin-labels-status" };
+	var BinLabelsPanel_default = _plugin_vue_export_helper_default(defineComponent({
+		__name: "BinLabelsPanel",
+		props: {
+			reservationId: {},
+			parcels: {}
+		},
+		emits: ["done", "failed"],
+		setup(__props, { emit: __emit }) {
+			const props = __props;
+			const emit = __emit;
+			const lines = ref([]);
+			const running = ref(false);
+			const failed = computed(() => !running.value && lines.value.some((line) => line.state == "failed"));
+			onMounted(run);
+			async function run() {
+				const record = getBinRecord(props.reservationId);
+				if (!record) {
+					emit("done");
+					return;
+				}
+				running.value = true;
+				lines.value = record.parcels.map((parcel) => ({
+					parcelId: parcel.id,
+					number: parcel.number,
+					bin: record.bins.find((entry) => entry.parcelId == parcel.id)?.bin,
+					state: "waiting"
+				})).sort((a, b) => Number(Boolean(a.bin)) - Number(Boolean(b.bin)));
+				if (lines.value.length == 0) lines.value = record.bins.map((entry) => ({
+					parcelId: entry.parcelId,
+					number: "",
+					bin: entry.bin,
+					state: "failed",
+					error: "Niet bekend welk pakket dit is. Print het label via de ERP."
+				}));
+				for (const line of lines.value) {
+					if (line.state == "failed") continue;
+					const parcel = props.parcels.find((candidate) => candidate.number == line.number);
+					if (!parcel?.barcode) {
+						fail(line, "Dit pakket heeft geen barcode gekregen.");
+						continue;
+					}
+					if (!record.printed.includes(line.parcelId)) {
+						line.state = "printing";
+						try {
+							const environmentId = line.bin ? Settings.binWallEnvironmentId : Settings.environmentId;
+							const { printer } = await printParcelLabel(props.reservationId, line.parcelId, environmentId);
+							line.printer = printer;
+							record.printed.push(line.parcelId);
+							saveBinRecord(props.reservationId, record);
+						} catch (error) {
+							if (error instanceof ErpSignedOutError) erpStore.reportSignedOut();
+							console.error("Pack&Ship Extended could not send a label.", error);
+							fail(line, "Het label kon niet geprint worden.");
+							continue;
+						}
+					}
+					if (line.bin && !record.reported.includes(line.bin)) {
+						line.state = "reporting";
+						try {
+							await reportBinTracking(line.bin, Number(props.reservationId), parcel.barcode, parcel.units);
+							record.reported.push(line.bin);
+							saveBinRecord(props.reservationId, record);
+						} catch (error) {
+							fail(line, error.message);
+							continue;
+						}
+					}
+					line.state = "done";
+				}
+				running.value = false;
+				if (lines.value.every((line) => line.state == "done")) {
+					clearBinRecord(props.reservationId);
+					emit("done");
+				} else {
+					playSound("error");
+					emit("failed");
+				}
+			}
+			function fail(line, error) {
+				line.state = "failed";
+				line.error = error;
+			}
+			function name(line) {
+				return line.bin ? binLabel(line.bin) : `Pakket ${line.number}`;
+			}
+			function status(line) {
+				switch (line.state) {
+					case "waiting": return "Wacht";
+					case "printing": return "Label wordt geprint...";
+					case "reporting": return "Wordt gemeld bij de sorteerwand...";
+					case "done": return line.bin ? "Label bij de CVP, gemeld bij de sorteerwand" : line.printer ? `Geprint op ${line.printer}` : "Geprint";
+					case "failed": return line.error ?? "Mislukt";
+				}
+			}
+			return (_ctx, _cache) => {
+				return openBlock(), createElementBlock("section", _hoisted_1$14, [
+					_cache[1] || (_cache[1] = createBaseVNode("h2", { class: "pse-bin-labels-title" }, "Labels", -1)),
+					createBaseVNode("ul", _hoisted_2$14, [(openBlock(true), createElementBlock(Fragment, null, renderList(lines.value, (line) => {
+						return openBlock(), createElementBlock("li", {
+							key: line.parcelId,
+							class: normalizeClass(["pse-bin-labels-line", [`is-${line.state}`, { "is-bin": line.bin }]])
+						}, [createBaseVNode("span", _hoisted_3$11, toDisplayString(line.state == "done" ? "check_circle" : line.state == "failed" ? "error" : line.bin ? "shopping_basket" : "inventory_2"), 1), createBaseVNode("span", _hoisted_4$10, [createBaseVNode("span", _hoisted_5$10, toDisplayString(name(line)), 1), createBaseVNode("span", _hoisted_6$9, toDisplayString(status(line)), 1)])], 2);
+					}), 128))]),
+					failed.value ? (openBlock(), createElementBlock("button", {
+						key: 0,
+						type: "button",
+						class: "pse-done-button",
+						onClick: _cache[0] || (_cache[0] = ($event) => run())
+					}, " Opnieuw proberen ")) : createCommentVNode("", true)
+				]);
+			};
+		}
+	}), [["__scopeId", "data-v-d83aa205"]]);
+	var _hoisted_1$13 = { class: "pse-done-layout" };
+	var _hoisted_2$13 = {
 		key: 0,
 		class: "pse-done-side"
 	};
-	var _hoisted_3$8 = {
+	var _hoisted_3$10 = {
 		key: 0,
 		viewBox: "0 0 24 24",
 		width: "30",
@@ -10008,7 +10766,7 @@
 		"stroke-linecap": "round",
 		"stroke-linejoin": "round"
 	};
-	var _hoisted_4$7 = {
+	var _hoisted_4$9 = {
 		key: 1,
 		viewBox: "0 0 24 24",
 		width: "30",
@@ -10019,73 +10777,77 @@
 		"stroke-linecap": "round",
 		"stroke-linejoin": "round"
 	};
-	var _hoisted_5$7 = {
+	var _hoisted_5$9 = {
 		key: 2,
 		class: "pse-done-spinner"
 	};
-	var _hoisted_6$6 = { class: "pse-done-title" };
-	var _hoisted_7$6 = {
+	var _hoisted_6$8 = { class: "pse-done-title" };
+	var _hoisted_7$8 = {
 		key: 0,
 		class: "pse-done-number pse-copy-cell"
 	};
-	var _hoisted_8$6 = {
+	var _hoisted_8$7 = {
 		key: 1,
 		class: "pse-done-failures"
 	};
-	var _hoisted_9$6 = {
+	var _hoisted_9$7 = {
 		key: 0,
 		class: "pse-done-failure-step"
 	};
-	var _hoisted_10$6 = {
+	var _hoisted_10$7 = {
 		key: 1,
 		class: "pse-done-failure-detail"
 	};
-	var _hoisted_11$4 = {
+	var _hoisted_11$5 = {
 		key: 2,
 		class: "pse-done-text"
 	};
-	var _hoisted_12$3 = {
+	var _hoisted_12$4 = {
 		key: 3,
 		class: "pse-done-text"
 	};
-	var _hoisted_13$3 = {
+	var _hoisted_13$4 = {
 		key: 4,
 		class: "pse-done-text"
 	};
-	var _hoisted_14$2 = {
+	var _hoisted_14$3 = {
 		key: 5,
 		class: "pse-done-text"
 	};
-	var _hoisted_15$1 = {
+	var _hoisted_15$2 = {
 		key: 6,
+		class: "pse-done-text"
+	};
+	var _hoisted_16$2 = {
+		key: 7,
 		class: "pse-done-flyer"
 	};
-	var _hoisted_16$1 = {
-		key: 7,
+	var _hoisted_17$2 = {
+		key: 9,
 		class: "pse-done-actions"
 	};
-	var _hoisted_17$1 = {
+	var _hoisted_18$2 = {
 		key: 1,
 		class: "pse-done-parcels-column"
 	};
-	var _hoisted_18$1 = {
+	var _hoisted_19$2 = {
 		key: 0,
 		class: "pse-done-parcels"
 	};
-	var _hoisted_19$1 = { class: "pse-done-parcel-name" };
-	var _hoisted_20$1 = {
+	var _hoisted_20$2 = { class: "pse-done-parcel-name" };
+	var _hoisted_21$2 = {
 		key: 0,
 		class: "pse-done-parcel-fields"
 	};
-	var _hoisted_21$1 = { class: "pse-copy-cell" };
-	var _hoisted_22$1 = {
+	var _hoisted_22$2 = { class: "pse-copy-cell" };
+	var _hoisted_23$2 = {
 		key: 1,
 		class: "pse-done-parcel-lines"
 	};
-	var _hoisted_23$1 = { class: "pse-done-parcel-amount" };
-	var _hoisted_24 = { class: "pse-done-parcel-product" };
-	var _hoisted_25 = { class: "pse-done-parcel-product-name" };
-	var _hoisted_26 = {
+	var _hoisted_24$2 = { class: "pse-done-parcel-amount" };
+	var _hoisted_25$2 = { class: "pse-done-parcel-product" };
+	var _hoisted_26$2 = { class: "pse-done-parcel-product-name" };
+	var _hoisted_27$2 = {
 		key: 0,
 		class: "pse-done-parcel-barcode pse-copy-cell"
 	};
@@ -10108,6 +10870,14 @@
 			const parcelsUrl = ref("");
 			const parcels = ref([]);
 			const proceedLabel = ref("Afronden");
+			const binLabels = ref(false);
+			const binLabelsFailed = ref(false);
+			const reservationId = ref("");
+			const completedParcels = computed(() => parcels.value.map((parcel) => ({
+				number: parcel.title.split("/")[0].trim(),
+				barcode: parcel.fields.find((field) => isBarcode(field.label))?.value ?? "",
+				units: parcel.lines.reduce((sum, line) => sum + (parseInt(line.amount, 10) || 0), 0)
+			})));
 			const root = useTemplateRef("root");
 			let restorePortalPage = null;
 			onMounted(() => {
@@ -10126,6 +10896,8 @@
 					number: getCurrentReservationNumber()
 				};
 				setLastCompletedReservation(finished);
+				reservationId.value = finished.id;
+				binLabels.value = !failed.value && !props.announced && Boolean(getBinRecord(finished.id)?.bins.length);
 				recordCompletedReservation({
 					...finished,
 					completedAt: Date.now(),
@@ -10141,7 +10913,7 @@
 				if (failed.value) playSound("error");
 				pickup.value = !failed.value && !props.announced && isStorePickup(pickupTransport.value) && !isMassCompleteReservation(reservationNumber.value);
 				if (pickup.value) playSound("warning");
-				if (failed.value || props.announced || pickup.value || !Settings.autoMasterSwitch) return;
+				if (failed.value || props.announced || pickup.value || binLabels.value || !Settings.autoMasterSwitch) return;
 				finalizing.value = true;
 				afterReveal(() => afterPaint(finalize));
 			});
@@ -10237,9 +11009,20 @@
 				}
 				button.click();
 			}
+			function onBinLabelsDone() {
+				binLabels.value = false;
+				binLabelsFailed.value = false;
+				if (!Settings.autoMasterSwitch || pickup.value) return;
+				finalizing.value = true;
+				afterPaint(finalize);
+			}
+			function finalizeWithoutLabels() {
+				clearBinRecord(reservationId.value);
+				finalize();
+			}
 			function confirmPickup() {
 				pickup.value = false;
-				if (!Settings.autoMasterSwitch) return;
+				if (!Settings.autoMasterSwitch || binLabels.value) return;
 				finalizing.value = true;
 				afterPaint(finalize);
 			}
@@ -10271,8 +11054,8 @@
 						"is-failed": failed.value,
 						"is-detailed": detailed.value
 					}])
-				}, [createBaseVNode("div", _hoisted_1$11, [
-					detailed.value ? (openBlock(), createElementBlock("aside", _hoisted_2$11, [createVNode(ReservationSidebar_default)])) : createCommentVNode("", true),
+				}, [createBaseVNode("div", _hoisted_1$13, [
+					detailed.value ? (openBlock(), createElementBlock("aside", _hoisted_2$13, [createVNode(ReservationSidebar_default)])) : createCommentVNode("", true),
 					createBaseVNode("div", { class: normalizeClass(["pse-done-card", { "is-failed": failed.value }]) }, [
 						createBaseVNode("span", {
 							class: normalizeClass(["pse-done-mark", {
@@ -10280,55 +11063,67 @@
 								"is-failed": failed.value
 							}]),
 							"aria-hidden": "true"
-						}, [failed.value ? (openBlock(), createElementBlock("svg", _hoisted_3$8, [..._cache[4] || (_cache[4] = [
+						}, [failed.value ? (openBlock(), createElementBlock("svg", _hoisted_3$10, [..._cache[7] || (_cache[7] = [
 							createBaseVNode("path", { d: "M12 8v5" }, null, -1),
 							createBaseVNode("path", { d: "M12 16.6v.1" }, null, -1),
 							createBaseVNode("path", { d: "M10.3 3.9L2.6 17.2A2 2 0 004.3 20.2h15.4a2 2 0 001.7-3L13.7 3.9a2 2 0 00-3.4 0z" }, null, -1)
-						])])) : !finalizing.value ? (openBlock(), createElementBlock("svg", _hoisted_4$7, [..._cache[5] || (_cache[5] = [createBaseVNode("path", { d: "M5 12.5l4.5 4.5L19 7.5" }, null, -1)])])) : (openBlock(), createElementBlock("span", _hoisted_5$7))], 2),
-						createBaseVNode("h1", _hoisted_6$6, toDisplayString(failed.value ? heading.value || "Reservering niet verzonden" : __props.announced ? "Pakket aangemeld" : "Reservering afgerond"), 1),
-						reservationNumber.value ? (openBlock(), createElementBlock("p", _hoisted_7$6, [createTextVNode(toDisplayString(reservationNumber.value) + " ", 1), createVNode(CopyButton_default, {
+						])])) : !finalizing.value ? (openBlock(), createElementBlock("svg", _hoisted_4$9, [..._cache[8] || (_cache[8] = [createBaseVNode("path", { d: "M5 12.5l4.5 4.5L19 7.5" }, null, -1)])])) : (openBlock(), createElementBlock("span", _hoisted_5$9))], 2),
+						createBaseVNode("h1", _hoisted_6$8, toDisplayString(failed.value ? heading.value || "Reservering niet verzonden" : __props.announced ? "Pakket aangemeld" : "Reservering afgerond"), 1),
+						reservationNumber.value ? (openBlock(), createElementBlock("p", _hoisted_7$8, [createTextVNode(toDisplayString(reservationNumber.value) + " ", 1), createVNode(CopyButton_default, {
 							value: reservationNumber.value,
 							label: `Reserveringsnummer ${reservationNumber.value}`
 						}, null, 8, ["value", "label"])])) : createCommentVNode("", true),
-						failed.value ? (openBlock(), createElementBlock("ul", _hoisted_8$6, [(openBlock(true), createElementBlock(Fragment, null, renderList(failures.value, (failure, index) => {
+						failed.value ? (openBlock(), createElementBlock("ul", _hoisted_8$7, [(openBlock(true), createElementBlock(Fragment, null, renderList(failures.value, (failure, index) => {
 							return openBlock(), createElementBlock("li", {
 								class: "pse-done-failure",
 								key: index
-							}, [failure.step ? (openBlock(), createElementBlock("span", _hoisted_9$6, toDisplayString(failure.step), 1)) : createCommentVNode("", true), failure.detail ? (openBlock(), createElementBlock("span", _hoisted_10$6, toDisplayString(failure.detail), 1)) : createCommentVNode("", true)]);
+							}, [failure.step ? (openBlock(), createElementBlock("span", _hoisted_9$7, toDisplayString(failure.step), 1)) : createCommentVNode("", true), failure.detail ? (openBlock(), createElementBlock("span", _hoisted_10$7, toDisplayString(failure.detail), 1)) : createCommentVNode("", true)]);
 						}), 128))])) : createCommentVNode("", true),
-						failed.value ? (openBlock(), createElementBlock("p", _hoisted_11$4, " De pakketten zijn niet aangemeld. Ga terug naar de pakketten om het opnieuw te proberen. ")) : __props.announced ? (openBlock(), createElementBlock("p", _hoisted_12$3, " Het label is geprint en het pakket is aangemeld. De reservering was al afgerond en blijft dat. ")) : finalizing.value ? (openBlock(), createElementBlock("p", _hoisted_13$3, " Wordt afgesloten en gaat terug naar zoeken... ")) : (openBlock(), createElementBlock("p", _hoisted_14$2, " De pakketten zijn aangemeld. Sluit de reservering af om verder te gaan. ")),
-						!failed.value && !__props.announced ? (openBlock(), createElementBlock("p", _hoisted_15$1, toDisplayString(unref(FLYER_REMINDER)), 1)) : createCommentVNode("", true),
-						failed.value ? (openBlock(), createElementBlock("div", _hoisted_16$1, [parcelsUrl.value ? (openBlock(), createElementBlock("button", {
+						failed.value ? (openBlock(), createElementBlock("p", _hoisted_11$5, " De pakketten zijn niet aangemeld. Ga terug naar de pakketten om het opnieuw te proberen. ")) : __props.announced ? (openBlock(), createElementBlock("p", _hoisted_12$4, " Het label is geprint en het pakket is aangemeld. De reservering was al afgerond en blijft dat. ")) : binLabels.value ? (openBlock(), createElementBlock("p", _hoisted_13$4, " De pakketten zijn aangemeld. De labels gaan nu naar hun printer: de bakken naar de CVP. ")) : finalizing.value ? (openBlock(), createElementBlock("p", _hoisted_14$3, " Wordt afgesloten en gaat terug naar zoeken... ")) : (openBlock(), createElementBlock("p", _hoisted_15$2, " De pakketten zijn aangemeld. Sluit de reservering af om verder te gaan. ")),
+						!failed.value && !__props.announced ? (openBlock(), createElementBlock("p", _hoisted_16$2, toDisplayString(unref(FLYER_REMINDER)), 1)) : createCommentVNode("", true),
+						binLabels.value ? (openBlock(), createBlock(BinLabelsPanel_default, {
+							key: 8,
+							"reservation-id": reservationId.value,
+							parcels: completedParcels.value,
+							onDone: _cache[1] || (_cache[1] = ($event) => onBinLabelsDone()),
+							onFailed: _cache[2] || (_cache[2] = ($event) => binLabelsFailed.value = true)
+						}, null, 8, ["reservation-id", "parcels"])) : createCommentVNode("", true),
+						failed.value ? (openBlock(), createElementBlock("div", _hoisted_17$2, [parcelsUrl.value ? (openBlock(), createElementBlock("button", {
 							key: 0,
 							type: "button",
 							class: "pse-done-button",
-							onClick: _cache[1] || (_cache[1] = ($event) => backToParcels())
+							onClick: _cache[3] || (_cache[3] = ($event) => backToParcels())
 						}, " Terug naar pakketten ")) : createCommentVNode("", true), createBaseVNode("button", {
 							type: "button",
 							class: "pse-done-button is-quiet",
-							onClick: _cache[2] || (_cache[2] = ($event) => finalize())
-						}, toDisplayString(proceedLabel.value), 1)])) : !finalizing.value ? (openBlock(), createElementBlock("button", {
-							key: 8,
+							onClick: _cache[4] || (_cache[4] = ($event) => finalize())
+						}, toDisplayString(proceedLabel.value), 1)])) : binLabels.value && binLabelsFailed.value ? (openBlock(), createElementBlock("button", {
+							key: 10,
+							type: "button",
+							class: "pse-done-button is-quiet",
+							onClick: _cache[5] || (_cache[5] = ($event) => finalizeWithoutLabels())
+						}, toDisplayString(proceedLabel.value), 1)) : !finalizing.value && !binLabels.value ? (openBlock(), createElementBlock("button", {
+							key: 11,
 							type: "button",
 							class: "pse-done-button",
-							onClick: _cache[3] || (_cache[3] = ($event) => finalize())
+							onClick: _cache[6] || (_cache[6] = ($event) => finalize())
 						}, toDisplayString(proceedLabel.value), 1)) : createCommentVNode("", true)
 					], 2),
-					detailed.value ? (openBlock(), createElementBlock("aside", _hoisted_17$1, [parcels.value.length ? (openBlock(), createElementBlock("section", _hoisted_18$1, [_cache[6] || (_cache[6] = createBaseVNode("h2", { class: "pse-done-parcels-title" }, "Pakketten", -1)), (openBlock(true), createElementBlock(Fragment, null, renderList(parcels.value, (parcel, index) => {
+					detailed.value ? (openBlock(), createElementBlock("aside", _hoisted_18$2, [parcels.value.length ? (openBlock(), createElementBlock("section", _hoisted_19$2, [_cache[9] || (_cache[9] = createBaseVNode("h2", { class: "pse-done-parcels-title" }, "Pakketten", -1)), (openBlock(true), createElementBlock(Fragment, null, renderList(parcels.value, (parcel, index) => {
 						return openBlock(), createElementBlock("article", {
 							class: "pse-done-parcel",
 							key: index
 						}, [
-							createBaseVNode("h3", _hoisted_19$1, toDisplayString(parcel.title), 1),
-							parcel.fields.length ? (openBlock(), createElementBlock("dl", _hoisted_20$1, [(openBlock(true), createElementBlock(Fragment, null, renderList(parcel.fields, (field) => {
-								return openBlock(), createElementBlock(Fragment, { key: field.label }, [createBaseVNode("dt", null, toDisplayString(field.label), 1), createBaseVNode("dd", null, [createBaseVNode("span", _hoisted_21$1, [createTextVNode(toDisplayString(field.value) + " ", 1), isBarcode(field.label) ? (openBlock(), createBlock(CopyButton_default, {
+							createBaseVNode("h3", _hoisted_20$2, toDisplayString(parcel.title), 1),
+							parcel.fields.length ? (openBlock(), createElementBlock("dl", _hoisted_21$2, [(openBlock(true), createElementBlock(Fragment, null, renderList(parcel.fields, (field) => {
+								return openBlock(), createElementBlock(Fragment, { key: field.label }, [createBaseVNode("dt", null, toDisplayString(field.label), 1), createBaseVNode("dd", null, [createBaseVNode("span", _hoisted_22$2, [createTextVNode(toDisplayString(field.value) + " ", 1), isBarcode(field.label) ? (openBlock(), createBlock(CopyButton_default, {
 									key: 0,
 									value: field.value,
 									label: field.label
 								}, null, 8, ["value", "label"])) : createCommentVNode("", true)])])], 64);
 							}), 128))])) : createCommentVNode("", true),
-							parcel.lines.length ? (openBlock(), createElementBlock("ul", _hoisted_22$1, [(openBlock(true), createElementBlock(Fragment, null, renderList(parcel.lines, (line, lineIndex) => {
-								return openBlock(), createElementBlock("li", { key: lineIndex }, [createBaseVNode("span", _hoisted_23$1, toDisplayString(line.amount) + "×", 1), createBaseVNode("span", _hoisted_24, [createBaseVNode("span", _hoisted_25, toDisplayString(line.name), 1), line.barcode ? (openBlock(), createElementBlock("span", _hoisted_26, [createTextVNode(toDisplayString(line.barcode) + " ", 1), createVNode(CopyButton_default, {
+							parcel.lines.length ? (openBlock(), createElementBlock("ul", _hoisted_23$2, [(openBlock(true), createElementBlock(Fragment, null, renderList(parcel.lines, (line, lineIndex) => {
+								return openBlock(), createElementBlock("li", { key: lineIndex }, [createBaseVNode("span", _hoisted_24$2, toDisplayString(line.amount) + "×", 1), createBaseVNode("span", _hoisted_25$2, [createBaseVNode("span", _hoisted_26$2, toDisplayString(line.name), 1), line.barcode ? (openBlock(), createElementBlock("span", _hoisted_27$2, [createTextVNode(toDisplayString(line.barcode) + " ", 1), createVNode(CopyButton_default, {
 									value: line.barcode,
 									label: "Barcode"
 								}, null, 8, ["value"])])) : createCommentVNode("", true)])]);
@@ -10338,18 +11133,18 @@
 				])], 2)) : createCommentVNode("", true)], 512);
 			};
 		}
-	}), [["__scopeId", "data-v-c8d78d22"]]);
-	var _hoisted_1$10 = { class: "pse-products" };
-	var _hoisted_2$10 = { class: "pse-products-card" };
-	var _hoisted_3$7 = { class: "pse-table" };
-	var _hoisted_4$6 = { class: "pse-cell-description" };
-	var _hoisted_5$6 = { class: "pse-cell-barcode" };
-	var _hoisted_6$5 = { class: "pse-copy-cell" };
-	var _hoisted_7$5 = { class: "pse-cell-quantity" };
-	var _hoisted_8$5 = { class: "pse-table-right" };
-	var _hoisted_9$5 = { class: "pse-actions" };
-	var _hoisted_10$5 = ["onClick"];
-	var _hoisted_11$3 = ["src"];
+	}), [["__scopeId", "data-v-2834e9d3"]]);
+	var _hoisted_1$12 = { class: "pse-products" };
+	var _hoisted_2$12 = { class: "pse-products-card" };
+	var _hoisted_3$9 = { class: "pse-table" };
+	var _hoisted_4$8 = { class: "pse-cell-description" };
+	var _hoisted_5$8 = { class: "pse-cell-barcode" };
+	var _hoisted_6$7 = { class: "pse-copy-cell" };
+	var _hoisted_7$7 = { class: "pse-cell-quantity" };
+	var _hoisted_8$6 = { class: "pse-table-right" };
+	var _hoisted_9$6 = { class: "pse-actions" };
+	var _hoisted_10$6 = ["onClick"];
+	var _hoisted_11$4 = ["src"];
 	var ReservationProducts_default = _plugin_vue_export_helper_default(defineComponent({
 		__name: "ReservationProducts",
 		props: { products: {} },
@@ -10368,20 +11163,20 @@
 						onClose: _cache[0] || (_cache[0] = ($event) => showImageModal.value = false)
 					}, null, 8, ["image-url"])) : createCommentVNode("", true)]),
 					_: 1
-				})])), createBaseVNode("section", _hoisted_1$10, [_cache[2] || (_cache[2] = createBaseVNode("header", { class: "pse-products-head" }, [createBaseVNode("h2", { class: "pse-products-title" }, "Producten"), createBaseVNode("span", { class: "pse-products-note" }, "Uit de eerdere verwerking")], -1)), createBaseVNode("div", _hoisted_2$10, [createBaseVNode("table", _hoisted_3$7, [_cache[1] || (_cache[1] = createBaseVNode("thead", null, [createBaseVNode("tr", null, [
+				})])), createBaseVNode("section", _hoisted_1$12, [_cache[2] || (_cache[2] = createBaseVNode("header", { class: "pse-products-head" }, [createBaseVNode("h2", { class: "pse-products-title" }, "Producten"), createBaseVNode("span", { class: "pse-products-note" }, "Uit de eerdere verwerking")], -1)), createBaseVNode("div", _hoisted_2$12, [createBaseVNode("table", _hoisted_3$9, [_cache[1] || (_cache[1] = createBaseVNode("thead", null, [createBaseVNode("tr", null, [
 					createBaseVNode("th", null, "Omschrijving"),
 					createBaseVNode("th", null, "Hoofd barcode"),
 					createBaseVNode("th", null, "Aantal"),
 					createBaseVNode("th", { class: "pse-table-right" }, "Actie")
 				])], -1)), createBaseVNode("tbody", null, [(openBlock(true), createElementBlock(Fragment, null, renderList(__props.products, (product) => {
 					return openBlock(), createElementBlock("tr", { key: product.itemId }, [
-						createBaseVNode("td", _hoisted_4$6, toDisplayString(product.description), 1),
-						createBaseVNode("td", _hoisted_5$6, [createBaseVNode("span", _hoisted_6$5, [createTextVNode(toDisplayString(product.mainBarcode) + " ", 1), createVNode(CopyButton_default, {
+						createBaseVNode("td", _hoisted_4$8, toDisplayString(product.description), 1),
+						createBaseVNode("td", _hoisted_5$8, [createBaseVNode("span", _hoisted_6$7, [createTextVNode(toDisplayString(product.mainBarcode) + " ", 1), createVNode(CopyButton_default, {
 							value: product.mainBarcode,
 							label: "Barcode"
 						}, null, 8, ["value"])])]),
-						createBaseVNode("td", _hoisted_7$5, toDisplayString(product.requiredQuantity), 1),
-						createBaseVNode("td", _hoisted_8$5, [createBaseVNode("div", _hoisted_9$5, [createBaseVNode("button", {
+						createBaseVNode("td", _hoisted_7$7, toDisplayString(product.requiredQuantity), 1),
+						createBaseVNode("td", _hoisted_8$6, [createBaseVNode("div", _hoisted_9$6, [createBaseVNode("button", {
 							type: "button",
 							class: "pse-action pse-action-quiet",
 							title: "Afbeelding tonen",
@@ -10391,35 +11186,35 @@
 							width: "18",
 							height: "18",
 							alt: "Afbeelding"
-						}, null, 8, _hoisted_11$3)], 8, _hoisted_10$5)])])
+						}, null, 8, _hoisted_11$4)], 8, _hoisted_10$6)])])
 					]);
 				}), 128))])])])])], 64);
 			};
 		}
 	}), [["__scopeId", "data-v-77facacc"]]);
-	var _hoisted_1$9 = { class: "pse-back-row" };
-	var _hoisted_2$9 = ["href"];
+	var _hoisted_1$11 = { class: "pse-back-row" };
+	var _hoisted_2$11 = ["href"];
 	var BackLink_default = _plugin_vue_export_helper_default(defineComponent({
 		__name: "BackLink",
 		setup(__props) {
 			return (_ctx, _cache) => {
-				return openBlock(), createElementBlock("div", _hoisted_1$9, [createBaseVNode("a", {
+				return openBlock(), createElementBlock("div", _hoisted_1$11, [createBaseVNode("a", {
 					class: "pse-back",
 					href: unref(PACKING_PORTAL_URL)
 				}, [..._cache[0] || (_cache[0] = [createBaseVNode("span", {
 					class: "material-icons pse-back-icon",
 					"aria-hidden": "true"
-				}, "chevron_left", -1), createTextVNode(" Nieuwe zoekopdracht ", -1)])], 8, _hoisted_2$9)]);
+				}, "chevron_left", -1), createTextVNode(" Nieuwe zoekopdracht ", -1)])], 8, _hoisted_2$11)]);
 			};
 		}
 	}), [["__scopeId", "data-v-29aa4ab2"]]);
-	var _hoisted_1$8 = ["disabled", "title"];
-	var _hoisted_2$8 = {
+	var _hoisted_1$10 = ["disabled", "title"];
+	var _hoisted_2$10 = {
 		key: 0,
 		class: "pse-reprint-spinner",
 		"aria-hidden": "true"
 	};
-	var _hoisted_3$6 = {
+	var _hoisted_3$8 = {
 		key: 1,
 		class: "material-icons pse-reprint-icon",
 		"aria-hidden": "true"
@@ -10447,7 +11242,7 @@
 					disabled: printing.value || !configured.value,
 					title: configured.value ? `Print het etiket van pakket ${__props.parcel.barcode} opnieuw` : "Stel eerst de omgeving van deze werkplek in bij Instellingen",
 					onClick: _cache[0] || (_cache[0] = ($event) => reprint())
-				}, [printing.value ? (openBlock(), createElementBlock("span", _hoisted_2$8)) : (openBlock(), createElementBlock("span", _hoisted_3$6, "print")), createTextVNode(" " + toDisplayString(printing.value ? "Printen..." : "Etiket opnieuw"), 1)], 8, _hoisted_1$8);
+				}, [printing.value ? (openBlock(), createElementBlock("span", _hoisted_2$10)) : (openBlock(), createElementBlock("span", _hoisted_3$8, "print")), createTextVNode(" " + toDisplayString(printing.value ? "Printen..." : "Etiket opnieuw"), 1)], 8, _hoisted_1$10);
 			};
 		}
 	}), [["__scopeId", "data-v-7ce2449e"]]);
@@ -10683,11 +11478,11 @@
 		});
 	}
 	var kampeerhal_roden_default = "data:image/svg+xml,%3csvg%20width='211'%20height='50'%20viewBox='0%200%20211%2050'%20fill='none'%20xmlns='http://www.w3.org/2000/svg'%3e%3cpath%20d='M24.412%2035.6565V11.098L41.6909%2043.6364L24.412%2035.6565ZM22.0017%200.496094L19.282%201.47322L22.4577%207.45001L0%2049.7435L24.0863%2038.6205L48.1725%2049.7435L25.6985%207.43372L28.8579%201.48951L26.1382%200.528665L24.0863%204.40462L22.018%200.512379L22.0017%200.496094Z'%20fill='%23689F69'/%3e%3cpath%20d='M69.7016%2023.3452C69.7831%2023.4592%2069.8156%2023.5569%2069.8156%2023.6546C69.8156%2023.7686%2069.7342%2023.8337%2069.5551%2023.8337H65.4511C65.1417%2023.8337%2064.9788%2023.6872%2064.7834%2023.3777L61.2332%2017.9547L59.6372%2019.8438V23.3777C59.6372%2023.6872%2059.4743%2023.8337%2059.1649%2023.8337H55.9404C55.6309%2023.8337%2055.4844%2023.6709%2055.4844%2023.3777V8.50907C55.4844%208.21593%2055.6635%208.03679%2055.9404%208.03679H59.1323C59.3278%208.03679%2059.6535%208.23222%2059.6535%208.50907V14.3393L64.3111%208.37879C64.5717%208.06936%2064.702%208.02051%2065.1091%208.02051H69.0013C69.1642%208.02051%2069.2619%208.08565%2069.2619%208.21593C69.2619%208.31365%2069.2131%208.41136%2069.1316%208.52536L63.904%2014.7627L69.7016%2023.3289V23.3452Z'%20fill='%23689F69'/%3e%3cpath%20d='M80.1247%2017.8731L78.3822%2013.0363L76.6885%2017.8731H80.1247ZM76.4279%208.5089C76.5419%208.18319%2076.7699%208.03662%2077.0956%208.03662H79.7339C80.0433%208.03662%2080.2713%208.19948%2080.3853%208.5089L86.2807%2023.3776C86.3132%2023.4753%2086.3295%2023.5404%2086.3295%2023.6056C86.3295%2023.7684%2086.1992%2023.8499%2085.9712%2023.8499H82.7467C82.421%2023.8499%2082.2093%2023.687%2082.1116%2023.3776L81.3624%2021.293H75.4671L74.7342%2023.3776C74.6365%2023.687%2074.4248%2023.8499%2074.0828%2023.8499H70.8583C70.614%2023.8499%2070.5%2023.7684%2070.5%2023.6056C70.5%2023.5567%2070.5163%2023.4916%2070.5651%2023.3776L76.4279%208.5089Z'%20fill='%23689F69'/%3e%3cpath%20d='M91.5576%2023.3937C91.525%2023.7194%2091.3947%2023.866%2091.0853%2023.866H88.0073C87.6816%2023.866%2087.5025%2023.7194%2087.535%2023.3937L89.1473%208.52501C89.1799%208.1993%2089.3102%208.05273%2089.6196%208.05273H93.4141C93.691%208.05273%2093.7561%208.16673%2093.8864%208.52501L96.8341%2018.0846L99.7817%208.52501C99.8957%208.16673%2099.9772%208.05273%20100.254%208.05273H104.032C104.342%208.05273%20104.472%208.21559%20104.505%208.52501L106.117%2023.3937C106.149%2023.7031%20105.97%2023.866%20105.645%2023.866H102.567C102.257%2023.866%20102.127%2023.7194%20102.094%2023.3937L101.215%2015.0392L98.6906%2023.3611C98.5603%2023.7683%2098.4789%2023.8497%2098.1532%2023.8497H95.4661C95.1567%2023.8497%2095.0427%2023.752%2094.9287%2023.3611L92.437%2014.8275L91.525%2023.3937H91.5576Z'%20fill='%23689F69'/%3e%3cpath%20d='M112.646%2014.9743H114.974C116%2014.9743%20116.636%2014.1274%20116.636%2013.1992C116.636%2012.336%20115.984%2011.424%20114.974%2011.424H112.646V14.9743ZM108.477%208.52521C108.477%208.23207%20108.672%208.05293%20108.933%208.05293H115.87C118.72%207.98779%20120.919%2010.6423%20120.87%2013.2317C120.919%2015.7886%20118.769%2018.3942%20115.952%2018.3454H112.646V23.3939C112.646%2023.7033%20112.483%2023.8662%20112.157%2023.8662H108.949C108.639%2023.8662%20108.493%2023.7033%20108.493%2023.3939V8.50893L108.477%208.52521Z'%20fill='%23689F69'/%3e%3cpath%20d='M137.809%208.5089C137.809%208.18319%20137.971%208.03662%20138.281%208.03662H149.046C149.355%208.03662%20149.518%208.19948%20149.518%208.5089V11.2449C149.518%2011.5543%20149.355%2011.7171%20149.046%2011.7171H141.994V15.5442H145.756C146.098%2015.5442%20146.293%2015.7071%20146.293%2016.0328V18.2314C146.293%2018.5408%20146.114%2018.7036%20145.756%2018.7036H141.994V20.2182H149.241C149.567%2020.2182%20149.73%2020.3648%20149.73%2020.6905V23.4101C149.73%2023.7196%20149.567%2023.8824%20149.241%2023.8824H138.281C137.971%2023.8824%20137.809%2023.7196%20137.809%2023.4101V8.5089Z'%20fill='%23689F69'/%3e%3cpath%20d='M155.935%2015.1858H158.329C159.436%2015.1858%20160.25%2014.2575%20160.25%2013.2641C160.25%2012.2707%20159.404%2011.3261%20158.329%2011.3261H155.935V15.1858ZM151.766%208.50872C151.766%208.24815%20151.928%208.03644%20152.222%208.03644H159.387C162.335%207.95501%20164.566%2010.691%20164.517%2013.3455C164.517%2014.1761%20164.289%2014.9904%20163.801%2015.7721C163.312%2016.5538%20162.693%2017.2052%20161.895%2017.6938L164.989%2023.3774C164.989%2023.3774%20165.038%2023.5077%20165.038%2023.5728C165.038%2023.7194%20164.924%2023.8497%20164.713%2023.8497H160.82C160.511%2023.8497%20160.413%2023.7682%20160.234%2023.41L157.677%2018.5895H155.935V23.3774C155.935%2023.6868%20155.772%2023.8497%20155.462%2023.8497H152.222C151.912%2023.8497%20151.766%2023.6868%20151.766%2023.3774V8.50872Z'%20fill='%23689F69'/%3e%3cpath%20d='M170.933%2019.7459V23.3776C170.933%2023.687%20170.77%2023.8499%20170.412%2023.8499H167.236C166.927%2023.8499%20166.764%2023.687%20166.764%2023.3776V8.5089C166.764%208.24833%20166.927%208.03662%20167.236%208.03662H170.477C170.721%208.03662%20170.933%208.15062%20170.933%208.49261V15.984H176.356V8.5089C176.356%208.24833%20176.535%208.03662%20176.828%208.03662H180.069C180.297%208.03662%20180.525%208.15062%20180.525%208.49261V23.3939C180.525%2023.7033%20180.362%2023.8661%20180.004%2023.8661H176.828C176.519%2023.8661%20176.356%2023.7033%20176.356%2023.3939V19.7622H170.933V19.7459Z'%20fill='%23689F69'/%3e%3cpath%20d='M192.136%2017.8731L190.394%2013.0363L188.7%2017.8731H192.136ZM188.44%208.5089C188.554%208.18319%20188.782%208.03662%20189.107%208.03662H191.746C192.055%208.03662%20192.267%208.19948%20192.397%208.5089L198.292%2023.3776C198.325%2023.4753%20198.341%2023.5404%20198.341%2023.6056C198.341%2023.7684%20198.211%2023.8499%20197.983%2023.8499H194.758C194.433%2023.8499%20194.221%2023.687%20194.123%2023.3776L193.374%2021.293H187.479L186.746%2023.3776C186.648%2023.687%20186.437%2023.8499%20186.095%2023.8499H182.87C182.626%2023.8499%20182.512%2023.7684%20182.512%2023.6056C182.512%2023.5567%20182.528%2023.4916%20182.577%2023.3776L188.44%208.5089Z'%20fill='%23689F69'/%3e%3cpath%20d='M199.791%208.5089C199.791%208.21576%20199.986%208.03662%20200.247%208.03662H203.488C203.797%208.03662%20203.96%208.19948%20203.96%208.5089V20.0716H209.953C210.263%2020.0716%20210.425%2020.2182%20210.425%2020.5439V23.3776C210.425%2023.687%20210.263%2023.8499%20209.953%2023.8499H200.247C199.938%2023.8499%20199.791%2023.687%20199.791%2023.3776V8.5089Z'%20fill='%23689F69'/%3e%3cpath%20d='M59.7023%2036.3411H62.0963C63.22%2036.3411%2064.018%2035.4128%2064.018%2034.4194C64.018%2033.4259%2063.1711%2032.4814%2062.0963%2032.4814H59.7023V36.3411ZM55.5332%2029.664C55.5332%2029.4034%2055.6961%2029.1917%2055.9892%2029.1917H63.1711C66.1188%2029.1103%2068.3336%2031.8463%2068.301%2034.5008C68.301%2035.3314%2068.0568%2036.1456%2067.5845%2036.9273C67.0959%2037.709%2066.4771%2038.3605%2065.6791%2038.849L68.7733%2044.5327C68.7733%2044.5327%2068.8222%2044.663%2068.8222%2044.7281C68.8222%2044.8747%2068.7082%2045.0049%2068.4965%2045.0049H64.6042C64.2948%2045.0049%2064.1971%2044.9235%2064.018%2044.5652L61.4611%2039.7447H59.7186V44.5327C59.7186%2044.8421%2059.5557%2045.0049%2059.2463%2045.0049H56.0055C55.6961%2045.0049%2055.5495%2044.8421%2055.5495%2044.5327V29.664H55.5332Z'%20fill='%23689F69'/%3e%3cpath%20d='M78.023%2041.3243C80.3519%2041.3731%2082.1758%2039.4026%2082.127%2037.1063C82.1758%2034.7938%2080.3519%2032.8395%2078.023%2032.8884C75.7105%2032.8395%2073.8702%2034.7938%2073.9191%2037.1063C73.8702%2039.4188%2075.7268%2041.3731%2078.023%2041.3243ZM70.8737%2033.0186C71.6065%2031.7809%2072.6162%2030.7875%2073.8865%2030.0547C75.1568%2029.3218%2076.5248%2028.9473%2078.023%2028.9473C79.5213%2028.9473%2080.8893%2029.3218%2082.1596%2030.0547C83.4298%2030.7875%2084.4232%2031.7809%2085.1724%2033.0186C85.9215%2034.2726%2086.2961%2035.6243%2086.2961%2037.1063C86.2961%2038.5883%2085.9215%2039.94%2085.1724%2041.1777C84.4232%2042.4317%2083.4298%2043.4251%2082.1596%2044.1416C80.8893%2044.8745%2079.5213%2045.2491%2078.023%2045.2491C76.5248%2045.2491%2075.1568%2044.8745%2073.8865%2044.1416C72.6162%2043.4251%2071.6065%2042.4317%2070.8737%2041.1777C70.1246%2039.94%2069.75%2038.5883%2069.75%2037.1063C69.75%2035.6243%2070.1246%2034.2726%2070.8737%2033.0186Z'%20fill='%23689F69'/%3e%3cpath%20d='M94.211%2032.9534H92.6964V41.2264H94.211C96.5398%2041.2753%2098.4615%2039.3373%2098.4289%2037.1062C98.4778%2034.8588%2096.5561%2032.9208%2094.211%2032.9534ZM88.5273%2029.6637C88.5273%2029.338%2088.6902%2029.1914%2088.9996%2029.1914H94.6181C95.9535%2029.1914%2097.2401%2029.5497%2098.4778%2030.25C99.7155%2030.9665%20100.725%2031.9437%20101.491%2033.1488C102.256%2034.3702%20102.631%2035.6893%20102.631%2037.1062C102.631%2038.523%20102.272%2039.777%20101.556%2040.9821C100.839%2042.1872%2099.8621%2043.1644%2098.6406%2043.8972C97.4192%2044.6464%2096.0675%2045.0046%2094.6344%2045.0046H89.0159C88.7065%2045.0046%2088.5436%2044.8418%2088.5436%2044.5324V29.6637H88.5273Z'%20fill='%23689F69'/%3e%3cpath%20d='M123.64%2044.5324C123.64%2044.8418%20123.461%2045.0046%20123.102%2045.0046H120.089C119.78%2045.0046%20119.617%2044.8581%20119.617%2044.5324V29.6637C119.617%2029.4031%20119.78%2029.1914%20120.089%2029.1914H123.591C123.9%2029.1914%20124.161%2029.3543%20124.356%2029.6637L129.779%2038.295V29.6637C129.779%2029.4031%20129.942%2029.1914%20130.268%2029.1914H133.281C133.525%2029.1914%20133.818%2029.4031%20133.818%2029.6637V44.5324C133.818%2044.8418%20133.639%2045.0046%20133.281%2045.0046H130.121C129.796%2045.0046%20129.535%2044.8581%20129.34%2044.5324L123.656%2035.3148V44.5324H123.64Z'%20fill='%23689F69'/%3e%3cpath%20d='M105.023%2029.7945C105.023%2029.4688%20105.186%2029.3223%20105.496%2029.3223H116.26C116.57%2029.3223%20116.733%2029.4851%20116.733%2029.7945V32.5305C116.733%2032.8399%20116.57%2033.0028%20116.26%2033.0028H109.209V36.8299H112.971C113.313%2036.8299%20113.508%2036.9927%20113.508%2037.3185V39.517C113.508%2039.8264%20113.329%2039.9893%20112.971%2039.9893H109.209V41.5038H116.456C116.782%2041.5038%20116.944%2041.6504%20116.944%2041.9761V44.6958C116.944%2045.0052%20116.782%2045.1681%20116.456%2045.1681H105.496C105.186%2045.1681%20105.023%2045.0052%20105.023%2044.6958V29.8271V29.7945Z'%20fill='%23689F69'/%3e%3cpath%20d='M123.166%208.5089C123.166%208.18319%20123.329%208.03662%20123.638%208.03662H134.403C134.712%208.03662%20134.875%208.19948%20134.875%208.5089V11.2449C134.875%2011.5543%20134.712%2011.7171%20134.403%2011.7171H127.351V15.5442H131.113C131.455%2015.5442%20131.651%2015.7071%20131.651%2016.0328V18.2314C131.651%2018.5408%20131.472%2018.7036%20131.113%2018.7036H127.351V20.2182H134.598C134.924%2020.2182%20135.087%2020.3648%20135.087%2020.6905V23.4101C135.087%2023.7196%20134.924%2023.8824%20134.598%2023.8824H123.638C123.329%2023.8824%20123.166%2023.7196%20123.166%2023.4101V8.5089Z'%20fill='%23689F69'/%3e%3c/svg%3e";
-	var _hoisted_1$7 = { class: "pse-header" };
-	var _hoisted_2$7 = { class: "pse-header-inner" };
-	var _hoisted_3$5 = ["href"];
-	var _hoisted_4$5 = ["src"];
-	var _hoisted_5$5 = ["src"];
+	var _hoisted_1$9 = { class: "pse-header" };
+	var _hoisted_2$9 = { class: "pse-header-inner" };
+	var _hoisted_3$7 = ["href"];
+	var _hoisted_4$7 = ["src"];
+	var _hoisted_5$7 = ["src"];
 	var Header_default = _plugin_vue_export_helper_default(defineComponent({
 		__name: "Header",
 		props: { linked: {
@@ -10696,7 +11491,7 @@
 		} },
 		setup(__props) {
 			return (_ctx, _cache) => {
-				return openBlock(), createElementBlock("header", _hoisted_1$7, [createBaseVNode("div", _hoisted_2$7, [__props.linked ? (openBlock(), createElementBlock("a", {
+				return openBlock(), createElementBlock("header", _hoisted_1$9, [createBaseVNode("div", _hoisted_2$9, [__props.linked ? (openBlock(), createElementBlock("a", {
 					key: 0,
 					class: "pse-header-link",
 					href: unref(PACKING_PORTAL_URL),
@@ -10705,93 +11500,19 @@
 					class: "pse-header-logo",
 					src: unref(kampeerhal_roden_default),
 					alt: "Kampeerhal Roden"
-				}, null, 8, _hoisted_4$5)], 8, _hoisted_3$5)) : (openBlock(), createElementBlock("img", {
+				}, null, 8, _hoisted_4$7)], 8, _hoisted_3$7)) : (openBlock(), createElementBlock("img", {
 					key: 1,
 					class: "pse-header-logo",
 					src: unref(kampeerhal_roden_default),
 					alt: "Kampeerhal Roden"
-				}, null, 8, _hoisted_5$5))])]);
+				}, null, 8, _hoisted_5$7))])]);
 			};
 		}
 	}), [["__scopeId", "data-v-895c5c8c"]]);
-	var pickerStyle$1;
-	function hideEnvironmentPicker() {
-		setPickerStyle(`${ENVIRONMENT_SELECT_SELECTOR} { display: none !important; }`);
-	}
-	function setPickerStyle(rule) {
-		if (!pickerStyle$1) {
-			pickerStyle$1 = document.createElement("style");
-			document.documentElement.append(pickerStyle$1);
-		}
-		pickerStyle$1.textContent = rule;
-	}
-	function showEnvironmentPicker() {
-		setPickerStyle(`${ENVIRONMENT_SELECT_SELECTOR} { display: inline-block !important; }`);
-	}
-	function getEnvironmentSelect() {
-		return document.querySelector(ENVIRONMENT_SELECT_SELECTOR);
-	}
-	function getEnvironmentOptions() {
-		const select = getEnvironmentSelect();
-		if (!select) return [];
-		return Array.from(select.options).map((option) => ({
-			id: Number(option.value),
-			name: option.text.trim()
-		})).filter((option) => option.id > 0 && option.name.length > 0);
-	}
-	function getEnvironmentName(environmentId) {
-		return getEnvironmentOptions().find((option) => option.id == environmentId)?.name;
-	}
-	function lockEnvironmentPicker() {
-		const select = getEnvironmentSelect();
-		if (select) syncEnvironmentPicker(select, Settings.environmentId);
-	}
-	function applyConfiguredEnvironment() {
-		const select = getEnvironmentSelect();
-		if (!select) return;
-		const configured = Settings.environmentId;
-		syncEnvironmentPicker(select, configured);
-		if (!(configured > 0)) return;
-		if (Number(select.value) == configured) return;
-		if (!Array.from(select.options).some((option) => Number(option.value) == configured)) {
-			console.warn(`Configured environment (${configured}) is not offered by the portal, leaving the session as it is.`);
-			return;
-		}
-		debug(`Applying configured environment (${configured}), was (${select.value}).`);
-		select.value = String(configured);
-		$(select).trigger("change");
-	}
-	function environmentLabel(environmentId) {
-		if (Settings.environmentName) return Settings.environmentName;
-		const name = getEnvironmentName(environmentId);
-		if (name) {
-			Settings.environmentName = name;
-			Settings.save();
-		}
-		return name ?? `#${environmentId}`;
-	}
-	function syncEnvironmentPicker(select, environmentId) {
-		const container = select.closest("form#selectEnviroment") ?? select.parentElement;
-		if (!container) return;
-		let label = container.querySelector(".pse-environment-locked");
-		if (!(environmentId > 0)) {
-			showEnvironmentPicker();
-			label?.remove();
-			return;
-		}
-		hideEnvironmentPicker();
-		if (!label) {
-			label = document.createElement("span");
-			label.className = "pse-environment-locked";
-			label.title = "Vastgezet in de Pack&Ship Extended instellingen";
-			select.insertAdjacentElement("afterend", label);
-		}
-		label.textContent = environmentLabel(environmentId);
-	}
 	var package_default = {
 		name: "pack-ship-extended",
 		"private": true,
-		version: "1.1.6",
+		version: "1.1.7",
 		type: "module",
 		scripts: {
 			"dev": "vite",
@@ -10857,29 +11578,44 @@
 		}
 		return false;
 	}
-	var _hoisted_1$6 = { class: "pse-settings-switch" };
-	var _hoisted_2$6 = { class: "pse-settings-switch" };
-	var _hoisted_3$4 = { class: "pse-settings-field" };
-	var _hoisted_4$4 = ["disabled"];
-	var _hoisted_5$4 = ["value"];
-	var _hoisted_6$4 = { class: "pse-settings-field" };
-	var _hoisted_7$4 = { class: "pse-settings-field" };
-	var _hoisted_8$4 = ["value"];
-	var _hoisted_9$4 = { class: "pse-settings-group" };
-	var _hoisted_10$4 = { class: "pse-settings-switch pse-settings-switch-compact" };
-	var _hoisted_11$2 = ["onUpdate:modelValue"];
-	var _hoisted_12$2 = { class: "pse-settings-switch-text" };
-	var _hoisted_13$2 = { class: "pse-settings-switch-title" };
-	var _hoisted_14$1 = { class: "pse-dialog-hint" };
-	var _hoisted_15 = ["title", "onClick"];
-	var _hoisted_16 = { class: "pse-settings-group" };
-	var _hoisted_17 = { class: "pse-settings-field" };
-	var _hoisted_18 = { class: "pse-settings-field" };
-	var _hoisted_19 = { class: "pse-settings-group" };
-	var _hoisted_20 = { class: "pse-settings-field" };
-	var _hoisted_21 = ["href"];
-	var _hoisted_22 = { class: "pse-dialog-hint" };
-	var _hoisted_23 = {
+	var _hoisted_1$8 = { class: "pse-settings-switch" };
+	var _hoisted_2$8 = { class: "pse-settings-switch" };
+	var _hoisted_3$6 = { class: "pse-settings-field" };
+	var _hoisted_4$6 = ["disabled"];
+	var _hoisted_5$6 = ["value"];
+	var _hoisted_6$6 = { class: "pse-settings-field" };
+	var _hoisted_7$6 = { class: "pse-settings-field" };
+	var _hoisted_8$5 = ["value"];
+	var _hoisted_9$5 = { class: "pse-settings-group" };
+	var _hoisted_10$5 = { class: "pse-settings-switch pse-settings-switch-compact" };
+	var _hoisted_11$3 = ["onUpdate:modelValue"];
+	var _hoisted_12$3 = { class: "pse-settings-switch-text" };
+	var _hoisted_13$3 = { class: "pse-settings-switch-title" };
+	var _hoisted_14$2 = { class: "pse-dialog-hint" };
+	var _hoisted_15$1 = ["title", "onClick"];
+	var _hoisted_16$1 = { class: "pse-settings-group" };
+	var _hoisted_17$1 = { class: "pse-settings-switch pse-settings-switch-compact" };
+	var _hoisted_18$1 = { class: "pse-settings-field" };
+	var _hoisted_19$1 = ["disabled"];
+	var _hoisted_20$1 = ["value"];
+	var _hoisted_21$1 = { class: "pse-settings-field" };
+	var _hoisted_22$1 = ["disabled"];
+	var _hoisted_23$1 = ["value"];
+	var _hoisted_24$1 = { class: "pse-settings-field" };
+	var _hoisted_25$1 = { class: "pse-settings-field" };
+	var _hoisted_26$1 = { class: "pse-settings-group" };
+	var _hoisted_27$1 = { class: "pse-settings-field" };
+	var _hoisted_28$1 = { class: "pse-dialog-hint" };
+	var _hoisted_29$1 = { class: "pse-settings-field" };
+	var _hoisted_30$1 = ["value"];
+	var _hoisted_31$1 = { class: "pse-settings-group" };
+	var _hoisted_32$1 = { class: "pse-settings-field" };
+	var _hoisted_33$1 = { class: "pse-settings-field" };
+	var _hoisted_34$1 = { class: "pse-settings-group" };
+	var _hoisted_35$1 = { class: "pse-settings-field" };
+	var _hoisted_36$1 = ["href"];
+	var _hoisted_37$1 = { class: "pse-dialog-hint" };
+	var _hoisted_38$1 = {
 		key: 0,
 		class: "pse-dialog-hint pse-settings-update-status"
 	};
@@ -10916,6 +11652,25 @@
 			const environmentId = ref(Settings.environmentId);
 			const slotScope = ref(Settings.slotScope);
 			const idleLogoutSeconds = ref(Settings.idleLogoutSeconds);
+			const binsEnabled = ref(Settings.binsEnabled);
+			const noPrintEnvironmentId = ref(Settings.noPrintEnvironmentId);
+			const binWallEnvironmentId = ref(Settings.binWallEnvironmentId);
+			const putWallUrl = ref(Settings.putWallUrl);
+			const putWallToken = ref(Settings.putWallToken);
+			const cvpBridgeUrl = ref(Settings.cvpBridgeUrl);
+			const cvpMaxUnits = ref(Settings.cvpMaxUnits);
+			const CVP_MAX_UNITS = [
+				1,
+				2,
+				3,
+				4,
+				5,
+				6,
+				8,
+				10,
+				15,
+				20
+			];
 			const IDLE_TIMES = [
 				{
 					seconds: 0,
@@ -10964,6 +11719,13 @@
 				Settings.showCompletedHistory = showCompletedHistory.value;
 				Settings.slotScope = slotScope.value;
 				Settings.idleLogoutSeconds = Number(idleLogoutSeconds.value);
+				Settings.binsEnabled = binsEnabled.value;
+				Settings.noPrintEnvironmentId = Number(noPrintEnvironmentId.value);
+				Settings.binWallEnvironmentId = Number(binWallEnvironmentId.value);
+				Settings.putWallUrl = putWallUrl.value.trim();
+				Settings.putWallToken = putWallToken.value.trim();
+				Settings.cvpBridgeUrl = cvpBridgeUrl.value.trim();
+				Settings.cvpMaxUnits = Number(cvpMaxUnits.value);
 				Settings.save();
 				document.dispatchEvent(new CustomEvent(SETTINGS_SAVED_EVENT));
 				setCredentials({
@@ -10979,30 +11741,30 @@
 				return openBlock(), createBlock(ModalShell_default, {
 					title: "Pack&Ship Extended instellingen",
 					size: "md",
-					onClose: _cache[10] || (_cache[10] = ($event) => emit("close"))
+					onClose: _cache[17] || (_cache[17] = ($event) => emit("close"))
 				}, {
 					footer: withCtx(() => [createBaseVNode("button", {
 						type: "button",
 						class: "pse-dialog-btn pse-dialog-btn-quiet",
-						onClick: _cache[8] || (_cache[8] = ($event) => emit("close"))
+						onClick: _cache[15] || (_cache[15] = ($event) => emit("close"))
 					}, " Annuleren "), createBaseVNode("button", {
 						type: "button",
 						class: "pse-dialog-btn",
-						onClick: _cache[9] || (_cache[9] = ($event) => save())
+						onClick: _cache[16] || (_cache[16] = ($event) => save())
 					}, " Opslaan ")]),
 					default: withCtx(() => [
-						createBaseVNode("label", _hoisted_1$6, [withDirectives(createBaseVNode("input", {
+						createBaseVNode("label", _hoisted_1$8, [withDirectives(createBaseVNode("input", {
 							type: "checkbox",
 							class: "pse-settings-checkbox",
 							"onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => masterSwitch.value = $event)
-						}, null, 512), [[vModelCheckbox, masterSwitch.value]]), _cache[11] || (_cache[11] = createBaseVNode("span", { class: "pse-settings-switch-text" }, [createBaseVNode("span", { class: "pse-settings-switch-title" }, "Automatische afhandeling"), createBaseVNode("span", { class: "pse-dialog-hint" }, " Verifieert, kondigt aan en rondt reserveringen af zonder tussenkomst. ")], -1))]),
-						createBaseVNode("label", _hoisted_2$6, [withDirectives(createBaseVNode("input", {
+						}, null, 512), [[vModelCheckbox, masterSwitch.value]]), _cache[18] || (_cache[18] = createBaseVNode("span", { class: "pse-settings-switch-text" }, [createBaseVNode("span", { class: "pse-settings-switch-title" }, "Automatische afhandeling"), createBaseVNode("span", { class: "pse-dialog-hint" }, " Verifieert, kondigt aan en rondt reserveringen af zonder tussenkomst. ")], -1))]),
+						createBaseVNode("label", _hoisted_2$8, [withDirectives(createBaseVNode("input", {
 							type: "checkbox",
 							class: "pse-settings-checkbox",
 							"onUpdate:modelValue": _cache[1] || (_cache[1] = ($event) => showCompletedHistory.value = $event)
-						}, null, 512), [[vModelCheckbox, showCompletedHistory.value]]), _cache[12] || (_cache[12] = createBaseVNode("span", { class: "pse-settings-switch-text" }, [createBaseVNode("span", { class: "pse-settings-switch-title" }, "Afgeronde reserveringen tonen"), createBaseVNode("span", { class: "pse-dialog-hint" }, " Zet de lijst met afgeronde reserveringen naast het zoekscherm. Uit betekent alleen verbergen: de lijst wordt bijgehouden en staat er compleet weer zodra je hem aanzet. ")], -1))]),
-						createBaseVNode("div", _hoisted_3$4, [
-							_cache[14] || (_cache[14] = createBaseVNode("label", {
+						}, null, 512), [[vModelCheckbox, showCompletedHistory.value]]), _cache[19] || (_cache[19] = createBaseVNode("span", { class: "pse-settings-switch-text" }, [createBaseVNode("span", { class: "pse-settings-switch-title" }, "Afgeronde reserveringen tonen"), createBaseVNode("span", { class: "pse-dialog-hint" }, " Zet de lijst met afgeronde reserveringen naast het zoekscherm. Uit betekent alleen verbergen: de lijst wordt bijgehouden en staat er compleet weer zodra je hem aanzet. ")], -1))]),
+						createBaseVNode("div", _hoisted_3$6, [
+							_cache[21] || (_cache[21] = createBaseVNode("label", {
 								class: "pse-dialog-label",
 								for: "environmentId"
 							}, "Omgeving", -1)),
@@ -11011,21 +11773,21 @@
 								class: "pse-dialog-input",
 								"onUpdate:modelValue": _cache[2] || (_cache[2] = ($event) => environmentId.value = $event),
 								disabled: unref(environmentOptions).length == 0
-							}, [_cache[13] || (_cache[13] = createBaseVNode("option", { value: -1 }, "Niet vastgezet (kiezen in de portal)", -1)), (openBlock(true), createElementBlock(Fragment, null, renderList(unref(environmentOptions), (option) => {
+							}, [_cache[20] || (_cache[20] = createBaseVNode("option", { value: -1 }, "Niet vastgezet (kiezen in de portal)", -1)), (openBlock(true), createElementBlock(Fragment, null, renderList(unref(environmentOptions), (option) => {
 								return openBlock(), createElementBlock("option", {
 									key: option.id,
 									value: option.id
-								}, toDisplayString(option.name), 9, _hoisted_5$4);
-							}), 128))], 8, _hoisted_4$4), [[
+								}, toDisplayString(option.name), 9, _hoisted_5$6);
+							}), 128))], 8, _hoisted_4$6), [[
 								vModelSelect,
 								environmentId.value,
 								void 0,
 								{ number: true }
 							]]),
-							_cache[15] || (_cache[15] = createBaseVNode("small", { class: "pse-dialog-hint" }, " Hoort bij deze computer en de printer erachter. Vastzetten verbergt de keuzelijst in de portal en zet de omgeving bij elke pagina terug. ", -1))
+							_cache[22] || (_cache[22] = createBaseVNode("small", { class: "pse-dialog-hint" }, " Hoort bij deze computer en de printer erachter. Vastzetten verbergt de keuzelijst in de portal en zet de omgeving bij elke pagina terug. ", -1))
 						]),
-						createBaseVNode("div", _hoisted_6$4, [
-							_cache[17] || (_cache[17] = createBaseVNode("label", {
+						createBaseVNode("div", _hoisted_6$6, [
+							_cache[24] || (_cache[24] = createBaseVNode("label", {
 								class: "pse-dialog-label",
 								for: "pseSlotScope"
 							}, "Vakken in het rek", -1)),
@@ -11033,11 +11795,11 @@
 								id: "pseSlotScope",
 								class: "pse-dialog-input",
 								"onUpdate:modelValue": _cache[3] || (_cache[3] = ($event) => slotScope.value = $event)
-							}, [..._cache[16] || (_cache[16] = [createBaseVNode("option", { value: "order" }, "Eén vak per order", -1), createBaseVNode("option", { value: "line" }, "Een vak per productregel", -1)])], 512), [[vModelSelect, slotScope.value]]),
-							_cache[18] || (_cache[18] = createBaseVNode("small", { class: "pse-dialog-hint" }, " Waar een order blijft staan tot de rest binnen is. Per order staat het vak naast de reservering; per regel kies je het in de productlijst, voor orders waarvan de artikelen los binnenkomen. Het vak wordt bij de order in Shopware bewaard, apart van de notitie van de klant. ", -1))
+							}, [..._cache[23] || (_cache[23] = [createBaseVNode("option", { value: "order" }, "Eén vak per order", -1), createBaseVNode("option", { value: "line" }, "Een vak per productregel", -1)])], 512), [[vModelSelect, slotScope.value]]),
+							_cache[25] || (_cache[25] = createBaseVNode("small", { class: "pse-dialog-hint" }, " Waar een order blijft staan tot de rest binnen is. Per order staat het vak naast de reservering; per regel kies je het in de productlijst, voor orders waarvan de artikelen los binnenkomen. Het vak wordt bij de order in Shopware bewaard, apart van de notitie van de klant. ", -1))
 						]),
-						createBaseVNode("div", _hoisted_7$4, [
-							_cache[19] || (_cache[19] = createBaseVNode("label", {
+						createBaseVNode("div", _hoisted_7$6, [
+							_cache[26] || (_cache[26] = createBaseVNode("label", {
 								class: "pse-dialog-label",
 								for: "pseIdleLogout"
 							}, "Automatisch uitloggen", -1)),
@@ -11049,36 +11811,170 @@
 								return createBaseVNode("option", {
 									key: time.seconds,
 									value: time.seconds
-								}, toDisplayString(time.label), 9, _hoisted_8$4);
+								}, toDisplayString(time.label), 9, _hoisted_8$5);
 							}), 64))], 512), [[
 								vModelSelect,
 								idleLogoutSeconds.value,
 								void 0,
 								{ number: true }
 							]]),
-							_cache[20] || (_cache[20] = createBaseVNode("small", { class: "pse-dialog-hint" }, " Logt deze werkplek uit als er zo lang niets is aangeraakt, zodat de volgende packer niet onder de naam van de vorige werkt. Een minuut van tevoren verschijnt er een waarschuwing; een toets, een scan of een klik zet de teller terug. Tijdens het massaal afronden gebeurt er niets. ", -1))
+							_cache[27] || (_cache[27] = createBaseVNode("small", { class: "pse-dialog-hint" }, " Logt deze werkplek uit als er zo lang niets is aangeraakt, zodat de volgende packer niet onder de naam van de vorige werkt. Een minuut van tevoren verschijnt er een waarschuwing; een toets, een scan of een klik zet de teller terug. Tijdens het massaal afronden gebeurt er niets. ", -1))
 						]),
-						createBaseVNode("div", _hoisted_9$4, [_cache[22] || (_cache[22] = createBaseVNode("h3", { class: "pse-settings-group-title" }, "Geluiden", -1)), (openBlock(), createElementBlock(Fragment, null, renderList(SOUNDS, (sound) => {
+						createBaseVNode("div", _hoisted_9$5, [_cache[29] || (_cache[29] = createBaseVNode("h3", { class: "pse-settings-group-title" }, "Geluiden", -1)), (openBlock(), createElementBlock(Fragment, null, renderList(SOUNDS, (sound) => {
 							return createBaseVNode("div", {
 								key: sound.kind,
 								class: "pse-settings-sound"
-							}, [createBaseVNode("label", _hoisted_10$4, [withDirectives(createBaseVNode("input", {
+							}, [createBaseVNode("label", _hoisted_10$5, [withDirectives(createBaseVNode("input", {
 								type: "checkbox",
 								class: "pse-settings-checkbox",
 								"onUpdate:modelValue": ($event) => soundSwitches.value[sound.kind] = $event
-							}, null, 8, _hoisted_11$2), [[vModelCheckbox, soundSwitches.value[sound.kind]]]), createBaseVNode("span", _hoisted_12$2, [createBaseVNode("span", _hoisted_13$2, toDisplayString(sound.title), 1), createBaseVNode("span", _hoisted_14$1, toDisplayString(sound.hint), 1)])]), createBaseVNode("button", {
+							}, null, 8, _hoisted_11$3), [[vModelCheckbox, soundSwitches.value[sound.kind]]]), createBaseVNode("span", _hoisted_12$3, [createBaseVNode("span", _hoisted_13$3, toDisplayString(sound.title), 1), createBaseVNode("span", _hoisted_14$2, toDisplayString(sound.hint), 1)])]), createBaseVNode("button", {
 								type: "button",
 								class: "pse-dialog-btn pse-dialog-btn-quiet pse-settings-listen",
 								title: `${sound.title} afspelen`,
 								onClick: ($event) => unref(previewSound)(sound.kind)
-							}, [..._cache[21] || (_cache[21] = [createBaseVNode("span", {
+							}, [..._cache[28] || (_cache[28] = [createBaseVNode("span", {
 								class: "material-icons pse-settings-listen-icon",
 								"aria-hidden": "true"
-							}, "volume_up", -1), createTextVNode(" Luister ", -1)])], 8, _hoisted_15)]);
+							}, "volume_up", -1), createTextVNode(" Luister ", -1)])], 8, _hoisted_15$1)]);
 						}), 64))]),
-						createBaseVNode("div", _hoisted_16, [
-							_cache[25] || (_cache[25] = createBaseVNode("h3", { class: "pse-settings-group-title" }, "Shopware koppeling", -1)),
-							createBaseVNode("div", _hoisted_17, [_cache[23] || (_cache[23] = createBaseVNode("label", {
+						createBaseVNode("div", _hoisted_16$1, [
+							_cache[40] || (_cache[40] = createBaseVNode("h3", { class: "pse-settings-group-title" }, "Bakken voor de CVP", -1)),
+							createBaseVNode("label", _hoisted_17$1, [withDirectives(createBaseVNode("input", {
+								type: "checkbox",
+								class: "pse-settings-checkbox",
+								"onUpdate:modelValue": _cache[5] || (_cache[5] = ($event) => binsEnabled.value = $event)
+							}, null, 512), [[vModelCheckbox, binsEnabled.value]]), _cache[30] || (_cache[30] = createBaseVNode("span", { class: "pse-settings-switch-text" }, [createBaseVNode("span", { class: "pse-settings-switch-title" }, "Bakken op deze werkplek"), createBaseVNode("span", { class: "pse-dialog-hint" }, " De barcode van een bak scannen op de pakketpagina maakt er een pakket voor. Wat erin gaat, gaat naar de CVP; de andere pakketten krijgen hier hun label. ")], -1))]),
+							createBaseVNode("div", _hoisted_18$1, [
+								_cache[32] || (_cache[32] = createBaseVNode("label", {
+									class: "pse-dialog-label",
+									for: "pseNoPrintEnvironment"
+								}, "Omgeving zonder printer", -1)),
+								withDirectives(createBaseVNode("select", {
+									id: "pseNoPrintEnvironment",
+									class: "pse-dialog-input",
+									"onUpdate:modelValue": _cache[6] || (_cache[6] = ($event) => noPrintEnvironmentId.value = $event),
+									disabled: unref(environmentOptions).length == 0
+								}, [_cache[31] || (_cache[31] = createBaseVNode("option", { value: -1 }, "Niet gekozen", -1)), (openBlock(true), createElementBlock(Fragment, null, renderList(unref(environmentOptions), (option) => {
+									return openBlock(), createElementBlock("option", {
+										key: option.id,
+										value: option.id
+									}, toDisplayString(option.name), 9, _hoisted_20$1);
+								}), 128))], 8, _hoisted_19$1), [[
+									vModelSelect,
+									noPrintEnvironmentId.value,
+									void 0,
+									{ number: true }
+								]]),
+								_cache[33] || (_cache[33] = createBaseVNode("small", { class: "pse-dialog-hint" }, " Een order met een bak wordt hieronder aangemeld, zodat er niets geprint wordt. Daarna gaat elk label naar zijn eigen printer. ", -1))
+							]),
+							createBaseVNode("div", _hoisted_21$1, [
+								_cache[35] || (_cache[35] = createBaseVNode("label", {
+									class: "pse-dialog-label",
+									for: "pseBinWallEnvironment"
+								}, "Omgeving van de sorteerwand", -1)),
+								withDirectives(createBaseVNode("select", {
+									id: "pseBinWallEnvironment",
+									class: "pse-dialog-input",
+									"onUpdate:modelValue": _cache[7] || (_cache[7] = ($event) => binWallEnvironmentId.value = $event),
+									disabled: unref(environmentOptions).length == 0
+								}, [_cache[34] || (_cache[34] = createBaseVNode("option", { value: -1 }, "Niet gekozen", -1)), (openBlock(true), createElementBlock(Fragment, null, renderList(unref(environmentOptions), (option) => {
+									return openBlock(), createElementBlock("option", {
+										key: option.id,
+										value: option.id
+									}, toDisplayString(option.name), 9, _hoisted_23$1);
+								}), 128))], 8, _hoisted_22$1), [[
+									vModelSelect,
+									binWallEnvironmentId.value,
+									void 0,
+									{ number: true }
+								]]),
+								_cache[36] || (_cache[36] = createBaseVNode("small", { class: "pse-dialog-hint" }, "De printer van deze omgeving is die van de CVP.", -1))
+							]),
+							createBaseVNode("div", _hoisted_24$1, [_cache[37] || (_cache[37] = createBaseVNode("label", {
+								class: "pse-dialog-label",
+								for: "psePutWallUrl"
+							}, "Adres van de sorteerwand", -1)), withDirectives(createBaseVNode("input", {
+								type: "text",
+								id: "psePutWallUrl",
+								name: "psePutWallUrl",
+								class: "pse-dialog-input",
+								"onUpdate:modelValue": _cache[8] || (_cache[8] = ($event) => putWallUrl.value = $event),
+								placeholder: "https://putwall.apps.kampeerhalroden.nl",
+								autocomplete: "off",
+								spellcheck: "false",
+								"data-1p-ignore": "",
+								"data-lpignore": "true",
+								"data-form-type": "other"
+							}, null, 512), [[vModelText, putWallUrl.value]])]),
+							createBaseVNode("div", _hoisted_25$1, [
+								_cache[38] || (_cache[38] = createBaseVNode("label", {
+									class: "pse-dialog-label",
+									for: "psePutWallKey"
+								}, "Plugin-sleutel van de sorteerwand", -1)),
+								withDirectives(createBaseVNode("input", {
+									type: "text",
+									id: "psePutWallKey",
+									name: "psePutWallKey",
+									class: "pse-dialog-input pse-settings-masked",
+									"onUpdate:modelValue": _cache[9] || (_cache[9] = ($event) => putWallToken.value = $event),
+									autocomplete: "off",
+									spellcheck: "false",
+									"data-1p-ignore": "",
+									"data-lpignore": "true",
+									"data-form-type": "other"
+								}, null, 512), [[vModelText, putWallToken.value]]),
+								_cache[39] || (_cache[39] = createBaseVNode("small", { class: "pse-dialog-hint" }, " De PLUGIN_TOKEN van de sorteerwand: in Coolify bij de omgevingsvariabelen van putwall als SERVICE_PASSWORD_64_PLUGIN. ", -1))
+							])
+						]),
+						createBaseVNode("div", _hoisted_26$1, [
+							_cache[44] || (_cache[44] = createBaseVNode("h3", { class: "pse-settings-group-title" }, "CVP-station", -1)),
+							createBaseVNode("div", _hoisted_27$1, [
+								_cache[41] || (_cache[41] = createBaseVNode("label", {
+									class: "pse-dialog-label",
+									for: "pseCvpBridgeUrl"
+								}, "Adres van de CVP-brug", -1)),
+								withDirectives(createBaseVNode("input", {
+									type: "text",
+									id: "pseCvpBridgeUrl",
+									name: "pseCvpBridgeUrl",
+									class: "pse-dialog-input",
+									"onUpdate:modelValue": _cache[10] || (_cache[10] = ($event) => cvpBridgeUrl.value = $event),
+									placeholder: "http://127.0.0.1:8085",
+									autocomplete: "off",
+									spellcheck: "false",
+									"data-1p-ignore": "",
+									"data-lpignore": "true",
+									"data-form-type": "other"
+								}, null, 512), [[vModelText, cvpBridgeUrl.value]]),
+								createBaseVNode("small", _hoisted_28$1, " De brug op de computer bij de machine. Een werkplek op de omgeving " + toDisplayString(unref(CVP_ENVIRONMENT_NAME)) + " krijgt het CVP-station in plaats van het zoekscherm. ", 1)
+							]),
+							createBaseVNode("div", _hoisted_29$1, [
+								_cache[42] || (_cache[42] = createBaseVNode("label", {
+									class: "pse-dialog-label",
+									for: "pseCvpMaxUnits"
+								}, "Stuks per order op de CVP", -1)),
+								withDirectives(createBaseVNode("select", {
+									id: "pseCvpMaxUnits",
+									class: "pse-dialog-input",
+									"onUpdate:modelValue": _cache[11] || (_cache[11] = ($event) => cvpMaxUnits.value = $event)
+								}, [(openBlock(), createElementBlock(Fragment, null, renderList(CVP_MAX_UNITS, (units) => {
+									return createBaseVNode("option", {
+										key: units,
+										value: units
+									}, toDisplayString(units == 1 ? "1 -- alleen orders van één stuk" : `Tot ${units} stuks`), 9, _hoisted_30$1);
+								}), 64))], 512), [[
+									vModelSelect,
+									cvpMaxUnits.value,
+									void 0,
+									{ number: true }
+								]]),
+								_cache[43] || (_cache[43] = createBaseVNode("small", { class: "pse-dialog-hint" }, " Een order van meer stuks van hetzelfde product gaat ook over de CVP, tot dit aantal. Voordat er iets gebeurt, telt de operator het aantal op de band en bevestigt het. Kies niet meer dan er in de grootste doos van de machine past. ", -1))
+							])
+						]),
+						createBaseVNode("div", _hoisted_31$1, [
+							_cache[47] || (_cache[47] = createBaseVNode("h3", { class: "pse-settings-group-title" }, "Shopware koppeling", -1)),
+							createBaseVNode("div", _hoisted_32$1, [_cache[45] || (_cache[45] = createBaseVNode("label", {
 								class: "pse-dialog-label",
 								for: "pseSwClient"
 							}, "Client ID", -1)), withDirectives(createBaseVNode("input", {
@@ -11086,14 +11982,14 @@
 								id: "pseSwClient",
 								name: "pseSwClient",
 								class: "pse-dialog-input",
-								"onUpdate:modelValue": _cache[5] || (_cache[5] = ($event) => clientId.value = $event),
+								"onUpdate:modelValue": _cache[12] || (_cache[12] = ($event) => clientId.value = $event),
 								autocomplete: "off",
 								spellcheck: "false",
 								"data-1p-ignore": "",
 								"data-lpignore": "true",
 								"data-form-type": "other"
 							}, null, 512), [[vModelText, clientId.value]])]),
-							createBaseVNode("div", _hoisted_18, [_cache[24] || (_cache[24] = createBaseVNode("label", {
+							createBaseVNode("div", _hoisted_33$1, [_cache[46] || (_cache[46] = createBaseVNode("label", {
 								class: "pse-dialog-label",
 								for: "pseSwSecret"
 							}, "Client secret", -1)), withDirectives(createBaseVNode("input", {
@@ -11101,7 +11997,7 @@
 								id: "pseSwSecret",
 								name: "pseSwSecret",
 								class: "pse-dialog-input pse-settings-masked",
-								"onUpdate:modelValue": _cache[6] || (_cache[6] = ($event) => clientSecret.value = $event),
+								"onUpdate:modelValue": _cache[13] || (_cache[13] = ($event) => clientSecret.value = $event),
 								autocomplete: "off",
 								spellcheck: "false",
 								"data-1p-ignore": "",
@@ -11109,39 +12005,39 @@
 								"data-form-type": "other"
 							}, null, 512), [[vModelText, clientSecret.value]])])
 						]),
-						createBaseVNode("div", _hoisted_19, [_cache[27] || (_cache[27] = createBaseVNode("h3", { class: "pse-settings-group-title" }, "Versie", -1)), createBaseVNode("div", _hoisted_20, [
+						createBaseVNode("div", _hoisted_34$1, [_cache[49] || (_cache[49] = createBaseVNode("h3", { class: "pse-settings-group-title" }, "Versie", -1)), createBaseVNode("div", _hoisted_35$1, [
 							createBaseVNode("a", {
 								class: "pse-dialog-btn pse-settings-update",
 								href: unref(UPDATE_INSTALL_URL),
 								target: "_blank",
 								rel: "noopener",
-								onClick: _cache[7] || (_cache[7] = ($event) => onCheckForUpdate())
-							}, [_cache[26] || (_cache[26] = createBaseVNode("span", {
+								onClick: _cache[14] || (_cache[14] = ($event) => onCheckForUpdate())
+							}, [_cache[48] || (_cache[48] = createBaseVNode("span", {
 								class: "material-icons pse-settings-update-icon",
 								"aria-hidden": "true"
-							}, "system_update_alt", -1)), createTextVNode(" " + toDisplayString(checking.value ? "Bezig met controleren" : "Controleer op updates"), 1)], 8, _hoisted_21),
-							createBaseVNode("small", _hoisted_22, " Deze werkplek draait " + toDisplayString(unref(package_default).version) + ". Opent het installatiescherm van Tampermonkey, ook als er geen nieuwere versie is -- zo haal je een werkplek bij die achterloopt. ", 1),
-							updateStatus.value ? (openBlock(), createElementBlock("small", _hoisted_23, toDisplayString(updateStatus.value), 1)) : createCommentVNode("", true)
+							}, "system_update_alt", -1)), createTextVNode(" " + toDisplayString(checking.value ? "Bezig met controleren" : "Controleer op updates"), 1)], 8, _hoisted_36$1),
+							createBaseVNode("small", _hoisted_37$1, " Deze werkplek draait " + toDisplayString(unref(package_default).version) + ". Opent het installatiescherm van Tampermonkey, ook als er geen nieuwere versie is -- zo haal je een werkplek bij die achterloopt. ", 1),
+							updateStatus.value ? (openBlock(), createElementBlock("small", _hoisted_38$1, toDisplayString(updateStatus.value), 1)) : createCommentVNode("", true)
 						])])
 					]),
 					_: 1
 				});
 			};
 		}
-	}), [["__scopeId", "data-v-42ef061e"]]);
-	var _hoisted_1$5 = { class: "pse-credentials-intro" };
-	var _hoisted_2$5 = ["src"];
-	var _hoisted_3$3 = { class: "pse-credentials-field" };
-	var _hoisted_4$3 = ["disabled"];
-	var _hoisted_5$3 = { class: "pse-credentials-field" };
-	var _hoisted_6$3 = ["disabled"];
-	var _hoisted_7$3 = {
+	}), [["__scopeId", "data-v-3e8af50e"]]);
+	var _hoisted_1$7 = { class: "pse-credentials-intro" };
+	var _hoisted_2$7 = ["src"];
+	var _hoisted_3$5 = { class: "pse-credentials-field" };
+	var _hoisted_4$5 = ["disabled"];
+	var _hoisted_5$5 = { class: "pse-credentials-field" };
+	var _hoisted_6$5 = ["disabled"];
+	var _hoisted_7$5 = {
 		key: 0,
 		class: "pse-credentials-error"
 	};
-	var _hoisted_8$3 = ["disabled"];
-	var _hoisted_9$3 = ["disabled"];
-	var _hoisted_10$3 = {
+	var _hoisted_8$4 = ["disabled"];
+	var _hoisted_9$4 = ["disabled"];
+	var _hoisted_10$4 = {
 		key: 0,
 		class: "pse-credentials-spinner",
 		"aria-hidden": "true"
@@ -11192,21 +12088,21 @@
 						class: "pse-dialog-btn pse-dialog-btn-quiet",
 						disabled: checking.value,
 						onClick: _cache[4] || (_cache[4] = ($event) => emit("dismiss"))
-					}, " Later ", 8, _hoisted_8$3), createBaseVNode("button", {
+					}, " Later ", 8, _hoisted_8$4), createBaseVNode("button", {
 						type: "button",
 						class: "pse-dialog-btn",
 						disabled: !filledIn() || checking.value,
 						onClick: _cache[5] || (_cache[5] = ($event) => save())
-					}, [checking.value ? (openBlock(), createElementBlock("span", _hoisted_10$3)) : createCommentVNode("", true), createTextVNode(" " + toDisplayString(checking.value ? "Controleren..." : "Opslaan"), 1)], 8, _hoisted_9$3)]),
+					}, [checking.value ? (openBlock(), createElementBlock("span", _hoisted_10$4)) : createCommentVNode("", true), createTextVNode(" " + toDisplayString(checking.value ? "Controleren..." : "Opslaan"), 1)], 8, _hoisted_9$4)]),
 					default: withCtx(() => [
-						createBaseVNode("div", _hoisted_1$5, [createBaseVNode("img", {
+						createBaseVNode("div", _hoisted_1$7, [createBaseVNode("img", {
 							src: unref(shopware_default),
 							class: "pse-credentials-logo",
 							width: "34",
 							height: "34",
 							alt: ""
-						}, null, 8, _hoisted_2$5), _cache[7] || (_cache[7] = createBaseVNode("p", { class: "pse-credentials-subtitle" }, " Pack&Ship Extended heeft de client gegevens van de Shopware integratie nodig om ordergegevens op te halen. Ze worden alleen op deze computer bewaard. ", -1))]),
-						createBaseVNode("div", _hoisted_3$3, [_cache[8] || (_cache[8] = createBaseVNode("label", {
+						}, null, 8, _hoisted_2$7), _cache[7] || (_cache[7] = createBaseVNode("p", { class: "pse-credentials-subtitle" }, " Pack&Ship Extended heeft de client gegevens van de Shopware integratie nodig om ordergegevens op te halen. Ze worden alleen op deze computer bewaard. ", -1))]),
+						createBaseVNode("div", _hoisted_3$5, [_cache[8] || (_cache[8] = createBaseVNode("label", {
 							class: "pse-dialog-label",
 							for: "pseSetupClient"
 						}, "Client ID", -1)), withDirectives(createBaseVNode("input", {
@@ -11224,8 +12120,8 @@
 							"data-lpignore": "true",
 							"data-form-type": "other",
 							onKeyup: _cache[1] || (_cache[1] = withKeys(($event) => save(), ["enter"]))
-						}, null, 40, _hoisted_4$3), [[vModelText, clientId.value]])]),
-						createBaseVNode("div", _hoisted_5$3, [_cache[9] || (_cache[9] = createBaseVNode("label", {
+						}, null, 40, _hoisted_4$5), [[vModelText, clientId.value]])]),
+						createBaseVNode("div", _hoisted_5$5, [_cache[9] || (_cache[9] = createBaseVNode("label", {
 							class: "pse-dialog-label",
 							for: "pseSetupSecret"
 						}, "Client secret", -1)), withDirectives(createBaseVNode("input", {
@@ -11241,9 +12137,9 @@
 							"data-lpignore": "true",
 							"data-form-type": "other",
 							onKeyup: _cache[3] || (_cache[3] = withKeys(($event) => save(), ["enter"]))
-						}, null, 40, _hoisted_6$3), [[vModelText, clientSecret.value]])]),
+						}, null, 40, _hoisted_6$5), [[vModelText, clientSecret.value]])]),
 						createVNode(Transition, { name: "pse-credentials-error" }, {
-							default: withCtx(() => [error.value ? (openBlock(), createElementBlock("p", _hoisted_7$3, toDisplayString(error.value), 1)) : createCommentVNode("", true)]),
+							default: withCtx(() => [error.value ? (openBlock(), createElementBlock("p", _hoisted_7$5, toDisplayString(error.value), 1)) : createCommentVNode("", true)]),
 							_: 1
 						}),
 						_cache[10] || (_cache[10] = createBaseVNode("p", { class: "pse-credentials-footnote" }, [
@@ -11257,19 +12153,19 @@
 			};
 		}
 	}), [["__scopeId", "data-v-a3fdb084"]]);
-	var _hoisted_1$4 = { class: "pse-erp-field" };
-	var _hoisted_2$4 = ["disabled"];
-	var _hoisted_3$2 = { class: "pse-erp-field" };
-	var _hoisted_4$2 = ["disabled"];
-	var _hoisted_5$2 = { class: "pse-erp-field" };
-	var _hoisted_6$2 = ["disabled"];
-	var _hoisted_7$2 = {
+	var _hoisted_1$6 = { class: "pse-erp-field" };
+	var _hoisted_2$6 = ["disabled"];
+	var _hoisted_3$4 = { class: "pse-erp-field" };
+	var _hoisted_4$4 = ["disabled"];
+	var _hoisted_5$4 = { class: "pse-erp-field" };
+	var _hoisted_6$4 = ["disabled"];
+	var _hoisted_7$4 = {
 		key: 0,
 		class: "pse-erp-error"
 	};
-	var _hoisted_8$2 = ["disabled"];
-	var _hoisted_9$2 = ["disabled"];
-	var _hoisted_10$2 = {
+	var _hoisted_8$3 = ["disabled"];
+	var _hoisted_9$3 = ["disabled"];
+	var _hoisted_10$3 = {
 		key: 0,
 		class: "pse-erp-spinner",
 		"aria-hidden": "true"
@@ -11315,15 +12211,15 @@
 							unref(erpStore).dismiss();
 							emit("done");
 						})
-					}, " Later ", 8, _hoisted_8$2), createBaseVNode("button", {
+					}, " Later ", 8, _hoisted_8$3), createBaseVNode("button", {
 						type: "button",
 						class: "pse-dialog-btn",
 						disabled: !filledIn() || unref(erpStore).busy.value,
 						onClick: _cache[7] || (_cache[7] = ($event) => signIn())
-					}, [unref(erpStore).busy.value ? (openBlock(), createElementBlock("span", _hoisted_10$2)) : createCommentVNode("", true), createTextVNode(" " + toDisplayString(unref(erpStore).busy.value ? "Inloggen..." : "Inloggen"), 1)], 8, _hoisted_9$2)]),
+					}, [unref(erpStore).busy.value ? (openBlock(), createElementBlock("span", _hoisted_10$3)) : createCommentVNode("", true), createTextVNode(" " + toDisplayString(unref(erpStore).busy.value ? "Inloggen..." : "Inloggen"), 1)], 8, _hoisted_9$3)]),
 					default: withCtx(() => [
 						_cache[12] || (_cache[12] = createBaseVNode("p", { class: "pse-erp-subtitle" }, " De verbinding met RetailVista is verlopen. Vakken kunnen pas weer worden opgeslagen als je opnieuw inlogt. Je blijft gewoon ingelogd in de inpakportal. ", -1)),
-						createBaseVNode("div", _hoisted_1$4, [_cache[9] || (_cache[9] = createBaseVNode("label", {
+						createBaseVNode("div", _hoisted_1$6, [_cache[9] || (_cache[9] = createBaseVNode("label", {
 							class: "pse-dialog-label",
 							for: "pseErpCompany"
 						}, "Bedrijf nr", -1)), withDirectives(createBaseVNode("input", {
@@ -11335,8 +12231,8 @@
 							autocomplete: "off",
 							spellcheck: "false",
 							onKeyup: _cache[1] || (_cache[1] = withKeys(($event) => signIn(), ["enter"]))
-						}, null, 40, _hoisted_2$4), [[vModelText, companyNumber.value]])]),
-						createBaseVNode("div", _hoisted_3$2, [_cache[10] || (_cache[10] = createBaseVNode("label", {
+						}, null, 40, _hoisted_2$6), [[vModelText, companyNumber.value]])]),
+						createBaseVNode("div", _hoisted_3$4, [_cache[10] || (_cache[10] = createBaseVNode("label", {
 							class: "pse-dialog-label",
 							for: "pseErpUser"
 						}, "Gebruikersnaam", -1)), withDirectives(createBaseVNode("input", {
@@ -11350,8 +12246,8 @@
 							autocomplete: "username",
 							spellcheck: "false",
 							onKeyup: _cache[3] || (_cache[3] = withKeys(($event) => signIn(), ["enter"]))
-						}, null, 40, _hoisted_4$2), [[vModelText, userName.value]])]),
-						createBaseVNode("div", _hoisted_5$2, [_cache[11] || (_cache[11] = createBaseVNode("label", {
+						}, null, 40, _hoisted_4$4), [[vModelText, userName.value]])]),
+						createBaseVNode("div", _hoisted_5$4, [_cache[11] || (_cache[11] = createBaseVNode("label", {
 							class: "pse-dialog-label",
 							for: "pseErpPassword"
 						}, "Wachtwoord", -1)), withDirectives(createBaseVNode("input", {
@@ -11364,9 +12260,9 @@
 							disabled: unref(erpStore).busy.value,
 							autocomplete: "current-password",
 							onKeyup: _cache[5] || (_cache[5] = withKeys(($event) => signIn(), ["enter"]))
-						}, null, 40, _hoisted_6$2), [[vModelText, password.value]])]),
+						}, null, 40, _hoisted_6$4), [[vModelText, password.value]])]),
 						createVNode(Transition, { name: "pse-erp-error" }, {
-							default: withCtx(() => [unref(erpStore).refused.value ? (openBlock(), createElementBlock("p", _hoisted_7$2, " RetailVista accepteert deze gegevens niet. Controleer het bedrijfsnummer, de gebruikersnaam en het wachtwoord. ")) : createCommentVNode("", true)]),
+							default: withCtx(() => [unref(erpStore).refused.value ? (openBlock(), createElementBlock("p", _hoisted_7$4, " RetailVista accepteert deze gegevens niet. Controleer het bedrijfsnummer, de gebruikersnaam en het wachtwoord. ")) : createCommentVNode("", true)]),
 							_: 1
 						})
 					]),
@@ -11377,25 +12273,25 @@
 	}), [["__scopeId", "data-v-ebdfaa5a"]]);
 	var leaves_fan_default = "data:image/svg+xml,%3c!--%20One%20of%20the%20two%20leaf%20decals%20from%20the%20printed%20instruction%20sheet,%20as%20the%20sheet's%20own%20vector%20paths.%20Drawn%20for%20a%20bottom-left%20corner:%20its%20left%20and%20bottom%20edges%20are%20the%20page's.%20`InstructionsModal.vue`%20turns%20a%20second%20copy%20round%20for%20the%20opposite%20one.%20--%3e%3csvg%20viewBox='0%20168%20420%20332'%20fill='none'%20xmlns='http://www.w3.org/2000/svg'%3e%3cpath%20fill-rule='evenodd'%20fill='%23205732'%20d='M419.1%20427.3C409.1%20461.4%20370%20498%20370%20498L348.8%20498C348.8%20498%20356.9%20490.3%20372.4%20476.9C387.9%20463.6%20419.1%20427.3%20419.1%20427.3ZM383.7%20415.5C383.7%20415.5%20358%20456%20338.8%20468.8C319.6%20481.6%20320.4%20498%20320.4%20498L335.1%20498C335.1%20498%20346.4%20481.7%20355.9%20470.9C365.3%20460.1%20382.1%20434.7%20383.7%20415.5ZM293.4%20498L308.6%20498L347.7%20416.3C347.7%20416.3%20316.5%20446.4%20293.4%20498ZM312.9%20406.3C312.9%20406.3%20274.6%20455.9%20268.6%20498L268.6%20497.7L260.9%20497C262.4%20489.6%20271.6%20443.5%20273.6%20428C275.7%20411.2%20276.7%20400.2%20276.7%20400.2C276.7%20400.2%20256%20455%20250.7%20471.6C248.1%20479.5%20246.2%20487.5%20245.1%20495.7L244.8%20495.7L244.6%20498L268.4%20500L268.6%20498L281.7%20498L312.9%20406.3ZM225%20494L223.9%20493.9L223.5%20497.9L224.8%20498L224.9%20498L240.1%20499.3L240.2%20498L240.2%20498L240.5%20495.4L240.3%20495.4L243.1%20401.1C243.1%20401.1%20227.4%20461.9%20225%20494ZM207.5%20411.5C207.5%20411.5%20199.7%20455.1%20197.1%20491.7L196.2%20491.6L195.7%20497.9L218%20499.9L218.6%20493.5L217.6%20493.4L207.5%20411.5ZM160.7%20454C160.4%20465.9%20161.8%20477.5%20164.9%20489L157.8%20488.4L157.1%20497.1L184.5%20499.4L185.2%20490.7L182%20490.4C176.7%20477.2%20169.6%20465.1%20160.7%20454Z'/%3e%3cpath%20fill-rule='evenodd'%20fill='%234d9b44'%20d='M35.6%20498C35.6%20498%2042.1%20474.4%2044.9%20473.4C47.7%20472.4%2069.5%20479.3%2076.4%20481.8C80.3%20483.4%2084.4%20484%2088.7%20483.6C88.7%20483.6%2097.7%20480.8%2073.6%20475.7C49.4%20470.6%2044%20459.7%2044%20459.7C42.3%20439.5%2053.5%20429.8%2053.5%20429.8C63.5%20440%2091.8%20454.8%2094.5%20452.1C97.2%20449.5%2093.4%20446%2093.4%20446C58.4%20433.8%2054.8%20421%2054.8%20421C57.6%20391.1%2067.1%20375.5%2070.4%20375.5C73.7%20375.5%2090.8%20387%2094.2%20389.3C97.5%20391.5%20106.4%20400.3%20107.4%20395.7C108.5%20391.1%20105.1%20386.5%2091.9%20381.4C78.6%20376.3%2076.5%20365%2076.5%20365C93.4%20323.8%20128.7%20324.6%20132%20327.2C135.3%20329.7%20131.4%20350.6%20130.7%20352.7C130.1%20354.9%20128.8%20359%20130.8%20360.3C132.8%20361.6%20133.9%20358.6%20133.9%20358.6C133.9%20358.6%20138.3%20327.2%20145.7%20326.9C147.9%20326.8%20150%20327.2%20152.1%20327.9C154.2%20328.7%20156%20329.8%20157.7%20331.3C162.5%20339.7%20144.1%20373.2%20142.3%20377.3C140.5%20381.3%20139.5%20390.8%20145.1%20389.8C150.8%20388.8%20162.3%20357.6%20163.3%20349.1C164.3%20340.7%20165.8%20335.6%20170.4%20334.1C175.1%20332.5%20186.3%20338.7%20200.3%20345.3C214.4%20351.9%20214.1%20362.7%20214.1%20362.7C216.2%20382.6%20185.5%20419.7%20185.2%20423.8C185%20427.9%20186.5%20433.5%20194.7%20427.6C202.9%20421.8%20224.6%20364.2%20224.6%20364.2C224.6%20364.2%20253.3%20376%20254.8%20395.9C256.3%20415.9%20229.5%20456%20224.6%20463.7C219.7%20471.3%20229.5%20477.2%20232.8%20468.8C236.1%20460.4%20266.1%20411%20266.1%20411C289.6%20444.8%20273.8%20498%20273.8%20498L35.6%20498Z'/%3e%3cpath%20fill-rule='evenodd'%20fill='%23205732'%20d='M26.7%20498L0%20474.6L0%20459.8C12.4%20469.3%2026.7%20498%2026.7%20498ZM0%20414.2L0%20433.8C0%20433.8%2053.2%20465.9%2082%20471.2C82%20471.2%2047.7%20433.2%200%20414.2ZM0%20393L0%20402C0%20402%2099%20431.3%20118.6%20434.7C118.6%20434.6%2079.8%20394.7%200%20393ZM0%20368.1L0%20375.1C0%20375.1%2051.2%20393%20116.7%20395.2C116.7%20395.2%20105.2%20369.8%200%20368.1L0%20368.1ZM6%20342.1C6%20342.1%2014.4%20325.9%2025.3%20325.4C36.2%20324.8%20118.6%20324.3%20142.4%20319C142.4%20319%20103.3%20306.7%2047.9%20315.1L20.8%20319.8C20.8%20319.8%2027.8%20314.5%2041.5%20310C55.1%20305.5%20148.2%20269.5%20148.2%20269.5C148.2%20269.5%20104.9%20268.1%2032%20305C32%20305%20102.7%20263.1%20118.9%20237.4C118.9%20237.4%2078.4%20251.3%2047.1%20284.3C47.1%20284.3%20102.7%20212.2%20105.5%20194.4C105.5%20194.4%2064.2%20230.4%2058.5%20240.4C52.8%20250.5%2027.8%20293.3%2027.8%20293.3C27.8%20293.3%2039%20207.2%2032%20168.1C32%20168.1%2017.8%20230.7%2017.5%20261.7C17.2%20292.7%2017.5%20316.7%2017.5%20316.7C17.5%20316.7%2013%20310.6%2012.7%20297.7C12.4%20284.9%207.7%20238.2%200%20220.3L0%20267.5C0%20267.5%201.8%20297.5%209.1%20320.4C9.1%20320.4%208.6%20332.6%204.3%20335.1L0%20339.6L0%20354.4C48%20345.5%20116.7%20368.9%20143.5%20358.6C86.5%20352.3%2070.4%20333.1%206%20342.1L6%20342.1Z'/%3e%3c/svg%3e";
 	var leaves_frond_default = "data:image/svg+xml,%3c!--%20The%20other%20leaf%20decal%20from%20the%20printed%20instruction%20sheet,%20as%20the%20sheet's%20own%20vector%20paths.%20Drawn%20for%20a%20top-left%20corner:%20its%20left%20and%20top%20edges%20are%20the%20page's.%20`InstructionsModal.vue`%20turns%20a%20second%20copy%20round%20for%20the%20opposite%20one.%20--%3e%3csvg%20viewBox='0%200%20454%20200'%20fill='none'%20xmlns='http://www.w3.org/2000/svg'%3e%3cpath%20fill-rule='evenodd'%20fill='%234d9b44'%20d='M0%2033.5L0%200L163%200C163%200%20200.2%2018.9%20204.2%2032.3C204.2%2032.3%20196.8%2038%20179.2%2039.7C179.2%2039.7%20189.9%2042.1%20209.2%2036.1C209.2%2036.1%20233.7%2057.8%20235%2086.8C235%2086.8%20226.5%2088.9%20208.6%2088.2L202.2%2077.5L205%2087.8C205%2087.8%20157.5%2088.8%20131.8%2082.2C131.8%2082.2%20126.9%2076.8%20121.7%2055.6L123.7%2079.9C123.7%2079.9%20115%2080.3%20112.9%2076.2C110.8%2072.1%20104.9%2049.1%20104.9%2049.1L107.2%2074.9C107.2%2074.9%2041.2%2061.5%200%2033.5Z'/%3e%3cpath%20fill-rule='evenodd'%20fill='%23205732'%20d='M10.9%2035.7L42.4%200L62.3%200C49.5%2016.7%2010.9%2035.7%2010.9%2035.7ZM123.3%200.1L97.1%200.1C97.1%200.1%2053.9%2071.3%2046.8%20109.8C46.8%20109.8%2097.8%2063.9%20123.3%200.1ZM151.8%200.1L139.8%200.1C139.8%200.1%20100.3%20132.7%2095.8%20158.9C95.8%20158.9%20149.4%20107%20151.8%200.1L151.8%200.1ZM185.1%200.1L175.7%200.1C175.7%200.1%20151.7%2068.7%20148.6%20156.4C148.6%20156.4%20182.6%20141.1%20185.1%200.2L185.1%200.1ZM219.9%208.1C219.9%208.1%20241.6%2019.4%20242.3%2033.9C243%2048.5%20243.6%20159%20250.7%20190.8C250.7%20190.8%20267.3%20138.5%20256.1%2064.3L249.8%2028C249.8%2028%20256.9%2037.4%20262.9%2055.7C268.8%2074%20317%20198.9%20317%20198.9C317%20198.9%20319%20140.9%20269.6%2043.1C269.6%2043.1%20325.7%20137.9%20360.1%20159.7C360.1%20159.7%20341.5%20105.4%20297.3%2063.4C297.3%2063.4%20393.8%20138%20417.8%20141.7C417.8%20141.7%20369.5%2086.3%20356.1%2078.7C342.6%2071.2%20285.4%2037.5%20285.4%2037.5C285.4%2037.5%20400.7%2052.6%20453.1%2043.3C453.1%2043.3%20369.2%2024.1%20327.7%2023.7C286.1%2023.3%20253.9%2023.6%20253.9%2023.6C253.9%2023.6%20262.2%2017.6%20279.4%2017.3C296.6%2016.9%20359.1%2010.7%20383.1%200.4L319.9%200.3C319.9%200.3%20279.8%202.7%20249.1%2012.4C249.1%2012.4%20232.6%2011.8%20229.2%206L223.2%200.2L203.4%200.2C215.3%2064.5%20183.9%20156.6%20197.6%20192.4C206.1%20116.1%20231.9%2094.5%20219.9%208.2L219.9%208.1Z'/%3e%3c/svg%3e";
-	var _hoisted_1$3 = { class: "pse-sheet" };
-	var _hoisted_2$3 = {
+	var _hoisted_1$5 = { class: "pse-sheet" };
+	var _hoisted_2$5 = {
 		class: "pse-sheet-leaves",
 		"aria-hidden": "true"
 	};
-	var _hoisted_3$1 = ["src"];
-	var _hoisted_4$1 = ["src"];
-	var _hoisted_5$1 = ["src"];
-	var _hoisted_6$1 = ["src"];
-	var _hoisted_7$1 = { class: "pse-sheet-scroll" };
-	var _hoisted_8$1 = { class: "pse-sheet-card" };
-	var _hoisted_9$1 = { class: "pse-instructions" };
-	var _hoisted_10$1 = { class: "pse-instruction-text" };
-	var _hoisted_11$1 = {
+	var _hoisted_3$3 = ["src"];
+	var _hoisted_4$3 = ["src"];
+	var _hoisted_5$3 = ["src"];
+	var _hoisted_6$3 = ["src"];
+	var _hoisted_7$3 = { class: "pse-sheet-scroll" };
+	var _hoisted_8$2 = { class: "pse-sheet-card" };
+	var _hoisted_9$2 = { class: "pse-instructions" };
+	var _hoisted_10$2 = { class: "pse-instruction-text" };
+	var _hoisted_11$2 = {
 		key: 0,
 		class: "pse-instruction-title"
 	};
-	var _hoisted_12$1 = { class: "pse-sheet-foot" };
-	var _hoisted_13$1 = ["src"];
+	var _hoisted_12$2 = { class: "pse-sheet-foot" };
+	var _hoisted_13$2 = ["src"];
 	var InstructionsModal_default = _plugin_vue_export_helper_default(defineComponent({
 		__name: "InstructionsModal",
 		emits: ["close"],
@@ -11407,28 +12303,28 @@
 					bare: "",
 					onClose: _cache[2] || (_cache[2] = ($event) => _ctx.$emit("close"))
 				}, {
-					default: withCtx(() => [createBaseVNode("div", _hoisted_1$3, [createBaseVNode("div", _hoisted_2$3, [
+					default: withCtx(() => [createBaseVNode("div", _hoisted_1$5, [createBaseVNode("div", _hoisted_2$5, [
 						createBaseVNode("img", {
 							class: "pse-sheet-leaf is-frond is-top",
 							src: unref(leaves_frond_default),
 							alt: ""
-						}, null, 8, _hoisted_3$1),
+						}, null, 8, _hoisted_3$3),
 						createBaseVNode("img", {
 							class: "pse-sheet-leaf is-fan is-top",
 							src: unref(leaves_fan_default),
 							alt: ""
-						}, null, 8, _hoisted_4$1),
+						}, null, 8, _hoisted_4$3),
 						createBaseVNode("img", {
 							class: "pse-sheet-leaf is-fan is-bottom",
 							src: unref(leaves_fan_default),
 							alt: ""
-						}, null, 8, _hoisted_5$1),
+						}, null, 8, _hoisted_5$3),
 						createBaseVNode("img", {
 							class: "pse-sheet-leaf is-frond is-bottom",
 							src: unref(leaves_frond_default),
 							alt: ""
-						}, null, 8, _hoisted_6$1)
-					]), createBaseVNode("div", _hoisted_7$1, [createBaseVNode("div", _hoisted_8$1, [
+						}, null, 8, _hoisted_6$3)
+					]), createBaseVNode("div", _hoisted_7$3, [createBaseVNode("div", _hoisted_8$2, [
 						createBaseVNode("button", {
 							type: "button",
 							class: "pse-sheet-close",
@@ -11445,7 +12341,7 @@
 							"aria-hidden": "true"
 						}, [createBaseVNode("path", { d: "M6 6l12 12M18 6L6 18" })], -1)])]),
 						_cache[5] || (_cache[5] = createBaseVNode("h2", { class: "pse-sheet-title" }, "Instructies webshop", -1)),
-						createBaseVNode("ul", _hoisted_9$1, [(openBlock(true), createElementBlock(Fragment, null, renderList(unref(INSTRUCTIONS), (instruction, index) => {
+						createBaseVNode("ul", _hoisted_9$2, [(openBlock(true), createElementBlock(Fragment, null, renderList(unref(INSTRUCTIONS), (instruction, index) => {
 							return openBlock(), createElementBlock("li", {
 								key: index,
 								class: "pse-instruction"
@@ -11457,9 +12353,9 @@
 								width: "19",
 								height: "19",
 								fill: "currentColor"
-							}, [createBaseVNode("path", { d: "M24.412 35.6565V11.098L41.6909 43.6364L24.412 35.6565ZM22.0017 0.496094L19.282 1.47322L22.4577 7.45001L0 49.7435L24.0863 38.6205L48.1725 49.7435L25.6985 7.43372L28.8579 1.48951L26.1382 0.528665L24.0863 4.40462L22.018 0.512379L22.0017 0.496094Z" })])], -1)), createBaseVNode("p", _hoisted_10$1, [instruction.title ? (openBlock(), createElementBlock("strong", _hoisted_11$1, toDisplayString(instruction.title), 1)) : createCommentVNode("", true), createTextVNode(" " + toDisplayString(instruction.text), 1)])]);
+							}, [createBaseVNode("path", { d: "M24.412 35.6565V11.098L41.6909 43.6364L24.412 35.6565ZM22.0017 0.496094L19.282 1.47322L22.4577 7.45001L0 49.7435L24.0863 38.6205L48.1725 49.7435L25.6985 7.43372L28.8579 1.48951L26.1382 0.528665L24.0863 4.40462L22.018 0.512379L22.0017 0.496094Z" })])], -1)), createBaseVNode("p", _hoisted_10$2, [instruction.title ? (openBlock(), createElementBlock("strong", _hoisted_11$2, toDisplayString(instruction.title), 1)) : createCommentVNode("", true), createTextVNode(" " + toDisplayString(instruction.text), 1)])]);
 						}), 128))]),
-						createBaseVNode("footer", _hoisted_12$1, [createBaseVNode("button", {
+						createBaseVNode("footer", _hoisted_12$2, [createBaseVNode("button", {
 							type: "button",
 							class: "pse-dialog-btn",
 							onClick: _cache[1] || (_cache[1] = ($event) => _ctx.$emit("close"))
@@ -11467,7 +12363,7 @@
 							class: "pse-sheet-logo",
 							src: unref(kampeerhal_roden_default),
 							alt: "Kampeerhal Roden"
-						}, null, 8, _hoisted_13$1)])
+						}, null, 8, _hoisted_13$2)])
 					])])])]),
 					_: 1
 				});
@@ -11580,35 +12476,35 @@
 		canvas.getContext("2d")?.drawImage(image, 0, 0, ICON_SIZE, ICON_SIZE);
 		return canvas.toDataURL("image/png");
 	}
-	var _hoisted_1$2 = ["aria-pressed", "title"];
-	var _hoisted_2$2 = ["src"];
-	var _hoisted_3 = { class: "pse-toggle-label" };
-	var _hoisted_4 = {
+	var _hoisted_1$4 = ["aria-pressed", "title"];
+	var _hoisted_2$4 = ["src"];
+	var _hoisted_3$2 = { class: "pse-toggle-label" };
+	var _hoisted_4$2 = {
 		key: 1,
 		class: "pse-divider",
 		"aria-hidden": "true"
 	};
-	var _hoisted_5 = ["title"];
-	var _hoisted_6 = { class: "pse-user-name" };
-	var _hoisted_7 = {
+	var _hoisted_5$2 = ["title"];
+	var _hoisted_6$2 = { class: "pse-user-name" };
+	var _hoisted_7$2 = {
 		class: "pse-version",
 		title: "Pack&Ship Extended"
 	};
-	var _hoisted_8 = { class: "pse-version-number" };
-	var _hoisted_9 = ["href", "title"];
-	var _hoisted_10 = {
+	var _hoisted_8$1 = { class: "pse-version-number" };
+	var _hoisted_9$1 = ["href", "title"];
+	var _hoisted_10$1 = {
 		key: 3,
 		class: "pse-divider",
 		"aria-hidden": "true"
 	};
-	var _hoisted_11 = ["src"];
-	var _hoisted_12 = {
+	var _hoisted_11$1 = ["src"];
+	var _hoisted_12$1 = {
 		key: 5,
 		class: "pse-divider",
 		"aria-hidden": "true"
 	};
-	var _hoisted_13 = ["src"];
-	var _hoisted_14 = ["src"];
+	var _hoisted_13$1 = ["src"];
+	var _hoisted_14$1 = ["src"];
 	var Footer_default = _plugin_vue_export_helper_default(defineComponent({
 		__name: "Footer",
 		props: {
@@ -11663,8 +12559,8 @@
 						class: "pse-icon",
 						src: unref(power_default),
 						alt: ""
-					}, null, 8, _hoisted_2$2), createBaseVNode("span", _hoisted_3, toDisplayString(masterSwitchLabel.value), 1)], 10, _hoisted_1$2)) : createCommentVNode("", true),
-					!__props.minimal ? (openBlock(), createElementBlock("span", _hoisted_4)) : createCommentVNode("", true),
+					}, null, 8, _hoisted_2$4), createBaseVNode("span", _hoisted_3$2, toDisplayString(masterSwitchLabel.value), 1)], 10, _hoisted_1$4)) : createCommentVNode("", true),
+					!__props.minimal ? (openBlock(), createElementBlock("span", _hoisted_4$2)) : createCommentVNode("", true),
 					currentUser.value && !__props.minimal ? (openBlock(), createElementBlock("span", {
 						key: 2,
 						class: "pse-user",
@@ -11672,10 +12568,10 @@
 					}, [_cache[10] || (_cache[10] = createBaseVNode("span", {
 						class: "pse-dot",
 						"aria-hidden": "true"
-					}, null, -1)), createBaseVNode("span", _hoisted_6, toDisplayString(currentUser.value.userName), 1)], 8, _hoisted_5)) : createCommentVNode("", true),
-					createBaseVNode("span", _hoisted_7, [
+					}, null, -1)), createBaseVNode("span", _hoisted_6$2, toDisplayString(currentUser.value.userName), 1)], 8, _hoisted_5$2)) : createCommentVNode("", true),
+					createBaseVNode("span", _hoisted_7$2, [
 						_cache[12] || (_cache[12] = createBaseVNode("span", { class: "pse-brand" }, "P&S Extended", -1)),
-						createBaseVNode("span", _hoisted_8, "v" + toDisplayString(unref(package_default).version), 1),
+						createBaseVNode("span", _hoisted_8$1, "v" + toDisplayString(unref(package_default).version), 1),
 						update.value ? (openBlock(), createElementBlock("a", {
 							key: 0,
 							class: "pse-update",
@@ -11686,9 +12582,9 @@
 						}, [_cache[11] || (_cache[11] = createBaseVNode("span", {
 							class: "pse-update-dot",
 							"aria-hidden": "true"
-						}, null, -1)), createTextVNode(" update " + toDisplayString(update.value.version), 1)], 8, _hoisted_9)) : createCommentVNode("", true)
+						}, null, -1)), createTextVNode(" update " + toDisplayString(update.value.version), 1)], 8, _hoisted_9$1)) : createCommentVNode("", true)
 					]),
-					unref(canInstall) ? (openBlock(), createElementBlock("span", _hoisted_10)) : createCommentVNode("", true),
+					unref(canInstall) ? (openBlock(), createElementBlock("span", _hoisted_10$1)) : createCommentVNode("", true),
 					unref(canInstall) ? (openBlock(), createElementBlock("button", {
 						key: 4,
 						type: "button",
@@ -11699,8 +12595,8 @@
 						class: "pse-icon",
 						src: unref(install_default),
 						alt: ""
-					}, null, 8, _hoisted_11), _cache[13] || (_cache[13] = createBaseVNode("span", { class: "pse-install-label" }, "App installeren", -1))])) : createCommentVNode("", true),
-					!__props.minimal ? (openBlock(), createElementBlock("span", _hoisted_12)) : createCommentVNode("", true),
+					}, null, 8, _hoisted_11$1), _cache[13] || (_cache[13] = createBaseVNode("span", { class: "pse-install-label" }, "App installeren", -1))])) : createCommentVNode("", true),
+					!__props.minimal ? (openBlock(), createElementBlock("span", _hoisted_12$1)) : createCommentVNode("", true),
 					!__props.minimal ? (openBlock(), createElementBlock("button", {
 						key: 6,
 						type: "button",
@@ -11713,7 +12609,7 @@
 						class: "pse-icon",
 						src: unref(help_default),
 						alt: ""
-					}, null, 8, _hoisted_13), _cache[14] || (_cache[14] = createBaseVNode("span", { class: "pse-help-label" }, "Instructies", -1))])) : createCommentVNode("", true),
+					}, null, 8, _hoisted_13$1), _cache[14] || (_cache[14] = createBaseVNode("span", { class: "pse-help-label" }, "Instructies", -1))])) : createCommentVNode("", true),
 					!__props.minimal ? (openBlock(), createElementBlock("button", {
 						key: 7,
 						type: "button",
@@ -11726,7 +12622,7 @@
 						class: "pse-icon",
 						src: unref(settings_default),
 						alt: ""
-					}, null, 8, _hoisted_14), _cache[15] || (_cache[15] = createBaseVNode("span", { class: "pse-settings-label" }, "Instellingen", -1))])) : createCommentVNode("", true)
+					}, null, 8, _hoisted_14$1), _cache[15] || (_cache[15] = createBaseVNode("span", { class: "pse-settings-label" }, "Instellingen", -1))])) : createCommentVNode("", true)
 				], 2)], 8, ["to"])), !__props.minimal ? (openBlock(), createBlock(Teleport, {
 					key: 0,
 					to: "body"
@@ -11765,8 +12661,8 @@
 			};
 		}
 	}), [["__scopeId", "data-v-13beeac1"]]);
-	var _hoisted_1$1 = { class: "pse-login" };
-	var _hoisted_2$1 = { class: "pse-login-card" };
+	var _hoisted_1$3 = { class: "pse-login" };
+	var _hoisted_2$3 = { class: "pse-login-card" };
 	var LOGIN_FORM_ID = "account";
 	var COMPANY_INPUT = "#Input_CompanyNumber";
 	var USER_NAME_INPUT = "#Input_UserName";
@@ -11852,7 +12748,7 @@
 			return (_ctx, _cache) => {
 				return openBlock(), createElementBlock(Fragment, null, [
 					createVNode(Header_default, { linked: false }),
-					createBaseVNode("div", _hoisted_1$1, [createBaseVNode("div", _hoisted_2$1, [createVNode(SearchPanel_default, {
+					createBaseVNode("div", _hoisted_1$3, [createBaseVNode("div", _hoisted_2$3, [createVNode(SearchPanel_default, {
 						title: "Inloggen",
 						subtitle: "Meld je aan om te beginnen met inpakken."
 					}, {
@@ -11918,6 +12814,1154 @@
 			};
 		}
 	});
+	var CvpBridgeError = class extends Error {};
+	var TIMEOUT_MS = 5e3;
+	var BIN_TIMEOUT_MS = 3e4;
+	function readBridgeHealth() {
+		return request("GET", "/api/health");
+	}
+	function scanBin(bin) {
+		return request("POST", `/api/bins/${encodeURIComponent(bin)}/scan`, void 0, BIN_TIMEOUT_MS, [400]);
+	}
+	function printBinOnZebra(bin) {
+		return request("POST", `/api/bins/${encodeURIComponent(bin)}/print-zebra`, void 0, BIN_TIMEOUT_MS, [400]);
+	}
+	function readHeldLabels() {
+		return request("GET", "/api/bins/held");
+	}
+	function sendHeldToCvp(id) {
+		return request("POST", `/api/held/${id}/send-cvp`, void 0, TIMEOUT_MS, [409]);
+	}
+	function printHeldOnZebra(id) {
+		return request("POST", `/api/held/${id}/print-zebra`, void 0, TIMEOUT_MS, [409]);
+	}
+	function readRecentLabels(limit = 20) {
+		return request("GET", `/api/labels?limit=${limit}`);
+	}
+	async function sendHint(hint) {
+		try {
+			await request("POST", "/api/hint", {
+				...hint,
+				parcelIndex: 1,
+				expectedCount: 1
+			});
+		} catch (error) {
+			debug("The CVP bridge did not take the hint.", error);
+		}
+	}
+	function request(method, path, body, timeout = TIMEOUT_MS, answeredStatuses = []) {
+		const base = Settings.cvpBridgeUrl.trim().replace(/\/+$/, "");
+		if (!base) return Promise.reject(new CvpBridgeError("Het adres van de CVP-brug is niet ingesteld."));
+		return new Promise((resolve, reject) => {
+			_GM_xmlhttpRequest({
+				method,
+				url: base + path,
+				timeout,
+				headers: body ? { "Content-Type": "application/json" } : void 0,
+				data: body ? JSON.stringify(body) : void 0,
+				onload: (response) => {
+					if (!(response.status >= 200 && response.status < 300 || answeredStatuses.includes(response.status))) {
+						reject(new CvpBridgeError(`De CVP-brug antwoordde ${response.status}.`));
+						return;
+					}
+					if (response.status == 202 || response.status == 204 || !response.responseText) {
+						resolve(void 0);
+						return;
+					}
+					try {
+						resolve(JSON.parse(response.responseText));
+					} catch {
+						reject(new CvpBridgeError("De CVP-brug gaf een antwoord dat niet te lezen is."));
+					}
+				},
+				onerror: () => reject(new CvpBridgeError("De CVP-brug is niet bereikbaar.")),
+				ontimeout: () => reject(new CvpBridgeError("De CVP-brug reageert niet."))
+			});
+		});
+	}
+	var CvpRefusal = class extends Error {
+		tone;
+		order;
+		parcelsUrl;
+		constructor(message, tone = "warning", order, parcelsUrl) {
+			super(message);
+			this.tone = tone;
+			this.order = order;
+			this.parcelsUrl = parcelsUrl;
+		}
+	};
+	var REQUEST_TIMEOUT_MS = 3e4;
+	var ANNOUNCE_TIMEOUT_MS = 9e4;
+	var parser = new DOMParser();
+	async function completeSingleLine(barcode, options) {
+		options.onStep("search");
+		const opened = await findOrder(barcode, options.skip, options.maxUnits);
+		const { order } = opened;
+		options.onStep("open", order);
+		const parcelsUrl = `${PACKING_PORTAL_URL}/Parcels?reservationId=${encodeURIComponent(order.reservationId)}&allowCashOnDelivery=False`;
+		let written = false;
+		const refuse = (message, tone = "error") => new CvpRefusal(message, tone, order, written ? parcelsUrl + PARCELS_RETURN_HASH : void 0);
+		try {
+			assertCvpEnvironment(opened.page, refuse);
+			if (order.units > 1 && !await options.confirmUnits(order)) throw refuse(`${order.reservationNumber} is niet naar de CVP gestuurd. Pak de order met de hand.`, "warning");
+			setLastOpenReservation({
+				id: order.reservationId,
+				number: order.reservationNumber
+			});
+			const details = getReservationDetailsFromOverview(overviewOf(opened.page));
+			if (details) cacheReservationDetails(details);
+			options.onStep("verify", order);
+			const verification = overviewOf(opened.page);
+			verification.querySelectorAll("input[id^='ReservationRowsNotInCarriers_'][id$='__Collected']").forEach((collected) => collected.value = "true");
+			written = true;
+			let page = await portalPage(`${PACKING_PORTAL_URL}/Reservations/Update`, "De verificatie", {
+				method: "POST",
+				body: formBody(verification)
+			});
+			if (page.querySelector("#ReservationId")?.getAttribute("value") != order.reservationId || !page.querySelector("#ParcelsContainer")) throw refuse(`De verificatie van ${order.reservationNumber} kwam niet uit op de pakketpagina.`);
+			assertCvpEnvironment(page, refuse);
+			if (readParcels(page).some((parcel) => parcel.announced || parcel.barcode)) throw refuse(`Een pakket van ${order.reservationNumber} is al aangemeld. Rond de order af in Pack & Ship.`);
+			options.onStep("parcel", order);
+			page = await shapeOneEmptyParcel(page, order, parcelsUrl, refuse);
+			page = await fillParcel(page, order, refuse);
+			options.onStep("announce", order);
+			const result = await announce(page, order, refuse);
+			setLastCompletedReservation({
+				id: order.reservationId,
+				number: order.reservationNumber
+			});
+			recordCompletedReservation({
+				id: order.reservationId,
+				number: order.reservationNumber,
+				completedAt: Date.now(),
+				customer: order.customer,
+				parcels: result.parcels,
+				failed: result.failure != void 0
+			});
+			if (result.failure) throw refuse(`Aanmelden van ${order.reservationNumber} geweigerd: ${result.failure}`);
+			return {
+				...order,
+				trackings: result.trackings
+			};
+		} catch (error) {
+			if (error instanceof CvpRefusal) throw error;
+			console.error(`Pack&Ship Extended could not complete ${order.reservationNumber} for the CVP.`, error);
+			throw refuse(error instanceof Error ? error.message : String(error));
+		}
+	}
+	async function findOrder(barcode, skip, maxUnits) {
+		let answer = await portalPage(`${PACKING_PORTAL_URL}/Reservations/Search?${searchQuery(barcode)}`, "De zoekopdracht");
+		if (evaluateSearchResponse(answer.body) == ReservationSearchResponseType.UnfinishedRun) {
+			await handleUnfinishedRun(answer.body);
+			answer = await portalPage(`${PACKING_PORTAL_URL}/Reservations/Search?${searchQuery(barcode)}`, "De zoekopdracht");
+		}
+		switch (evaluateSearchResponse(answer.body)) {
+			case ReservationSearchResponseType.ContinueVerification: {
+				const verdict = judge(answer, "", maxUnits);
+				if (typeof verdict == "string") throw new CvpRefusal(verdict);
+				if (skip.has(verdict.order.reservationNumber)) throw new CvpRefusal(`${verdict.order.reservationNumber} is hier al eens mislukt. Rond hem af in Pack & Ship.`);
+				return verdict;
+			}
+			case ReservationSearchResponseType.SelectionModal: return pickFromList(answer, skip, maxUnits);
+			case ReservationSearchResponseType.UnfinishedRun: throw new CvpRefusal("De raapronde van deze reservering kon niet worden afgerond. Rond hem af in RetailVista.", "error");
+			default: throw new CvpRefusal(alertText(answer) || "Geen open order met dit product.");
+		}
+	}
+	async function pickFromList(answer, skip, maxUnits) {
+		const list = retrieveModalData(answer.body);
+		const physical = (reservation) => reservation.products.filter((product) => !/verzendkosten/i.test(product.description));
+		const listedUnits = (reservation) => physical(reservation).reduce((sum, product) => sum + quantity(product.amount), 0);
+		const singleProduct = [...list.singleLineReservations, ...maxUnits > 1 ? list.validReservations.filter((reservation) => physical(reservation).length == 1) : []];
+		const candidates = singleProduct.filter((reservation) => reservation.url && !skip.has(String(reservation.reservationNumber))).sort((first, second) => listedUnits(first) - listedUnits(second));
+		if (candidates.length == 0) {
+			if (singleProduct.length > 0) throw new CvpRefusal("De orders met dit product zijn hier al eens mislukt, of nog niet volledig geraapt.");
+			throw new CvpRefusal(list.validReservations.length + list.invalidReservations.length > 0 ? "Dit product staat alleen in orders met meer artikelen. Die gaan niet over de CVP." : "Geen open order met dit product.");
+		}
+		const reasons = [];
+		for (const candidate of candidates) {
+			const verdict = judge(await portalPage(candidate.url, "Het openen van de reservering"), candidate.saleOrderReference, maxUnits);
+			if (typeof verdict != "string") return verdict;
+			debug(`CVP: passing over ${candidate.reservationNumber}:`, verdict);
+			reasons.push(verdict);
+		}
+		const distinct = [...new Set(reasons)];
+		throw new CvpRefusal(distinct.length == 1 ? distinct[0] : "Geen order met dit product kan over de CVP.");
+	}
+	function judge(page, orderReference, maxUnits) {
+		const overview = page.querySelector("#ReservationOverview");
+		if (!overview) return alertText(page) || "De reservering kon niet worden geopend.";
+		const details = getReservationDetailsFromOverview(overview);
+		const physical = (details?.products ?? []).filter((product) => !/verzendkosten/i.test(product.description));
+		const units = physical.reduce((sum, product) => sum + product.requiredQuantity, 0);
+		if (physical.length != 1) return "Dit product staat alleen in orders met meer artikelen. Die gaan niet over de CVP.";
+		if (units < 1) return "De reservering noemt geen aantal voor dit product.";
+		if (units > maxUnits) return maxUnits == 1 ? `Deze order is voor ${units} stuks. Op deze CVP gaan alleen orders van één stuk.` : `Deze order is voor ${units} stuks. Op deze CVP gaan orders van ten hoogste ${maxUnits}.`;
+		if (isStorePickup(getCurrentTransport(page))) return "Dit is een afhaalorder. Die gaat niet over de CVP.";
+		return {
+			page,
+			order: {
+				reservationId: page.querySelector("#ReservationId")?.getAttribute("value") ?? "",
+				reservationNumber: details.id,
+				orderReference: orderReference || readOrderReference(page),
+				customer: getCurrentCustomerName(page),
+				product: physical[0].description,
+				units
+			}
+		};
+	}
+	function searchQuery(barcode) {
+		const params = new URLSearchParams();
+		const form = document.querySelector("#frmReservations");
+		if (form) {
+			for (const [key, value] of new FormData(form)) if (typeof value == "string") params.append(key, value);
+		}
+		params.set(document.querySelector("#Productbarcode")?.name || "Productbarcode", barcode);
+		params.set(document.querySelector("#ReservationNumber")?.name || "ReservationNumber", "");
+		return params.toString();
+	}
+	function readParcels(page) {
+		const fields = new Map();
+		for (const input of page.querySelectorAll("input[name^='Items[']")) {
+			const match = input.name.match(/^Items\[(\d+)\]\.(\w+)$/);
+			if (match) {
+				const index = Number(match[1]);
+				fields.set(index, {
+					...fields.get(index),
+					[match[2]]: input.value.trim()
+				});
+			}
+		}
+		return [...fields.entries()].filter(([, parcel]) => parcel.ItemId != void 0).sort(([first], [second]) => first - second).map(([index, parcel]) => ({
+			index,
+			itemId: parcel.ItemId,
+			announced: /^true$/i.test(parcel.Announced ?? ""),
+			barcode: parcel.Barcode ?? ""
+		}));
+	}
+	function readItems(page) {
+		const items = [];
+		for (const input of page.querySelectorAll("input[name^='Items['][name$='].Amount']")) {
+			const match = input.name.match(/^Items\[(\d+)\]\.Items\[(\d+)\]\.Amount$/);
+			const amount = quantity(input.value);
+			if (match && amount > 0) items.push({
+				parcel: Number(match[1]),
+				index: Number(match[2]),
+				amount
+			});
+		}
+		return items;
+	}
+	async function shapeOneEmptyParcel(page, order, parcelsUrl, refuse) {
+		const leftovers = readItems(page).length;
+		for (let round = 0; readItems(page).length > 0; round++) {
+			if (round >= leftovers) throw refuse(`De artikelen in de pakketten van ${order.reservationNumber} gaan er niet uit.`);
+			const items = readItems(page);
+			page = await postParcelForm(page, "Update", refuse, (form) => {
+				for (const item of items) {
+					setField(form, `Items[${item.parcel}].Items[${item.index}].Amount`, "0");
+					setField(form, `Items[${item.parcel}].Items[${item.index}].Active`, "True");
+				}
+			});
+		}
+		const surplus = readParcels(page).slice(1).reverse();
+		for (const parcel of surplus) {
+			const response = await portalFetch(`${PACKING_PORTAL_URL}/Parcels/Delete?itemId=${encodeURIComponent(parcel.itemId)}`, "Een pakket verwijderen", { method: "DELETE" });
+			if (!response.ok) throw refuse(`Een pakket van ${order.reservationNumber} verwijderen gaf HTTP ${response.status}.`);
+		}
+		if (surplus.length > 0) page = await portalPage(parcelsUrl, "De pakketpagina");
+		if (readParcels(page).length == 0) {
+			const add = (page.querySelector("#add-parcel")?.getAttribute("href") ?? "").match(/newParcel\(\s*\d+\s*,\s*(\d+)\s*,\s*(\d+)\s*,\s*(true|false)\s*\)/i);
+			if (!add) throw refuse(`De pakketpagina van ${order.reservationNumber} heeft geen pakket en geen manier om er een te maken.`);
+			const parcelForm = (await portalPage(`${PACKING_PORTAL_URL}/Parcels/Create?${new URLSearchParams({
+				reservationId: order.reservationId,
+				parcelServiceId: add[1],
+				parcelServiceCarrierId: add[2],
+				cashOnDelivery: add[3].toLowerCase()
+			})}`, "Een pakket maken")).querySelector("#parcelForm");
+			if (!parcelForm) throw refuse(`Een pakket maken voor ${order.reservationNumber} gaf geen formulier.`);
+			const saved = await portalFetch(`${PACKING_PORTAL_URL}/Parcels/Edit`, "Het pakket opslaan", {
+				method: "POST",
+				body: formBody(parcelForm)
+			});
+			if (!saved.ok) throw refuse(`Een pakket opslaan voor ${order.reservationNumber} gaf HTTP ${saved.status}.`);
+			page = await portalPage(parcelsUrl, "De pakketpagina");
+		}
+		const parcels = readParcels(page);
+		if (parcels.length != 1 || readItems(page).length > 0) throw refuse(`De pakketpagina van ${order.reservationNumber} heeft ${parcels.length} pakketten en ${readItems(page).length} artikelen erin, verwacht één leeg pakket.`);
+		return page;
+	}
+	async function fillParcel(page, order, refuse) {
+		const specify = page.querySelector("input[name='SpecifyProductsInReservationParcels']");
+		if (!/^true$/i.test(specify?.value ?? "")) return page;
+		const row = getVerificationRows(page).find((candidate) => !/verzendkosten/i.test(candidate.description));
+		if (!row?.mainBarcode) throw refuse(`De pakketpagina van ${order.reservationNumber} noemt het product niet.`);
+		const parcel = readParcels(page)[0];
+		for (let unit = 0; unit < order.units; unit++) {
+			page = await postParcelForm(page, "VerifyProduct", refuse, (form) => {
+				setField(form, `Items[${parcel.index}].Active`, "True");
+				const scan = form.querySelector("#productBarcode");
+				if (scan) scan.value = row.mainBarcode;
+			});
+			if (page.querySelector("#VerificationAmount")) {
+				page = await postParcelForm(page, "VerifyProductAmount", refuse, (form) => {
+					setField(form, `Items[${parcel.index}].Active`, "True");
+					const amount = form.querySelector("#VerificationAmount");
+					if (amount) amount.value = String(order.units);
+				});
+				break;
+			}
+		}
+		const inParcel = readItems(page).reduce((sum, item) => sum + item.amount, 0);
+		if (inParcel != order.units) throw refuse(`Na het scannen zitten er ${inParcel} artikelen in het pakket van ${order.reservationNumber}, verwacht ${order.units}.`);
+		return page;
+	}
+	async function announce(page, order, refuse) {
+		const container = page.querySelector("#ParcelsContainer");
+		const button = Array.from(container?.querySelectorAll("button, a") ?? []).find((element) => /\/CompleteReservations\?/.test(element.getAttribute("onclick") ?? element.getAttribute("href") ?? ""));
+		const target = (button?.getAttribute("onclick") ?? button?.getAttribute("href") ?? "").match(/['"]([^'"]*\/CompleteReservations\?[^'"]*)['"]/)?.[1];
+		if (!button || !target) throw refuse(`De pakketpagina van ${order.reservationNumber} heeft geen knop om aan te kondigen.`);
+		if (button.hasAttribute("disabled")) throw refuse(`Pack & Ship laat ${order.reservationNumber} nog niet aankondigen.`);
+		await sendHint({
+			reservation: order.reservationNumber,
+			order: order.orderReference,
+			customerName: order.customer
+		});
+		const result = await portalPage(new URL(target, PACKING_PORTAL_URL).href, "Het aankondigen", void 0, ANNOUNCE_TIMEOUT_MS);
+		if (!result.querySelector("#ReservationContainer")) throw refuse(`Het resultaat van aankondigen voor ${order.reservationNumber} is niet te lezen. Kijk in Pack & Ship.`);
+		const failures = Array.from(result.querySelectorAll(COMPLETED_STEP_SELECTOR)).filter((step) => step.querySelector(COMPLETED_STEP_ERROR_SELECTOR)).map((step) => {
+			const detail = text(step.querySelector(COMPLETED_STEP_DETAIL_SELECTOR));
+			const scope = step.cloneNode(true);
+			scope.querySelectorAll(`${COMPLETED_STEP_DETAIL_SELECTOR}, .material-icons`).forEach((part) => part.remove());
+			return [text(scope), detail].filter(Boolean).join(": ");
+		});
+		const cards = Array.from(result.querySelectorAll(COMPLETED_PARCEL_SELECTOR));
+		return {
+			trackings: cards.map((card) => Array.from(card.querySelectorAll(`${COMPLETED_PARCEL_TITLE_SELECTOR}, ${COMPLETED_PARCEL_FIELD_SELECTOR}`)).map((cell) => text(cell).match(/^barcode:\s*(\S+)$/i)?.[1]).find(Boolean)).filter((tracking) => Boolean(tracking)),
+			parcels: cards.length,
+			failure: failures.length > 0 ? failures.join("; ") : void 0
+		};
+	}
+	async function postParcelForm(page, route, refuse, fill) {
+		const form = overviewOf(page);
+		fill(form);
+		const response = await portalFetch(`${PACKING_PORTAL_URL}/Parcels/${route}`, "De pakketpagina", {
+			method: "POST",
+			body: formBody(form)
+		});
+		const answer = await response.text();
+		if (!response.ok) throw refuse(`Parcels/${route} gaf HTTP ${response.status}.`);
+		const container = page.querySelector("#ParcelsContainer");
+		if (!container) throw refuse("De pakketpagina is haar pakketten kwijt.");
+		container.innerHTML = answer;
+		const alert = container.querySelector("#alert");
+		if (alert) throw refuse(`De portal weigerde het: ${text(alert).replace(/^×\s*/, "")}`);
+		return page;
+	}
+	function assertCvpEnvironment(page, refuse) {
+		const environment = getSessionEnvironmentName(page);
+		if (environment && !isCvpEnvironment(environment)) throw refuse(`De sessie staat op omgeving "${environment}": het label zou daar printen. Ververs de pagina.`);
+	}
+	function overviewOf(page) {
+		const form = page.querySelector("#ReservationOverview");
+		if (!form) throw new CvpRefusal("De pagina van de reservering is niet te lezen.", "error");
+		return form;
+	}
+	function setField(form, name, value) {
+		const input = form.querySelector(`input[name='${name}']`);
+		if (input) input.value = value;
+	}
+	function formBody(form) {
+		const body = new URLSearchParams();
+		for (const [key, value] of new FormData(form)) if (typeof value == "string") body.append(key, value);
+		return body;
+	}
+	async function portalPage(url, what, init, timeout = REQUEST_TIMEOUT_MS) {
+		const response = await portalFetch(url, what, init, timeout);
+		if (!response.ok) throw new CvpRefusal(`${what} gaf HTTP ${response.status}.`, "error");
+		return parser.parseFromString(await response.text(), "text/html");
+	}
+	async function portalFetch(url, what, init, timeout = REQUEST_TIMEOUT_MS) {
+		let response;
+		try {
+			response = await fetch(url, {
+				cache: "no-store",
+				...init,
+				signal: AbortSignal.timeout(timeout)
+			});
+		} catch (error) {
+			console.error(`Pack&Ship Extended: ${what} failed.`, error);
+			throw new CvpRefusal(`${what} lukte niet: de portal reageert niet.`, "error");
+		}
+		if (/\/Identity\/Account\/Login/i.test(response.url)) throw new CvpRefusal("De sessie van Pack & Ship is verlopen. Log opnieuw in.", "error");
+		return response;
+	}
+	function alertText(page) {
+		return Array.from(page.querySelectorAll(".alert")).map((alert) => {
+			const copy = alert.cloneNode(true);
+			copy.querySelectorAll("button").forEach((button) => button.remove());
+			return text(copy);
+		}).filter(Boolean).join(" ");
+	}
+	function readOrderReference(page) {
+		return text(page.querySelector(`[id^='ReservationSummary'] > div:nth-child(3)`)).split(" ")[2] ?? "";
+	}
+	function quantity(value) {
+		return Number(value.split(",")[0]) || 0;
+	}
+	function text(element) {
+		return (element?.textContent ?? "").replace(/\s+/g, " ").trim();
+	}
+	var _hoisted_1$2 = { class: "pse-cvp-status-head" };
+	var _hoisted_2$2 = { class: "pse-cvp-status-titles" };
+	var _hoisted_3$1 = { class: "pse-cvp-status-machine" };
+	var _hoisted_4$1 = {
+		key: 0,
+		class: "pse-cvp-status-note"
+	};
+	var _hoisted_5$1 = {
+		key: 1,
+		class: "pse-cvp-status-rows"
+	};
+	var _hoisted_6$1 = {
+		key: 2,
+		class: "pse-cvp-status-foot"
+	};
+	var _hoisted_7$1 = { key: 0 };
+	var POLL_MS = 4e3;
+	var CvpStatusPanel_default = _plugin_vue_export_helper_default(defineComponent({
+		__name: "CvpStatusPanel",
+		emits: ["reachable"],
+		setup(__props, { emit: __emit }) {
+			const emit = __emit;
+			const UNREACHABLE_MACHINE = new Set(["not connected", "unreachable"]);
+			const health = ref();
+			const unreachable = ref("");
+			const checkedAt = ref();
+			let timer;
+			let stopped = false;
+			onMounted(poll);
+			onBeforeUnmount(() => {
+				stopped = true;
+				clearTimeout(timer);
+			});
+			async function poll() {
+				try {
+					health.value = await readBridgeHealth();
+					unreachable.value = "";
+				} catch (error) {
+					health.value = void 0;
+					unreachable.value = error instanceof Error ? error.message : String(error);
+				}
+				checkedAt.value = Date.now();
+				emit("reachable", Boolean(health.value) && !UNREACHABLE_MACHINE.has(health.value.machineState));
+				if (!stopped) timer = setTimeout(poll, POLL_MS);
+			}
+			const machine = computed(() => {
+				if (!health.value) return {
+					label: "Machine",
+					value: "Onbekend",
+					tone: "off"
+				};
+				switch (health.value.machineState) {
+					case "ready": return {
+						label: "Machine",
+						value: "Klaar",
+						tone: "ok"
+					};
+					case "ok": return {
+						label: "Machine",
+						value: "Klaar",
+						tone: "ok"
+					};
+					case "busy": return {
+						label: "Machine",
+						value: "Bezig",
+						tone: "wait"
+					};
+					case "not connected": return {
+						label: "Machine",
+						value: "Niet verbonden",
+						tone: "bad"
+					};
+					case "unreachable": return {
+						label: "Machine",
+						value: "Niet bereikbaar",
+						tone: "bad"
+					};
+					default: return {
+						label: "Machine",
+						value: health.value.machineState,
+						tone: "wait"
+					};
+				}
+			});
+			const rows = computed(() => {
+				const current = health.value;
+				if (!current) return [];
+				const list = [
+					{
+						label: "Labelpoort",
+						value: current.listenerUp ? "Luistert" : current.listenerError || "Uit",
+						tone: current.listenerUp ? "ok" : "bad"
+					},
+					{
+						label: "Wachtrij",
+						value: current.queueDepth == 1 ? "1 label" : `${current.queueDepth} labels`,
+						tone: current.queueDepth > 0 ? "wait" : "ok"
+					},
+					{
+						label: "Zebra",
+						value: current.zebraReachable ? "Bereikbaar" : "Niet bereikbaar",
+						tone: current.zebraReachable ? "ok" : "bad"
+					}
+				];
+				if (current.putWallState != null) {
+					list.push({
+						label: "Sorteerwand",
+						value: putWallLabel(current.putWallState),
+						tone: current.putWallState == "ok" ? "ok" : "bad"
+					});
+					list.push({
+						label: "Bakken met label",
+						value: current.heldCount == 1 ? "1 wacht op scan" : `${current.heldCount} wachten op scan`,
+						tone: current.heldCount > 0 ? "wait" : "ok"
+					});
+				}
+				return list;
+			});
+			function putWallLabel(state) {
+				switch (state) {
+					case "ok": return "Verbonden";
+					case "unreachable": return "Niet bereikbaar";
+					case "token rejected": return "Sleutel geweigerd";
+					case "no token": return "Geen sleutel";
+					default: return state;
+				}
+			}
+			const checkedLabel = computed(() => checkedAt.value ? new Date(checkedAt.value).toLocaleTimeString("nl-NL", {
+				hour: "2-digit",
+				minute: "2-digit",
+				second: "2-digit"
+			}) : "");
+			return (_ctx, _cache) => {
+				return openBlock(), createElementBlock("aside", { class: normalizeClass(["pse-cvp-status", `is-${unreachable.value ? "bad" : machine.value.tone}`]) }, [
+					createBaseVNode("header", _hoisted_1$2, [_cache[1] || (_cache[1] = createBaseVNode("span", {
+						class: "pse-cvp-status-dot",
+						"aria-hidden": "true"
+					}, null, -1)), createBaseVNode("span", _hoisted_2$2, [_cache[0] || (_cache[0] = createBaseVNode("span", { class: "pse-cvp-status-kicker" }, "CVP-500", -1)), createBaseVNode("span", _hoisted_3$1, toDisplayString(unreachable.value ? "Brug niet bereikbaar" : machine.value.value), 1)])]),
+					unreachable.value ? (openBlock(), createElementBlock("p", _hoisted_4$1, toDisplayString(unreachable.value) + " Controleer of de CVP Bridge op deze computer draait. ", 1)) : createCommentVNode("", true),
+					rows.value.length > 0 ? (openBlock(), createElementBlock("dl", _hoisted_5$1, [(openBlock(true), createElementBlock(Fragment, null, renderList(rows.value, (row) => {
+						return openBlock(), createElementBlock(Fragment, { key: row.label }, [createBaseVNode("dt", null, toDisplayString(row.label), 1), createBaseVNode("dd", { class: normalizeClass(`is-${row.tone}`) }, toDisplayString(row.value), 3)], 64);
+					}), 128))])) : createCommentVNode("", true),
+					checkedLabel.value ? (openBlock(), createElementBlock("footer", _hoisted_6$1, [health.value ? (openBlock(), createElementBlock("span", _hoisted_7$1, "Brug " + toDisplayString(health.value.version), 1)) : createCommentVNode("", true), createBaseVNode("span", null, "Bijgewerkt " + toDisplayString(checkedLabel.value), 1)])) : createCommentVNode("", true)
+				], 2);
+			};
+		}
+	}), [["__scopeId", "data-v-c2a17cf7"]]);
+	var _hoisted_1$1 = { class: "pse-cvp" };
+	var _hoisted_2$1 = { class: "pse-cvp-layout" };
+	var _hoisted_3 = { class: "pse-cvp-main" };
+	var _hoisted_4 = { class: "pse-cvp-card" };
+	var _hoisted_5 = { class: "pse-cvp-field" };
+	var _hoisted_6 = ["disabled"];
+	var _hoisted_7 = {
+		key: 0,
+		class: "pse-cvp-queue"
+	};
+	var _hoisted_8 = { class: "pse-cvp-result-head" };
+	var _hoisted_9 = { class: "pse-cvp-result-kind" };
+	var _hoisted_10 = { class: "pse-cvp-result-time" };
+	var _hoisted_11 = { class: "pse-cvp-result-title" };
+	var _hoisted_12 = {
+		key: 0,
+		class: "pse-cvp-spinner",
+		"aria-hidden": "true"
+	};
+	var _hoisted_13 = {
+		key: 0,
+		class: "pse-cvp-steps"
+	};
+	var _hoisted_14 = {
+		key: 1,
+		class: "pse-cvp-facts"
+	};
+	var _hoisted_15 = { class: "pse-cvp-mono" };
+	var _hoisted_16 = {
+		key: 3,
+		class: "pse-cvp-detail"
+	};
+	var _hoisted_17 = {
+		key: 4,
+		class: "pse-cvp-detail"
+	};
+	var _hoisted_18 = {
+		key: 5,
+		class: "pse-cvp-held"
+	};
+	var _hoisted_19 = {
+		key: 0,
+		class: "pse-cvp-held-note"
+	};
+	var _hoisted_20 = {
+		key: 1,
+		class: "pse-cvp-held-note"
+	};
+	var _hoisted_21 = {
+		key: 2,
+		class: "pse-cvp-held-list"
+	};
+	var _hoisted_22 = { class: "pse-cvp-held-text" };
+	var _hoisted_23 = { class: "pse-cvp-mono" };
+	var _hoisted_24 = { class: "pse-cvp-held-age" };
+	var _hoisted_25 = { class: "pse-cvp-held-buttons" };
+	var _hoisted_26 = ["disabled", "onClick"];
+	var _hoisted_27 = ["disabled", "onClick"];
+	var _hoisted_28 = {
+		key: 6,
+		class: "pse-cvp-actions"
+	};
+	var _hoisted_29 = ["disabled"];
+	var _hoisted_30 = {
+		key: 1,
+		class: "pse-cvp-empty"
+	};
+	var _hoisted_31 = {
+		key: 2,
+		class: "pse-cvp-history"
+	};
+	var _hoisted_32 = { class: "pse-cvp-history-code" };
+	var _hoisted_33 = { class: "pse-cvp-history-text" };
+	var _hoisted_34 = { class: "pse-cvp-history-time" };
+	var _hoisted_35 = { class: "pse-cvp-count-units" };
+	var _hoisted_36 = { class: "pse-cvp-count-order" };
+	var _hoisted_37 = { class: "pse-cvp-count-lead" };
+	var _hoisted_38 = { class: "pse-cvp-count-scanned" };
+	var _hoisted_39 = {
+		key: 0,
+		class: "pse-cvp-count-problem",
+		role: "alert"
+	};
+	var _hoisted_40 = ["disabled"];
+	var HISTORY_LIMIT = 12;
+	var LABEL_POLL_MS = 2e3;
+	var LABEL_FOLLOW_MS = 3 * 6e4;
+	var CvpStationPage_default = _plugin_vue_export_helper_default(defineComponent({
+		__name: "CvpStationPage",
+		setup(__props) {
+			const STEPS = [
+				{
+					step: "search",
+					label: "Zoeken"
+				},
+				{
+					step: "open",
+					label: "Openen"
+				},
+				{
+					step: "verify",
+					label: "Verifiëren"
+				},
+				{
+					step: "parcel",
+					label: "Pakket"
+				},
+				{
+					step: "announce",
+					label: "Aanmelden"
+				}
+			];
+			const STEP_TITLES = {
+				search: "Order zoeken",
+				open: "Reservering openen",
+				verify: "Producten verifiëren",
+				parcel: "Pakket maken",
+				announce: "Aanmelden bij de vervoerder"
+			};
+			const scanValue = ref("");
+			const scanInput = useTemplateRef("scanInput");
+			const cvpReachable = ref();
+			function onReachable(value) {
+				const reopened = value && !cvpReachable.value;
+				cvpReachable.value = value;
+				if (reopened) nextTick(focusScanIfIdle);
+			}
+			const jobs = ref([]);
+			let nextId = 1;
+			const failedReservations = new Set();
+			const current = computed(() => jobs.value[0]);
+			const earlier = computed(() => jobs.value.slice(1));
+			const waiting = computed(() => jobs.value.filter((job) => job.state == "waiting").length);
+			let working = false;
+			let unmounted = false;
+			onMounted(() => {
+				getSearchBlock()?.classList.add("pse-portal-replaced");
+				warmUpAudio();
+				focusScan();
+				window.addEventListener("focus", focusScanIfIdle);
+			});
+			onBeforeUnmount(() => {
+				unmounted = true;
+				window.removeEventListener("focus", focusScanIfIdle);
+				counting.value?.answer(false);
+			});
+			function focusScan() {
+				afterReveal(() => scanInput.value?.focus());
+			}
+			function focusScanIfIdle() {
+				if (!document.activeElement || document.activeElement == document.body) focusScan();
+			}
+			function onScan() {
+				const code = scanValue.value.trim();
+				scanValue.value = "";
+				if (!code || !cvpReachable.value) return;
+				const job = reactive({
+					id: nextId++,
+					kind: BIN_CODE_PATTERN.test(code.toUpperCase()) ? "bin" : "order",
+					code: BIN_CODE_PATTERN.test(code.toUpperCase()) ? code.toUpperCase() : code,
+					state: "waiting",
+					scannedAt: Date.now()
+				});
+				jobs.value.unshift(job);
+				jobs.value.splice(HISTORY_LIMIT);
+				if (job.kind == "bin") runBin(job);
+				else runOrders();
+			}
+			async function runOrders() {
+				if (working) return;
+				working = true;
+				try {
+					for (let job = nextWaiting(); job && !unmounted; job = nextWaiting()) await runOrder(job);
+				} finally {
+					working = false;
+				}
+			}
+			function nextWaiting() {
+				return [...jobs.value].reverse().find((job) => job.kind == "order" && job.state == "waiting");
+			}
+			async function runOrder(job) {
+				job.state = "working";
+				try {
+					const completed = await completeSingleLine(job.code, {
+						skip: failedReservations,
+						maxUnits: Settings.cvpMaxUnits,
+						onStep: (step, order) => {
+							job.step = step;
+							job.order = order ?? job.order;
+						},
+						confirmUnits: (order) => askUnits(job, order)
+					});
+					job.order = completed;
+					job.trackings = completed.trackings;
+					job.state = "done";
+					playSound("success");
+					followLabel(job);
+				} catch (error) {
+					const refusal = error instanceof CvpRefusal ? error : new CvpRefusal(error instanceof Error ? error.message : String(error), "error");
+					if (!(error instanceof CvpRefusal)) console.error("Pack&Ship Extended could not complete a scan for the CVP.", error);
+					job.order = refusal.order ?? job.order;
+					job.message = refusal.message;
+					job.parcelsUrl = refusal.parcelsUrl;
+					job.state = refusal.tone == "error" ? "failed" : "refused";
+					if (refusal.parcelsUrl && refusal.order) failedReservations.add(refusal.order.reservationNumber);
+					playSound(refusal.tone == "error" ? "error" : "warning");
+				}
+				focusScanIfIdle();
+			}
+			const counting = ref(null);
+			const countInput = useTemplateRef("countInput");
+			const TYPED_COUNT = /^\d{1,4}$/;
+			function askUnits(job, order) {
+				return new Promise((resolve) => {
+					counting.value = {
+						job,
+						order,
+						scanned: 1,
+						typed: "",
+						answer: (yes) => {
+							counting.value = null;
+							if (!yes) failedReservations.add(order.reservationNumber);
+							resolve(yes);
+						}
+					};
+					nextTick(() => countInput.value?.focus());
+				});
+			}
+			function onCount() {
+				const ask = counting.value;
+				if (!ask) return;
+				const value = ask.typed.trim();
+				ask.typed = "";
+				if (!value) return;
+				if (value == ask.job.code) {
+					ask.scanned++;
+					ask.problem = void 0;
+					if (ask.scanned >= ask.order.units) ask.answer(true);
+					else playSound("success");
+					return;
+				}
+				if (TYPED_COUNT.test(value)) {
+					if (Number(value) == ask.order.units) ask.answer(true);
+					else {
+						ask.problem = `Geteld: ${Number(value)}. De order is voor ${ask.order.units} stuks. Tel opnieuw, of pak de order met de hand.`;
+						playSound("warning");
+					}
+					return;
+				}
+				ask.problem = "Dat is een ander artikel. Bevestig eerst deze order, of pak hem met de hand, en scan het dan opnieuw.";
+				playSound("warning");
+			}
+			const typedMatches = computed(() => counting.value != null && TYPED_COUNT.test(counting.value.typed.trim()) && Number(counting.value.typed.trim()) == counting.value.order.units);
+			const LABEL_FINAL = new Set([
+				"Produced",
+				"Retracted",
+				"FallbackPrinted",
+				"Duplicate",
+				"Stale",
+				"Error",
+				"Released",
+				"Removed"
+			]);
+			async function followLabel(job) {
+				const trackings = new Set(job.trackings ?? []);
+				if (trackings.size == 0) return;
+				const until = Date.now() + LABEL_FOLLOW_MS;
+				while (!unmounted && Date.now() < until && jobs.value.includes(job)) {
+					try {
+						const label = (await readRecentLabels(30)).find((candidate) => candidate.tracking && trackings.has(candidate.tracking));
+						if (label) {
+							job.labelStatus = label.status;
+							job.labelError = label.error;
+							if (LABEL_FINAL.has(label.status)) return;
+						}
+					} catch {
+						return;
+					}
+					await new Promise((resolve) => setTimeout(resolve, LABEL_POLL_MS));
+				}
+			}
+			function labelStatusText(job) {
+				switch (job.labelStatus) {
+					case void 0: return "Wacht op het label bij de CVP-brug";
+					case "Received": return "Label ontvangen door de CVP-brug";
+					case "Staged": return "Klaar in de machine";
+					case "Scanned": return "In de machine";
+					case "Produced": return "Doos gemaakt";
+					case "Retracted": return "Teruggezet door de machine";
+					case "FallbackPrinted": return "Op de Zebra geprint";
+					case "Duplicate": return "Dubbel label, niet opnieuw naar de machine";
+					case "Error": return `Fout bij de CVP-brug${job.labelError ? `: ${job.labelError}` : ""}`;
+					default: return job.labelStatus;
+				}
+			}
+			function labelTone(job) {
+				switch (job.labelStatus) {
+					case "Staged":
+					case "Scanned":
+					case "Produced": return "ok";
+					case "Error":
+					case "Retracted":
+					case "Duplicate": return "bad";
+					default: return "wait";
+				}
+			}
+			const BIN_DONE = new Set([
+				"released",
+				"printed_zebra",
+				"already_released"
+			]);
+			const BIN_WAIT = new Set([
+				"waiting_for_bins",
+				"label_not_ready",
+				"label_not_arrived",
+				"not_complete"
+			]);
+			async function runBin(job, zebra = false) {
+				job.state = "working";
+				job.busy = true;
+				try {
+					const answer = zebra ? await printBinOnZebra(job.code) : await scanBin(job.code);
+					job.bin = answer;
+					job.message = withBinLabels(answer.message);
+					if (BIN_DONE.has(answer.result)) {
+						job.state = "done";
+						playSound("success");
+					} else if (BIN_WAIT.has(answer.result) && !answer.isProblem) {
+						job.state = "wait";
+						playSound("warning");
+					} else {
+						job.state = answer.isProblem ? "failed" : "refused";
+						playSound(answer.isProblem ? "error" : "warning");
+					}
+					if (answer.showHeldList) await loadHeld(job);
+				} catch (error) {
+					job.message = error instanceof Error ? error.message : String(error);
+					job.state = "failed";
+					playSound("error");
+				} finally {
+					job.busy = false;
+				}
+				focusScanIfIdle();
+			}
+			const confirmingHeld = ref(null);
+			async function loadHeld(job) {
+				job.heldError = void 0;
+				try {
+					job.held = await readHeldLabels();
+				} catch (error) {
+					job.held = void 0;
+					job.heldError = `${error instanceof Error ? error.message : String(error)} Kies het label in het venster van de CVP-brug.`;
+				}
+			}
+			async function heldToMachine(job, label) {
+				if (confirmingHeld.value != label.id) {
+					confirmingHeld.value = label.id;
+					return;
+				}
+				confirmingHeld.value = null;
+				await heldAction(job, () => sendHeldToCvp(label.id), `${label.tracking} is naar de machine gestuurd.`);
+			}
+			async function heldToZebra(job, label) {
+				confirmingHeld.value = null;
+				await heldAction(job, () => printHeldOnZebra(label.id), `${label.tracking ?? "Het label"} is op de Zebra geprint.`);
+			}
+			async function heldAction(job, action, done) {
+				job.busy = true;
+				try {
+					const answer = await action();
+					job.heldMessage = answer.ok ? done : `Niet gelukt: ${answer.message}`;
+					job.heldTone = answer.ok ? "ok" : "bad";
+					playSound(answer.ok ? "success" : "error");
+				} catch (error) {
+					job.heldMessage = error instanceof Error ? error.message : String(error);
+					job.heldTone = "bad";
+					playSound("error");
+				} finally {
+					job.busy = false;
+				}
+				await loadHeld(job);
+				focusScanIfIdle();
+			}
+			function heldAge(label) {
+				const minutes = Math.max(0, Math.round((Date.now() - new Date(label.receivedAt).getTime()) / 6e4));
+				return minutes < 60 ? `${minutes} min` : `${Math.floor(minutes / 60)} u ${String(minutes % 60).padStart(2, "0")}`;
+			}
+			function title(job) {
+				if (job.kind == "bin") switch (job.state) {
+					case "waiting":
+					case "working": return `${binLabel(job.code)} vrijgeven`;
+					case "done": switch (job.bin?.result) {
+						case "printed_zebra": return "Op de Zebra geprint";
+						case "already_released": return "Bak vrijgegeven";
+						default: return "Naar de machine";
+					}
+					default: return job.message ?? "";
+				}
+				switch (job.state) {
+					case "waiting": return "In de wachtrij";
+					case "working":
+						if (counting.value?.job == job) return "Aantal tellen";
+						return job.step ? STEP_TITLES[job.step] : "Bezig";
+					case "done": return "Klaar voor de machine";
+					default: return job.message ?? "";
+				}
+			}
+			function tone(job) {
+				switch (job.state) {
+					case "waiting":
+					case "working": return "busy";
+					case "done": return "ok";
+					case "wait":
+					case "refused": return "wait";
+					case "failed": return "bad";
+				}
+			}
+			function stepState(job, step) {
+				const at = STEPS.findIndex((entry) => entry.step == job.step);
+				const index = STEPS.findIndex((entry) => entry.step == step);
+				if (job.state == "done" || index < at) return "done";
+				return index == at && job.state == "working" ? "active" : "todo";
+			}
+			function time(at) {
+				return new Date(at).toLocaleTimeString("nl-NL", {
+					hour: "2-digit",
+					minute: "2-digit"
+				});
+			}
+			function codeLabel(job) {
+				return job.kind == "bin" ? binLabel(job.code) : job.code;
+			}
+			function openParcels(url) {
+				setBusy(true);
+				window.location.href = url;
+			}
+			return (_ctx, _cache) => {
+				return openBlock(), createElementBlock("div", _hoisted_1$1, [createBaseVNode("div", _hoisted_2$1, [createBaseVNode("main", _hoisted_3, [
+					createBaseVNode("section", _hoisted_4, [
+						_cache[10] || (_cache[10] = createStaticVNode("<header class=\"pse-cvp-head\" data-v-c91be66e><span class=\"pse-cvp-icon\" aria-hidden=\"true\" data-v-c91be66e><svg viewBox=\"0 0 24 24\" width=\"22\" height=\"22\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\" data-v-c91be66e><path d=\"M4 7V5a1 1 0 0 1 1-1h2M17 4h2a1 1 0 0 1 1 1v2M20 17v2a1 1 0 0 1-1 1h-2M7 20H5a1 1 0 0 1-1-1v-2\" data-v-c91be66e></path><path d=\"M8 8v8M11 8v8M14 8v8M17 8v8\" data-v-c91be66e></path></svg></span><span class=\"pse-cvp-head-text\" data-v-c91be66e><h2 class=\"pse-cvp-title\" data-v-c91be66e>CVP-station</h2><p class=\"pse-cvp-subtitle\" data-v-c91be66e> Scan een artikel om de order af te ronden, of een bak om zijn label naar de machine te sturen. </p></span></header>", 1)),
+						createBaseVNode("label", _hoisted_5, [_cache[9] || (_cache[9] = createBaseVNode("span", { class: "pse-cvp-field-label" }, "Scan", -1)), withDirectives(createBaseVNode("input", {
+							ref_key: "scanInput",
+							ref: scanInput,
+							"onUpdate:modelValue": _cache[0] || (_cache[0] = ($event) => scanValue.value = $event),
+							class: "pse-cvp-input",
+							type: "text",
+							autocomplete: "off",
+							spellcheck: "false",
+							placeholder: "Artikel of bak",
+							disabled: !cvpReachable.value,
+							"data-1p-ignore": "",
+							"data-lpignore": "true",
+							"data-form-type": "other",
+							onKeydown: _cache[1] || (_cache[1] = withKeys(withModifiers(($event) => onScan(), ["prevent"]), ["enter"]))
+						}, null, 40, _hoisted_6), [[vModelText, scanValue.value]])]),
+						waiting.value > 0 ? (openBlock(), createElementBlock("p", _hoisted_7, toDisplayString(waiting.value == 1 ? "1 scan wacht" : `${waiting.value} scans wachten`) + " op de order die nu wordt afgerond. ", 1)) : createCommentVNode("", true)
+					]),
+					current.value ? (openBlock(), createElementBlock("section", {
+						key: 0,
+						class: normalizeClass(["pse-cvp-result", `is-${tone(current.value)}`]),
+						"aria-live": "polite"
+					}, [
+						createBaseVNode("div", _hoisted_8, [createBaseVNode("span", _hoisted_9, toDisplayString(current.value.kind == "bin" ? "Bak" : "Artikel") + " · " + toDisplayString(codeLabel(current.value)), 1), createBaseVNode("span", _hoisted_10, toDisplayString(time(current.value.scannedAt)), 1)]),
+						createBaseVNode("h3", _hoisted_11, [current.value.state == "working" ? (openBlock(), createElementBlock("span", _hoisted_12)) : createCommentVNode("", true), createTextVNode(" " + toDisplayString(title(current.value)), 1)]),
+						current.value.kind == "order" && (current.value.state == "working" || current.value.state == "done") ? (openBlock(), createElementBlock("ol", _hoisted_13, [(openBlock(), createElementBlock(Fragment, null, renderList(STEPS, (entry) => {
+							return createBaseVNode("li", {
+								key: entry.step,
+								class: normalizeClass(`is-${stepState(current.value, entry.step)}`)
+							}, toDisplayString(entry.label), 3);
+						}), 64))])) : createCommentVNode("", true),
+						current.value.order || current.value.bin?.customer || current.value.bin?.orderReference ? (openBlock(), createElementBlock("dl", _hoisted_14, [current.value.order ? (openBlock(), createElementBlock(Fragment, { key: 0 }, [
+							_cache[14] || (_cache[14] = createBaseVNode("dt", null, "Reservering", -1)),
+							createBaseVNode("dd", null, toDisplayString(current.value.order.reservationNumber), 1),
+							current.value.order.orderReference ? (openBlock(), createElementBlock(Fragment, { key: 0 }, [_cache[11] || (_cache[11] = createBaseVNode("dt", null, "Order", -1)), createBaseVNode("dd", null, toDisplayString(current.value.order.orderReference), 1)], 64)) : createCommentVNode("", true),
+							current.value.order.customer ? (openBlock(), createElementBlock(Fragment, { key: 1 }, [_cache[12] || (_cache[12] = createBaseVNode("dt", null, "Klant", -1)), createBaseVNode("dd", null, toDisplayString(current.value.order.customer), 1)], 64)) : createCommentVNode("", true),
+							_cache[15] || (_cache[15] = createBaseVNode("dt", null, "Product", -1)),
+							createBaseVNode("dd", null, toDisplayString(current.value.order.product), 1),
+							current.value.order.units > 1 ? (openBlock(), createElementBlock(Fragment, { key: 2 }, [_cache[13] || (_cache[13] = createBaseVNode("dt", null, "Aantal", -1)), createBaseVNode("dd", null, toDisplayString(current.value.order.units) + " stuks", 1)], 64)) : createCommentVNode("", true)
+						], 64)) : current.value.bin ? (openBlock(), createElementBlock(Fragment, { key: 1 }, [
+							current.value.bin.orderReference ? (openBlock(), createElementBlock(Fragment, { key: 0 }, [_cache[16] || (_cache[16] = createBaseVNode("dt", null, "Order", -1)), createBaseVNode("dd", null, toDisplayString(current.value.bin.orderReference), 1)], 64)) : createCommentVNode("", true),
+							current.value.bin.customer ? (openBlock(), createElementBlock(Fragment, { key: 1 }, [_cache[17] || (_cache[17] = createBaseVNode("dt", null, "Klant", -1)), createBaseVNode("dd", null, toDisplayString(current.value.bin.customer), 1)], 64)) : createCommentVNode("", true),
+							current.value.bin.itemCount ? (openBlock(), createElementBlock(Fragment, { key: 2 }, [_cache[18] || (_cache[18] = createBaseVNode("dt", null, "Artikelen", -1)), createBaseVNode("dd", null, toDisplayString(current.value.bin.itemCount) + " stuks", 1)], 64)) : createCommentVNode("", true)
+						], 64)) : createCommentVNode("", true), current.value.trackings?.length || current.value.bin?.trackings?.length ? (openBlock(), createElementBlock(Fragment, { key: 2 }, [_cache[19] || (_cache[19] = createBaseVNode("dt", null, "Label", -1)), createBaseVNode("dd", _hoisted_15, toDisplayString((current.value.trackings ?? current.value.bin?.trackings ?? []).join(", ")), 1)], 64)) : createCommentVNode("", true)])) : createCommentVNode("", true),
+						current.value.kind == "order" && current.value.state == "done" ? (openBlock(), createElementBlock("p", {
+							key: 2,
+							class: normalizeClass(["pse-cvp-label", `is-${labelTone(current.value)}`])
+						}, [_cache[20] || (_cache[20] = createBaseVNode("span", {
+							class: "pse-cvp-label-dot",
+							"aria-hidden": "true"
+						}, null, -1)), createTextVNode(" " + toDisplayString(labelStatusText(current.value)), 1)], 2)) : createCommentVNode("", true),
+						current.value.bin?.waitingFor?.length ? (openBlock(), createElementBlock("p", _hoisted_16, " Scan ook " + toDisplayString(current.value.bin.waitingFor.map(unref(binLabel)).join(", ")) + ". ", 1)) : createCommentVNode("", true),
+						current.value.kind == "bin" && current.value.state == "done" && current.value.message ? (openBlock(), createElementBlock("p", _hoisted_17, toDisplayString(current.value.message), 1)) : createCommentVNode("", true),
+						current.value.bin?.showHeldList ? (openBlock(), createElementBlock("div", _hoisted_18, [
+							_cache[21] || (_cache[21] = createBaseVNode("h4", { class: "pse-cvp-held-title" }, "Vastgehouden labels bij de CVP-brug", -1)),
+							current.value.heldError ? (openBlock(), createElementBlock("p", _hoisted_19, toDisplayString(current.value.heldError), 1)) : current.value.held && current.value.held.length == 0 ? (openBlock(), createElementBlock("p", _hoisted_20, " De CVP-brug houdt geen labels vast. ")) : createCommentVNode("", true),
+							current.value.held?.length ? (openBlock(), createElementBlock("ul", _hoisted_21, [(openBlock(true), createElementBlock(Fragment, null, renderList(current.value.held, (label) => {
+								return openBlock(), createElementBlock("li", { key: label.id }, [createBaseVNode("span", _hoisted_22, [
+									createBaseVNode("strong", _hoisted_23, toDisplayString(label.tracking ?? "Onleesbaar label"), 1),
+									createBaseVNode("span", null, toDisplayString([
+										label.customer,
+										label.reference,
+										label.bin ? unref(binLabel)(label.bin) : null
+									].filter(Boolean).join(" · ") || "Nog geen bak gescand"), 1),
+									createBaseVNode("span", _hoisted_24, toDisplayString(heldAge(label)) + " vastgehouden", 1)
+								]), createBaseVNode("span", _hoisted_25, [label.tracking && label.status == "Held" ? (openBlock(), createElementBlock("button", {
+									key: 0,
+									type: "button",
+									class: "pse-cvp-button",
+									disabled: current.value.busy,
+									onClick: ($event) => heldToMachine(current.value, label)
+								}, toDisplayString(confirmingHeld.value == label.id ? "Zeker? Naar de machine" : "Naar de machine"), 9, _hoisted_26)) : createCommentVNode("", true), createBaseVNode("button", {
+									type: "button",
+									class: "pse-cvp-button is-quiet",
+									disabled: current.value.busy,
+									onClick: ($event) => heldToZebra(current.value, label)
+								}, " Op de Zebra ", 8, _hoisted_27)])]);
+							}), 128))])) : createCommentVNode("", true),
+							current.value.heldMessage ? (openBlock(), createElementBlock("p", {
+								key: 3,
+								class: normalizeClass(["pse-cvp-held-result", `is-${current.value.heldTone}`])
+							}, toDisplayString(current.value.heldMessage), 3)) : createCommentVNode("", true)
+						])) : createCommentVNode("", true),
+						current.value.parcelsUrl || current.value.bin?.canPrintOnZebra && current.value.state != "done" ? (openBlock(), createElementBlock("div", _hoisted_28, [current.value.bin?.canPrintOnZebra && current.value.state != "done" ? (openBlock(), createElementBlock("button", {
+							key: 0,
+							type: "button",
+							class: "pse-cvp-button",
+							disabled: current.value.busy,
+							onClick: _cache[2] || (_cache[2] = ($event) => runBin(current.value, true))
+						}, " Labels op de Zebra printen ", 8, _hoisted_29)) : createCommentVNode("", true), current.value.parcelsUrl ? (openBlock(), createElementBlock("button", {
+							key: 1,
+							type: "button",
+							class: "pse-cvp-button is-quiet",
+							onClick: _cache[3] || (_cache[3] = ($event) => openParcels(current.value.parcelsUrl))
+						}, " Openen in Pack & Ship ")) : createCommentVNode("", true)])) : createCommentVNode("", true)
+					], 2)) : (openBlock(), createElementBlock("section", _hoisted_30, " Nog niets gescand. Het resultaat van elke scan verschijnt hier. ")),
+					earlier.value.length > 0 ? (openBlock(), createElementBlock("ul", _hoisted_31, [(openBlock(true), createElementBlock(Fragment, null, renderList(earlier.value, (job) => {
+						return openBlock(), createElementBlock("li", {
+							key: job.id,
+							class: normalizeClass(`is-${tone(job)}`)
+						}, [
+							_cache[22] || (_cache[22] = createBaseVNode("span", {
+								class: "pse-cvp-history-dot",
+								"aria-hidden": "true"
+							}, null, -1)),
+							createBaseVNode("span", _hoisted_32, toDisplayString(codeLabel(job)), 1),
+							createBaseVNode("span", _hoisted_33, [createTextVNode(toDisplayString(title(job)), 1), job.order ? (openBlock(), createElementBlock(Fragment, { key: 0 }, [createTextVNode(" · " + toDisplayString(job.order.reservationNumber), 1)], 64)) : createCommentVNode("", true)]),
+							createBaseVNode("span", _hoisted_34, toDisplayString(time(job.scannedAt)), 1)
+						], 2);
+					}), 128))])) : createCommentVNode("", true)
+				]), createVNode(CvpStatusPanel_default, {
+					class: "pse-cvp-side",
+					onReachable
+				})]), (openBlock(), createBlock(Teleport, { to: "body" }, [createVNode(Transition, { name: "modal" }, {
+					default: withCtx(() => [counting.value ? (openBlock(), createBlock(ModalShell_default, {
+						key: 0,
+						title: "Tel de stuks op de band",
+						size: "sm",
+						dismissable: false,
+						onClose: _cache[8] || (_cache[8] = ($event) => counting.value.answer(false))
+					}, {
+						footer: withCtx(() => [createBaseVNode("button", {
+							type: "button",
+							class: "pse-dialog-btn pse-dialog-btn-quiet",
+							onClick: _cache[6] || (_cache[6] = ($event) => counting.value.answer(false))
+						}, " Pak met de hand "), createBaseVNode("button", {
+							type: "button",
+							class: "pse-dialog-btn",
+							disabled: !typedMatches.value,
+							onClick: _cache[7] || (_cache[7] = ($event) => onCount())
+						}, " Bevestig " + toDisplayString(counting.value.order.units) + " stuks ", 9, _hoisted_40)]),
+						default: withCtx(() => [
+							createBaseVNode("p", _hoisted_35, [createBaseVNode("strong", null, toDisplayString(counting.value.order.units), 1), createBaseVNode("span", null, "× " + toDisplayString(counting.value.order.product), 1)]),
+							createBaseVNode("p", _hoisted_36, [createTextVNode(" Reservering " + toDisplayString(counting.value.order.reservationNumber), 1), counting.value.order.customer ? (openBlock(), createElementBlock(Fragment, { key: 0 }, [createTextVNode(" · " + toDisplayString(counting.value.order.customer), 1)], 64)) : createCommentVNode("", true)]),
+							createBaseVNode("p", _hoisted_37, " Leg alle " + toDisplayString(counting.value.order.units) + " op de band. Scan elk stuk, of typ het aantal en druk op Enter. ", 1),
+							createBaseVNode("p", _hoisted_38, [
+								_cache[23] || (_cache[23] = createTextVNode(" Gescand: ", -1)),
+								createBaseVNode("strong", null, toDisplayString(counting.value.scanned), 1),
+								createTextVNode(" van " + toDisplayString(counting.value.order.units), 1)
+							]),
+							withDirectives(createBaseVNode("input", {
+								ref_key: "countInput",
+								ref: countInput,
+								"onUpdate:modelValue": _cache[4] || (_cache[4] = ($event) => counting.value.typed = $event),
+								class: "pse-dialog-input pse-cvp-count-input",
+								type: "text",
+								inputmode: "numeric",
+								autocomplete: "off",
+								spellcheck: "false",
+								placeholder: "Aantal of scan",
+								"aria-label": "Aantal of scan",
+								"data-1p-ignore": "",
+								"data-lpignore": "true",
+								"data-form-type": "other",
+								onKeydown: _cache[5] || (_cache[5] = withKeys(withModifiers(($event) => onCount(), ["prevent"]), ["enter"]))
+							}, null, 544), [[vModelText, counting.value.typed]]),
+							counting.value.problem ? (openBlock(), createElementBlock("p", _hoisted_39, toDisplayString(counting.value.problem), 1)) : createCommentVNode("", true)
+						]),
+						_: 1
+					})) : createCommentVNode("", true)]),
+					_: 1
+				})]))]);
+			};
+		}
+	}), [["__scopeId", "data-v-c91be66e"]]);
 	var _hoisted_1 = { class: "pse-idle-lead" };
 	var _hoisted_2 = { class: "pse-idle-count" };
 	var IdleLogoutWarning_default = _plugin_vue_export_helper_default(defineComponent({
@@ -11999,8 +14043,8 @@
 		document.documentElement.classList.add(PINNED_CLASS);
 		new ResizeObserver(publish).observe(footer);
 	}
-	_css(":root .mainContainerBorder{border:1px solid var(--pse-chrome-dark)}:root .footer{background-color:var(--pse-chrome-dark)}:root .btn-primary{background-color:var(--pse-brand);border-color:var(--pse-brand)}:root .btn-primary:hover{background-color:var(--pse-chrome-active);border-color:var(--pse-chrome-active)}:root .btn-primary:focus,:root .btn-primary.focus,:root .btn-primary:not(:disabled):not(.disabled):active:focus,:root .btn-primary:not(:disabled):not(.disabled).active:focus,:root .show>.btn-primary.dropdown-toggle:focus{box-shadow:0 0 0 .2rem var(--pse-brand-ring)}:root .btn-primary:not(:disabled):not(.disabled):active,:root .btn-primary:not(:disabled):not(.disabled).active,:root .show>.btn-primary.dropdown-toggle{background-color:var(--pse-chrome-active);border-color:var(--pse-chrome-active)}:root .backButton{background-color:var(--pse-brand)}:root .retailvista-packing-ui .btn-outline-primary{border-color:var(--pse-brand)}:root .retailvista-packing-ui .btn-outline-primary:not(:disabled):not(.disabled).active{background-color:var(--pse-brand);border-color:var(--pse-brand)}:root .retailvista-packing-ui .btn-outline-primary .tab-parcelnumber{color:var(--pse-brand)}:root .retailvista-packing-ui .btn-outline-primary:hover,:root .btn-outline-primary:not(:disabled):not(.disabled):active,:root .btn-outline-primary:not(:disabled):not(.disabled).active,:root .show>.btn-outline-primary.dropdown-toggle{background-color:var(--pse-chrome-tint);border-color:var(--pse-chrome-active)}:root .btn-outline-primary:not(:disabled):not(.disabled):active:focus,:root .btn-outline-primary:not(:disabled):not(.disabled).active:focus,:root .show>.btn-outline-primary.dropdown-toggle:focus{box-shadow:0 0 0 .2rem var(--pse-brand-ring)}:root .btn:focus,:root .btn.focus,:root .btn-outline-primary:focus,:root .btn-outline-primary.focus{box-shadow:0 0 0 .2rem #0000}:root .btn-link,:root .btn-link:disabled,:root .btn-link.disabled{color:var(--pse-chrome-on-dark)}:root .btn-link:hover,:root .btn-link:focus,:root .btn-link.focus,:root .btn-link:active{color:#fff}:root .pse-footer-cell .btn-link{letter-spacing:.03em;border:0;padding:0;font-size:12px;font-weight:700;line-height:1.5;text-decoration:none}:root .pse-footer-cell .btn-link:hover,:root .pse-footer-cell .btn-link:focus{text-decoration:none}:root .btn-link{transition:none}:root .form-control:focus{box-shadow:0 0 0 .2rem var(--pse-brand-ring);border-color:var(--pse-chrome-active)}:root .form-control:disabled,:root .readonlyInput[readonly],:root .searchCarrierDialog,:root .searchProductDialog{background-color:var(--pse-chrome-tint)}:root .alert-info{color:var(--pse-chrome-active);background-color:var(--pse-chrome-tint);border-color:var(--pse-chrome-active)}:root .text-muted{color:#d3d3d3!important}:root .loading{background-color:var(--pse-scrim);-webkit-backdrop-filter:blur(3px);opacity:0;visibility:hidden;transition:opacity .2s,visibility .2s,background-color .15s linear,-webkit-backdrop-filter .15s linear,backdrop-filter .15s linear;display:block!important}:root body.busy .loading{opacity:1;visibility:visible}:is(:root body:has(.pse-modal) .loading,:root body:has(.modal-backdrop.show) .loading){-webkit-backdrop-filter:blur();background-color:#0000}:root .nfSpinner{border:1px solid var(--pse-line);text-align:center;background-color:#fff;border-radius:16px;flex-direction:column;justify-content:center;align-items:center;gap:16px;width:auto;min-width:200px;height:auto;margin:0;padding:30px 38px;transition:transform .2s cubic-bezier(.2,.9,.3,1);display:flex;top:50%;left:50%;transform:translate(-50%,-50%)scale(.96);box-shadow:0 18px 46px #1b2b222e}:root body.busy .nfSpinner{transform:translate(-50%,-50%)scale(1)}:root .nfSpinner>div{display:none}:root .nfSpinner:before{content:\"\";border:3px solid var(--pse-brand-ring);border-top-color:var(--pse-brand);border-radius:50%;width:34px;height:34px;animation:.7s linear infinite pse-busy-spin}:root .nfSpinner .loadingBanner{letter-spacing:.01em;width:auto;color:var(--pse-ink);margin:0;font-size:15px;font-weight:600}:root .nfSpinner .pse-busy-note{background-color:var(--pse-attention-soft);max-width:280px;color:var(--pse-attention-ink);border-radius:12px;margin:0;padding:11px 14px;font-size:14.5px;font-weight:650;line-height:1.4;display:none}:root body.pse-announcing .nfSpinner .pse-busy-note{display:block}@keyframes pse-busy-spin{to{transform:rotate(360deg)}}@media (prefers-reduced-motion:reduce){:root .loading,:root .nfSpinner{transition:none}:root .nfSpinner:before{animation-duration:1.6s}}:root #add-parcel>img{background:url(https://i.imgur.com/zJ9sNJR.png) no-repeat!important;width:0!important;height:0!important;padding-top:42px!important;padding-left:42px!important}:root .pse-footer-login a{color:var(--pse-chrome-on-dark)}:root .pse-footer-login a:hover,:root .pse-footer-login a:focus{color:#fff}:root #ParcelsContainer h4{color:var(--pse-ink);margin:0 0 12px;font-size:17px;font-weight:650;line-height:1.3}:root .searchProductDialog{border:1px solid var(--pse-line);background-color:#fff;border-radius:14px;margin:0 0 22px;box-shadow:0 1px 2px #1430210a;padding:14px!important}:root .searchProductDialog .form-control{border:1px solid var(--pse-line);background-color:var(--pse-well);height:46px;color:var(--pse-ink);border-right:0;border-radius:11px 0 0 11px;font-size:15px}:root .searchProductDialog .form-control:focus{border-color:var(--pse-brand);box-shadow:0 0 0 3px var(--pse-brand-ring);background-color:#fff}:root .searchProductDialog .btn{background-color:var(--pse-brand-ink);border:0;border-color:var(--pse-brand-ink);border-radius:0 11px 11px 0;height:46px;font-size:14.5px;font-weight:650}:root .searchProductDialog .btn:hover{background-color:var(--pse-brand-ink-strong);border-color:var(--pse-brand-ink-strong)}:root #tabs-parcels{gap:8px;margin-bottom:14px!important}:root #tabs-parcels .nav-item{margin-right:0!important}:root #tabs-parcels .btn-outline-primary{border:1px solid var(--pse-line);background-color:#fff;border-radius:13px;justify-content:center;align-items:center;gap:7px;min-width:62px;height:52px;padding:0 14px;font-weight:650;transition:border-color .15s,background-color .15s;display:flex}:root #tabs-parcels .btn-outline-primary:hover{border-color:var(--pse-brand);background-color:var(--pse-brand-soft)}:root #tabs-parcels .btn-outline-primary.active{border-color:var(--pse-brand-ink);background-color:var(--pse-brand-ink)}:root #tabs-parcels .btn-outline-primary .tab-parcelnumber{color:var(--pse-ink-soft);font-size:15px}:root #tabs-parcels .btn-outline-primary.active .tab-parcelnumber{color:#fff}:root #tabs-parcels .btn-outline-primary.active img{filter:brightness(0)invert()}:root .parcels-content .card{border:1px solid var(--pse-line);background-color:#fff;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px #1430210a,0 18px 40px -30px #14302173}:root .parcels-content .card-header{border-bottom:1px solid var(--pse-line);background-color:var(--pse-well);padding:15px 18px}:root .parcels-content .card-title{color:var(--pse-ink);margin:0;font-size:15.5px;font-weight:650}:root .parcels-content .card-text{color:var(--pse-ink-soft);margin:3px 0 0;font-size:12.5px;line-height:1.45}:root .parcels-content .card-body{padding:6px 18px 14px}:root .parcels-content .table th,:root .parcels-content .table td{border-color:var(--pse-line);vertical-align:middle;padding:11px 0}:root .parcels-content .table thead th,:root .parcels-content .table tbody tr:first-child th{border-top:0;border-bottom:1px solid var(--pse-line);letter-spacing:.06em;text-transform:uppercase;color:var(--pse-ink-faint);font-size:10.5px;font-weight:650}:root .parcels-content .btn,:root #ParcelsContainer>div>div:last-child .btn{border-radius:10px;font-size:13.5px;font-weight:650}:root .parcels-content .input-group>.form-control:first-child{border-top-left-radius:10px;border-bottom-left-radius:10px}:root .parcels-content .input-group-append .btn{border-top-left-radius:0;border-bottom-left-radius:0}:root .parcels-content .input-group-prepend .btn{border-top-right-radius:0;border-bottom-right-radius:0}:root .pse-parcels-loading{min-height:232px;position:relative}:root .pse-parcels-loading>*{visibility:hidden}:root .pse-parcels-loading:before{content:\"\";background-color:var(--pse-line);border-radius:13px;width:62px;height:52px;animation:1.4s ease-in-out infinite pse-parcels-pulse;position:absolute;top:0;left:0}:root .pse-parcels-loading:after{content:\"\";border:1px solid var(--pse-line);background-color:var(--pse-well);border-radius:16px;height:166px;animation:1.4s ease-in-out .15s infinite pse-parcels-pulse;position:absolute;top:66px;left:0;right:0}@keyframes pse-parcels-pulse{50%{opacity:.45}}@media (prefers-reduced-motion:reduce){:root .pse-parcels-loading:before,:root .pse-parcels-loading:after{animation:none}}:root.pse-fixed-footer .footer{z-index:10;bottom:0;left:0;right:0;position:fixed!important}:root.pse-fixed-footer .retailvista-packing-ui{min-height:calc(100vh - var(--pse-footer-height,56px));height:auto!important}:root.pse-fixed-footer .mainContainer .container-fluid.h-100,:root.pse-fixed-footer .mainContainer .container-fluid>div.d-flex.flex-column.h-100,:root.pse-fixed-footer .mainContent>.container.h-100{height:auto!important}:root.pse-fixed-footer body{padding-bottom:var(--pse-footer-height,56px)}:root .mainContent>.container.p-5{max-width:1800px;padding-top:28px!important}:root .loading.pse-busy-supplied{display:none}:root body.busy .loading.pse-busy-supplied{display:block}:root .modal-backdrop{background-color:var(--pse-scrim)}:root .modal-backdrop.show{opacity:1}:root #editParcelModal .modal-content,:root #deleteParcelModal .modal-content{border-radius:var(--pse-dialog-radius);box-shadow:var(--pse-dialog-shadow);background-color:#fff;border:0}:root #editParcelModal .modal-header,:root #deleteParcelModal .modal-header{border-bottom:1px solid var(--pse-line);align-items:center;padding:17px 20px}:root #editParcelModal .modal-title,:root #deleteParcelModal .modal-title{color:var(--pse-ink);font-size:16px;font-weight:650;line-height:1.3}:root #editParcelModal .close,:root #deleteParcelModal .close{width:32px;height:32px;color:var(--pse-ink-faint);opacity:1;text-shadow:none;background-color:#0000;border-radius:9px;justify-content:center;align-items:center;margin:0;padding:0;font-size:21px;font-weight:400;line-height:1;transition:background-color .15s,color .15s;display:flex}:root #editParcelModal .close:hover,:root #deleteParcelModal .close:hover{background-color:var(--pse-well);color:var(--pse-ink);opacity:1}:root #editParcelModal .modal-body,:root #deleteParcelModal .modal-body{color:var(--pse-ink);padding:20px;font-size:14px;line-height:1.5}:root #editParcelModal .modal-footer,:root #deleteParcelModal .modal-footer{border-top:1px solid var(--pse-line);justify-content:flex-end;gap:9px;padding:15px 20px}:root #editParcelModal .modal-footer>*,:root #deleteParcelModal .modal-footer>*{margin:0}:root #deleteParcelModal #deleteBtns{justify-content:flex-end;gap:9px;display:flex}:root #editParcelModal .modal-footer .btn,:root #deleteParcelModal .modal-footer .btn{border:1px solid #0000;border-radius:11px;min-width:104px;height:40px;padding:0 18px;font-size:14px;font-weight:650;line-height:38px}:root #editParcelModal .modal-footer .btn-primary,:root #deleteParcelModal .modal-footer .btn-primary,:root #deleteParcelModal .modal-footer .btn-danger{background-color:var(--pse-brand-ink);border-color:var(--pse-brand-ink);color:#fff}:root #editParcelModal .modal-footer .btn-primary:hover,:root #deleteParcelModal .modal-footer .btn-primary:hover{background-color:var(--pse-brand-ink-strong);border-color:var(--pse-brand-ink-strong)}:root #deleteParcelModal .modal-footer .btn-danger{background-color:#a3372c;border-color:#a3372c}:root #deleteParcelModal .modal-footer .btn-danger:hover{background-color:#8d2f25;border-color:#8d2f25}:root #editParcelModal .modal-footer .btn-secondary,:root #deleteParcelModal .modal-footer .btn-secondary{border-color:var(--pse-line);color:var(--pse-ink-soft);background-color:#fff}:root #editParcelModal .modal-footer .btn-secondary:hover,:root #deleteParcelModal .modal-footer .btn-secondary:hover{border-color:var(--pse-ink-faint);background-color:var(--pse-well);color:var(--pse-ink)}:root #editParcelModal .modal-body .form-control,:root #editParcelModal .modal-body select{border:1px solid var(--pse-line);background-color:var(--pse-well);height:42px;color:var(--pse-ink);border-radius:11px;padding:0 13px;font-size:14.5px}:root #editParcelModal .modal-body select{appearance:none;background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7d73' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E\");background-position:right 14px center;background-repeat:no-repeat;background-size:13px;padding-right:40px}:root #editParcelModal .modal-body .input-group>.form-control:first-child{border-top-right-radius:0;border-bottom-right-radius:0}:root #editParcelModal .modal-body .input-group-append .input-group-text,:root #editParcelModal .modal-body .input-group-append .btn{border:1px solid var(--pse-line);background-color:var(--pse-line);height:42px;color:var(--pse-ink-soft);border-left:0;border-radius:0 11px 11px 0;padding:0 14px;font-size:13px;font-weight:600}:root #editParcelModal .modal-body .input-group-prepend .input-group-text{border:1px solid var(--pse-line);background-color:var(--pse-line);height:42px;color:var(--pse-ink-soft);border-right:0;border-radius:11px 0 0 11px;padding:0 14px;font-size:13px;font-weight:600}:root #editParcelModal .modal-body .form-control:focus,:root #editParcelModal .modal-body select:focus{border-color:var(--pse-brand);box-shadow:0 0 0 3px var(--pse-brand-ring);background-color:#fff}:root #editParcelModal .modal-body label{letter-spacing:.07em;text-transform:uppercase;color:var(--pse-ink-soft);margin-bottom:6px;font-size:11px;font-weight:650}:root .card-header .pse-has-reprint{flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:0;display:flex}");
-	_css(":root{--pse-brand:#689f69;--pse-brand-ink:#4b7f4d;--pse-brand-ink-strong:#3f6b41;--pse-brand-soft:#689f6924;--pse-brand-ring:#689f694d;--pse-ink:#1b2b22;--pse-ink-soft:#6b7d73;--pse-ink-faint:#9aa8a0;--pse-line:#e2eae5;--pse-well:#f6f9f7;--pse-alert:#b03a2e;--pse-alert-ink:#a3372c;--pse-alert-soft:#b03a2e1f;--pse-alert-wash:#b03a2e0d;--pse-attention-ink:#8a5a12;--pse-attention-soft:#ba822029;--pse-attention-wash-strong:#e2a02e2e;--pse-attention-line-soft:#ba822038;--pse-scrim:#14231b85;--pse-dialog-shadow:0 1px 2px #1430210f, 0 28px 64px -24px #0b1a128c;--pse-dialog-radius:20px;--pse-chrome-dark:#3e5f42;--pse-chrome-tint:#eff6f3;--pse-chrome-active:#537f5f;--pse-chrome-on-dark:#c8d6cb}body{padding-left:calc(100vw - 100%)}html:not(.pse-ready) *{transition:none!important}.v-enter-active,.v-leave-active{transition:opacity .25s,transform .1s}.v-enter-from,.v-leave-to{opacity:0;transform:scaleY(0)}.modal-enter-active,.modal-leave-active{transition:opacity .2s}.modal-enter-from,.modal-leave-to{opacity:0}.modal-enter-active .pse-modal-panel,.modal-leave-active .pse-modal-panel{transition:transform .2s cubic-bezier(.2,.9,.3,1)}.modal-enter-from .pse-modal-panel,.modal-leave-to .pse-modal-panel{transform:translateY(10px)scale(.98)}@media (prefers-reduced-motion:reduce){.modal-enter-active .pse-modal-panel,.modal-leave-active .pse-modal-panel{transition:none}}.pse-dialog-btn{background-color:var(--pse-brand-ink);min-width:104px;height:40px;font:inherit;color:#fff;white-space:nowrap;cursor:pointer;border:1px solid #0000;border-radius:11px;justify-content:center;align-items:center;gap:8px;padding:0 18px;font-size:14px;font-weight:650;transition:background-color .15s,border-color .15s,color .15s;display:inline-flex}.pse-dialog-btn:hover:not(:disabled){background-color:var(--pse-brand-ink-strong)}.pse-dialog-btn:focus{outline:none}.pse-dialog-btn:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-dialog-btn:disabled{color:#fff;cursor:not-allowed;background-color:#dfe6e2}.pse-dialog-btn-quiet{border-color:var(--pse-line);color:var(--pse-ink-soft);background-color:#fff}.pse-dialog-btn-quiet:hover:not(:disabled){border-color:var(--pse-ink-faint);background-color:var(--pse-well);color:var(--pse-ink)}.pse-dialog-btn-quiet:disabled{border-color:var(--pse-line);color:var(--pse-ink-faint);background-color:#fff}.pse-dialog-label{letter-spacing:.07em;text-transform:uppercase;color:var(--pse-ink-soft);font-size:11px;font-weight:650;display:block;margin-bottom:6px!important}.pse-dialog-input{box-sizing:border-box;border:1px solid var(--pse-line);background-color:var(--pse-well);width:100%;height:42px;font:inherit;color:var(--pse-ink);border-radius:11px;margin:0;padding:0 13px;font-size:14.5px;transition:border-color .15s,background-color .15s,box-shadow .15s;display:block}.pse-dialog-input:focus{border-color:var(--pse-brand);box-shadow:0 0 0 3px var(--pse-brand-ring);background-color:#fff;outline:none}.pse-dialog-input:disabled{color:var(--pse-ink-faint);cursor:not-allowed}select.pse-dialog-input{appearance:none;background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7d73' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E\");background-position:right 14px center;background-repeat:no-repeat;background-size:13px;padding-right:40px}.pse-dialog-hint{color:var(--pse-ink-soft);margin-top:6px;font-size:12.5px;line-height:1.4;display:block}@supports (appearance:base-select){select.pse-dialog-input,:root #editParcelModal .modal-body select{appearance:base-select}select.pse-dialog-input::picker(select){appearance:base-select}:root #editParcelModal .modal-body select::picker(select){appearance:base-select}select.pse-dialog-input,:root #editParcelModal .modal-body select{background-image:none;align-items:center;gap:10px;padding:0 14px;display:flex}select.pse-dialog-input::picker-icon{color:var(--pse-ink-soft);margin-left:auto;transition:transform .15s}:root #editParcelModal .modal-body select::picker-icon{color:var(--pse-ink-soft);margin-left:auto;transition:transform .15s}select.pse-dialog-input:open::picker-icon{transform:rotate(180deg)}:root #editParcelModal .modal-body select:open::picker-icon{transform:rotate(180deg)}select.pse-dialog-input::picker(select){border:1px solid var(--pse-line);background-color:#fff;border-radius:14px;max-height:320px;margin-top:6px;padding:6px;box-shadow:0 1px 2px #1430210f,0 18px 44px -20px #0b1a1273}:root #editParcelModal .modal-body select::picker(select){border:1px solid var(--pse-line);background-color:#fff;border-radius:14px;max-height:320px;margin-top:6px;padding:6px;box-shadow:0 1px 2px #1430210f,0 18px 44px -20px #0b1a1273}select.pse-dialog-input option,:root #editParcelModal .modal-body select option{color:var(--pse-ink);border-radius:9px;padding:9px 11px;font-size:14px}select.pse-dialog-input option:hover,:root #editParcelModal .modal-body select option:hover{background-color:var(--pse-well)}select.pse-dialog-input option:checked,:root #editParcelModal .modal-body select option:checked{background-color:var(--pse-brand-soft);color:var(--pse-brand-ink);font-weight:650}select.pse-dialog-input option::checkmark{display:none}:root #editParcelModal .modal-body select option::checkmark{display:none}}.pse-footer-row{align-items:center}.pse-footer-cell{flex-wrap:wrap;align-items:center;gap:20px 22px;display:flex}.pse-footer-cell .btn-link:focus{box-shadow:none}.pse-footer-end{color:#ffffff73;white-space:nowrap;justify-content:flex-end;align-items:center;gap:18px;font-size:11.5px;display:flex}.pse-footer-end form{margin:0}.pse-vendor{white-space:nowrap}.pse-environment-locked{color:#ffffffb8;font-weight:600}.pse-footer-login{flex-wrap:wrap;justify-content:space-between;align-items:center;gap:6px 22px;display:flex}.pse-footer-row{row-gap:22px}.pse-footer-cell>.row>.col.ml-2{margin-left:0!important}@media (width<=1199.98px){.pse-footer-end{justify-content:flex-start}}@media (width<=991px){.pse-footer-end{flex-wrap:wrap;gap:6px 16px}}.pse-portal-replaced{display:none!important}.pse-products-head{justify-content:space-between;align-items:baseline;gap:16px;margin-bottom:12px;display:flex}.pse-products-title{color:var(--pse-ink);margin:0;font-size:17px;font-weight:650;line-height:1.3}.pse-products-card{border:1px solid var(--pse-line);background-color:#fff;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px #1430210a,0 18px 40px -30px #14302173}.pse-table{border-collapse:collapse;width:100%;margin:0;font-size:14px}.pse-table th{border-bottom:1px solid var(--pse-line);background-color:var(--pse-well);letter-spacing:.06em;text-transform:uppercase;color:var(--pse-ink-faint);white-space:nowrap;padding:11px 16px;font-size:10.5px;font-weight:650}.pse-table td{border-top:1px solid var(--pse-line);vertical-align:middle;padding:12px 16px}.pse-table tbody tr:first-child td{border-top:0}.pse-table-centre{text-align:center}.pse-table-right{text-align:right}.pse-cell-description{width:100%;color:var(--pse-ink);font-weight:600}.pse-cell-barcode{font-variant-numeric:tabular-nums;color:var(--pse-ink-soft);white-space:nowrap;font-size:13.5px}.pse-copy{width:26px;height:26px;color:var(--pse-ink-faint);cursor:pointer;background-color:#0000;border:0;border-radius:8px;flex:none;justify-content:center;align-items:center;padding:0;transition:background-color .15s,color .15s;display:inline-flex}.pse-copy:hover{background-color:var(--pse-well);color:var(--pse-ink)}.pse-copy:focus{outline:none}.pse-copy:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-copy.is-copied{color:var(--pse-brand-ink);background-color:var(--pse-brand-soft)}.pse-copy.is-failed{color:#a3372c;background-color:#b03a2e1a}.pse-copy-icon{font-size:15px;line-height:1}.pse-copy-cell{align-items:center;gap:2px;display:inline-flex}.pse-actions{gap:6px;display:inline-flex}.pse-action{background-color:var(--pse-brand-ink);cursor:pointer;border:1px solid #0000;border-radius:10px;justify-content:center;align-items:center;width:34px;height:34px;padding:0;transition:background-color .15s,border-color .15s,opacity .15s;display:inline-flex}.pse-action img{filter:invert();display:block}.pse-action:hover:not(:disabled){background-color:var(--pse-brand-ink-strong)}.pse-action:focus{outline:none}.pse-action:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-action:disabled{cursor:not-allowed;background-color:#dfe6e2}.pse-action-quiet{border-color:var(--pse-line);background-color:#fff}.pse-action-quiet img{filter:none;opacity:.55}.pse-action-quiet:hover:not(:disabled){border-color:var(--pse-brand);background-color:var(--pse-brand-soft)}.pse-action-quiet:hover:not(:disabled) img{opacity:.9}.pse-back{color:var(--pse-ink-soft);border-radius:9px;flex:none;align-items:center;gap:3px;padding:4px 10px 4px 4px;font-size:13px;font-weight:600;text-decoration:none;transition:background-color .15s,color .15s;display:inline-flex}.pse-back:hover{background-color:var(--pse-brand-soft);color:var(--pse-brand-ink);text-decoration:none}.pse-back-icon{font-size:19px}.pse-slot-chip{border:1px solid var(--pse-brand-ring);background-color:var(--pse-brand-soft);min-width:58px;height:32px;font:inherit;font-variant-numeric:tabular-nums;color:var(--pse-brand-ink);white-space:nowrap;cursor:pointer;border-radius:10px;justify-content:center;align-items:center;gap:5px;padding:0 12px;font-size:13px;font-weight:700;transition:border-color .15s,background-color .15s,color .15s,box-shadow .15s;display:inline-flex}.pse-slot-chip:hover:not(:disabled):not(.is-static){border-color:var(--pse-brand-ink);background-color:var(--pse-brand-ink);color:#fff}.pse-slot-chip:focus{outline:none}.pse-slot-chip:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-slot-chip.is-empty{border-style:dashed;border-color:var(--pse-line);color:var(--pse-ink-faint);background-color:#0000;font-weight:600}.pse-slot-chip.is-empty:hover:not(:disabled){border-style:solid;border-color:var(--pse-brand);background-color:var(--pse-brand-soft);color:var(--pse-brand-ink)}.pse-slot-chip.is-empty:disabled{border-style:dashed;border-color:var(--pse-line);color:var(--pse-ink-faint);opacity:.55;background-color:#0000}.pse-slot-chip:disabled{border-color:var(--pse-line);background-color:var(--pse-well);color:var(--pse-ink-faint);cursor:not-allowed}.pse-slot-chip.is-large{letter-spacing:.02em;width:100%;height:46px;font-size:20px}.pse-slot-chip.is-static{cursor:default}.pse-slot-chip-empty{align-items:center;gap:4px;font-size:13px;display:inline-flex}.pse-slot-chip-empty-icon{font-size:17px}.pse-erp-frame{pointer-events:none;border:0;width:1280px;height:900px;position:fixed;top:0;left:-10000px}");
+	_css(":root .mainContainerBorder{border:1px solid var(--pse-chrome-dark)}:root .footer{background-color:var(--pse-chrome-dark)}:root .btn-primary{background-color:var(--pse-brand);border-color:var(--pse-brand)}:root .btn-primary:hover{background-color:var(--pse-chrome-active);border-color:var(--pse-chrome-active)}:root .btn-primary:focus,:root .btn-primary.focus,:root .btn-primary:not(:disabled):not(.disabled):active:focus,:root .btn-primary:not(:disabled):not(.disabled).active:focus,:root .show>.btn-primary.dropdown-toggle:focus{box-shadow:0 0 0 .2rem var(--pse-brand-ring)}:root .btn-primary:not(:disabled):not(.disabled):active,:root .btn-primary:not(:disabled):not(.disabled).active,:root .show>.btn-primary.dropdown-toggle{background-color:var(--pse-chrome-active);border-color:var(--pse-chrome-active)}:root .backButton{background-color:var(--pse-brand)}:root .retailvista-packing-ui .btn-outline-primary{border-color:var(--pse-brand)}:root .retailvista-packing-ui .btn-outline-primary:not(:disabled):not(.disabled).active{background-color:var(--pse-brand);border-color:var(--pse-brand)}:root .retailvista-packing-ui .btn-outline-primary .tab-parcelnumber{color:var(--pse-brand)}:root .retailvista-packing-ui .btn-outline-primary:hover,:root .btn-outline-primary:not(:disabled):not(.disabled):active,:root .btn-outline-primary:not(:disabled):not(.disabled).active,:root .show>.btn-outline-primary.dropdown-toggle{background-color:var(--pse-chrome-tint);border-color:var(--pse-chrome-active)}:root .btn-outline-primary:not(:disabled):not(.disabled):active:focus,:root .btn-outline-primary:not(:disabled):not(.disabled).active:focus,:root .show>.btn-outline-primary.dropdown-toggle:focus{box-shadow:0 0 0 .2rem var(--pse-brand-ring)}:root .btn:focus,:root .btn.focus,:root .btn-outline-primary:focus,:root .btn-outline-primary.focus{box-shadow:0 0 0 .2rem #0000}:root .btn-link,:root .btn-link:disabled,:root .btn-link.disabled{color:var(--pse-chrome-on-dark)}:root .btn-link:hover,:root .btn-link:focus,:root .btn-link.focus,:root .btn-link:active{color:#fff}:root .pse-footer-cell .btn-link{letter-spacing:.03em;border:0;padding:0;font-size:12px;font-weight:700;line-height:1.5;text-decoration:none}:root .pse-footer-cell .btn-link:hover,:root .pse-footer-cell .btn-link:focus{text-decoration:none}:root .btn-link{transition:none}:root .form-control:focus{box-shadow:0 0 0 .2rem var(--pse-brand-ring);border-color:var(--pse-chrome-active)}:root .form-control:disabled,:root .readonlyInput[readonly],:root .searchCarrierDialog,:root .searchProductDialog{background-color:var(--pse-chrome-tint)}:root .alert-info{color:var(--pse-chrome-active);background-color:var(--pse-chrome-tint);border-color:var(--pse-chrome-active)}:root .text-muted{color:#d3d3d3!important}:root .loading{background-color:var(--pse-scrim);-webkit-backdrop-filter:blur(3px);opacity:0;visibility:hidden;transition:opacity .2s,visibility .2s,background-color .15s linear,-webkit-backdrop-filter .15s linear,backdrop-filter .15s linear;display:block!important}:root body.busy .loading{opacity:1;visibility:visible}:is(:root body:has(.pse-modal) .loading,:root body:has(.modal-backdrop.show) .loading){-webkit-backdrop-filter:blur();background-color:#0000}:root .nfSpinner{border:1px solid var(--pse-line);text-align:center;background-color:#fff;border-radius:16px;flex-direction:column;justify-content:center;align-items:center;gap:16px;width:auto;min-width:200px;height:auto;margin:0;padding:30px 38px;transition:transform .2s cubic-bezier(.2,.9,.3,1);display:flex;top:50%;left:50%;transform:translate(-50%,-50%)scale(.96);box-shadow:0 18px 46px #1b2b222e}:root body.busy .nfSpinner{transform:translate(-50%,-50%)scale(1)}:root .nfSpinner>div{display:none}:root .nfSpinner:before{content:\"\";border:3px solid var(--pse-brand-ring);border-top-color:var(--pse-brand);border-radius:50%;width:34px;height:34px;animation:.7s linear infinite pse-busy-spin}:root .nfSpinner .loadingBanner{letter-spacing:.01em;width:auto;color:var(--pse-ink);margin:0;font-size:15px;font-weight:600}:root .nfSpinner .pse-busy-note{background-color:var(--pse-attention-soft);max-width:280px;color:var(--pse-attention-ink);border-radius:12px;margin:0;padding:11px 14px;font-size:14.5px;font-weight:650;line-height:1.4;display:none}:root body.pse-announcing .nfSpinner .pse-busy-note{display:block}@keyframes pse-busy-spin{to{transform:rotate(360deg)}}@media (prefers-reduced-motion:reduce){:root .loading,:root .nfSpinner{transition:none}:root .nfSpinner:before{animation-duration:1.6s}}:root #add-parcel>img{background:url(https://i.imgur.com/zJ9sNJR.png) no-repeat!important;width:0!important;height:0!important;padding-top:42px!important;padding-left:42px!important}:root .pse-footer-login a{color:var(--pse-chrome-on-dark)}:root .pse-footer-login a:hover,:root .pse-footer-login a:focus{color:#fff}:root #ParcelsContainer h4{color:var(--pse-ink);margin:0 0 12px;font-size:17px;font-weight:650;line-height:1.3}:root .searchProductDialog{border:1px solid var(--pse-line);background-color:#fff;border-radius:14px;margin:0 0 22px;box-shadow:0 1px 2px #1430210a;padding:14px!important}:root .searchProductDialog .form-control{border:1px solid var(--pse-line);background-color:var(--pse-well);height:46px;color:var(--pse-ink);border-right:0;border-radius:11px 0 0 11px;font-size:15px}:root .searchProductDialog .form-control:focus{border-color:var(--pse-brand);box-shadow:0 0 0 3px var(--pse-brand-ring);background-color:#fff}:root .searchProductDialog .btn{background-color:var(--pse-brand-ink);border:0;border-color:var(--pse-brand-ink);border-radius:0 11px 11px 0;height:46px;font-size:14.5px;font-weight:650}:root .searchProductDialog .btn:hover{background-color:var(--pse-brand-ink-strong);border-color:var(--pse-brand-ink-strong)}:root #tabs-parcels{gap:8px;margin-bottom:14px!important}:root #tabs-parcels .nav-item{margin-right:0!important}:root #tabs-parcels .btn-outline-primary{border:1px solid var(--pse-line);background-color:#fff;border-radius:13px;justify-content:center;align-items:center;gap:7px;min-width:62px;height:52px;padding:0 14px;font-weight:650;transition:border-color .15s,background-color .15s;display:flex}:root #tabs-parcels .btn-outline-primary:hover{border-color:var(--pse-brand);background-color:var(--pse-brand-soft)}:root #tabs-parcels .btn-outline-primary.active{border-color:var(--pse-brand-ink);background-color:var(--pse-brand-ink)}:root #tabs-parcels .btn-outline-primary .tab-parcelnumber{color:var(--pse-ink-soft);font-size:15px}:root #tabs-parcels .btn-outline-primary.active .tab-parcelnumber{color:#fff}:root #tabs-parcels .btn-outline-primary.active img{filter:brightness(0)invert()}:root #tabs-parcels .pse-bin-divider{border-left:1px solid var(--pse-line);letter-spacing:.06em;text-transform:uppercase;color:var(--pse-ink-faint);align-self:center;margin-left:6px;padding-left:14px;font-size:10.5px;font-weight:650}:root #tabs-parcels .btn-outline-primary.pse-bin-tab{color:var(--pse-attention-ink);background-color:#fffaf0;border-color:#ba822073}:root #tabs-parcels .btn-outline-primary.pse-bin-tab:hover{border-color:var(--pse-attention-ink);background-color:var(--pse-attention-soft)}:root #tabs-parcels .btn-outline-primary.pse-bin-tab.active{color:#ffe163;background-color:#3c3c3b;border-color:#3c3c3b}:root #tabs-parcels .pse-bin-tab .tab-parcelnumber,:root #tabs-parcels .pse-bin-tab img{display:none}:root #tabs-parcels .pse-bin-code{letter-spacing:.02em;font-size:15px;font-weight:650}:root #tabs-parcels .pse-bin-hint{color:var(--pse-ink-soft);align-items:center;gap:6px;padding:0 4px;font-size:13px;font-weight:550;display:flex}:root #tabs-parcels .pse-bin-hint .material-icons{color:var(--pse-ink-faint);font-size:20px}:root .parcels-content .pse-bin-card .card-header{background-color:#fffaf0}:root .parcels-content .pse-bin-card .pse-bin-note{color:var(--pse-attention-ink);font-weight:650}:root .parcels-content .card{border:1px solid var(--pse-line);background-color:#fff;border-radius:16px;overflow:hidden;box-shadow:0 1px 2px #1430210a,0 18px 40px -30px #14302173}:root .parcels-content .card-header{border-bottom:1px solid var(--pse-line);background-color:var(--pse-well);padding:15px 18px}:root .parcels-content .card-title{color:var(--pse-ink);margin:0;font-size:15.5px;font-weight:650}:root .parcels-content .card-text{color:var(--pse-ink-soft);margin:3px 0 0;font-size:12.5px;line-height:1.45}:root .parcels-content .card-body{padding:6px 18px 14px}:root .parcels-content .table th,:root .parcels-content .table td{border-color:var(--pse-line);vertical-align:middle;padding:11px 0}:root .parcels-content .table thead th,:root .parcels-content .table tbody tr:first-child th{border-top:0;border-bottom:1px solid var(--pse-line);letter-spacing:.06em;text-transform:uppercase;color:var(--pse-ink-faint);font-size:10.5px;font-weight:650}:root .parcels-content .btn,:root #ParcelsContainer>div>div:last-child .btn{border-radius:10px;font-size:13.5px;font-weight:650}:root .parcels-content .input-group>.form-control:first-child{border-top-left-radius:10px;border-bottom-left-radius:10px}:root .parcels-content .input-group-append .btn{border-top-left-radius:0;border-bottom-left-radius:0}:root .parcels-content .input-group-prepend .btn{border-top-right-radius:0;border-bottom-right-radius:0}:root .pse-parcels-loading{min-height:232px;position:relative}:root .pse-parcels-loading>*{visibility:hidden}:root .pse-parcels-loading:before{content:\"\";background-color:var(--pse-line);border-radius:13px;width:62px;height:52px;animation:1.4s ease-in-out infinite pse-parcels-pulse;position:absolute;top:0;left:0}:root .pse-parcels-loading:after{content:\"\";border:1px solid var(--pse-line);background-color:var(--pse-well);border-radius:16px;height:166px;animation:1.4s ease-in-out .15s infinite pse-parcels-pulse;position:absolute;top:66px;left:0;right:0}@keyframes pse-parcels-pulse{50%{opacity:.45}}@media (prefers-reduced-motion:reduce){:root .pse-parcels-loading:before,:root .pse-parcels-loading:after{animation:none}}:root.pse-fixed-footer .footer{z-index:10;bottom:0;left:0;right:0;position:fixed!important}:root.pse-fixed-footer .retailvista-packing-ui{min-height:calc(100vh - var(--pse-footer-height,56px));height:auto!important}:root.pse-fixed-footer .mainContainer .container-fluid.h-100,:root.pse-fixed-footer .mainContainer .container-fluid>div.d-flex.flex-column.h-100,:root.pse-fixed-footer .mainContent>.container.h-100{height:auto!important}:root.pse-fixed-footer body{padding-bottom:var(--pse-footer-height,56px)}:root .mainContent>.container.p-5{max-width:1800px;padding-top:28px!important}:root .loading.pse-busy-supplied{display:none}:root body.busy .loading.pse-busy-supplied{display:block}:root .modal-backdrop{background-color:var(--pse-scrim)}:root .modal-backdrop.show{opacity:1}:root #editParcelModal .modal-content,:root #deleteParcelModal .modal-content{border-radius:var(--pse-dialog-radius);box-shadow:var(--pse-dialog-shadow);background-color:#fff;border:0}:root #editParcelModal .modal-header,:root #deleteParcelModal .modal-header{border-bottom:1px solid var(--pse-line);align-items:center;padding:17px 20px}:root #editParcelModal .modal-title,:root #deleteParcelModal .modal-title{color:var(--pse-ink);font-size:16px;font-weight:650;line-height:1.3}:root #editParcelModal .close,:root #deleteParcelModal .close{width:32px;height:32px;color:var(--pse-ink-faint);opacity:1;text-shadow:none;background-color:#0000;border-radius:9px;justify-content:center;align-items:center;margin:0;padding:0;font-size:21px;font-weight:400;line-height:1;transition:background-color .15s,color .15s;display:flex}:root #editParcelModal .close:hover,:root #deleteParcelModal .close:hover{background-color:var(--pse-well);color:var(--pse-ink);opacity:1}:root #editParcelModal .modal-body,:root #deleteParcelModal .modal-body{color:var(--pse-ink);padding:20px;font-size:14px;line-height:1.5}:root #editParcelModal .modal-footer,:root #deleteParcelModal .modal-footer{border-top:1px solid var(--pse-line);justify-content:flex-end;gap:9px;padding:15px 20px}:root #editParcelModal .modal-footer>*,:root #deleteParcelModal .modal-footer>*{margin:0}:root #deleteParcelModal #deleteBtns{justify-content:flex-end;gap:9px;display:flex}:root #editParcelModal .modal-footer .btn,:root #deleteParcelModal .modal-footer .btn{border:1px solid #0000;border-radius:11px;min-width:104px;height:40px;padding:0 18px;font-size:14px;font-weight:650;line-height:38px}:root #editParcelModal .modal-footer .btn-primary,:root #deleteParcelModal .modal-footer .btn-primary,:root #deleteParcelModal .modal-footer .btn-danger{background-color:var(--pse-brand-ink);border-color:var(--pse-brand-ink);color:#fff}:root #editParcelModal .modal-footer .btn-primary:hover,:root #deleteParcelModal .modal-footer .btn-primary:hover{background-color:var(--pse-brand-ink-strong);border-color:var(--pse-brand-ink-strong)}:root #deleteParcelModal .modal-footer .btn-danger{background-color:#a3372c;border-color:#a3372c}:root #deleteParcelModal .modal-footer .btn-danger:hover{background-color:#8d2f25;border-color:#8d2f25}:root #editParcelModal .modal-footer .btn-secondary,:root #deleteParcelModal .modal-footer .btn-secondary{border-color:var(--pse-line);color:var(--pse-ink-soft);background-color:#fff}:root #editParcelModal .modal-footer .btn-secondary:hover,:root #deleteParcelModal .modal-footer .btn-secondary:hover{border-color:var(--pse-ink-faint);background-color:var(--pse-well);color:var(--pse-ink)}:root #editParcelModal .modal-body .form-control,:root #editParcelModal .modal-body select{border:1px solid var(--pse-line);background-color:var(--pse-well);height:42px;color:var(--pse-ink);border-radius:11px;padding:0 13px;font-size:14.5px}:root #editParcelModal .modal-body select{appearance:none;background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7d73' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E\");background-position:right 14px center;background-repeat:no-repeat;background-size:13px;padding-right:40px}:root #editParcelModal .modal-body .input-group>.form-control:first-child{border-top-right-radius:0;border-bottom-right-radius:0}:root #editParcelModal .modal-body .input-group-append .input-group-text,:root #editParcelModal .modal-body .input-group-append .btn{border:1px solid var(--pse-line);background-color:var(--pse-line);height:42px;color:var(--pse-ink-soft);border-left:0;border-radius:0 11px 11px 0;padding:0 14px;font-size:13px;font-weight:600}:root #editParcelModal .modal-body .input-group-prepend .input-group-text{border:1px solid var(--pse-line);background-color:var(--pse-line);height:42px;color:var(--pse-ink-soft);border-right:0;border-radius:11px 0 0 11px;padding:0 14px;font-size:13px;font-weight:600}:root #editParcelModal .modal-body .form-control:focus,:root #editParcelModal .modal-body select:focus{border-color:var(--pse-brand);box-shadow:0 0 0 3px var(--pse-brand-ring);background-color:#fff}:root #editParcelModal .modal-body label{letter-spacing:.07em;text-transform:uppercase;color:var(--pse-ink-soft);margin-bottom:6px;font-size:11px;font-weight:650}:root .card-header .pse-has-reprint{flex-wrap:wrap;align-items:center;gap:12px;margin-bottom:0;display:flex}");
+	_css(":root{--pse-brand:#689f69;--pse-brand-ink:#4b7f4d;--pse-brand-ink-strong:#3f6b41;--pse-brand-soft:#689f6924;--pse-brand-ring:#689f694d;--pse-ink:#1b2b22;--pse-ink-soft:#6b7d73;--pse-ink-faint:#9aa8a0;--pse-line:#e2eae5;--pse-well:#f6f9f7;--pse-alert:#b03a2e;--pse-alert-ink:#a3372c;--pse-alert-soft:#b03a2e1f;--pse-alert-wash:#b03a2e0d;--pse-attention-ink:#8a5a12;--pse-attention-soft:#ba822029;--pse-attention-wash-strong:#e2a02e2e;--pse-attention-line-soft:#ba822038;--pse-scrim:#14231b85;--pse-dialog-shadow:0 1px 2px #1430210f, 0 28px 64px -24px #0b1a128c;--pse-dialog-radius:20px;--pse-chrome-dark:#3e5f42;--pse-chrome-tint:#eff6f3;--pse-chrome-active:#537f5f;--pse-chrome-on-dark:#c8d6cb}body{padding-left:calc(100vw - 100%)}html:not(.pse-ready) *{transition:none!important}.v-enter-active,.v-leave-active{transition:opacity .25s,transform .1s}.v-enter-from,.v-leave-to{opacity:0;transform:scaleY(0)}.modal-enter-active,.modal-leave-active{transition:opacity .2s}.modal-enter-from,.modal-leave-to{opacity:0}.modal-enter-active .pse-modal-panel,.modal-leave-active .pse-modal-panel{transition:transform .2s cubic-bezier(.2,.9,.3,1)}.modal-enter-from .pse-modal-panel,.modal-leave-to .pse-modal-panel{transform:translateY(10px)scale(.98)}@media (prefers-reduced-motion:reduce){.modal-enter-active .pse-modal-panel,.modal-leave-active .pse-modal-panel{transition:none}}.pse-dialog-btn{background-color:var(--pse-brand-ink);min-width:104px;height:40px;font:inherit;color:#fff;white-space:nowrap;cursor:pointer;border:1px solid #0000;border-radius:11px;justify-content:center;align-items:center;gap:8px;padding:0 18px;font-size:14px;font-weight:650;transition:background-color .15s,border-color .15s,color .15s;display:inline-flex}.pse-dialog-btn:hover:not(:disabled){background-color:var(--pse-brand-ink-strong)}.pse-dialog-btn:focus{outline:none}.pse-dialog-btn:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-dialog-btn:disabled{color:#fff;cursor:not-allowed;background-color:#dfe6e2}.pse-dialog-btn-quiet{border-color:var(--pse-line);color:var(--pse-ink-soft);background-color:#fff}.pse-dialog-btn-quiet:hover:not(:disabled){border-color:var(--pse-ink-faint);background-color:var(--pse-well);color:var(--pse-ink)}.pse-dialog-btn-quiet:disabled{border-color:var(--pse-line);color:var(--pse-ink-faint);background-color:#fff}.pse-dialog-label{letter-spacing:.07em;text-transform:uppercase;color:var(--pse-ink-soft);font-size:11px;font-weight:650;display:block;margin-bottom:6px!important}.pse-dialog-input{box-sizing:border-box;border:1px solid var(--pse-line);background-color:var(--pse-well);width:100%;height:42px;font:inherit;color:var(--pse-ink);border-radius:11px;margin:0;padding:0 13px;font-size:14.5px;transition:border-color .15s,background-color .15s,box-shadow .15s;display:block}.pse-dialog-input:focus{border-color:var(--pse-brand);box-shadow:0 0 0 3px var(--pse-brand-ring);background-color:#fff;outline:none}.pse-dialog-input:disabled{color:var(--pse-ink-faint);cursor:not-allowed}select.pse-dialog-input{appearance:none;background-image:url(\"data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236b7d73' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E\");background-position:right 14px center;background-repeat:no-repeat;background-size:13px;padding-right:40px}.pse-dialog-hint{color:var(--pse-ink-soft);margin-top:6px;font-size:12.5px;line-height:1.4;display:block}@supports (appearance:base-select){select.pse-dialog-input,:root #editParcelModal .modal-body select{appearance:base-select}select.pse-dialog-input::picker(select){appearance:base-select}:root #editParcelModal .modal-body select::picker(select){appearance:base-select}select.pse-dialog-input,:root #editParcelModal .modal-body select{background-image:none;align-items:center;gap:10px;padding:0 14px;display:flex}select.pse-dialog-input::picker-icon{color:var(--pse-ink-soft);margin-left:auto;transition:transform .15s}:root #editParcelModal .modal-body select::picker-icon{color:var(--pse-ink-soft);margin-left:auto;transition:transform .15s}select.pse-dialog-input:open::picker-icon{transform:rotate(180deg)}:root #editParcelModal .modal-body select:open::picker-icon{transform:rotate(180deg)}select.pse-dialog-input::picker(select){border:1px solid var(--pse-line);background-color:#fff;border-radius:14px;max-height:320px;margin-top:6px;padding:6px;box-shadow:0 1px 2px #1430210f,0 18px 44px -20px #0b1a1273}:root #editParcelModal .modal-body select::picker(select){border:1px solid var(--pse-line);background-color:#fff;border-radius:14px;max-height:320px;margin-top:6px;padding:6px;box-shadow:0 1px 2px #1430210f,0 18px 44px -20px #0b1a1273}select.pse-dialog-input option,:root #editParcelModal .modal-body select option{color:var(--pse-ink);border-radius:9px;padding:9px 11px;font-size:14px}select.pse-dialog-input option:hover,:root #editParcelModal .modal-body select option:hover{background-color:var(--pse-well)}select.pse-dialog-input option:checked,:root #editParcelModal .modal-body select option:checked{background-color:var(--pse-brand-soft);color:var(--pse-brand-ink);font-weight:650}select.pse-dialog-input option::checkmark{display:none}:root #editParcelModal .modal-body select option::checkmark{display:none}}.pse-footer-row{align-items:center}.pse-footer-cell{flex-wrap:wrap;align-items:center;gap:20px 22px;display:flex}.pse-footer-cell .btn-link:focus{box-shadow:none}.pse-footer-end{color:#ffffff73;white-space:nowrap;justify-content:flex-end;align-items:center;gap:18px;font-size:11.5px;display:flex}.pse-footer-end form{margin:0}.pse-vendor{white-space:nowrap}.pse-environment-locked{color:#ffffffb8;font-weight:600}.pse-footer-login{flex-wrap:wrap;justify-content:space-between;align-items:center;gap:6px 22px;display:flex}.pse-footer-row{row-gap:22px}.pse-footer-cell>.row>.col.ml-2{margin-left:0!important}@media (width<=1199.98px){.pse-footer-end{justify-content:flex-start}}@media (width<=991px){.pse-footer-end{flex-wrap:wrap;gap:6px 16px}}.pse-portal-replaced{display:none!important}.pse-products-head{justify-content:space-between;align-items:baseline;gap:16px;margin-bottom:12px;display:flex}.pse-products-title{color:var(--pse-ink);margin:0;font-size:17px;font-weight:650;line-height:1.3}.pse-products-card{border:1px solid var(--pse-line);background-color:#fff;border-radius:16px;overflow:hidden}.pse-table{border-collapse:collapse;width:100%;margin:0;font-size:14px}.pse-table th{border-bottom:1px solid var(--pse-line);background-color:var(--pse-well);letter-spacing:.06em;text-transform:uppercase;color:var(--pse-ink-faint);white-space:nowrap;padding:11px 16px;font-size:10.5px;font-weight:650}.pse-table td{border-top:1px solid var(--pse-line);vertical-align:middle;padding:12px 16px}.pse-table tbody tr:first-child td{border-top:0}.pse-table-centre{text-align:center}.pse-table-right{text-align:right}.pse-cell-description{width:100%;color:var(--pse-ink);font-weight:600}.pse-cell-barcode{font-variant-numeric:tabular-nums;color:var(--pse-ink-soft);white-space:nowrap;font-size:13.5px}.pse-copy{width:26px;height:26px;color:var(--pse-ink-faint);cursor:pointer;background-color:#0000;border:0;border-radius:8px;flex:none;justify-content:center;align-items:center;padding:0;transition:background-color .15s,color .15s;display:inline-flex}.pse-copy:hover{background-color:var(--pse-well);color:var(--pse-ink)}.pse-copy:focus{outline:none}.pse-copy:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-copy.is-copied{color:var(--pse-brand-ink);background-color:var(--pse-brand-soft)}.pse-copy.is-failed{color:#a3372c;background-color:#b03a2e1a}.pse-copy-icon{font-size:15px;line-height:1}.pse-copy-cell{align-items:center;gap:2px;display:inline-flex}.pse-actions{gap:6px;display:inline-flex}.pse-action{background-color:var(--pse-brand-ink);cursor:pointer;border:1px solid #0000;border-radius:10px;justify-content:center;align-items:center;width:34px;height:34px;padding:0;transition:background-color .15s,border-color .15s,opacity .15s;display:inline-flex}.pse-action img{filter:invert();display:block}.pse-action:hover:not(:disabled){background-color:var(--pse-brand-ink-strong)}.pse-action:focus{outline:none}.pse-action:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-action:disabled{cursor:not-allowed;background-color:#dfe6e2}.pse-action-quiet{border-color:var(--pse-line);background-color:#fff}.pse-action-quiet img{filter:none;opacity:.55}.pse-action-quiet:hover:not(:disabled){border-color:var(--pse-brand);background-color:var(--pse-brand-soft)}.pse-action-quiet:hover:not(:disabled) img{opacity:.9}.pse-back{color:var(--pse-ink-soft);border-radius:9px;flex:none;align-items:center;gap:3px;padding:4px 10px 4px 4px;font-size:13px;font-weight:600;text-decoration:none;transition:background-color .15s,color .15s;display:inline-flex}.pse-back:hover{background-color:var(--pse-brand-soft);color:var(--pse-brand-ink);text-decoration:none}.pse-back-icon{font-size:19px}.pse-slot-chip{border:1px solid var(--pse-brand-ring);background-color:var(--pse-brand-soft);min-width:58px;height:32px;font:inherit;font-variant-numeric:tabular-nums;color:var(--pse-brand-ink);white-space:nowrap;cursor:pointer;border-radius:10px;justify-content:center;align-items:center;gap:5px;padding:0 12px;font-size:13px;font-weight:700;transition:border-color .15s,background-color .15s,color .15s,box-shadow .15s;display:inline-flex}.pse-slot-chip:hover:not(:disabled):not(.is-static){border-color:var(--pse-brand-ink);background-color:var(--pse-brand-ink);color:#fff}.pse-slot-chip:focus{outline:none}.pse-slot-chip:focus-visible{box-shadow:0 0 0 3px var(--pse-brand-ring);outline:none}.pse-slot-chip.is-empty{border-style:dashed;border-color:var(--pse-line);color:var(--pse-ink-faint);background-color:#0000;font-weight:600}.pse-slot-chip.is-empty:hover:not(:disabled){border-style:solid;border-color:var(--pse-brand);background-color:var(--pse-brand-soft);color:var(--pse-brand-ink)}.pse-slot-chip.is-empty:disabled{border-style:dashed;border-color:var(--pse-line);color:var(--pse-ink-faint);opacity:.55;background-color:#0000}.pse-slot-chip:disabled{border-color:var(--pse-line);background-color:var(--pse-well);color:var(--pse-ink-faint);cursor:not-allowed}.pse-slot-chip.is-large{letter-spacing:.02em;width:100%;height:46px;font-size:20px}.pse-slot-chip.is-static{cursor:default}.pse-slot-chip-empty{align-items:center;gap:4px;font-size:13px;display:inline-flex}.pse-slot-chip-empty-icon{font-size:17px}.pse-erp-frame{pointer-events:none;border:0;width:1280px;height:900px;position:fixed;top:0;left:-10000px}");
 	var pickerScrollbar_default = "/* ---- The select dropdown's scrollbar ---- *\n * Split out of `src/style.css`, and imported as raw text by `src/main.ts`\n * rather than as a stylesheet, for one reason: lightningcss -- the minifier the\n * build runs every other stylesheet through -- fails outright on\n * `::picker(select)::-webkit-scrollbar`, and takes the whole build down with\n * it. Text it never parses is text it cannot refuse.\n *\n * What it draws: Chrome's default scrollbar in the picker is the wide one with\n * a stepper button at each end, drawn hard against the panel's inner edge -- so\n * it ran the full height straight through both rounded corners and put two\n * little arrows in a card that has no other chrome on it. A thumb on an empty\n * track instead: the transparent border with `background-clip` insets it from\n * the edge, and the margin on the track holds it clear of the corners at either\n * end.\n *\n * The `::-webkit-` pseudo-elements rather than `scrollbar-width` and\n * `scrollbar-color`: they cannot be mixed -- Chrome drops these the moment the\n * standard properties are set on the same element -- and the standard pair can\n * neither inset the thumb nor hold it off the corners, which is the whole point\n * of the exercise.\n *\n * Spelled out flat, one selector per rule. Chrome matches a\n * `::-webkit-scrollbar` chained onto `::picker(select)` only written this way:\n * the same thing nested as `&::-webkit-scrollbar` inside the picker's own rule\n * parses, survives the build and then matches nothing, because nesting resolves\n * the parent into an `:is()` that a pseudo-element cannot live in.\n *\n * The values track `src/style.css`: `--pse-line` for the thumb, `--pse-ink-faint`\n * on hover, and a track margin a little over the picker's 14px corner radius.\n */\n@supports (appearance: base-select) {\n	select.pse-dialog-input::picker(select)::-webkit-scrollbar {\n		width: 11px;\n	}\n\n	select.pse-dialog-input::picker(select)::-webkit-scrollbar-track {\n		margin: 10px 0;\n		background: transparent;\n	}\n\n	select.pse-dialog-input::picker(select)::-webkit-scrollbar-thumb {\n		border: 3px solid transparent;\n		border-radius: 999px;\n		background-color: var(--pse-line);\n		background-clip: content-box;\n	}\n\n	select.pse-dialog-input::picker(select)::-webkit-scrollbar-thumb:hover {\n		background-color: var(--pse-ink-faint);\n	}\n\n	:root #editParcelModal .modal-body select::picker(select)::-webkit-scrollbar {\n		width: 11px;\n	}\n\n	:root #editParcelModal .modal-body select::picker(select)::-webkit-scrollbar-track {\n		margin: 10px 0;\n		background: transparent;\n	}\n\n	:root #editParcelModal .modal-body select::picker(select)::-webkit-scrollbar-thumb {\n		border: 3px solid transparent;\n		border-radius: 999px;\n		background-color: var(--pse-line);\n		background-clip: content-box;\n	}\n\n	:root #editParcelModal .modal-body select::picker(select)::-webkit-scrollbar-thumb:hover {\n		background-color: var(--pse-ink-faint);\n	}\n}\n";
 	var pickerScrollbarStyle = document.createElement("style");
 	pickerScrollbarStyle.textContent = pickerScrollbar_default;
@@ -12018,6 +14062,10 @@
 		pattern: /outdoor\/packship/,
 		component: SearchReservationsPage_default,
 		attach: (host) => getSearchBlock()?.insertAdjacentElement("afterend", host)
+	};
+	var cvpStationRoute = {
+		...searchReservationsRoute,
+		component: CvpStationPage_default
 	};
 	var routes = [
 		{
@@ -12129,6 +14177,10 @@
 		target.prepend(moved);
 	}
 	function servedRoute(current) {
+		const served = asServed(current);
+		return served == searchReservationsRoute && isCvpStation() ? cvpStationRoute : served;
+	}
+	function asServed(current) {
 		if (current?.component != AddParcelsPage_default) return current;
 		return !document.querySelector("#ReservationOverview") && Boolean(getSearchBlock()) ? searchReservationsRoute : current;
 	}
