@@ -70,7 +70,12 @@ type SettingsData = {
 	// the operator counts them onto the belt -- since a single scan vouches for
 	// one item and the machine boxes whatever is in front of it. Per machine: it
 	// is the size of the box the machine can make.
-	cvpMaxUnits: number
+	cvpMaxUnits: number,
+	// The webshop dashboard's login for its carrier advice -- see
+	// `src/shippingAdvice.ts`. A script account that may call that one endpoint
+	// and nothing else. No password means no advice: the card is not shown.
+	shippingAdviceUser: string,
+	shippingAdvicePassword: string
 }
 
 function defaults(): SettingsData {
@@ -97,7 +102,9 @@ function defaults(): SettingsData {
 		putWallUrl: "",
 		putWallToken: "",
 		cvpBridgeUrl: "http://127.0.0.1:8085",
-		cvpMaxUnits: 1
+		cvpMaxUnits: 1,
+		shippingAdviceUser: "packship",
+		shippingAdvicePassword: ""
 	}
 }
 
@@ -132,7 +139,9 @@ const Settings = {
 			putWallUrl: this.putWallUrl,
 			putWallToken: this.putWallToken,
 			cvpBridgeUrl: this.cvpBridgeUrl,
-			cvpMaxUnits: this.cvpMaxUnits
+			cvpMaxUnits: this.cvpMaxUnits,
+			shippingAdviceUser: this.shippingAdviceUser,
+			shippingAdvicePassword: this.shippingAdvicePassword
 		});
 	},
 

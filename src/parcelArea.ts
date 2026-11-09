@@ -31,6 +31,47 @@ export function getRenderedParcels(target: ParentNode = document): RenderedParce
 	}));
 }
 
+// How a parcel on the page goes out, as its card prints it. Two parts, and the
+// carrier's name can be in either:
+//
+//   "405 / SendCloud"     "Pakketdienst carrier: PostNL Standard"
+//   "375608 / Smilda"     "Pakketdienst carrier: Colli - L200 - 60kg"
+//
+// `provider` is the title after the slash -- the integration the parcel is
+// announced through -- and `service` the carrier line. Both are what a packer
+// changes with Bewerk, where the reservation's transport is fixed. Off the cards
+// rather than the hidden `Items[n].*` inputs, which are wrong after a delete --
+// see above.
+//
+// The carrier line is matched on the label's last word, the same in both
+// languages the portal serves. A card with neither part is left out.
+export interface ParcelCarrier {
+	provider: string;
+	service: string;
+}
+
+export function getParcelCarriers(target: ParentNode = document): ParcelCarrier[] {
+	return Array.from(target.querySelectorAll<HTMLElement>(PARCEL_PANE_SELECTOR))
+		.map((pane) => {
+			const title = pane.querySelector(".card-title")?.textContent ?? "";
+			const provider = title.includes("/") ? title.slice(title.indexOf("/") + 1).trim() : "";
+			let service = "";
+
+			for (const cell of Array.from(pane.querySelectorAll(".card-text"))) {
+				const text = cell.textContent?.replace(/\s+/g, " ").trim() ?? "";
+				const separator = text.indexOf(":");
+
+				if (separator > 0 && /carrier/i.test(text.slice(0, separator))) {
+					service = text.slice(separator + 1).trim();
+					break;
+				}
+			}
+
+			return { provider, service };
+		})
+		.filter((parcel) => parcel.provider || parcel.service);
+}
+
 // Whether the hidden inputs have fallen out of step with the panes they sit in.
 // Each pane carries its parcel's `Items[n].ItemId`; one that names another
 // parcel is the posted-back value of a parcel that has since moved or gone.

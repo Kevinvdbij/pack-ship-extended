@@ -56,8 +56,9 @@ export default defineConfig({
         // Fork's metadata block, read on every page to see whether this
         // workplace is behind (`src/update.ts`), and the CVP station's bridge
         // on the station PC itself, which sends no CORS headers
-        // (`src/cvpBridge.ts`).
-        connect: ['update.greasyfork.org', '127.0.0.1', 'localhost'],
+        // (`src/cvpBridge.ts`), and the webshop dashboard's carrier advice,
+        // which sends none for the portal either (`src/shippingAdvice.ts`).
+        connect: ['update.greasyfork.org', '127.0.0.1', 'localhost', 'dashboard.kampeerhalroden.nl'],
         license: "MIT",
       },
       // Vue is bundled rather than pulled from a CDN with @require. A required

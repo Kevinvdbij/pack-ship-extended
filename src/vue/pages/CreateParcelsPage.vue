@@ -15,6 +15,7 @@ import addIconUrl from "../../assets/add.svg";
 import imageIconUrl from "../../assets/image.svg";
 import { MassCompleteStatus, ParcelItem, VerificationRow } from '../../interfaces.ts';
 import ReservationSidebar from '../components/ReservationSidebar.vue';
+import ShippingAdviceBanner from '../components/ShippingAdviceBanner.vue';
 import CopyButton from '../components/CopyButton.vue';
 import ImageModal from '../components/ImageModal.vue';
 import SlotPicker from '../components/SlotPicker.vue';
@@ -170,6 +171,7 @@ onMounted(() => {
 
 	setupSidebar();
 	markParcelsLoading();
+	domReady().then(mountShippingAdvice);
 	watchScannerFocus();
 
 	RVUtils.setLastOpenReservation({
@@ -353,6 +355,52 @@ function markParcelsLoading() {
 	sync();
 
 	new MutationObserver(sync).observe(container, { childList: true, subtree: true });
+}
+
+// The carrier advice, above the "Pakketten" heading: it is about how the boxes
+// go out, and it is read on the way into them.
+//
+// Found as the row before `#parcelsGroup` rather than by the heading's text,
+// which is "Parcels" on a page still served in English.
+//
+// Inside `#ParcelsContainer`, which the portal's `refresh()` replaces whole
+// after every parcel change -- the scan field above the heading is in there
+// too. So it is mounted once, into a host of its own, and that same host is put
+// back above the heading whenever a refresh has taken it out
+// -- the app keeps running in a detached host, so nothing is asked again and
+// nothing flickers back to its loading state. Only ever our own element moved
+// in; nothing of the portal's is moved out.
+//
+// Idempotent, because it answers its own insertion: the observer sees the move
+// and calls it again, and that pass finds the host already in the area.
+function mountShippingAdvice() {
+	const container = document.querySelector(PARCEL_CONTAINER_SELECTOR);
+
+	// Once per document. Two hosts each putting themselves directly above the
+	// heading would take turns forever, one observer answering the other -- it
+	// froze a tab under `npm run dev` when a hot reload mounted the page again.
+	if (!container || document.querySelector(".pse-advice-host")) {
+		return;
+	}
+
+	const { host } = mountApp(ShippingAdviceBanner, () => {});
+
+	host.className = "pse-advice-host";
+
+	// Only when a refresh has taken it out. Where it stands inside the area is
+	// not checked again, so nothing else that inserts there can start a fight.
+	const place = () => {
+		if (container.contains(host)) {
+			return;
+		}
+
+		document.querySelector(PARCEL_GROUP_SELECTOR)?.previousElementSibling
+			?.insertAdjacentElement("beforebegin", host);
+	};
+
+	place();
+
+	new MutationObserver(place).observe(container, { childList: true, subtree: true });
 }
 
 // The scan field as it stood when the cursor was last in it.

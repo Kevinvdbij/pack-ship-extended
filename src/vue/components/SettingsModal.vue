@@ -64,6 +64,10 @@ const putWallToken = ref(Settings.putWallToken);
 const cvpBridgeUrl = ref(Settings.cvpBridgeUrl);
 const cvpMaxUnits = ref(Settings.cvpMaxUnits);
 
+// The dashboard's carrier advice -- see `src/shippingAdvice.ts`.
+const shippingAdviceUser = ref(Settings.shippingAdviceUser);
+const shippingAdvicePassword = ref(Settings.shippingAdvicePassword);
+
 // Picked from a list for the same reason as the idle times: it is how many items
 // an operator is asked to count onto the belt, not a number to mistype.
 const CVP_MAX_UNITS = [1, 2, 3, 4, 5, 6, 8, 10, 15, 20];
@@ -132,6 +136,9 @@ function save() {
 	Settings.putWallToken = putWallToken.value.trim();
 	Settings.cvpBridgeUrl = cvpBridgeUrl.value.trim();
 	Settings.cvpMaxUnits = Number(cvpMaxUnits.value);
+	Settings.shippingAdviceUser = shippingAdviceUser.value.trim();
+	// Not trimmed: a password is whatever was chosen for it.
+	Settings.shippingAdvicePassword = shippingAdvicePassword.value;
 	Settings.save();
 
 	// The pages are mounted separately from this footer, so anything of theirs
@@ -329,6 +336,32 @@ function save() {
 					Een order van meer stuks van hetzelfde product gaat ook over de CVP, tot dit aantal. Voordat er iets
 					gebeurt, telt de operator het aantal op de band en bevestigt het. Kies niet meer dan er in de
 					grootste doos van de machine past.
+				</small>
+			</div>
+		</div>
+
+		<div class="pse-settings-group">
+			<h3 class="pse-settings-group-title">Verzendadvies</h3>
+
+			<!-- A login, but not this person's: the dashboard's script account, set
+			     once per workplace. Opted out of password managers the same way the
+			     Shopware credentials below are, and for the same reason. -->
+			<div class="pse-settings-field">
+				<label class="pse-dialog-label" for="pseAdviceAccount">Account op het dashboard</label>
+				<input type="text" id="pseAdviceAccount" name="pseAdviceAccount" class="pse-dialog-input"
+					v-model="shippingAdviceUser" placeholder="packship" autocomplete="off" spellcheck="false"
+					data-1p-ignore data-lpignore="true" data-form-type="other" />
+			</div>
+
+			<div class="pse-settings-field">
+				<label class="pse-dialog-label" for="pseAdviceKey">Wachtwoord van het account</label>
+				<input type="text" id="pseAdviceKey" name="pseAdviceKey"
+					class="pse-dialog-input pse-settings-masked" v-model="shippingAdvicePassword" autocomplete="off"
+					spellcheck="false" data-1p-ignore data-lpignore="true" data-form-type="other" />
+				<small class="pse-dialog-hint">
+					Toont boven de pakketpagina welke vervoerder het webshop dashboard adviseert, PostNL of Smilda.
+					Wijkt het advies af van de reservering, dan valt de melding op. Alleen een advies: de transporteur
+					van de reservering blijft zoals hij is. Leeg laten zet het advies uit.
 				</small>
 			</div>
 		</div>

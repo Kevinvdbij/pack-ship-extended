@@ -4,6 +4,10 @@ export const PACKING_PORTAL_URL = "https://retailvista.net/outdoor/packship";
 
 export const SHOPWARE_URL = "https://www.kampeerhalroden.nl";
 
+// The webshop dashboard's carrier advice: PostNL or Smilda for a shipment. See
+// `src/shippingAdvice.ts`. Its host is one of the script's `@connect` entries.
+export const SHIPPING_ADVICE_URL = "https://dashboard.kampeerhalroden.nl/webshop/api/verzendkeuze";
+
 // The ERP the packing portal is a front for, and which owns the reservation
 // itself. The same origin as the portal -- `/outdoor/packship` is a sub
 // application of `/outdoor` -- which is the whole reason the rack bays can be

@@ -436,6 +436,64 @@ export async function fetchReservationTransport(url: string): Promise<string> {
 	}
 }
 
+// The sale order reference -- the webshop's or Bol's order number on an order
+// from either -- off its labelled row, in either language. Empty when the block
+// has no such row.
+export function getSaleOrderReference(root: ParentNode = document): string {
+	const block = root.querySelector(RESERVATION_SUMMARY_SELECTOR);
+
+	for (const row of Array.from(block?.children ?? [])) {
+		const text = row.textContent?.replace(/\s+/g, " ").trim() ?? "";
+		const separator = text.indexOf(":");
+
+		if (separator < 0 || !/referen(tie|ce)/i.test(text.slice(0, separator))) {
+			continue;
+		}
+
+		return text.slice(separator + 1).trim();
+	}
+
+	return "";
+}
+
+// The delivery address, one entry per printed line: "Kanaalstraat 63",
+// "9301LR RODEN", "Nederland". The portal writes it as the one row of the
+// summary block with no label, its lines broken with `<br>`, under a row that is
+// only a label ("Bezorgadres:"). Read through `textContent` node by node, the way
+// the sidebar reads it, so it works with the block hidden.
+export function getDeliveryAddressLines(root: ParentNode = document): string[] {
+	const block = root.querySelector(RESERVATION_SUMMARY_SELECTOR);
+
+	for (const row of Array.from(block?.children ?? [])) {
+		if (row.tagName == "INPUT" || row.classList.contains("lead") || (row.textContent ?? "").includes(":")) {
+			continue;
+		}
+
+		const lines: string[] = [];
+		let current = "";
+
+		for (const node of Array.from(row.childNodes)) {
+			if (node.nodeName == "BR") {
+				lines.push(current.trim());
+				current = "";
+				continue;
+			}
+
+			current += node.textContent ?? "";
+		}
+
+		lines.push(current.trim());
+
+		const filled = lines.filter(Boolean);
+
+		if (filled.length) {
+			return filled;
+		}
+	}
+
+	return [];
+}
+
 function readTransport(root: ParentNode): string {
 	const block = root.querySelector(RESERVATION_SUMMARY_SELECTOR);
 
