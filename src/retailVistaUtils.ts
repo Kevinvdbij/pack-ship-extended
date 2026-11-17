@@ -521,6 +521,13 @@ export function isStorePickup(transport = getCurrentTransport()): boolean {
 	return /afhalen in de winkel/i.test(transport);
 }
 
+// Whether the customer chose a carrier's service point to collect the box at:
+// "PostNL Afhaalpunt Nederland". The address on such a reservation is the
+// point's, not the customer's.
+export function isPickupPoint(transport = getCurrentTransport()): boolean {
+	return /afhaalpunt|pick-?up ?point/i.test(transport);
+}
+
 export function getCurrentOrderNumber() {
 	return document.querySelector<HTMLElement>(`${RESERVATION_SUMMARY_SELECTOR} > div:nth-child(3)`)!.innerHTML.split(" ")[2];
 }

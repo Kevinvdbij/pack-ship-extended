@@ -16,6 +16,7 @@ import imageIconUrl from "../../assets/image.svg";
 import { MassCompleteStatus, ParcelItem, VerificationRow } from '../../interfaces.ts';
 import ReservationSidebar from '../components/ReservationSidebar.vue';
 import ShippingAdviceBanner from '../components/ShippingAdviceBanner.vue';
+import PickupPointWarning from '../components/PickupPointWarning.vue';
 import CopyButton from '../components/CopyButton.vue';
 import ImageModal from '../components/ImageModal.vue';
 import SlotPicker from '../components/SlotPicker.vue';
@@ -373,19 +374,28 @@ function markParcelsLoading() {
 //
 // Idempotent, because it answers its own insertion: the observer sees the move
 // and calls it again, and that pass finds the host already in the area.
+//
+// The service point warning goes the same way and is mounted first, so it
+// stands above the advice: each is put directly above the heading, in this
+// order, on the first pass and after every refresh.
 function mountShippingAdvice() {
+	mountAboveParcels(PickupPointWarning, "pse-pickup-point-host");
+	mountAboveParcels(ShippingAdviceBanner, "pse-advice-host");
+}
+
+function mountAboveParcels(component: Parameters<typeof mountApp>[0], hostClass: string) {
 	const container = document.querySelector(PARCEL_CONTAINER_SELECTOR);
 
 	// Once per document. Two hosts each putting themselves directly above the
 	// heading would take turns forever, one observer answering the other -- it
 	// froze a tab under `npm run dev` when a hot reload mounted the page again.
-	if (!container || document.querySelector(".pse-advice-host")) {
+	if (!container || document.querySelector(`.${hostClass}`)) {
 		return;
 	}
 
-	const { host } = mountApp(ShippingAdviceBanner, () => {});
+	const { host } = mountApp(component, () => {});
 
-	host.className = "pse-advice-host";
+	host.className = hostClass;
 
 	// Only when a refresh has taken it out. Where it stands inside the area is
 	// not checked again, so nothing else that inserts there can start a fight.

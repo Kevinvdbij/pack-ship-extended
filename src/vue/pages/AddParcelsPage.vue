@@ -2,6 +2,7 @@
 import ReservationSidebar from '../components/ReservationSidebar.vue';
 import ReservationProducts from '../components/ReservationProducts.vue';
 import BackLink from '../components/BackLink.vue';
+import PickupPointWarning from '../components/PickupPointWarning.vue';
 import ParcelLabelButton from '../components/ParcelLabelButton.vue';
 import { App } from 'vue';
 import { mountApp } from '../mount.ts';
@@ -30,6 +31,7 @@ import {
 slotStore.setSingleUnit(isSingleUnitOrder(cachedProducts()));
 
 mountSidebar();
+mountPickupPointWarning();
 mountProducts();
 mountParcelLabels();
 mountBackLink();
@@ -175,6 +177,20 @@ function mountSidebar() {
 	}
 
 	mountApp(ReservationSidebar, (host) => column.insertAdjacentElement("afterbegin", host));
+}
+
+// A parcel added here can be put on Smilda as well, on a reservation that goes
+// to a service point. Into the column, directly above the portal's block --
+// mounted before the products and the back link, which each go in ahead of it
+// -- and not into `#ParcelsContainer`, which the portal re-renders wholesale.
+function mountPickupPointWarning() {
+	const column = getParcelContainerParent();
+
+	if (!column) {
+		return;
+	}
+
+	mountApp(PickupPointWarning, (host) => column.insertAdjacentElement("afterbegin", host));
 }
 
 // The products, if this workstation still has them.
